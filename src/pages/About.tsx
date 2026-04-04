@@ -228,7 +228,7 @@ export function About() {
                 We are building the nation's most scalable digital healthcare platform for the modern era.
               </p>
               <div className="flex flex-col sm:flex-row gap-8 justify-center">
-                 <Link to="/partners" className="bg-white text-[#050249] px-12 py-6 rounded-2xl font-black text-lg hover:scale-105 transition-all shadow-2xl uppercase tracking-tighter">Partner With Us</Link>
+                 <Link to="/partners" className="bg-white text-[#050249] px-12 py-6 rounded-2xl font-black text-lg hover:scale-105 transition-all shadow-2xl uppercase tracking-tighter">Connect With Us</Link>
                  <Link to="/contact" className="bg-blue-600/30 backdrop-blur-md border border-white/20 px-12 py-6 rounded-2xl font-black text-lg hover:bg-blue-600/50 transition-all shadow-2xl uppercase tracking-tighter">Contact Support</Link>
               </div>
            </motion.div>

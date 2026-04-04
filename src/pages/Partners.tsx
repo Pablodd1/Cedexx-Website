@@ -57,10 +57,10 @@ export function Partners() {
             animate={{ opacity: 1, scale: 1 }}
             className="text-4xl md:text-6xl font-black mb-6 tracking-tight"
           >
-            Strategic Partnerships
+            Provider Network
           </motion.h1>
           <p className="text-xl text-blue-100 font-medium leading-relaxed max-w-2xl mx-auto">
-            We partner with leading healthcare organizations and licensed physicians to deliver a premium mobile healthcare experience—seamless, trusted, and always within reach. Better Care. Here. <span className="text-[#23d9b0]">Now.</span>
+            We connect with leading healthcare organizations and licensed physicians to deliver a premium mobile healthcare experience—seamless, trusted, and always within reach. Better Care. Here. <span className="text-[#23d9b0]">Now.</span>
           </p>
         </div>
       </section>
@@ -115,7 +115,7 @@ export function Partners() {
                <div className="space-y-6">
                   {[
                     { icon: Activity, title: 'Physician Opportunities', text: 'Earn flexible income through our scheduled block model.' },
-                    { icon: Users, title: 'Employer Solutions', text: 'Reduce absenteeism with immediate 24/7 care for staff.' },
+                    { icon: Users, title: 'Employer Solutions', text: 'Reduce absenteeism with access to 24/7 virtual care options for staff.' },
                     { icon: Shield, title: 'Compliance & Safety', text: 'Military-grade encryption and HIPAA security for all partners.' }
                   ].map((item, id) => (
                     <div key={id} className="flex gap-5">
