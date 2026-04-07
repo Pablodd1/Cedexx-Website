@@ -91,11 +91,18 @@ export function Partners() {
             ))}
           </div>
 
-          <div className="max-w-lg mx-auto text-center">
-            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6">
-              <p className="text-xs text-amber-700 font-medium leading-relaxed">
-                Cedexx is an independent technology platform. Cedexx does not endorse, guarantee, or warrant the services of Lyric Health or any third-party partner. Any interaction with third-party partners is at the user's own discretion. Cedexx shall not be held liable for any claims, damages, or losses arising from the use of third-party services.
-              </p>
+          <div className="max-w-lg mx-auto text-center -mt-4">
+            <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-5">
+              <div className="flex items-start gap-3">
+                <div className="h-8 w-8 bg-emerald-500 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <Shield className="h-4 w-4 text-white" />
+                </div>
+                <div className="text-left">
+                  <p className="text-xs text-emerald-700 font-semibold leading-relaxed">
+                    Cedexx is an independent technology platform and does not endorse, guarantee, or warrant the services of Lyric Health or any third-party partner. Any interaction with third-party partners is at the user's own discretion. Cedexx shall not be held liable for any claims, damages, or losses arising from the use of third-party services.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
