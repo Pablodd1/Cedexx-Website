@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { MessageSquare, X, Send, Bot, User, Minimize2, Mic, MicOff, Volume2, Phone } from 'lucide-react';
+import { MessageSquare, X, Send, Bot, User, Minimize2, Mic, MicOff, Volume2, VolumeX, Phone } from 'lucide-react';
 import { cn } from './ui';
 import { GoogleGenAI } from '@google/genai';
 
@@ -23,11 +23,35 @@ IMPORTANT DISCLAIMERS:
 - For medical emergencies, call 911 immediately.
 
 TONE: Warm, friendly, professional, concise. Speak naturally like a real receptionist. Never give medical advice.
-IMPORTANT: Respond in PLAIN TEXT only. No markdown. Keep it conversational and natural.`;
+IMPORTANT: Respond in PLAIN TEXT only. No markdown. Keep it conversational and natural. Keep responses short — 2-3 sentences max.`;
 
 interface Message {
   role: 'user' | 'model';
   text: string;
+}
+
+const FALLBACK_RESPONSES: Record<string, string> = {
+  'hello': "Hey there! How can I help you today? I can tell you about our services, pricing, or enrollment.",
+  'hi': "Hi! Welcome to Cedexx. What can I help you with today?",
+  'pricing': "We offer two plans: Individual at $14.99/month and Family at $27.99/month for up to 4 members. No insurance needed!",
+  'price': "We offer two plans: Individual at $14.99/month and Family at $27.99/month for up to 4 members. No insurance needed!",
+  'cost': "We offer two plans: Individual at $14.99/month and Family at $27.99/month for up to 4 members. No insurance needed!",
+  'how does it work': "It's simple: you connect through our platform, an independent licensed provider joins in minutes, and you get real-time care. No insurance, no waiting rooms!",
+  'services': "We offer 24/7 telemedicine, mental wellness support, and digital prescriptions sent to your local pharmacy. All through our platform!",
+  'contact': "You can reach us at info@cedexx.net or call 954-624-6744. We're here to help!",
+  'phone': "You can call us at 954-624-6744 or email info@cedexx.net.",
+  'prescription': "Providers on our platform can send prescriptions directly to your local pharmacy. No controlled substances though.",
+  'insurance': "No insurance needed! Cedexx works without insurance. Our plans are affordable monthly memberships.",
+  'who are you': "I'm Cedex, the AI front desk virtual assistant for Cedexx. I can answer questions about our services, pricing, enrollment, and more!",
+  'what is cedexx': "Cedexx is a technology platform connecting families to independent telemedicine providers. 24/7 access, no insurance needed, affordable monthly plans.",
+};
+
+function getFallbackResponse(input: string): string | null {
+  const lower = input.toLowerCase().trim();
+  for (const [key, response] of Object.entries(FALLBACK_RESPONSES)) {
+    if (lower.includes(key)) return response;
+  }
+  return null;
 }
 
 export function Chatbot({ inline = false }: { inline?: boolean }) {
@@ -40,14 +64,33 @@ export function Chatbot({ inline = false }: { inline?: boolean }) {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [interimText, setInterimText] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatRef = useRef<any>(null);
   const recognitionRef = useRef<any>(null);
   const greetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const voicesRef = useRef<SpeechSynthesisVoice[]>([]);
+  const synthRef = useRef<SpeechSynthesis | null>(null);
 
+  // Initialize
+  useEffect(() => {
+    synthRef.current = window.speechSynthesis;
+    const loadVoices = () => {
+      const voices = synthRef.current?.getVoices() || [];
+      if (voices.length > 0) voicesRef.current = voices;
+    };
+    loadVoices();
+    synthRef.current?.addEventListener('voiceschanged', loadVoices);
+    return () => synthRef.current?.removeEventListener('voiceschanged', loadVoices);
+  }, []);
+
+  // Init Gemini chat
   useEffect(() => {
     const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-    if (!apiKey || apiKey === 'MY_GEMINI_API_KEY') return;
+    if (!apiKey || apiKey === 'MY_GEMINI_API_KEY') {
+      console.log('Gemini API key not configured — using fallback responses');
+      return;
+    }
     try {
       const ai = new GoogleGenAI({ apiKey });
       chatRef.current = ai.chats.create({
@@ -59,90 +102,143 @@ export function Chatbot({ inline = false }: { inline?: boolean }) {
     }
   }, []);
 
+  // Scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  }, [messages, interimText]);
 
-  // Load voices on mount
-  useEffect(() => {
-    window.speechSynthesis.getVoices();
-    const handler = () => window.speechSynthesis.getVoices();
-    window.speechSynthesis.addEventListener('voiceschanged', handler);
-    return () => window.speechSynthesis.removeEventListener('voiceschanged', handler);
-  }, []);
-
+  // Auto-greet
   useEffect(() => {
     if (!isOpen || isMinimized || hasAutoGreeted) return;
     greetTimerRef.current = setTimeout(() => {
       const greeting: Message = {
         role: 'model',
-        text: "Hey there! How may I assist you today? I'm Cedex, your AI front desk virtual assistant. I can answer all your questions about Cedexx — our services, pricing, enrollment, or anything else. You can type your question or use the microphone to speak with me. What can I help you with?",
+        text: "Hey there! How may I assist you today? I'm Cedex, your AI front desk virtual assistant. I can answer all your questions about Cedexx — our services, pricing, enrollment, or anything else. You can type your question or click the microphone to speak with me. What can I help you with?",
       };
       setMessages([greeting]);
       setHasAutoGreeted(true);
-      // Delay speak slightly so message renders first
-      setTimeout(() => speak(greeting.text), 300);
-    }, 5000);
+      // Speak after a short delay
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          speak(greeting.text);
+        });
+      });
+    }, 3000);
     return () => { if (greetTimerRef.current) clearTimeout(greetTimerRef.current); };
-  }, [isOpen, isMinimized, hasAutoGreeted, speak]);
+  }, [isOpen, isMinimized, hasAutoGreeted]);
 
   const speak = useCallback((text: string) => {
-    if (!isVoiceEnabled) return;
-    window.speechSynthesis.cancel();
+    if (!isVoiceEnabled || !synthRef.current) return;
 
-    const cleanText = text.replace(/[*#_~`]/g, '').replace(/\n+/g, '. ');
+    // Cancel any ongoing speech
+    synthRef.current.cancel();
+
+    const cleanText = text.replace(/[*#_~`]/g, '').replace(/\n+/g, '. ').replace(/\s+/g, ' ').trim();
+    if (!cleanText) return;
+
     const utterance = new SpeechSynthesisUtterance(cleanText);
 
-    // Try to get voices immediately, or wait for voiceschanged
-    let voices = window.speechSynthesis.getVoices();
+    // Use cached voices or get fresh ones
+    let voices = voicesRef.current;
     if (voices.length === 0) {
-      const voicesChanged = () => {
-        voices = window.speechSynthesis.getVoices();
-        window.speechSynthesis.removeEventListener('voiceschanged', voicesChanged);
-        applyVoice(utterance, voices);
-      };
-      window.speechSynthesis.addEventListener('voiceschanged', voicesChanged);
-    } else {
-      applyVoice(utterance, voices);
+      voices = synthRef.current.getVoices();
     }
-  }, [isVoiceEnabled]);
 
-  const applyVoice = (utterance: SpeechSynthesisUtterance, voices: SpeechSynthesisVoice[]) => {
-    const preferred = voices.find(v =>
-      (v.name.includes('Google') || v.name.includes('Samantha') || v.name.includes('Natural') || v.name.includes('Microsoft'))
-      && v.lang.startsWith('en')
-    ) || voices.find(v => v.lang.startsWith('en')) || voices[0];
-    if (preferred) utterance.voice = preferred;
+    // Pick best English voice
+    const preferred =
+      voices.find(v => v.name.includes('Google') && v.lang.startsWith('en')) ||
+      voices.find(v => v.name.includes('Samantha') && v.lang.startsWith('en')) ||
+      voices.find(v => v.name.includes('Natural') && v.lang.startsWith('en')) ||
+      voices.find(v => v.lang === 'en-US') ||
+      voices.find(v => v.lang.startsWith('en')) ||
+      voices[0];
+
+    if (preferred) {
+      utterance.voice = preferred;
+    }
+
     utterance.rate = 0.95;
     utterance.pitch = 1.0;
     utterance.volume = 1.0;
+
     utterance.onstart = () => setIsSpeaking(true);
     utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = () => setIsSpeaking(false);
-    window.speechSynthesis.speak(utterance);
-  };
+    utterance.onerror = (e) => {
+      console.warn('Speech error:', e.error);
+      setIsSpeaking(false);
+    };
+
+    // Small delay to ensure browser is ready
+    setTimeout(() => {
+      synthRef.current?.speak(utterance);
+    }, 100);
+  }, [isVoiceEnabled]);
+
+  const stopSpeaking = useCallback(() => {
+    synthRef.current?.cancel();
+    setIsSpeaking(false);
+  }, []);
 
   const toggleListening = () => {
     if (isListening) {
       recognitionRef.current?.stop();
       setIsListening(false);
+      setInterimText('');
       return;
     }
+
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      alert('Voice recognition not supported in this browser.');
+      alert('Voice recognition is not supported in this browser. Try Chrome or Edge.');
       return;
     }
+
     const recognition = new SpeechRecognition();
     recognition.continuous = false;
-    recognition.interimResults = false;
+    recognition.interimResults = true;
     recognition.lang = 'en-US';
-    recognition.onstart = () => setIsListening(true);
-    recognition.onresult = (event: any) => {
-      setInput(event.results[0][0].transcript);
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = () => {
+      setIsListening(true);
+      setInterimText('');
     };
-    recognition.onerror = () => setIsListening(false);
-    recognition.onend = () => setIsListening(false);
+
+    recognition.onresult = (event: any) => {
+      let finalTranscript = '';
+      let interim = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscript += transcript;
+        } else {
+          interim += transcript;
+        }
+      }
+      if (interim) setInterimText(interim);
+      if (finalTranscript) {
+        setInput(finalTranscript.trim());
+        setInterimText('');
+        setIsListening(false);
+        // Auto-send after voice input
+        setTimeout(() => handleSend(finalTranscript.trim()), 500);
+      }
+    };
+
+    recognition.onerror = (event: any) => {
+      console.warn('Speech recognition error:', event.error);
+      setIsListening(false);
+      setInterimText('');
+      if (event.error === 'not-allowed') {
+        alert('Microphone access denied. Please allow microphone access in your browser settings.');
+      }
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+      setInterimText('');
+    };
+
     recognitionRef.current = recognition;
     recognition.start();
   };
@@ -151,29 +247,36 @@ export function Chatbot({ inline = false }: { inline?: boolean }) {
     const text = (manualText || input).trim();
     if (!text) return;
     setInput('');
+    setInterimText('');
     setMessages(prev => [...prev, { role: 'user', text }]);
+    stopSpeaking();
 
-    if (!chatRef.current) {
-      const err = 'AI assistant unavailable. Email us at info@cedexx.net.';
-      setMessages(prev => [...prev, { role: 'model', text: err }]);
-      speak(err);
-      return;
+    // Try Gemini first, fallback to local responses
+    if (chatRef.current) {
+      setIsLoading(true);
+      try {
+        const res = await chatRef.current.sendMessage({ message: text });
+        let reply = res.text || "Sorry, could you rephrase that?";
+        reply = reply.replace(/\*+/g, '').trim();
+        setMessages(prev => [...prev, { role: 'model', text: reply }]);
+        speak(reply);
+        return;
+      } catch (err) {
+        console.warn('Gemini error, using fallback:', err);
+      } finally {
+        setIsLoading(false);
+      }
     }
 
+    // Fallback responses
     setIsLoading(true);
-    try {
-      const res = await chatRef.current.sendMessage({ message: text });
-      let reply = res.text || "Sorry, could you rephrase that?";
-      reply = reply.replace(/\*+/g, '');
+    setTimeout(() => {
+      const fallback = getFallbackResponse(text);
+      const reply = fallback || `Thanks for your message! I'm a basic assistant right now. For detailed help, email info@cedexx.net or call 954-624-6744.`;
       setMessages(prev => [...prev, { role: 'model', text: reply }]);
       speak(reply);
-    } catch {
-      const err = 'Something went wrong. Email info@cedexx.net.';
-      setMessages(prev => [...prev, { role: 'model', text: err }]);
-      speak(err);
-    } finally {
       setIsLoading(false);
-    }
+    }, 800);
   };
 
   const formatText = (text: string) =>
@@ -187,14 +290,14 @@ export function Chatbot({ inline = false }: { inline?: boolean }) {
       {!inline && (
         <div className="bg-[#050249] px-4 h-14 flex-shrink-0 text-white flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <div className={cn("h-8 w-8 rounded-full flex items-center justify-center transition-all", isSpeaking ? "bg-emerald-400 animate-pulse" : "bg-white/20")}>
+            <div className={cn("h-8 w-8 rounded-full flex items-center justify-center transition-all duration-300", isSpeaking ? "bg-emerald-400 animate-pulse" : "bg-white/20")}>
               <Bot className={cn("h-4 w-4", isSpeaking ? "text-[#050249]" : "text-white")} />
             </div>
             <div>
               <p className="font-bold text-sm leading-tight">Cedex — AI Receptionist</p>
               <div className="flex items-center gap-1">
-                <span className={cn("h-1.5 w-1.5 rounded-full transition-colors", isSpeaking ? "bg-emerald-400" : "bg-emerald-400")} />
-                <span className={cn("text-[10px] transition-colors", isSpeaking ? "text-emerald-300 font-medium" : "text-blue-200")}>
+                <span className={cn("h-1.5 w-1.5 rounded-full transition-all", isSpeaking ? "bg-emerald-400 animate-pulse" : "bg-emerald-400")} />
+                <span className={cn("text-[10px] transition-all", isSpeaking ? "text-emerald-300 font-semibold" : "text-blue-200")}>
                   {isSpeaking ? "Speaking..." : isVoiceEnabled ? "Text or Voice" : "Voice muted"}
                 </span>
               </div>
@@ -202,16 +305,19 @@ export function Chatbot({ inline = false }: { inline?: boolean }) {
           </div>
           <div className="flex items-center gap-1">
             <button
-              onClick={() => setIsVoiceEnabled(!isVoiceEnabled)}
+              onClick={() => {
+                if (isSpeaking) stopSpeaking();
+                setIsVoiceEnabled(!isVoiceEnabled);
+              }}
               className={cn("p-1.5 rounded transition-colors", isVoiceEnabled ? "text-white bg-white/10" : "text-blue-300 hover:text-white")}
               title={isVoiceEnabled ? "Mute voice" : "Enable voice"}
             >
-              {isVoiceEnabled ? <Volume2 className="h-4 w-4" /> : <MicOff className="h-4 w-4" />}
+              {isSpeaking ? <Volume2 className="h-4 w-4 animate-pulse" /> : isVoiceEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
             </button>
             <button onClick={() => setIsMinimized(!isMinimized)} className="text-blue-200 hover:text-white p-1 rounded transition-colors">
               <Minimize2 className="h-4 w-4" />
             </button>
-            <button onClick={() => setIsOpen(false)} className="text-blue-200 hover:text-white p-1 rounded transition-colors">
+            <button onClick={() => { setIsOpen(false); stopSpeaking(); }} className="text-blue-200 hover:text-white p-1 rounded transition-colors">
               <X className="h-4 w-4" />
             </button>
           </div>
@@ -225,7 +331,7 @@ export function Chatbot({ inline = false }: { inline?: boolean }) {
               <div className="flex flex-col items-center justify-center h-full text-center text-slate-400">
                 <Phone className="h-12 w-12 mb-3 opacity-30" />
                 <p className="text-sm font-medium">Cedex will greet you in a moment...</p>
-                <p className="text-xs text-slate-300 mt-1">Type or use your microphone</p>
+                <p className="text-xs text-slate-300 mt-1">Type or use the microphone</p>
                 <div className="flex gap-1 mt-3">
                   <span className="h-2 w-2 rounded-full bg-[#050249] animate-bounce [animation-delay:0ms]" />
                   <span className="h-2 w-2 rounded-full bg-[#050249] animate-bounce [animation-delay:150ms]" />
@@ -257,6 +363,14 @@ export function Chatbot({ inline = false }: { inline?: boolean }) {
               </div>
             ))}
 
+            {interimText && (
+              <div className="flex gap-2 justify-end">
+                <div className="px-3 py-2 rounded-2xl max-w-[80%] text-sm bg-slate-200 text-slate-500 italic rounded-br-none">
+                  {interimText}
+                </div>
+              </div>
+            )}
+
             {isLoading && (
               <div className="flex gap-2 justify-start">
                 <div className="h-7 w-7 rounded-full bg-[#EBF3FB] border border-blue-100 flex items-center justify-center flex-shrink-0">
@@ -277,10 +391,10 @@ export function Chatbot({ inline = false }: { inline?: boolean }) {
               onClick={toggleListening}
               disabled={isLoading}
               className={cn(
-                "h-10 w-10 rounded-xl flex items-center justify-center transition-all duration-300",
-                isListening ? "bg-red-500 text-white animate-pulse" : "bg-slate-100 text-slate-500 hover:bg-slate-200"
+                "h-10 w-10 rounded-xl flex items-center justify-center transition-all duration-300 flex-shrink-0",
+                isListening ? "bg-red-500 text-white animate-pulse scale-110" : "bg-slate-100 text-slate-500 hover:bg-slate-200"
               )}
-              title={isListening ? "Stop listening" : "Speak your message"}
+              title={isListening ? "Tap to stop" : "Tap to speak"}
             >
               <Mic className={cn("h-4 w-4", isListening && "animate-bounce")} />
             </button>
@@ -291,7 +405,7 @@ export function Chatbot({ inline = false }: { inline?: boolean }) {
               placeholder={isListening ? "Listening..." : "Type or speak..."}
               className="flex-1 h-10 rounded-xl border border-blue-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#050249] transition"
             />
-            <button onClick={() => handleSend()} disabled={isLoading || !input.trim()} className="h-10 w-10 rounded-xl bg-[#050249] text-white flex items-center justify-center hover:bg-[#03013b] disabled:opacity-40 transition-colors">
+            <button onClick={() => handleSend()} disabled={isLoading || !input.trim()} className="h-10 w-10 rounded-xl bg-[#050249] text-white flex items-center justify-center hover:bg-[#03013b] disabled:opacity-40 transition-colors flex-shrink-0">
               <Send className="h-4 w-4" />
             </button>
           </div>
