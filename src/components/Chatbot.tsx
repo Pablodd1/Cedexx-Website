@@ -39,6 +39,7 @@ export function Chatbot({ inline = false }: { inline?: boolean }) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatRef = useRef<any>(null);
   const recognitionRef = useRef<any>(null);
@@ -62,6 +63,14 @@ export function Chatbot({ inline = false }: { inline?: boolean }) {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  // Load voices on mount
+  useEffect(() => {
+    window.speechSynthesis.getVoices();
+    const handler = () => window.speechSynthesis.getVoices();
+    window.speechSynthesis.addEventListener('voiceschanged', handler);
+    return () => window.speechSynthesis.removeEventListener('voiceschanged', handler);
+  }, []);
+
   useEffect(() => {
     if (!isOpen || isMinimized || hasAutoGreeted) return;
     greetTimerRef.current = setTimeout(() => {
@@ -71,17 +80,34 @@ export function Chatbot({ inline = false }: { inline?: boolean }) {
       };
       setMessages([greeting]);
       setHasAutoGreeted(true);
-      speak(greeting.text);
+      // Delay speak slightly so message renders first
+      setTimeout(() => speak(greeting.text), 300);
     }, 5000);
     return () => { if (greetTimerRef.current) clearTimeout(greetTimerRef.current); };
-  }, [isOpen, isMinimized, hasAutoGreeted]);
+  }, [isOpen, isMinimized, hasAutoGreeted, speak]);
 
   const speak = useCallback((text: string) => {
     if (!isVoiceEnabled) return;
     window.speechSynthesis.cancel();
+
     const cleanText = text.replace(/[*#_~`]/g, '').replace(/\n+/g, '. ');
     const utterance = new SpeechSynthesisUtterance(cleanText);
-    const voices = window.speechSynthesis.getVoices();
+
+    // Try to get voices immediately, or wait for voiceschanged
+    let voices = window.speechSynthesis.getVoices();
+    if (voices.length === 0) {
+      const voicesChanged = () => {
+        voices = window.speechSynthesis.getVoices();
+        window.speechSynthesis.removeEventListener('voiceschanged', voicesChanged);
+        applyVoice(utterance, voices);
+      };
+      window.speechSynthesis.addEventListener('voiceschanged', voicesChanged);
+    } else {
+      applyVoice(utterance, voices);
+    }
+  }, [isVoiceEnabled]);
+
+  const applyVoice = (utterance: SpeechSynthesisUtterance, voices: SpeechSynthesisVoice[]) => {
     const preferred = voices.find(v =>
       (v.name.includes('Google') || v.name.includes('Samantha') || v.name.includes('Natural') || v.name.includes('Microsoft'))
       && v.lang.startsWith('en')
@@ -89,8 +115,12 @@ export function Chatbot({ inline = false }: { inline?: boolean }) {
     if (preferred) utterance.voice = preferred;
     utterance.rate = 0.95;
     utterance.pitch = 1.0;
+    utterance.volume = 1.0;
+    utterance.onstart = () => setIsSpeaking(true);
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
     window.speechSynthesis.speak(utterance);
-  }, [isVoiceEnabled]);
+  };
 
   const toggleListening = () => {
     if (isListening) {
@@ -157,14 +187,16 @@ export function Chatbot({ inline = false }: { inline?: boolean }) {
       {!inline && (
         <div className="bg-[#050249] px-4 h-14 flex-shrink-0 text-white flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-full bg-white/20 flex items-center justify-center">
-              <Bot className="h-4 w-4" />
+            <div className={cn("h-8 w-8 rounded-full flex items-center justify-center transition-all", isSpeaking ? "bg-emerald-400 animate-pulse" : "bg-white/20")}>
+              <Bot className={cn("h-4 w-4", isSpeaking ? "text-[#050249]" : "text-white")} />
             </div>
             <div>
               <p className="font-bold text-sm leading-tight">Cedex — AI Receptionist</p>
               <div className="flex items-center gap-1">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                <span className="text-blue-200 text-[10px]">Text or Voice</span>
+                <span className={cn("h-1.5 w-1.5 rounded-full transition-colors", isSpeaking ? "bg-emerald-400" : "bg-emerald-400")} />
+                <span className={cn("text-[10px] transition-colors", isSpeaking ? "text-emerald-300 font-medium" : "text-blue-200")}>
+                  {isSpeaking ? "Speaking..." : isVoiceEnabled ? "Text or Voice" : "Voice muted"}
+                </span>
               </div>
             </div>
           </div>
