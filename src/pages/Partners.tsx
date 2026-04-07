@@ -23,16 +23,6 @@ export function Partners() {
 
   const partners = [
     {
-      name: 'MDLIVE',
-      url: 'https://www.mdlive.com/',
-      desc: 'A leading telehealth provider offering 24/7 access to board-certified doctors and therapists.'
-    },
-    {
-      name: 'Gemny',
-      url: 'https://gemny.com/',
-      desc: 'Innovative health solutions and technology partner.'
-    },
-    {
       name: 'Lyric',
       url: 'https://getlyric.com/',
       desc: 'Advanced health technology and patient engagement platform.'
@@ -72,7 +62,7 @@ export function Partners() {
             <p className="text-slate-500 font-medium">Industry leaders trusting Cedexx to deliver immediate healthcare access.</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto mb-24">
+          <div className="grid grid-cols-1 md:grid-cols-1 gap-8 max-w-lg mx-auto mb-6">
             {partners.map((p, i) => (
               <motion.div
                 key={i}
@@ -99,6 +89,14 @@ export function Partners() {
                 </Card>
               </motion.div>
             ))}
+          </div>
+
+          <div className="max-w-lg mx-auto text-center">
+            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6">
+              <p className="text-xs text-amber-700 font-medium leading-relaxed">
+                Cedexx is an independent technology platform. Cedexx does not endorse, guarantee, or warrant the services of Lyric Health or any third-party partner. Any interaction with third-party partners is at the user's own discretion. Cedexx shall not be held liable for any claims, damages, or losses arising from the use of third-party services.
+              </p>
+            </div>
           </div>
         </div>
       </section>
