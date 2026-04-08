@@ -308,52 +308,7 @@ export function Home() {
         </div>
       </section>
 
-      {/* ── INSTITUTIONAL INVESTOR SECTION ── */}
-      <section className="py-40 bg-white relative overflow-hidden">
-        <div className="container mx-auto px-6">
-          <div className="bg-[#050249] rounded-[4rem] p-12 md:p-24 text-white relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-emerald-500/10 rounded-full blur-[100px] -mr-64 -mt-64 group-hover:bg-emerald-500/20 transition-all duration-1000" />
-            
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center relative z-10">
-              <motion.div {...fadeIn}>
-                <div className="text-[10px] font-black text-emerald-400 uppercase tracking-[0.5em] mb-8">For REITs & Institutional Owners</div>
-                <h2 className="text-4xl md:text-7xl font-black mb-10 leading-[0.9] tracking-tighter italic uppercase">
-                  Drive <span className="text-emerald-400 font-bold">$8.4M</span> Asset Valuation Lift.
-                </h2>
-                <p className="text-xl text-blue-100/80 mb-12 font-medium leading-relaxed italic max-w-xl">
-                  Transform primary care into a revenue-generating resident amenity. For a 10,000-bed portfolio, Cedexx delivers significant NOI expansion and structural asset appreciation.
-                </p>
-                <Link to="/investor-pitch">
-                  <Button size="lg" className="bg-emerald-500 hover:bg-emerald-600 text-white font-black px-10 py-6 rounded-2xl text-lg uppercase tracking-widest border-none">
-                    Explore Investor Deck
-                  </Button>
-                </Link>
-              </motion.div>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                {[
-                  { label: 'Asset Lift', value: '$8.4M', sub: 'Per 10k Units' },
-                  { label: 'Annual NOI', value: '$420K', sub: 'New Revenue' },
-                  { label: 'Wait Time', value: '< 15m', sub: 'Instant Care' },
-                  { label: 'Enrolled', value: '12.4K', sub: 'Active Families' },
-                ].map((stat, i) => (
-                  <motion.div 
-                    key={i}
-                    className="p-8 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-sm group-hover:border-emerald-500/30 transition-all"
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: i * 0.1 }}
-                  >
-                    <div className="text-[10px] font-black text-blue-400 uppercase mb-4 tracking-widest">{stat.label}</div>
-                    <div className="text-4xl font-black text-white mb-2">{stat.value}</div>
-                    <div className="text-xs text-blue-300/60 font-bold uppercase">{stat.sub}</div>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+
 
       {/* ── PARTNER FORM SECTION ── */}
       <section id="partner" className="py-40 bg-slate-50 relative overflow-hidden">
