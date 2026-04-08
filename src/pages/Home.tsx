@@ -103,10 +103,10 @@ export function Home() {
               
               <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6" {...fadeIn}>
                 {[
-                  { title: 'Always Available', desc: '24/7 access to licensed providers — no appointments, no waiting rooms.', cta: t('serve.card1.cta'), link: '/about' },
-                  { title: 'Care Anywhere', desc: 'Care on your schedule, wherever you are.', cta: t('serve.card2.cta'), link: '/partners' },
-                  { title: 'Portfolio ROI', desc: 'Unlock institutional value with healthcare as a resident amenity.', cta: 'View Investor Pitch', link: '/investor-pitch' },
-                  { title: 'Simple Pricing', desc: 'Simple, affordable pricing with no surprises.', cta: t('serve.card3.cta'), link: '/about' }
+                  { title: 'Individual Care', desc: '24/7 access to licensed providers — no appointments, no waiting rooms.', cta: 'Learn More', link: '/about' },
+                  { title: 'Family Plans', desc: 'Helping parents solve everyday health requirements with ease for the whole family.', cta: 'View Plans', link: '/enroll' },
+                  { title: 'Employer Benefits', desc: 'Affordable healthcare benefits that employees actually use.', cta: 'Employer Solutions', link: '/partners' },
+                  { title: 'Global/Travel Access', desc: 'Care on your schedule, wherever you are around the globe.', cta: 'Learn More', link: '/about' }
                 ].map((card, i) => (
                   <motion.div
                     key={i}
