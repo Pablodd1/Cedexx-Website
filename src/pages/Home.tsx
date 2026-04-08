@@ -86,8 +86,8 @@ export function Home() {
             >
 
               <h1 className="text-4xl md:text-6xl font-black leading-[0.9] mb-4 tracking-tighter uppercase italic">
-                Better Care.<br />
-                Here. <span className="text-[#23d9b0]">Now.</span>
+                Keep It in<br />
+                Your <span className="text-[#23d9b0]">Back Pocket.</span>
               </h1>
               
               <h2 className="text-lg md:text-2xl font-bold text-blue-100 mb-8 tracking-tight italic">
@@ -365,7 +365,7 @@ export function Home() {
                 Strategic Partnerships
               </h2>
               <p className="text-xl text-slate-500 mb-12 font-medium leading-relaxed italic">
-                We partner with leading healthcare organizations and licensed physicians to deliver a premium mobile healthcare experience—seamless, trusted, and always within reach. Better Care. Here. <span className="text-[#23d9b0]">Now.</span>
+                We partner with leading healthcare organizations and licensed physicians to deliver a premium mobile healthcare experience—seamless, trusted, and always within reach. Keep It in Your <span className="text-[#23d9b0]">Back Pocket.</span>
               </p>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
@@ -432,9 +432,9 @@ export function Home() {
       <section className="py-40 bg-[#050249] text-white relative overflow-hidden">
         <div className="container mx-auto px-6 text-center relative z-10">
           <motion.div {...fadeIn}>
-            <h2 className="text-4xl md:text-7xl font-black mb-12 leading-none tracking-tighter">
-              Better Care.<br />Here. <span className="text-[#23d9b0]">Now.</span>
-            </h2>
+              <h2 className="text-4xl md:text-7xl font-black mb-12 leading-none tracking-tighter">
+                Keep It in<br />Your <span className="text-[#23d9b0]">Back Pocket.</span>
+              </h2>
             <div className="flex flex-col sm:flex-row gap-6 justify-center">
                <Link to="/enroll" className="bg-white text-[#050249] px-12 py-6 rounded-2xl font-black text-lg hover:scale-105 transition-all shadow-[0_30px_100px_rgba(255,255,255,0.1)] uppercase tracking-tighter">Start Membership</Link>
                <a href="#partner" className="bg-blue-600/30 backdrop-blur-md border border-white/20 px-12 py-6 rounded-2xl font-black text-lg hover:bg-blue-600/40 transition-all shadow-2xl uppercase tracking-tighter">Partner With Us</a>

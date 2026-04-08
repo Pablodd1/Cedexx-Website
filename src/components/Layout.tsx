@@ -178,10 +178,15 @@ export function Layout() {
       <footer className="bg-[#050249] text-blue-50 py-24 relative z-[60]">
         <div className="container mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-16">
             <div className="flex flex-col items-center md:items-start">
-               <Link to="/">
-                 <Logo className="text-4xl mb-8" variant="white" mode="text" />
+               <Link to="/" className="mb-6">
+                 <Logo className="h-10 w-auto" variant="white" />
                </Link>
-               <p className="text-blue-100/60 max-w-sm text-sm font-medium leading-relaxed italic text-center md:text-left">{t('footer.tagline')}</p>
+               <div className="space-y-1">
+                 <p className="text-white text-xs font-black uppercase tracking-[0.3em]">CEDEXX</p>
+                 <p className="text-blue-100/60 max-w-sm text-[11px] font-medium leading-relaxed italic whitespace-pre-line text-center md:text-left">
+                   {t('footer.tagline')}
+                 </p>
+               </div>
             </div>
 
           <div>

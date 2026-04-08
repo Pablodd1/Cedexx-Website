@@ -28,7 +28,7 @@ export function About() {
     },
     {
       name: 'Jasmel Acosta',
-      role: 'CTO',
+      role: 'Co-founder',
       initials: 'JA',
       desc: 'Engineering leadership and technology strategy. Expert in scaling secure, high-availability medical infrastructure and digital-first patient experiences.',
       image: jasmelImg,
