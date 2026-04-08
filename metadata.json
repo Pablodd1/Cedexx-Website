@@ -1,0 +1,9 @@
+{
+  "name": "Live Med Connect",
+  "description": "Telemedicine platform providing 24/7 access to board-certified doctors, therapists, and marketing tools.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone",
+    "geolocation"
+  ]
+}
