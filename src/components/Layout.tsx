@@ -62,12 +62,12 @@ export function Layout() {
       <header className={`sticky top-0 z-[60] w-full transition-all duration-500 ${
         scrolled 
           ? 'bg-white/80 backdrop-blur-2xl border-b border-slate-100 py-1' 
-          : 'bg-transparent py-2'
+          : 'bg-transparent py-3'
       }`}>
         <div className="container mx-auto px-6 flex items-center justify-between gap-8">
           <Link to="/" className="group flex items-center transition-transform duration-500 hover:scale-105">
             <Logo 
-              className={`transition-all duration-500 ${scrolled ? 'h-16 lg:h-24' : 'h-24 lg:h-32'}`} 
+              className={`transition-all duration-500 ${scrolled ? 'h-10 lg:h-14' : 'h-14 lg:h-18'}`} 
               variant={scrolled ? 'blue' : 'white'} 
             />
           </Link>

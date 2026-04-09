@@ -1,7 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { CheckCircle2, Shield, Lock, CreditCard, Activity, Heart, Users, Smartphone } from 'lucide-react';
-import { Button } from '../components/ui';
+import { CheckCircle2, Shield, Lock, CreditCard, Activity, Heart, Users, Smartphone, Building2 } from 'lucide-react';
 
 const fadeIn = {
   initial: { opacity: 0, y: 24 },
@@ -11,11 +10,19 @@ const fadeIn = {
 };
 
 export function Enroll() {
-  const [step, setStep] = React.useState(1);
+  const [step, setStep] = React.useState(0);
+  const [role, setRole] = React.useState('individual');
   const [plan, setPlan] = React.useState('family');
 
+  const roles = [
+    { id: 'individual', title: 'Individual / Life Solutions', icon: Heart, desc: 'Everyday care for yourself and your family.' },
+    { id: 'hospitality', title: 'Hospitality Partner', icon: Smartphone, desc: 'Concierge healthcare for hotel groups.' },
+    { id: 'housing', title: 'Housing / REIT Partner', icon: Building2, desc: 'Residential wellness amenity solutions.' },
+    { id: 'affiliate', title: 'Affiliate Partner', icon: Users, desc: 'Strategic marketing and growth partnerships.' }
+  ];
+
   return (
-    <div className="min-h-screen bg-[#F8FAFC] py-24">
+    <div className="min-h-screen bg-[#F8FAFC] py-24 font-sans">
       <div className="container mx-auto px-4 max-w-6xl">
         <div className="text-center mb-16">
           <motion.div
@@ -25,25 +32,26 @@ export function Enroll() {
           >
             Join the Network
           </motion.div>
-          <h1 className="text-4xl md:text-6xl font-black text-[#050249] mb-6 tracking-tight">Better Care. Here. Now.</h1>
-          <p className="text-xl text-slate-500 font-medium max-w-2xl mx-auto">Complete your enrollment in under 5 minutes and get immediate 24/7 access to board-certified care.</p>
+          <h1 className="text-4xl md:text-6xl font-black text-[#050249] mb-6 tracking-tight italic uppercase">Better Care. Here. Now.</h1>
+          <p className="text-xl text-slate-500 font-medium max-w-2xl mx-auto italic">Complete your enrollment in under 5 minutes and get immediate 24/7 access to board-certified care.</p>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-12 items-start">
           {/* Left Column: Form */}
           <div className="lg:col-span-2 order-2 lg:order-1">
-            <div className="bg-white rounded-2xl shadow-2xl border border-blue-50 p-6 md:p-8 max-w-3xl mx-auto">
+            <div className="bg-white rounded-[3rem] shadow-2xl border border-blue-50 p-8 md:p-12 max-w-3xl mx-auto">
+              
               {/* Progress Bar */}
               <div className="flex items-center justify-between mb-16 max-w-md mx-auto">
-                {[1, 2, 3].map((i) => (
+                {[0, 1, 2, 3].map((i) => (
                   <div key={i} className="flex items-center flex-1 last:flex-none">
-                    <div className={`h-12 w-12 rounded-2xl flex items-center justify-center font-black transition-all shadow-sm ${
+                    <div className={`h-10 w-10 rounded-xl flex items-center justify-center font-black transition-all shadow-sm text-xs ${
                       step >= i ? 'bg-[#050249] text-white' : 'bg-slate-100 text-slate-400'
                     }`}>
-                      {i}
+                      {i + 1}
                     </div>
                     {i < 3 && (
-                      <div className={`h-1.5 flex-1 mx-4 rounded-full transition-colors ${
+                      <div className={`h-1 flex-1 mx-2 rounded-full transition-colors ${
                         step > i ? 'bg-[#050249]' : 'bg-slate-100'
                       }`} />
                     )}
@@ -51,9 +59,40 @@ export function Enroll() {
                 ))}
               </div>
 
+              {step === 0 && (
+                <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
+                  <h2 className="text-3xl font-black text-[#050249] mb-8 italic uppercase tracking-tighter">Select Your Role</h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
+                    {roles.map((r) => (
+                      <div 
+                        key={r.id}
+                        onClick={() => setRole(r.id)}
+                        className={`p-6 rounded-3xl border-2 cursor-pointer transition-all group ${
+                          role === r.id ? 'border-[#050249] bg-[#EBF3FB] shadow-xl' : 'border-slate-100 hover:border-blue-200 bg-white'
+                        }`}
+                      >
+                        <div className={`h-12 w-12 rounded-2xl flex items-center justify-center mb-4 transition-colors ${
+                          role === r.id ? 'bg-[#050249] text-white' : 'bg-slate-50 text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-500'
+                        }`}>
+                          <r.icon className="h-6 w-6" />
+                        </div>
+                        <h4 className="font-black text-[#050249] uppercase tracking-wider text-sm mb-1">{r.title}</h4>
+                        <p className="text-slate-500 text-xs font-medium italic">{r.desc}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <button 
+                    className="w-full bg-[#050249] text-white font-black py-4 rounded-2xl hover:bg-[#03013b] transition-all shadow-xl hover:scale-[1.02] active:scale-[0.98] text-base uppercase tracking-tighter italic" 
+                    onClick={() => setStep(1)}
+                  >
+                    Continue to Membership Details
+                  </button>
+                </motion.div>
+              )}
+
               {step === 1 && (
                 <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
-                  <h2 className="text-3xl font-black text-[#050249] mb-8">Personal Information</h2>
+                  <h2 className="text-3xl font-black text-[#050249] mb-8 italic uppercase tracking-tighter">Personal Information</h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                     <div className="space-y-3">
                       <label className="text-xs font-black text-[#050249] uppercase tracking-widest">First Name</label>
@@ -76,27 +115,30 @@ export function Enroll() {
                       <input id="dob" type="date" className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-blue-50 focus:ring-2 focus:ring-[#050249] outline-none transition-all font-medium text-sm" />
                     </div>
                   </div>
-                  <button className="w-full mt-8 bg-[#050249] text-white font-black py-2.5 px-6 rounded-xl hover:bg-[#03013b] transition-all shadow-xl hover:scale-[1.02] active:scale-[0.98] text-xs" onClick={() => setStep(2)}>Continue to Plan Selection</button>
+                  <div className="flex flex-col sm:flex-row gap-4 mt-8">
+                    <button className="flex-1 py-4 rounded-2xl font-black border-2 border-slate-100 text-slate-400 hover:bg-slate-50 transition-all text-sm italic" onClick={() => setStep(0)}>Back</button>
+                    <button className="flex-[2] py-4 rounded-2xl font-black bg-[#050249] text-white hover:bg-[#03013b] transition-all shadow-xl text-sm italic" onClick={() => setStep(2)}>Plan Selection</button>
+                  </div>
                 </motion.div>
               )}
 
               {step === 2 && (
                 <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
-                  <h2 className="text-3xl font-black text-[#050249] mb-8">Choose Your Plan</h2>
+                  <h2 className="text-3xl font-black text-[#050249] mb-8 italic uppercase tracking-tighter">Choose Your Plan</h2>
                   <div className="space-y-6">
                     <div 
                       onClick={() => setPlan('family')}
-                      className={`p-8 rounded-[2.5rem] border-2 transition-all cursor-pointer flex items-center justify-between ${
+                      className={`p-8 rounded-[2.5rem] border-2 transition-all cursor-pointer flex items-center justify-between group ${
                         plan === 'family' ? 'border-[#050249] bg-[#EBF3FB] shadow-xl' : 'border-slate-100 bg-white hover:border-blue-200'
                       }`}
                     >
                       <div className="flex items-center gap-6">
-                        <div className={`h-12 w-12 rounded-2xl flex items-center justify-center transition-colors ${plan === 'family' ? 'bg-[#050249] text-white' : 'bg-slate-100 text-slate-400'}`}>
+                        <div className={`h-12 w-12 rounded-2xl flex items-center justify-center transition-colors ${plan === 'family' ? 'bg-[#050249] text-white' : 'bg-slate-100 text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-500'}`}>
                            <Heart className="h-6 w-6" />
                         </div>
                         <div>
                           <h3 className="font-black text-[#050249] text-xl">Family Plan</h3>
-                          <p className="text-slate-500 font-medium text-sm">Household coverage for up to 4 members</p>
+                          <p className="text-slate-500 font-medium text-sm italic underline">Household coverage for up to 4 members</p>
                         </div>
                       </div>
                       <div className="text-right">
@@ -107,17 +149,17 @@ export function Enroll() {
 
                     <div 
                       onClick={() => setPlan('individual')}
-                      className={`p-8 rounded-[2.5rem] border-2 transition-all cursor-pointer flex items-center justify-between ${
+                      className={`p-8 rounded-[2.5rem] border-2 transition-all cursor-pointer flex items-center justify-between group ${
                         plan === 'individual' ? 'border-[#050249] bg-[#EBF3FB] shadow-xl' : 'border-slate-100 bg-white hover:border-blue-200'
                       }`}
                     >
                       <div className="flex items-center gap-6">
-                        <div className={`h-12 w-12 rounded-2xl flex items-center justify-center transition-colors ${plan === 'individual' ? 'bg-[#050249] text-white' : 'bg-slate-100 text-slate-400'}`}>
+                        <div className={`h-12 w-12 rounded-2xl flex items-center justify-center transition-colors ${plan === 'individual' ? 'bg-[#050249] text-white' : 'bg-slate-100 text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-500'}`}>
                            <Smartphone className="h-6 w-6" />
                         </div>
                         <div>
                           <h3 className="font-black text-[#050249] text-xl">Individual Plan</h3>
-                          <p className="text-slate-500 font-medium text-sm">Single member 24/7 access</p>
+                          <p className="text-slate-500 font-medium text-sm italic underline">Single member 24/7 access</p>
                         </div>
                       </div>
                       <div className="text-right">
@@ -127,17 +169,17 @@ export function Enroll() {
                     </div>
                   </div>
                   <div className="flex flex-col sm:flex-row gap-4 mt-8">
-                    <button className="flex-1 py-2 rounded-xl font-black border-2 border-slate-100 text-slate-400 hover:bg-slate-50 transition-all text-xs" onClick={() => setStep(1)}>Back</button>
-                    <button className="flex-[2] py-2 rounded-xl font-black bg-[#050249] text-white hover:bg-[#03013b] transition-all shadow-xl text-xs" onClick={() => setStep(3)}>Continue to Payment</button>
+                    <button className="flex-1 py-4 rounded-2xl font-black border-2 border-slate-100 text-slate-400 hover:bg-slate-50 transition-all text-sm italic" onClick={() => setStep(1)}>Back</button>
+                    <button className="flex-[2] py-4 rounded-2xl font-black bg-[#050249] text-white hover:bg-[#03013b] transition-all shadow-xl text-sm italic" onClick={() => setStep(3)}>Continue to Payment</button>
                   </div>
                 </motion.div>
               )}
 
               {step === 3 && (
                 <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
-                  <h2 className="text-3xl font-black text-[#050249] mb-8">Payment Details</h2>
+                  <h2 className="text-3xl font-black text-[#050249] mb-8 italic uppercase tracking-tighter">Payment Details</h2>
                   <div className="space-y-8">
-                    <div className="p-6 bg-[#EBF3FB] rounded-[2rem] flex items-center gap-4 text-sm text-[#050249] border border-blue-50 font-bold">
+                    <div className="p-6 bg-[#EBF3FB] rounded-[2rem] flex items-center gap-4 text-sm text-[#050249] border border-blue-50 font-bold italic">
                       <Lock className="h-5 w-5" />
                       Secure 256-bit SSL Encrypted Transaction
                     </div>
@@ -164,8 +206,8 @@ export function Enroll() {
                     </div>
                   </div>
                   <div className="flex flex-col sm:flex-row gap-4 mt-8">
-                    <button className="flex-1 py-2 rounded-xl font-black border-2 border-slate-100 text-slate-400 hover:bg-slate-50 transition-all text-xs" onClick={() => setStep(2)}>Back</button>
-                    <button className="flex-[2] py-2 rounded-xl font-black bg-[#050249] text-white hover:bg-[#03013b] transition-all shadow-xl text-xs">Complete Enrollment</button>
+                    <button className="flex-1 py-4 rounded-2xl font-black border-2 border-slate-100 text-slate-400 hover:bg-slate-50 transition-all text-sm italic" onClick={() => setStep(2)}>Back</button>
+                    <button className="flex-[2] py-4 rounded-2xl font-black bg-[#050249] text-white hover:bg-[#03013b] transition-all shadow-xl text-sm italic">Complete Enrollment</button>
                   </div>
                 </motion.div>
               )}
@@ -176,7 +218,7 @@ export function Enroll() {
           <div className="lg:order-2 space-y-8">
             <div className="bg-[#050249] text-white rounded-[3rem] p-10 shadow-2xl relative overflow-hidden">
               <div className="absolute -top-10 -right-10 h-32 w-32 bg-blue-500/20 rounded-full blur-2xl" />
-              <h3 className="text-2xl font-black mb-8">Member Benefits</h3>
+              <h3 className="text-2xl font-black mb-8 italic uppercase tracking-tighter">Member Benefits</h3>
               <ul className="space-y-6">
                 {[
                   '24/7/365 Unlimited Consults',
@@ -186,7 +228,7 @@ export function Enroll() {
                   'Enterprise-Level Data Encryption',
                   'Digital School & Work Notes'
                 ].map((item, i) => (
-                  <li key={i} className="flex items-start gap-4 text-sm font-bold text-blue-100">
+                  <li key={i} className="flex items-start gap-4 text-sm font-bold text-blue-100 italic">
                     <CheckCircle2 className="h-6 w-6 text-blue-400 shrink-0" />
                     <span>{item}</span>
                   </li>
@@ -197,8 +239,8 @@ export function Enroll() {
               <div className="h-16 w-16 bg-[#EBF3FB] rounded-2xl flex items-center justify-center mb-6 text-[#050249] shadow-sm">
                 <Shield className="h-8 w-8" />
               </div>
-              <h3 className="font-black text-[#050249] text-xl mb-3">100% Satisfaction</h3>
-              <p className="text-sm text-slate-500 font-medium leading-relaxed">
+              <h3 className="font-black text-[#050249] text-xl mb-3 italic uppercase tracking-tighter">100% Satisfaction</h3>
+              <p className="text-sm text-slate-500 font-medium leading-relaxed italic">
                 Cancel your membership at any time with zero penalties. We are committed to frictionless healthcare.
               </p>
             </div>
@@ -209,8 +251,8 @@ export function Enroll() {
                     <Users className="h-6 w-6" />
                   </div>
                   <div>
-                    <h4 className="font-black text-xs text-[#050249] uppercase tracking-widest">Active Members</h4>
-                    <p className="text-slate-500 text-sm font-bold">12,400+ Families Enrolled</p>
+                    <h4 className="font-black text-xs text-[#050249] uppercase tracking-widest italic">Active Members</h4>
+                    <p className="text-slate-500 text-sm font-bold italic">12,400+ Families Enrolled</p>
                   </div>
                </div>
             </div>
