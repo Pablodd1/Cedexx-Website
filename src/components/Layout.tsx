@@ -95,7 +95,9 @@ export function Layout() {
                   className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
                     isActive 
                       ? 'bg-[#050249] text-white shadow-lg translate-y-[-1px]' 
-                      : (scrolled || location.pathname !== '/' ? 'text-slate-400 hover:text-slate-900' : 'text-white/60 hover:text-white')
+                      : (scrolled || location.pathname !== '/' 
+                          ? 'text-slate-600 hover:text-[#050249]' 
+                          : 'text-white/80 hover:text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]')
                   }`}
                 >
                   {link.label}
@@ -115,7 +117,9 @@ export function Layout() {
                   className={`px-3 py-1.5 rounded-lg text-[9px] font-black transition-all ${
                     lang === opt.code
                       ? 'bg-[#050249] text-white shadow-xl translate-y-[-1px]'
-                      : (scrolled || location.pathname !== '/' ? 'text-slate-400 hover:text-slate-900' : 'text-white/60 hover:text-white')
+                      : (scrolled || location.pathname !== '/' 
+                          ? 'text-slate-600 hover:text-[#050249]' 
+                          : 'text-white/80 hover:text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]')
                   }`}
                 >
                   {opt.label}
