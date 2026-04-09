@@ -15,6 +15,7 @@ const LANG_OPTIONS: { code: Lang; label: string }[] = [
 
 export function Layout() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const location = useLocation();
   const { lang, setLang, t } = useLanguage();
@@ -26,8 +27,17 @@ export function Layout() {
       document.documentElement.style.setProperty('--mouse-x', `${e.clientX}`);
       document.documentElement.style.setProperty('--mouse-y', `${e.clientY}`);
     };
+
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+
     window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, []);
 
   // SEO: Dynamic Title/Meta update when language changes
@@ -49,14 +59,23 @@ export function Layout() {
       />
 
       {/* ── HEADER (Enlarged for Brand Emphasis) ── */}
-      <header className="sticky top-0 z-[60] w-full border-b border-slate-100 bg-white/80 backdrop-blur-2xl">
-        <div className="container mx-auto px-6 py-1 lg:py-2 flex items-center justify-between gap-8">
+      <header className={`sticky top-0 z-[60] w-full transition-all duration-500 ${
+        scrolled 
+          ? 'bg-white/80 backdrop-blur-2xl border-b border-slate-100 py-1' 
+          : 'bg-transparent py-2'
+      }`}>
+        <div className="container mx-auto px-6 flex items-center justify-between gap-8">
           <Link to="/" className="group flex items-center transition-transform duration-500 hover:scale-105">
-            <Logo className="h-48 lg:h-[19.5rem]" variant="blue" />
+            <Logo 
+              className={`transition-all duration-500 ${scrolled ? 'h-16 lg:h-24' : 'h-24 lg:h-32'}`} 
+              variant={scrolled ? 'blue' : 'white'} 
+            />
           </Link>
 
           {/* Desktop nav with capsule effect to match language menu */}
-          <nav className="hidden lg:flex items-center bg-slate-50 rounded-2xl p-1 gap-1 border border-slate-100">
+          <nav className={`hidden lg:flex items-center rounded-2xl p-1 gap-1 border transition-all duration-500 ${
+            scrolled ? 'bg-slate-50 border-slate-100' : 'bg-white/10 border-white/20 backdrop-blur-md'
+          }`}>
             {[
               { to: '/', label: t('nav.home') },
               { to: '/about', label: t('nav.about') },
@@ -71,10 +90,10 @@ export function Layout() {
                 <Link 
                   key={link.to} 
                   to={link.to} 
-                  className={`px-4 py-2 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all ${
+                  className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
                     isActive 
                       ? 'bg-[#050249] text-white shadow-lg translate-y-[-1px]' 
-                      : 'text-slate-400 hover:text-slate-900'
+                      : scrolled ? 'text-slate-400 hover:text-slate-900' : 'text-white/60 hover:text-white'
                   }`}
                 >
                   {link.label}
@@ -84,15 +103,17 @@ export function Layout() {
           </nav>
 
           <div className="hidden lg:flex items-center gap-6">
-            <div className="flex items-center bg-slate-50 rounded-xl p-1 gap-1 border border-slate-100">
+            <div className={`flex items-center rounded-xl p-1 gap-1 border transition-all duration-500 ${
+              scrolled ? 'bg-slate-50 border-slate-100' : 'bg-white/10 border-white/20 backdrop-blur-md'
+            }`}>
               {LANG_OPTIONS.map(opt => (
                 <button
                   key={opt.code}
                   onClick={() => setLang(opt.code)}
-                  className={`px-3 py-1.5 rounded-lg text-[10px] font-black transition-all ${
+                  className={`px-3 py-1.5 rounded-lg text-[9px] font-black transition-all ${
                     lang === opt.code
                       ? 'bg-[#050249] text-white shadow-xl translate-y-[-1px]'
-                      : 'text-slate-400 hover:text-slate-900'
+                      : scrolled ? 'text-slate-400 hover:text-slate-900' : 'text-white/60 hover:text-white'
                   }`}
                 >
                   {opt.label}
@@ -108,7 +129,9 @@ export function Layout() {
           </div>
 
           {/* Mobile menu toggle */}
-          <button className="lg:hidden text-slate-900 bg-slate-50 p-3 rounded-2xl" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+          <button className={`lg:hidden p-3 rounded-2xl transition-all ${
+            scrolled ? 'text-slate-900 bg-slate-50' : 'text-white bg-white/10 backdrop-blur-md'
+          }`} onClick={() => setIsMenuOpen(!isMenuOpen)}>
             {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
         </div>

@@ -86,16 +86,16 @@ export function Home() {
             >
 
               <h1 className="text-4xl md:text-6xl font-black leading-[0.9] mb-4 tracking-tighter uppercase italic">
-                Keep It in<br />
-                Your <span className="text-[#23d9b0]">Back Pocket.</span>
+                {t('hero.title')}<br />
+                <span className="text-[#23d9b0]">Keep It in Your Back Pocket.</span>
               </h1>
               
               <h2 className="text-lg md:text-2xl font-bold text-blue-100 mb-8 tracking-tight italic">
-                Healthcare in your pocket.
+                {t('hero.subtitle')}
               </h2>
 
               <p className="text-base text-blue-50/70 mb-8 max-w-2xl leading-relaxed font-medium">
-                Affordable 24/7 telemedicine access — connect with independent licensed providers for mental wellness support, prescriptions, and everyday care through one secure platform.
+                {t('seo.description')}
               </p>
               <p className="text-[10px] text-blue-300/50 mb-6 max-w-2xl font-medium">
                 Cedexx is a technology platform. We do not provide medical care directly. All services are delivered by independent licensed providers.
@@ -103,10 +103,10 @@ export function Home() {
               
               <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6" {...fadeIn}>
                 {[
-                  { title: 'Individual Care', desc: '24/7 access to licensed providers — no appointments, no waiting rooms.', cta: 'Learn More', link: '/about' },
-                  { title: 'Family Plans', desc: 'Helping parents solve everyday health requirements with ease for the whole family.', cta: 'View Plans', link: '/enroll' },
-                  { title: 'Employer Benefits', desc: 'Affordable healthcare benefits that employees actually use.', cta: 'Employer Solutions', link: '/partners' },
-                  { title: 'Global/Travel Access', desc: 'Care on your schedule, wherever you are around the globe.', cta: 'Learn More', link: '/about' }
+                  { title: t('serve.card1.title'), desc: t('serve.card1.desc'), cta: t('serve.card1.cta'), link: '/partners' },
+                  { title: t('serve.card2.title'), desc: t('serve.card2.desc'), cta: t('serve.card2.cta'), link: '/partners' },
+                  { title: t('serve.card4.title'), desc: t('serve.card4.desc'), cta: t('serve.card4.cta'), link: '/partners' },
+                  { title: 'Life Solutions', desc: 'Healthcare access that moves with modern life—immediate, dependable, and accessible.', cta: 'About Us', link: '/about' }
                 ].map((card, i) => (
                   <motion.div
                     key={i}
@@ -269,7 +269,8 @@ export function Home() {
                     'Consultations in under 15 minutes',
                     'Affordable monthly membership',
                     'No insurance required',
-                    'Secure HIPAA compliant connection'
+                    'Secure HIPAA compliant connection',
+                    'Medical Notes for work, school & travel insurance'
                   ].map((text, i) => (
                     <motion.div 
                       key={i} 
@@ -325,10 +326,10 @@ export function Home() {
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                 {[
-                  { title: 'Doctors', desc: 'Connect with independent board-certified professionals for direct clinical integration.', icon: Heart },
-                  { title: 'Employer and Union Solutions', desc: 'Custom care packages for workforce and labor stability.', icon: Users },
-                  { title: 'Affiliate Opportunities', desc: 'Telecommunication and marketing partnerships built for scale.', icon: Smartphone },
-                  { title: 'Student/Corporate Housing & Multifamily', desc: 'Set your Multifamily or Housing Asset apart by incorporating the value of congenial, accessible mobile healthcare.', icon: Building2 }
+                  { title: t('serve.card1.title'), desc: t('serve.card1.desc'), icon: Smartphone },
+                  { title: t('serve.card2.title'), desc: t('serve.card2.desc'), icon: Users },
+                  { title: t('serve.card4.title'), desc: t('serve.card4.desc'), icon: Building2 },
+                  { title: 'Physician Opportunities', desc: 'Secure clinical blocks and earn flexible income with our independent provider model.', icon: Heart }
                 ].map((p, i) => (
                   <div key={i} className="space-y-3 group">
                     <div className="h-12 w-12 rounded-2xl bg-white flex items-center justify-center text-[#050249] shadow-sm border border-slate-100 group-hover:bg-[#050249] group-hover:text-white transition-all">

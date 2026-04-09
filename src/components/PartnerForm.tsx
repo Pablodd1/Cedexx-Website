@@ -14,12 +14,10 @@ export function PartnerForm() {
   const [isSent, setIsSent] = useState(false);
 
   const roles = [
-    'Organization',
-    'Property / Real Estate Group',
-    'Student Housing Provider',
-    'Hotel / Hospitality Operator',
-    'Asset Management',
-    'Other'
+    'Hospitality Partner',
+    'Affiliate Partner',
+    'Housing / REIT Partner',
+    'Individual / Life Solutions'
   ];
 
   const handleSubmit = (e: React.FormEvent) => {
