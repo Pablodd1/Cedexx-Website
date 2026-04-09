@@ -28,11 +28,10 @@ export function Partners() {
             transition={{ duration: 0.8 }}
           >
             <h1 className="text-4xl md:text-7xl font-black mb-8 tracking-tighter uppercase italic leading-[0.9]">
-              Strategic<br />Partnerships
+              {t('partners.hero.title')}
             </h1>
             <p className="text-xl md:text-2xl text-blue-100 font-medium leading-relaxed italic max-w-2xl mx-auto">
-              Better Care. Here. Now. <br />
-              <span className="text-[#23d9b0]">Keep It in Your Back Pocket.</span>
+              {t('partners.hero.subtitle')}
             </p>
           </motion.div>
         </div>
@@ -42,15 +41,15 @@ export function Partners() {
       <section className="py-32 bg-white">
         <div className="container mx-auto px-6">
           <div className="text-center mb-24 max-w-4xl mx-auto">
-            <h2 className="text-4xl md:text-6xl font-black text-[#050249] mb-6 tracking-tighter uppercase italic">Ecosystems We Serve</h2>
-            <p className="text-xl text-slate-500 font-medium italic mb-12">Industry leaders trust Cedexx to deliver immediate healthcare access.</p>
+            <h2 className="text-4xl md:text-6xl font-black text-[#050249] mb-6 tracking-tighter uppercase italic">{t('partners.ecosystems.title')}</h2>
+            <p className="text-xl text-slate-500 font-medium italic mb-12">{t('partners.ecosystems.subtitle')}</p>
             
             <div className="h-2 w-24 bg-[#23d9b0] mx-auto rounded-full mb-16" />
 
             <div className="space-y-16 text-left">
               <motion.div {...fadeIn} className="bg-slate-50 p-10 rounded-[3rem] border border-slate-100">
                 <p className="text-lg md:text-xl text-slate-700 leading-relaxed font-medium">
-                  Healthcare should move with modern life—immediate, dependable, and accessible wherever people live, work, travel, and grow.
+                  {t('partners.ecosystems.quote')}
                 </p>
               </motion.div>
 
@@ -60,8 +59,8 @@ export function Partners() {
                      <Smartphone className="h-8 w-8" />
                   </div>
                   <p className="text-slate-600 leading-relaxed font-medium">
-                    <strong className="text-[#050249] block text-xl mb-2 font-black uppercase">Gig Workforce Populations</strong>
-                    CEDEXX delivers modern digital healthcare across the environments where access matters most. We support gig workforce populations with affordable physician access that fits flexible schedules and everyday demands.
+                    <strong className="text-[#050249] block text-xl mb-2 font-black uppercase">{t('partners.ecosystems.gig.title')}</strong>
+                    {t('partners.ecosystems.gig.desc')}
                   </p>
                 </motion.div>
 
@@ -70,8 +69,8 @@ export function Partners() {
                      <Users className="h-8 w-8" />
                   </div>
                   <p className="text-slate-600 leading-relaxed font-medium">
-                    <strong className="text-[#050249] block text-xl mb-2 font-black uppercase">Individuals & Families</strong>
-                    For individuals and families, CEDEXX provides a practical layer of convenience—whether complementing existing coverage or offering affordable access when traditional insurance falls short.
+                    <strong className="text-[#050249] block text-xl mb-2 font-black uppercase">{t('partners.ecosystems.individuals.title')}</strong>
+                    {t('partners.ecosystems.individuals.desc')}
                   </p>
                 </motion.div>
 
@@ -80,8 +79,8 @@ export function Partners() {
                      <Building2 className="h-8 w-8" />
                   </div>
                   <p className="text-slate-600 leading-relaxed font-medium">
-                    <strong className="text-[#050249] block text-xl mb-2 font-black uppercase">Housing & Communities</strong>
-                    Through strategic partnerships in multifamily and student housing, we help asset managers introduce modern healthcare as a premium lifestyle amenity that adds value for residents, families, and communities.
+                    <strong className="text-[#050249] block text-xl mb-2 font-black uppercase">{t('partners.ecosystems.housing.title')}</strong>
+                    {t('partners.ecosystems.housing.desc')}
                   </p>
                 </motion.div>
 
@@ -90,19 +89,18 @@ export function Partners() {
                      <Heart className="h-8 w-8" />
                   </div>
                   <p className="text-slate-600 leading-relaxed font-medium">
-                    <strong className="text-[#050249] block text-xl mb-2 font-black uppercase">Hospitality Pillar</strong>
-                    Hospitality is our third strategic pillar, bringing private telehealth access into hotel environments so travelers can connect with licensed physicians from the comfort of their room—including when documentation is needed for travel interruptions or insurance claims.
+                    <strong className="text-[#050249] block text-xl mb-2 font-black uppercase">{t('partners.ecosystems.hospitality.title')}</strong>
+                    {t('partners.ecosystems.hospitality.desc')}
                   </p>
                 </motion.div>
               </div>
 
               <motion.div {...fadeIn} className="text-center pt-12 space-y-4">
-                <p className="text-2xl font-black text-[#050249] italic uppercase italic leading-tight">
-                  From home to campus to travel, CEDEXX keeps trusted care within reach.
+                <p className="text-2xl font-black text-[#050249] italic uppercase leading-tight">
+                  {t('partners.ecosystems.footer')}
                 </p>
                 <div className="text-[#050249] font-black italic uppercase tracking-widest text-lg">
-                  CEDEXX. Better Care. Here. Now.<br />
-                  <span className="text-blue-500">KEEP IT IN YOUR BACK POCKET.</span>
+                  {t('footer.tagline')}
                 </div>
               </motion.div>
             </div>
@@ -115,10 +113,14 @@ export function Partners() {
         <div className="container mx-auto px-6">
           <div className="max-w-6xl mx-auto flex flex-col lg:flex-row gap-20 items-center">
             <motion.div className="flex-1" {...fadeIn}>
-               <div className="inline-block bg-white text-[#050249] text-[10px] font-black px-4 py-2 rounded-full mb-8 border border-blue-200 uppercase tracking-widest">JOIN THE NETWORK</div>
-               <h2 className="text-4xl md:text-6xl font-black text-[#050249] mb-10 leading-[0.9] tracking-tighter italic uppercase">Partner With Cedexx</h2>
+               <div className="inline-block bg-white text-[#050249] text-[10px] font-black px-4 py-2 rounded-full mb-8 border border-blue-200 uppercase tracking-widest">
+                 {t('partners.form.badge')}
+               </div>
+               <h2 className="text-4xl md:text-6xl font-black text-[#050249] mb-10 leading-[0.9] tracking-tighter italic uppercase">
+                 {t('partners.form.title')}
+               </h2>
                <p className="text-xl text-slate-500 mb-12 font-medium leading-relaxed italic">
-                 Explore strategic integration opportunities across our key amenity pillars and physician networks.
+                 {t('partners.form.subtitle')}
                </p>
                <div className="space-y-8">
                   {[
