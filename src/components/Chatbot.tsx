@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageSquare, X, Send, Bot, User, Minimize2, Mic, MicOff, Volume2 } from 'lucide-react';
 import { cn } from './ui';
-import { GoogleGenAI } from '@google/genai';
 
 const FAMILY_SYSTEM_INSTRUCTION = `You are Cedex, a warm, professional, and highly knowledgeable AI Virtual Receptionist for Cedexx — a technology platform connecting families to independent telemedicine providers. No insurance needed.
 
@@ -57,17 +56,7 @@ export function Chatbot({ inline = false }: { inline?: boolean }) {
   const recognitionRef = useRef<any>(null);
 
   useEffect(() => {
-    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-    if (!apiKey || apiKey === 'MY_GEMINI_API_KEY') return;
-    try {
-      const ai = new GoogleGenAI({ apiKey });
-      chatRef.current = ai.chats.create({
-        model: 'gemini-2.0-flash',
-        config: { systemInstruction: FAMILY_SYSTEM_INSTRUCTION },
-      });
-    } catch (err) {
-      console.error('Chatbot init failed:', err);
-    }
+    // Backend API handles initialization
   }, []);
 
   useEffect(() => {
@@ -133,13 +122,24 @@ export function Chatbot({ inline = false }: { inline?: boolean }) {
 
     setIsLoading(true);
     try {
-      const res = await chatRef.current.sendMessage({ message: text });
-      let reply = res.text || "I'm sorry, I didn't catch that. Could you rephrase?";
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [{ role: 'user', content: text }],
+          provider: 'gemini'
+        })
+      });
+
+      const data = await response.json();
+      let reply = data.choices?.[0]?.message?.content || "I'm sorry, I'm having trouble thinking right now.";
+      
       // Remove Markdown asterisks
       reply = reply.replace(/\*+/g, '');
       setMessages(prev => [...prev, { role: 'model', text: reply }]);
       speak(reply);
-    } catch {
+    } catch (error) {
+      console.error('Chatbot API error:', error);
       const errorMsg = 'Something went wrong. Please try again or email info@cedexx.net.';
       setMessages(prev => [...prev, { role: 'model', text: errorMsg }]);
       speak(errorMsg);

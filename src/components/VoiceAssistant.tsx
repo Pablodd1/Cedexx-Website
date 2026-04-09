@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Mic, MicOff, X, PhoneCall, Volume2 } from 'lucide-react';
 import { cn } from './ui';
-import { GoogleGenAI, Modality, type LiveServerMessage } from '@google/genai';
 
 const SYSTEM_INSTRUCTION = `You are Cedex, the highly advanced AI Voice Assistant and Virtual Front Desk Receptionist for Cedexx — a technology platform connecting families to independent telemedicine providers. No insurance needed.
 
@@ -40,52 +39,22 @@ export function VoiceAssistant({ inline = false }: { inline?: boolean }) {
   const [transcript, setTranscript] = useState('');
   const sessionRef = useRef<any>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
-  const streamRef = useRef<MediaStream | null>(null);
-  const audioQueueRef = useRef<AudioBuffer[]>([]);
-  const isPlayingRef = useRef(false);
   const playbackCtxRef = useRef<AudioContext | null>(null);
-
-  const playNextInQueue = useCallback(() => {
-    if (audioQueueRef.current.length === 0) { isPlayingRef.current = false; return; }
-    isPlayingRef.current = true;
-    const ctx = playbackCtxRef.current!;
-    const buffer = audioQueueRef.current.shift()!;
-    const source = ctx.createBufferSource();
-    source.buffer = buffer;
-    source.connect(ctx.destination);
-    source.onended = playNextInQueue;
-    source.start();
-  }, []);
-
-  const enqueueAudio = useCallback(async (base64: string) => {
-    if (!playbackCtxRef.current) playbackCtxRef.current = new AudioContext({ sampleRate: 24000 });
-    const ctx = playbackCtxRef.current;
-    const raw = atob(base64);
-    const pcm = new Int16Array(raw.length / 2);
-    for (let i = 0; i < pcm.length; i++) {
-      pcm[i] = (raw.charCodeAt(i * 2)) | (raw.charCodeAt(i * 2 + 1) << 8);
-    }
-    const float32 = new Float32Array(pcm.length);
-    for (let i = 0; i < pcm.length; i++) float32[i] = pcm[i] / 32768;
-    const buffer = ctx.createBuffer(1, float32.length, 24000);
-    buffer.copyToChannel(float32, 0);
-    audioQueueRef.current.push(buffer);
-    if (!isPlayingRef.current) playNextInQueue();
-  }, [playNextInQueue]);
 
   const endCall = useCallback(() => {
     if (sessionRef.current) {
-      sessionRef.current.then((s: any) => s?.close?.()).catch(() => {});
       sessionRef.current = null;
     }
-    streamRef.current?.getTracks().forEach(t => t.stop());
-    streamRef.current = null;
+    const recognition = (window as any).recognition;
+    if (recognition) {
+      recognition.stop();
+      (window as any).recognition = null;
+    }
+    window.speechSynthesis.cancel();
     audioContextRef.current?.close();
     audioContextRef.current = null;
     playbackCtxRef.current?.close();
     playbackCtxRef.current = null;
-    audioQueueRef.current = [];
-    isPlayingRef.current = false;
     setIsConnected(false);
     setIsConnecting(false);
     setTranscript('');
@@ -98,59 +67,77 @@ export function VoiceAssistant({ inline = false }: { inline?: boolean }) {
       setTranscript('API key not configured. Voice assistant unavailable.');
       return;
     }
+
     setIsConnecting(true);
     setTranscript('Connecting to Cedex...');
+
     try {
-      const ai = new GoogleGenAI({ apiKey });
-      const sessionPromise = ai.live.connect({
-        model: 'gemini-2.0-flash-live-001',
-        config: {
-          responseModalities: [Modality.AUDIO],
-          speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Zephyr' } } },
-          systemInstruction: SYSTEM_INSTRUCTION,
-        },
-        callbacks: {
-          onopen: async () => {
-            setIsConnected(true);
-            setIsConnecting(false);
-            setTranscript('Connected — start speaking.');
-            try {
-              const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-              streamRef.current = stream;
-              const ctx = new AudioContext({ sampleRate: 16000 });
-              audioContextRef.current = ctx;
-              const source = ctx.createMediaStreamSource(stream);
-              const processor = ctx.createScriptProcessor(4096, 1, 1);
-              processor.onaudioprocess = (e) => {
-                const input = e.inputBuffer.getChannelData(0);
-                const pcm16 = new Int16Array(input.length);
-                for (let i = 0; i < input.length; i++) {
-                  pcm16[i] = Math.max(-32768, Math.min(32767, input[i] * 32768));
-                }
-                const base64 = btoa(String.fromCharCode(...new Uint8Array(pcm16.buffer)));
-                sessionPromise.then(s => s?.sendRealtimeInput({ media: { data: base64, mimeType: 'audio/pcm;rate=16000' } }));
-              };
-              source.connect(processor);
-              processor.connect(ctx.destination);
-            } catch {
-              setTranscript('Microphone access denied. Please allow mic access and try again.');
-            }
-          },
-          onmessage: async (msg: LiveServerMessage) => {
-            const text = msg.serverContent?.modelTurn?.parts?.[0]?.text;
-            if (text) setTranscript(text);
-            const audio = msg.serverContent?.modelTurn?.parts?.[0]?.inlineData?.data;
-            if (audio) await enqueueAudio(audio);
-          },
-          onclose: () => endCall(),
-          onerror: () => endCall(),
-        },
-      });
-      sessionRef.current = sessionPromise;
-    } catch {
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        setTranscript('Voice recognition not supported in this browser.');
+        setIsConnecting(false);
+        return;
+      }
+
+      const recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = 'en-US';
+
+      recognition.onstart = () => {
+        setIsConnected(true);
+        setIsConnecting(false);
+        setTranscript('Connected — I am listening.');
+        speak("Hello! I'm Cedex, your AI receptionist. How can I help you today?");
+      };
+
+      recognition.onresult = async (event: any) => {
+        const lastResult = event.results[event.results.length - 1];
+        if (lastResult.isFinal) {
+          const text = lastResult[0].transcript;
+          setTranscript('Thinking...');
+          try {
+            const response = await fetch('/api/chat', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                messages: [{ role: 'user', content: text }],
+                provider: 'gemini'
+              })
+            });
+            const data = await response.json();
+            const responseText = data.choices?.[0]?.message?.content || "I'm sorry, I'm having trouble thinking.";
+            setTranscript(responseText);
+            speak(responseText);
+          } catch (err) {
+            console.error('Gemini error:', err);
+            setTranscript('Sorry, I encountered an error. Please try again.');
+          }
+        }
+      };
+
+      recognition.onerror = () => endCall();
+      recognition.onend = () => { if (isConnected) recognition.start(); };
+      
+      (window as any).recognition = recognition;
+      recognition.start();
+
+    } catch (err) {
+      console.error('Start call failed:', err);
       setTranscript('Connection failed. Please try again.');
       setIsConnecting(false);
     }
+  };
+
+  const speak = (text: string) => {
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    const voices = window.speechSynthesis.getVoices();
+    const preferredVoice = voices.find(v => (v.name.includes('Google') || v.name.includes('Samantha') || v.name.includes('Natural')) && v.lang.startsWith('en')) || voices[0];
+    if (preferredVoice) utterance.voice = preferredVoice;
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+    window.speechSynthesis.speak(utterance);
   };
 
   const assistantUI = (
