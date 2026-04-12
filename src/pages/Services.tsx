@@ -150,7 +150,7 @@ export function Services() {
       <section className="py-24 bg-[#050249] text-white">
         <div className="container mx-auto px-4 text-center">
           <div className="max-w-4xl mx-auto bg-white/5 backdrop-blur-md rounded-[4rem] p-16 border border-white/10 shadow-2xl">
-            <h2 className="text-3xl md:text-5xl font-black mb-8 tracking-tight">Better Care. Here. <span className="text-[#23d9b0]">Now.</span></h2>
+            <h2 className="text-3xl md:text-5xl font-black mb-8 tracking-tight">Better Care, Here and <span className="text-[#23d9b0]">Now.</span></h2>
             <p className="text-xl md:text-2xl text-blue-100 mb-12 max-w-2xl mx-auto font-medium italic">
               "Connect with a provider in minutes!" — Enrollment now open for individuals and families at one fixed monthly rate.
             </p>

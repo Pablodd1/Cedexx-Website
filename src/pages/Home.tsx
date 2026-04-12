@@ -86,7 +86,7 @@ export function Home() {
             >
 
               <h1 className="text-4xl md:text-7xl font-black leading-[0.9] mb-6 tracking-tighter uppercase italic">
-                Better Care. <span className="text-[#23d9b0]">Here. Now.</span>
+                Better Care, Here and <span className="text-[#23d9b0]">Now.</span>
               </h1>
               
               <h2 className="text-xl md:text-3xl font-bold text-[#23d9b0] mb-8 tracking-tight italic max-w-2xl">
