@@ -66,11 +66,11 @@ export function Layout() {
               ? 'bg-transparent py-3' 
               : 'bg-white/50 backdrop-blur-xl border-b border-slate-100 py-2')
       }`}>
-        <div className="container mx-auto px-6 flex items-center justify-between gap-8">
+        <div className="container mx-auto px-6 flex items-center justify-between gap-8 h-full">
           <Link to="/" className="group flex items-center transition-transform duration-500 hover:scale-105">
             <Logo 
-              className={`transition-all duration-500 ${scrolled ? 'h-10 lg:h-14' : 'h-14 lg:h-18'}`} 
-              variant={scrolled || location.pathname !== '/' ? 'blue' : 'white'} 
+              className={`transition-all duration-500 ${scrolled ? 'h-30 lg:h-42' : 'h-42 lg:h-54'}`} 
+              variant="blue" 
             />
           </Link>
 
@@ -95,9 +95,7 @@ export function Layout() {
                   className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
                     isActive 
                       ? 'bg-[#050249] text-white shadow-lg translate-y-[-1px]' 
-                      : (scrolled || location.pathname !== '/' 
-                          ? 'text-slate-600 hover:text-[#050249]' 
-                          : 'text-white/80 hover:text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]')
+                      : 'text-[#050249]/80 hover:text-[#050249]'
                   }`}
                 >
                   {link.label}
@@ -117,9 +115,7 @@ export function Layout() {
                   className={`px-3 py-1.5 rounded-lg text-[9px] font-black transition-all ${
                     lang === opt.code
                       ? 'bg-[#050249] text-white shadow-xl translate-y-[-1px]'
-                      : (scrolled || location.pathname !== '/' 
-                          ? 'text-slate-600 hover:text-[#050249]' 
-                          : 'text-white/80 hover:text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]')
+                      : 'text-[#050249]/80 hover:text-[#050249]'
                   }`}
                 >
                   {opt.label}
@@ -136,7 +132,7 @@ export function Layout() {
 
           {/* Mobile menu toggle */}
           <button className={`lg:hidden p-3 rounded-2xl transition-all ${
-            scrolled || location.pathname !== '/' ? 'text-slate-900 bg-slate-50' : 'text-white bg-white/10 backdrop-blur-md'
+            scrolled || location.pathname !== '/' ? 'text-[#050249] bg-slate-50' : 'text-[#050249] bg-black/5 backdrop-blur-md'
           }`} onClick={() => setIsMenuOpen(!isMenuOpen)}>
             {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
@@ -212,7 +208,7 @@ export function Layout() {
                </Link>
                <div className="space-y-1">
                  <p className="text-blue-100/60 max-w-sm text-[11px] font-medium leading-relaxed italic whitespace-pre-line text-center md:text-left">
-                   {t('footer.tagline')}
+                   Better Care. <span className="text-[#23d9b0]">Here. Now.</span> Keep It in Your Back Pocket.
                  </p>
                </div>
             </div>

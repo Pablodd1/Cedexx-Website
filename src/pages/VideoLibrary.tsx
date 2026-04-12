@@ -46,7 +46,7 @@ export default function VideoLibrary() {
             Q&A Video Library
           </motion.h1>
           <p className="text-xl text-blue-100 max-w-2xl mx-auto font-medium leading-relaxed">
-            Better Care. Here. Now. Watch our demonstrations and find answers to common questions about our platform.
+            Better Care. <span className="text-[#23d9b0]">Here. Now.</span> Watch our demonstrations and find answers to common questions about our platform.
           </p>
         </div>
       </section>

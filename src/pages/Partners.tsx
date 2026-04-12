@@ -28,10 +28,10 @@ export function Partners() {
             transition={{ duration: 0.8 }}
           >
             <h1 className="text-4xl md:text-7xl font-black mb-8 tracking-tighter uppercase italic leading-[0.9]">
-              {t('partners.hero.title')}
+              Strategic <span className="text-[#23d9b0]">Partnerships</span>
             </h1>
             <p className="text-xl md:text-2xl text-blue-100 font-medium leading-relaxed italic max-w-2xl mx-auto">
-              {t('partners.hero.subtitle')}
+              Better Care. <span className="text-[#23d9b0]">Here. Now.</span> Keep It in Your Back Pocket.
             </p>
           </motion.div>
         </div>

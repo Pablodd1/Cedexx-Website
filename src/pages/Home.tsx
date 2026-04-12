@@ -85,66 +85,127 @@ export function Home() {
               className="flex flex-col items-end"
             >
 
-              <h1 className="text-4xl md:text-6xl font-black leading-[0.9] mb-4 tracking-tighter uppercase italic">
-                {t('hero.title')}<br />
-                <span className="text-[#23d9b0]">Keep It in Your Back Pocket.</span>
+              <h1 className="text-4xl md:text-7xl font-black leading-[0.9] mb-6 tracking-tighter uppercase italic">
+                Better Care. <span className="text-[#23d9b0]">Here. Now.</span>
               </h1>
               
-              <h2 className="text-lg md:text-2xl font-bold text-blue-100 mb-8 tracking-tight italic">
+              <h2 className="text-xl md:text-3xl font-bold text-[#23d9b0] mb-8 tracking-tight italic max-w-2xl">
                 {t('hero.subtitle')}
               </h2>
 
-              <p className="text-base text-blue-50/70 mb-8 max-w-2xl leading-relaxed font-medium">
-                {t('seo.description')}
-              </p>
-              <p className="text-[10px] text-blue-300/50 mb-6 max-w-2xl font-medium">
-                Cedexx is a technology platform. We do not provide medical care directly. All services are delivered by independent licensed providers.
-              </p>
-              
-              <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6" {...fadeIn}>
-                {[
-                  { title: t('serve.card1.title'), desc: t('serve.card1.desc'), cta: t('serve.card1.cta'), link: '/partners' },
-                  { title: t('serve.card2.title'), desc: t('serve.card2.desc'), cta: t('serve.card2.cta'), link: '/partners' },
-                  { title: t('serve.card4.title'), desc: t('serve.card4.desc'), cta: t('serve.card4.cta'), link: '/partners' },
-                  { title: 'Life Solutions', desc: 'Healthcare access that moves with modern life—immediate, dependable, and accessible.', cta: 'About Us', link: '/about' }
-                ].map((card, i) => (
-                  <motion.div
-                    key={i}
-                    className="bg-white rounded-[1.5rem] p-3 md:p-4 shadow-sm border border-blue-50 flex flex-col items-center text-center group hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 relative overflow-hidden scale-[0.80] origin-center"
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: i * 0.1 }}
-                  >
-                    <div className="absolute top-0 right-0 w-16 h-16 bg-blue-50 rounded-full -mr-8 -mt-8 group-hover:scale-150 transition-transform duration-700" />
-                    <h3 className="text-base font-black text-[#050249] mb-2 uppercase italic tracking-tighter relative z-10 leading-tight">{card.title}</h3>
-                    <p className="text-slate-500 font-medium mb-6 text-xs leading-relaxed relative z-10 italic">
-                      {card.desc}
-                    </p>
-                    <Link to={card.link} className="mt-auto w-full">
-                       <Button variant="outline" className="w-full rounded-xl border-2 border-blue-50 text-[#050249] font-black group-hover:bg-[#050249] group-hover:text-white transition-all uppercase text-[9px] tracking-widest py-2">{card.cta}</Button>
-                    </Link>
-                  </motion.div>
-                ))}
-              </motion.div>
-              <div className="h-12 md:h-24" /> 
+              <div className="space-y-4 mb-10 max-w-2xl">
+                <p className="text-lg text-blue-50/90 font-medium leading-relaxed italic">
+                  {t('hero.platform_desc')}
+                </p>
+                <p className="text-sm text-[#23d9b0] font-black uppercase tracking-widest italic">
+                  {t('hero.amenity_desc')}
+                </p>
+              </div>
 
               <div className="flex flex-col sm:flex-row gap-4 py-6">
                 <Link
                   to="/enroll"
-                  className="bg-white text-[#050249] hover:bg-blue-50 font-black px-6 py-3 rounded-2xl transition-all text-[12px] md:text-sm text-center shadow-2xl hover:-translate-y-1 active:translate-y-0"
+                  className="bg-white text-[#050249] hover:bg-blue-50 font-black px-10 py-5 rounded-2xl transition-all text-base text-center shadow-2xl hover:-translate-y-1 active:translate-y-0 uppercase tracking-tighter"
                 >
                   {t('hero.cta1')}
                 </Link>
                 <a
                   href="#partner"
-                  className="bg-blue-600/20 hover:bg-blue-600/30 backdrop-blur-md border border-white/20 text-white font-black px-6 py-3 rounded-2xl transition-all text-[12px] md:text-sm text-center flex items-center justify-center gap-3"
+                  className="bg-blue-600/20 hover:bg-blue-600/30 backdrop-blur-md border border-white/20 text-white font-black px-10 py-5 rounded-2xl transition-all text-base text-center flex items-center justify-center gap-3 uppercase tracking-tighter"
                 >
                   {t('hero.cta2')}
                 </a>
               </div>
+
+              <p className="text-[11px] text-blue-300/40 mt-8 max-w-md font-medium leading-relaxed">
+                {t('disclaimer.text')}
+              </p>
             </motion.div>
           </div>
+        </div>
+      </section>
+
+      {/* ── HIGH-CONVERSION FEATURE GRID ── */}
+      <section className="bg-white py-24 relative z-30">
+        <div className="container mx-auto px-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {[
+              { 
+                title: t('features.access.title'), 
+                desc: t('features.access.desc'), 
+                icon: Clock,
+                color: 'bg-blue-50 text-blue-600'
+              },
+              { 
+                title: t('features.speed.title'), 
+                desc: t('features.speed.desc'), 
+                icon: Zap,
+                color: 'bg-emerald-50 text-emerald-600'
+              },
+              { 
+                title: t('features.membership.title'), 
+                desc: t('features.membership.desc'), 
+                icon: Users,
+                color: 'bg-purple-50 text-purple-600'
+              },
+              { 
+                title: t('features.secure.title'), 
+                desc: t('features.secure.desc'), 
+                icon: Shield,
+                color: 'bg-slate-50 text-slate-600'
+              }
+            ].map((feature, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="group p-8 rounded-[2.5rem] bg-white border border-slate-100/10 hover:border-slate-200 hover:shadow-[0_20px_50px_rgba(0,0,0,0.05)] transition-all duration-500"
+              >
+                <div className={`h-14 w-14 rounded-2xl ${feature.color} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500`}>
+                  <feature.icon className="h-6 w-6" />
+                </div>
+                <h3 className="text-xl font-black text-[#050249] mb-3 uppercase tracking-tight italic">{feature.title}</h3>
+                <p className="text-slate-500 font-medium text-sm italic">{feature.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── PILLAR BLOCK (Four Pillars) ── */}
+      <section className="bg-slate-50 py-32 relative overflow-hidden">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-5xl font-black text-[#050249] uppercase italic tracking-tighter mb-4">{t('serve.title')}</h2>
+            <div className="h-1.5 w-24 bg-[#23d9b0] mx-auto rounded-full" />
+          </div>
+          <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8" {...fadeIn}>
+            {[
+              { title: t('serve.card1.title'), desc: t('serve.card1.desc'), cta: t('serve.card1.cta'), link: '/partners' },
+              { title: t('serve.card2.title'), desc: t('serve.card2.desc'), cta: t('serve.card2.cta'), link: '/partners' },
+              { title: t('serve.card4.title'), desc: t('serve.card4.desc'), cta: t('serve.card4.cta'), link: '/partners' },
+              { title: 'Hospitality Pillar', desc: 'Connecting travelers with licensed physicians from the comfort of their room.', cta: 'About Us', link: '/about' }
+            ].map((card, i) => (
+              <motion.div
+                key={i}
+                className="bg-white rounded-[2rem] p-8 shadow-sm border border-slate-100 flex flex-col group hover:shadow-2xl transition-all duration-500 hover:-translate-y-2"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+              >
+                <h3 className="text-xl font-black text-[#050249] mb-4 uppercase italic tracking-tight leading-tight">{card.title}</h3>
+                <p className="text-slate-500 font-medium mb-8 text-sm leading-relaxed italic">
+                  {card.desc}
+                </p>
+                <Link to={card.link} className="mt-auto">
+                    <Button variant="outline" className="w-full rounded-xl border-2 border-slate-100 text-[#050249] font-black group-hover:bg-[#050249] group-hover:text-white transition-all uppercase text-[10px] tracking-widest py-3">{card.cta}</Button>
+                </Link>
+              </motion.div>
+            ))}
+          </motion.div>
         </div>
       </section>
 

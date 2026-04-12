@@ -32,7 +32,7 @@ export function Enroll() {
           >
             Join the Network
           </motion.div>
-          <h1 className="text-4xl md:text-6xl font-black text-[#050249] mb-6 tracking-tight italic uppercase">Better Care. Here. Now.</h1>
+          <h1 className="text-4xl md:text-6xl font-black text-[#050249] mb-6 tracking-tight italic uppercase">Better Care. <span className="text-[#23d9b0]">Here. Now.</span></h1>
           <p className="text-xl text-slate-500 font-medium max-w-2xl mx-auto italic">Complete your enrollment in under 5 minutes and get immediate 24/7 access to board-certified care.</p>
         </div>
 
