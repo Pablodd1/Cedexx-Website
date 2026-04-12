@@ -41,19 +41,19 @@ export function VirtualReceptionist() {
       vapi.start({
         name: "Cedexx Front Desk Assistant",
         model: {
-          provider: "custom-llm", // Kimi is custom or we can use OpenAI
-          model: "gpt-4",
-          url: "https://cedexx-website.vercel.app/api/chat", // Pointing to our Kimi bridge
+          provider: "custom-llm", 
+          model: "moonshot-v1-8k",
+          url: "https://cedexx-website.vercel.app/api/chat", 
           messages: [
             {
               role: "system",
-              content: "You are the Cedexx Healthcare Virtual Front Desk. You are speaking to a customer. Be helpful, professional, and explain that you can help with 24/7 doctor access, prescriptions, and mental wellness coverage. Pricing is $14.99/mo individual, $27.99/mo family. Be concise."
+              content: "You are the Cedexx Healthcare Virtual Front Desk. You are speaking to a customer. Be helpful, professional, and explain that you can help with 24/7 doctor access, prescriptions, and mental wellness coverage. Pricing is $14.99/mo individual, $27.99/mo family. Be concise. Respond using the Kimi AI engine for maximum speed."
             }
           ]
         },
         voice: {
-          provider: "11labs",
-          voiceId: "jennifer" 
+          provider: "google",
+          voiceId: "en-US-Neural2-F" 
         }
       });
     } else {

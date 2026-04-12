@@ -15,14 +15,40 @@ export default async function handler(req, res) {
   const systemPrompt = `${langInstruction} You are Cedex, a warm and professional AI for Cedexx — a technology platform connecting families to independent telemedicine providers. No insurance needed. Pricing: $14.99/mo individual, $27.99/mo family. Contact: info@cedexx.net. No medical diagnoses. For emergencies, call 911.`;
 
   try {
-    if (provider === 'gemini' && GEMINI_KEY) {
+    const useKimi = provider === 'kimi' || req.body.model === 'moonshot-v1-8k' || (!GEMINI_KEY && KIMI_KEY);
+
+    if (useKimi && KIMI_KEY) {
+      // Kimi (Moonshot) Implementation - Optimized for speed
+      const response = await fetch('https://api.moonshot.cn/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${KIMI_KEY}`
+        },
+        body: JSON.stringify({
+          model: "moonshot-v1-8k",
+          messages: [
+            { role: "system", content: systemPrompt },
+            ...messages
+          ],
+          temperature: 0.3,
+          max_tokens: 400
+        })
+      });
+
+      const data = await response.json();
+      
+      // Vapi expects a specific structure if not using their standard OpenAI integration
+      // But typically it follows the OpenAI choices structure which Kimi already provides.
+      return res.status(200).json(data);
+    } else if (GEMINI_KEY) {
       // Google Gemini Implementation
       const geminiMessages = messages.map(m => ({
         role: m.role === 'assistant' ? 'model' : 'user',
         parts: [{ text: m.content }]
       }));
 
-      // Insert system prompt as first user message if history is empty
+      // Insert system prompt
       if (geminiMessages.length === 0 || geminiMessages[0].role !== 'user') {
         geminiMessages.unshift({ role: 'user', parts: [{ text: systemPrompt }] });
       } else {
@@ -44,26 +70,6 @@ export default async function handler(req, res) {
       return res.status(200).json({
         choices: [{ message: { content: reply } }]
       });
-    } else if (KIMI_KEY) {
-      // Kimi (Moonshot) Implementation
-      const response = await fetch('https://api.moonshot.cn/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${KIMI_KEY}`
-        },
-        body: JSON.stringify({
-          model: "moonshot-v1-8k",
-          messages: [
-            { role: "system", content: systemPrompt },
-            ...messages
-          ],
-          temperature: 0.3
-        })
-      });
-
-      const data = await response.json();
-      return res.status(200).json(data);
     } else {
       return res.status(500).json({ error: 'No AI provider configured' });
     }

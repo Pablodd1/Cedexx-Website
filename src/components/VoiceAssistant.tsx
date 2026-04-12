@@ -102,7 +102,7 @@ export function VoiceAssistant({ inline = false }: { inline?: boolean }) {
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 messages: [{ role: 'user', content: text }],
-                provider: 'gemini'
+                provider: 'kimi'
               })
             });
             const data = await response.json();
