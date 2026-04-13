@@ -31,7 +31,7 @@ export function Partners() {
               Strategic <span className="text-[#23d9b0]">Partnerships</span>
             </h1>
             <p className="text-xl md:text-2xl text-blue-100 font-medium leading-relaxed italic max-w-2xl mx-auto">
-              Better Care, Here and <span className="text-[#23d9b0]">Now.</span> Keep It in Your Back Pocket.
+              Better Care. Here. <span className="text-[#23d9b0]">Now.</span> Keep It in Your Back Pocket.
             </p>
           </motion.div>
         </div>
@@ -131,7 +131,7 @@ export function Partners() {
                     },
                     { 
                       icon: Smartphone, 
-                      title: 'Hospitality', 
+                      title: 'Hospitality Solutions', 
                       text: 'Add convenience and practicality for your hotel guests.' 
                     },
                     { 

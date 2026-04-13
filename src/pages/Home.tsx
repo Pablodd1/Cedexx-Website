@@ -86,7 +86,7 @@ export function Home() {
             >
 
               <h1 className="text-4xl md:text-7xl font-black leading-[0.9] mb-6 tracking-tighter uppercase italic">
-                Better Care, Here and <span className="text-[#23d9b0]">Now.</span>
+                Better Care. Here. <span className="text-[#23d9b0]">Now.</span>
               </h1>
               
               <h2 className="text-xl md:text-3xl font-bold text-[#23d9b0] mb-8 tracking-tight italic max-w-2xl">
@@ -186,7 +186,7 @@ export function Home() {
               { title: t('serve.card1.title'), desc: t('serve.card1.desc'), cta: t('serve.card1.cta'), link: '/partners' },
               { title: t('serve.card2.title'), desc: t('serve.card2.desc'), cta: t('serve.card2.cta'), link: '/partners' },
               { title: t('serve.card4.title'), desc: t('serve.card4.desc'), cta: t('serve.card4.cta'), link: '/partners' },
-              { title: 'Hospitality Pillar', desc: 'Connecting travelers with licensed physicians from the comfort of their room.', cta: 'About Us', link: '/about' }
+              { title: 'Travelers & Gig Workers', desc: 'Instant access to licensed physicians—at your hotel or on the move.', cta: 'About Us', link: '/about' }
             ].map((card, i) => (
               <motion.div
                 key={i}
@@ -450,7 +450,8 @@ export function Home() {
         <div className="container mx-auto px-6 text-center relative z-10">
           <motion.div {...fadeIn}>
               <h2 className="text-4xl md:text-7xl font-black mb-12 leading-none tracking-tighter">
-                Keep It in<br />Your <span className="text-[#23d9b0]">Back Pocket.</span>
+                Better Care. Here. <span className="text-[#23d9b0]">Now.</span><br />
+                Keep It in Your <span className="text-[#23d9b0]">Back Pocket.</span>
               </h2>
             <div className="flex flex-col sm:flex-row gap-6 justify-center">
                <Link to="/enroll" className="bg-white text-[#050249] px-12 py-6 rounded-2xl font-black text-lg hover:scale-105 transition-all shadow-[0_30px_100px_rgba(255,255,255,0.1)] uppercase tracking-tighter">Start Membership</Link>

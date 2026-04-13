@@ -176,7 +176,7 @@ export function Contact() {
                   href="/"
                   className="flex items-center gap-3 text-[12px] font-black text-[#050249] hover:bg-[#050249] hover:text-white transition-all bg-white border border-blue-50 rounded-2xl px-6 py-3 shadow-sm"
                 >
-                  <Globe className="h-5 w-5" /> cedexx.com
+                  <Globe className="h-5 w-5" /> cedexx.net
                 </a>
               </div>
 

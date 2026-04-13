@@ -208,7 +208,7 @@ export function Layout() {
                </Link>
                <div className="space-y-1">
                  <p className="text-blue-100/60 max-w-sm text-[11px] font-medium leading-relaxed italic whitespace-pre-line text-center md:text-left">
-                   Better Care, Here and <span className="text-[#23d9b0]">Now.</span> Keep It in Your Back Pocket.
+                   Better Care. Here. <span className="text-[#23d9b0]">Now.</span> Keep It in Your Back Pocket.
                  </p>
                </div>
             </div>

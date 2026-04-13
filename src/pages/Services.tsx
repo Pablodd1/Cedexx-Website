@@ -33,12 +33,12 @@ export function Services() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
-              { icon: Stethoscope, title: 'Urgent Care', desc: 'Treatment for common illnesses like flu, allergies, infections, and more. Available 24/7 in under 15 minutes.' },
-              { icon: Brain, title: 'Mental Wellness', desc: 'Immediate support and counseling for anxiety, depression, and stress management.' },
-              { icon: HeartPulse, title: 'Prescription Access', desc: 'Evaluation and digital prescriptions sent instantly to your local pharmacy in real time.' },
-              { icon: Activity, title: 'Pediatric Care', desc: 'Board-certified pediatric specialists for your children when your regular doctor is unavailable.' },
-              { icon: ShieldCheck, title: 'Work & School Notes', desc: 'Medically necessary documentation for employers and schools provided digitally after consults.' },
-              { icon: Users, title: 'Family Wellness', desc: 'Holistic support including nutrition counseling and preventative coaching for your whole household.' }
+              { icon: Stethoscope, title: 'Urgent Care', desc: 'Providers can evaluate and treat common illnesses like flu, allergies, infections, and more. Available 24/7.' },
+              { icon: Brain, title: 'Mental Wellness', desc: 'Secure consultations and support for anxiety, depression, and stress management.' },
+              { icon: HeartPulse, title: 'Prescription Access', desc: 'Evaluation and digital prescriptions and refills sent to your local pharmacy when medically appropriate.' },
+              { icon: Activity, title: 'Pediatric Care', desc: 'Immediate access to board-certified pediatric specialists for your children when your regular doctor is unavailable.' },
+              { icon: ShieldCheck, title: 'Work & School Notes', desc: 'Clinical documentation for employers and schools provided digitally after consults at provider discretion.' },
+              { icon: Users, title: 'Family Wellness', desc: 'Holistic support including wellness coaching and preventative counseling for your household.' }
             ].map((service, i) => (
               <Card key={i} className="p-10 hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 border-blue-50 bg-[#EBF3FB] rounded-[2.5rem] group">
                 <div className="h-16 w-16 rounded-2xl bg-white flex items-center justify-center mb-8 text-[#050249] group-hover:bg-[#050249] group-hover:text-white transition-all duration-300 shadow-sm">
@@ -61,7 +61,7 @@ export function Services() {
                 <div className="inline-block bg-white text-[#050249] text-[10px] font-black px-3 py-1 rounded-full mb-6 border border-blue-200">INSTANT ACCESS</div>
                 <h3 className="text-3xl md:text-5xl font-black text-[#050249] mb-8 leading-tight">Digital Prescriptions & Documentation</h3>
                 <p className="text-lg text-slate-600 mb-10 font-medium leading-relaxed">
-                  Don't wait hours in a clinic. Providers on our platform can diagnose and treat common conditions in minutes. If medication is needed, they'll send the prescription directly to your pharmacy in real time.
+                  Don't wait hours in a clinic. Licensed providers can evaluate and treat common conditions digitally. If medication is needed, they'll send the prescription directly to your pharmacy at their clinical discretion.
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                    {[
@@ -150,7 +150,7 @@ export function Services() {
       <section className="py-24 bg-[#050249] text-white">
         <div className="container mx-auto px-4 text-center">
           <div className="max-w-4xl mx-auto bg-white/5 backdrop-blur-md rounded-[4rem] p-16 border border-white/10 shadow-2xl">
-            <h2 className="text-3xl md:text-5xl font-black mb-8 tracking-tight">Better Care, Here and <span className="text-[#23d9b0]">Now.</span></h2>
+            <h2 className="text-3xl md:text-5xl font-black mb-8 tracking-tight">Better Care. Here. <span className="text-[#23d9b0]">Now.</span></h2>
             <p className="text-xl md:text-2xl text-blue-100 mb-12 max-w-2xl mx-auto font-medium italic">
               "Connect with a provider in minutes!" — Enrollment now open for individuals and families at one fixed monthly rate.
             </p>
