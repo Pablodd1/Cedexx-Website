@@ -17,7 +17,7 @@ export function PartnerForm() {
     'Hospitality Partner',
     'Affiliate Partner',
     'Housing / REIT Partner',
-    'Individual / Life Solutions'
+    'Physician'
   ];
 
   const handleSubmit = (e: React.FormEvent) => {
