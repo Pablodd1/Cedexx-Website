@@ -140,9 +140,9 @@ export function Partners() {
                       text: 'Earn flexible income through our scheduled block model.' 
                     },
                     { 
-                      icon: Shield, 
-                      title: 'Compliance & Safety', 
-                      text: 'National healthcare platform with security for all partners.' 
+                      icon: Users, 
+                      title: 'Affiliate Partner', 
+                      text: 'Join our referral network and help bring premium digital care to your community.' 
                     }
                   ].map((item, id) => (
                     <div key={id} className="flex gap-6 group">
