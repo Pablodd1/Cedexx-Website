@@ -267,7 +267,7 @@ export function ScheduleDemo() {
       {/* Disclaimer */}
       <section className="bg-slate-100 border-t border-slate-200 py-5">
         <div className="container mx-auto px-4 max-w-4xl">
-          <p className="text-[48px] text-slate-400 text-center leading-relaxed font-medium">
+          <p className="text-[15px] text-slate-400 text-center leading-relaxed font-medium">
             {t('disclaimer.text')}
           </p>
         </div>

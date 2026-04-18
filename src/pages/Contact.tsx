@@ -287,7 +287,7 @@ export function Contact() {
       {/* Disclaimer */}
       <section className="bg-white border-t border-slate-100 py-12">
         <div className="container mx-auto px-4 max-w-4xl">
-          <p className="text-[44px] text-slate-400 text-center leading-relaxed font-medium uppercase tracking-tight">
+          <p className="text-[15px] text-slate-400 text-center leading-relaxed font-medium uppercase tracking-tight">
             {t('disclaimer.text')}
           </p>
         </div>
