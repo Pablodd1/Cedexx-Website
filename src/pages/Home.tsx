@@ -117,7 +117,7 @@ export function Home() {
                 </a>
               </div>
 
-              <p className="text-[11px] text-blue-300/40 mt-8 max-w-md font-medium leading-relaxed">
+              <p className="text-[11px] text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] mt-8 max-w-md font-medium leading-relaxed">
                 {t('disclaimer.text')}
               </p>
             </motion.div>
