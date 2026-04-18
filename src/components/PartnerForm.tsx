@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { CheckCircle2, Loader2 } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 export function PartnerForm() {
+  const { t } = useLanguage();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -14,10 +16,10 @@ export function PartnerForm() {
   const [isSent, setIsSent] = useState(false);
 
   const roles = [
+    t('role.physician'),
+    t('role.affiliate'),
     'Hospitality Partner',
-    'Affiliate Partner',
-    'Housing / REIT Partner',
-    'Physician'
+    'Housing / REIT Partner'
   ];
 
   const handleSubmit = (e: React.FormEvent) => {

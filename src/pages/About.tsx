@@ -236,8 +236,8 @@ export function About() {
         
         {/* Secondary Disclaimer */}
         <div className="container mx-auto px-6 mt-20 relative z-10">
-           <p className="text-[10px] text-blue-400/30 uppercase tracking-[0.3em] text-center max-w-2xl mx-auto font-black italic">
-             CEDEXX is a technology platform connecting members to medical providers. We do not provide medical services or advice directly.
+           <p className="text-[40px] text-blue-400/30 uppercase tracking-[0.2em] text-center max-w-3xl mx-auto font-black italic leading-relaxed">
+             CEDEXX is a technology platform. We do not provide medical care directly. All services are delivered by independent licensed providers. This platform is not a substitute for health insurance.
            </p>
         </div>
       </section>

@@ -70,8 +70,7 @@ export const InvestorPitch = () => {
                 transition={{ delay: 0.2, duration: 0.8 }}
                 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-black text-white italic leading-[0.95] tracking-tighter mb-12 uppercase break-words"
               >
-                Driving <span className="text-emerald-400">Yield</span><br />
-                Multiplication.
+                Better Care. Here. <span className="text-[#23d9b0]">Now.</span>
               </motion.h1>
 
               <motion.p 
@@ -350,14 +349,15 @@ export const InvestorPitch = () => {
                           <button 
                              key={n}
                              onClick={() => setBedCount(n)}
-                             className={`py-3 rounded-xl text-[10px] font-black transition-all ${bedCount === n ? 'bg-emerald-400 text-[#050249]' : 'bg-white/5 text-blue-200 hover:bg-white/10'}`}
+                             className={`py-2 rounded-lg text-[6.3px] font-black transition-all ${bedCount === n ? 'bg-emerald-400 text-[#050249]' : 'bg-white/5 text-blue-200 hover:bg-white/10'}`}
                           >
                              {`${n / 1000}K`}
                           </button>
                         ))}
                      </div>
                  </div>
-              </Card>              <Card className="glass p-6 md:p-12 border-emerald-500/20 col-span-1 lg:col-span-2 shadow-[0_50px_150px_rgba(35,217,176,0.15)] flex flex-col justify-center items-center text-center">
+              </Card>
+              <Card className="glass p-6 md:p-12 border-emerald-500/20 col-span-1 lg:col-span-2 shadow-[0_50px_150px_rgba(35,217,176,0.15)] flex flex-col justify-center items-center text-center">
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 w-full items-stretch">
                     <motion.div 
                         key={bedCount}
@@ -365,21 +365,21 @@ export const InvestorPitch = () => {
                         animate={{ opacity: 1, scale: 1 }}
                         className="space-y-2 p-6 md:p-10 bg-blue-900/5 rounded-[2rem] md:rounded-[3rem] border border-blue-900/10 flex flex-col justify-center"
                      >
-                        <div className="text-[10px] font-black text-blue-500 uppercase tracking-[0.3em] mb-4">Annual NOI Multiplication</div>
-                        <div className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-black text-[#050249] italic leading-none whitespace-nowrap tracking-tighter">${annualNOI}</div>
-                        <p className="text-blue-900/40 text-[10px] md:text-xs font-bold uppercase tracking-widest italic pt-4">Direct Portfolio Revenue</p>
+                        <div className="text-[8px] md:text-[9px] font-black text-blue-500 uppercase tracking-[0.2em] mb-4">Annual NOI Multiplication</div>
+                        <div className={`${bedCount >= 5000 ? 'text-sm sm:text-base lg:text-lg xl:text-2xl' : 'text-2xl sm:text-3xl lg:text-4xl xl:text-5xl'} font-black text-[#050249] italic leading-none whitespace-nowrap tracking-tighter`}>${annualNOI}</div>
+                        <p className="text-blue-900/40 text-[8px] md:text-[10px] font-bold uppercase tracking-widest italic pt-4">Direct Portfolio Revenue</p>
                      </motion.div>
  
                      <motion.div 
                         key={bedCount + '_lift'}
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        className="space-y-2 p-6 md:p-10 bg-emerald-500 rounded-[2rem] md:rounded-[3rem] shadow-2xl relative overflow-hidden group w-full flex flex-col justify-center"
+                        className="space-y-2 p-6 md:p-10 bg-[#23d9b0] rounded-[2rem] md:rounded-[3rem] shadow-2xl relative overflow-hidden group w-full flex flex-col justify-center"
                      >
                         <div className="absolute top-0 right-0 w-32 h-32 bg-white/20 rounded-full blur-3xl -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-700" />
-                        <div className="text-[10px] font-black text-emerald-900 uppercase tracking-[0.3em] mb-4 relative z-10">Asset Valuation Expansion</div>
-                        <div className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-black text-white italic leading-none relative z-10 whitespace-nowrap tracking-tighter">${assetLift}</div>
-                        <p className="text-emerald-900/60 text-[10px] md:text-xs font-bold uppercase tracking-widest italic pt-4 relative z-10">At 5.0% Exit Cap Rate</p>
+                        <div className="text-[8px] md:text-[9px] font-black text-emerald-900 uppercase tracking-[0.2em] mb-4 relative z-10">Asset Valuation Expansion</div>
+                        <div className={`${bedCount >= 5000 ? 'text-sm sm:text-base lg:text-lg xl:text-2xl' : 'text-2xl sm:text-3xl lg:text-4xl xl:text-5xl'} font-black text-white italic leading-none relative z-10 whitespace-nowrap tracking-tighter`}>${assetLift}</div>
+                        <p className="text-emerald-900/60 text-[8px] md:text-[10px] font-bold uppercase tracking-widest italic pt-4 relative z-10">At 5.0% Exit Cap Rate</p>
                      </motion.div>
                  </div>
               </Card>

@@ -254,7 +254,7 @@ export function Layout() {
         </div>
 
         <div className="container mx-auto px-6 mt-20 pt-10 border-t border-white/5">
-          <p className="text-[10px] text-blue-500/60 leading-relaxed text-center max-w-2xl mx-auto mb-8 font-medium">
+          <p className="text-[40px] text-blue-500/60 leading-relaxed text-center max-w-3xl mx-auto mb-8 font-medium">
             {t('disclaimer.text')}
           </p>
           <div className="flex flex-col items-center gap-2">
