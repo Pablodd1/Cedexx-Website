@@ -86,7 +86,7 @@ export function Home() {
             >
 
               <h1 className="text-4xl md:text-7xl font-black leading-[0.9] mb-6 tracking-tighter uppercase italic">
-                Better Care. Here. <span className="text-[#23d9b0]">Now.</span>
+                Better Care, Here and <span className="text-[#23d9b0]">Now.</span>
               </h1>
               
               <h2 className="text-xl md:text-3xl font-bold text-[#23d9b0] mb-8 tracking-tight italic max-w-2xl">
@@ -117,7 +117,7 @@ export function Home() {
                 </a>
               </div>
 
-              <p className="text-[11px] text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] mt-8 max-w-md font-medium leading-relaxed">
+              <p className="text-[11px] text-white drop-shadow-[0_4px_6px_rgba(0,0,0,0.9)] mt-8 max-w-md font-bold leading-relaxed">
                 {t('disclaimer.text')}
               </p>
             </motion.div>
@@ -450,7 +450,7 @@ export function Home() {
         <div className="container mx-auto px-6 text-center relative z-10">
           <motion.div {...fadeIn}>
               <h2 className="text-4xl md:text-7xl font-black mb-12 leading-none tracking-tighter">
-                Better Care. Here. <span className="text-[#23d9b0]">Now.</span><br />
+                Better Care, Here and <span className="text-[#23d9b0]">Now.</span><br />
                 Keep It in Your <span className="text-[#23d9b0]">Back Pocket.</span>
               </h2>
             <div className="flex flex-col sm:flex-row gap-6 justify-center">

@@ -68,7 +68,7 @@ export const InvestorPitch = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2, duration: 0.8 }}
-                className="text-4xl md:text-8xl font-black text-white italic leading-[0.95] tracking-tighter mb-12 uppercase"
+                className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-black text-white italic leading-[0.95] tracking-tighter mb-12 uppercase break-words"
               >
                 Driving <span className="text-emerald-400">Yield</span><br />
                 Multiplication.
@@ -87,13 +87,13 @@ export const InvestorPitch = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.6 }}
-                className="flex flex-wrap gap-6"
+                className="flex flex-col sm:flex-row gap-6"
               >
-                <Button size="lg" className="bg-emerald-400 hover:bg-emerald-500 border-none px-12 h-16 rounded-2xl font-black text-lg uppercase tracking-widest shadow-2xl shadow-emerald-500/20 group text-[#050249]">
+                <Button size="lg" className="bg-emerald-400 hover:bg-emerald-500 border-none px-12 h-16 rounded-2xl font-black text-lg uppercase tracking-widest shadow-2xl shadow-emerald-500/20 group text-[#050249] w-full sm:w-auto">
                   Download Deck
                   <ChevronDown className="ml-2 group-hover:translate-y-1 transition-transform" />
                 </Button>
-                <Button variant="outline" size="lg" className="border-white/20 text-white hover:bg-white/10 px-8 md:px-12 h-16 rounded-2xl font-black text-lg uppercase tracking-widest bg-white/5 backdrop-blur-xl">
+                <Button variant="outline" size="lg" className="border-white/20 text-white hover:bg-white/10 px-8 md:px-12 h-16 rounded-2xl font-black text-lg uppercase tracking-widest bg-white/5 backdrop-blur-xl w-full sm:w-auto">
                   Contact Team
                 </Button>
               </motion.div>
@@ -108,12 +108,12 @@ export const InvestorPitch = () => {
           >
              <div className="relative group">
                 <div className="absolute inset-0 bg-emerald-500/20 blur-[150px] rounded-full scale-150" />
-                <Card className="glass-dark border-white/10 p-12 w-[500px] h-[600px] rotate-[-5deg] scale-110 shadow-[0_50px_100px_rgba(0,0,0,0.5)]">
+                <Card className="glass-dark border-white/10 p-6 md:p-12 w-full max-w-[500px] h-auto md:h-[600px] rotate-[-2deg] md:rotate-[-5deg] scale-100 md:scale-110 shadow-[0_50px_100px_rgba(0,0,0,0.5)]">
                    <div className="flex flex-col gap-10">
                       <div className="h-1 bg-gradient-to-r from-emerald-500 to-transparent w-full opacity-50" />
                       <div className="space-y-4">
                         <div className="text-[10px] uppercase font-black tracking-[0.5em] text-emerald-400">Net Asset Yield</div>
-                        <div className="text-6xl font-black text-white italic">+ $12.4M</div>
+                        <div className="text-4xl md:text-6xl font-black text-white italic">+ $12.4M</div>
                       </div>
                       <div className="space-y-6">
                         {[
@@ -185,7 +185,7 @@ export const InvestorPitch = () => {
                </p>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-stretch">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-stretch">
                {/* Problem Card */}
                <motion.div 
                   initial={{ opacity: 0, y: 30 }}
@@ -231,7 +231,7 @@ export const InvestorPitch = () => {
                   transition={{ delay: 0.2 }}
                   className="group relative"
                >
-                  <Card className="glass p-8 md:p-12 h-full border-blue-100 shadow-2xl group-hover:shadow-[0_80px_100px_rgba(56,189,248,0.15)] transition-all rounded-[2rem] md:rounded-[3rem] overflow-hidden">
+                  <Card className="glass p-8 md:p-12 h-full border-blue-100 shadow-2xl group-hover:shadow-[0_80px_100px_rgba(56,189,248,0.15)] transition-all rounded-[2.5rem] md:rounded-[3rem] overflow-hidden">
                      <div className="absolute top-0 right-0 w-64 h-64 bg-[#23d9b0]/5 rounded-full blur-[80px] -mr-32 -mt-32" />
                      <div className="h-16 w-16 bg-emerald-50 text-emerald-500 rounded-2xl md:rounded-3xl flex items-center justify-center mb-8 border border-emerald-100 relative z-10">
                         <Zap className="h-8 w-8" />
@@ -268,7 +268,7 @@ export const InvestorPitch = () => {
         {/* GROWTH RAMP - INTERACTIVE GRAPH */}
         <section className="py-40 bg-white">
            <div className="container mx-auto px-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-24 items-center">
                  <motion.div initial={{ opacity:0, x:-50 }} whileInView={{ opacity:1, x:0 }} viewport={{ once:true }}>
                     <div className="text-[10px] font-black text-blue-500 uppercase tracking-[0.5em] mb-8">Scaling Velocity</div>
                     <h2 className="text-4xl md:text-7xl font-black text-[#050249] mb-10 leading-[0.9] tracking-tighter italic uppercase">Portfolio Velocity.</h2>
@@ -294,16 +294,16 @@ export const InvestorPitch = () => {
                     </div>
                  </motion.div>
 
-                 <div className="relative h-[400px] md:h-[600px] flex items-end justify-between p-6 md:p-12 bg-slate-50 rounded-[2.5rem] md:rounded-[4rem] border border-slate-100 shadow-inner group overflow-hidden">
+                  <div className="relative h-[300px] md:h-[600px] flex items-end justify-around p-4 md:p-12 bg-slate-50 rounded-[2rem] md:rounded-[4rem] border border-slate-100 shadow-inner group">
                     {growthPoints.map((point, i) => (
                       <div key={i} className="flex flex-col items-center gap-4 md:gap-6 h-full justify-end relative z-10">
-                         <motion.div 
-                            initial={{ height: 0 }}
-                            whileInView={{ height: point.height }}
-                            viewport={{ once: true }}
-                            transition={{ delay: i * 0.2, duration: 1 }}
-                            className={`w-10 md:w-24 rounded-t-xl md:rounded-t-3xl relative ${i === 2 ? 'bg-gradient-to-t from-emerald-500 to-emerald-300 shadow-[0_20px_50px_rgba(52,211,153,0.3)]' : 'bg-blue-100 group-hover:bg-blue-200 transition-colors'}`}
-                         >
+                          <motion.div 
+                             initial={{ height: 0 }}
+                             whileInView={{ height: i === 2 ? '85%' : point.height }}
+                             viewport={{ once: true }}
+                             transition={{ delay: i * 0.2, duration: 1 }}
+                             className={`w-8 sm:w-16 md:w-24 rounded-t-xl md:rounded-t-3xl relative ${i === 2 ? 'bg-gradient-to-t from-emerald-500 to-emerald-300 shadow-[0_20px_50px_rgba(52,211,153,0.3)]' : 'bg-blue-100 group-hover:bg-blue-200 transition-colors'}`}
+                          >
                             <div className="absolute -top-12 md:-top-16 left-1/2 -translate-x-1/2 text-center w-max">
                                <div className="text-xl md:text-2xl font-black text-[#050249]">{point.revenue}</div>
                                <div className="text-[8px] md:text-xs font-bold text-slate-400 uppercase italic leading-none">{point.users}</div>
@@ -324,65 +324,63 @@ export const InvestorPitch = () => {
 
         {/* REIT PROFIT CALCULATOR - INTERACTIVE FOOTER */}
         <section className="py-40 bg-[#050249] text-white relative overflow-hidden">
-           <div className="container mx-auto px-6 relative z-10 text-center mb-24">
-              <h2 className="text-4xl md:text-7xl font-black mb-10 leading-[0.9] tracking-tighter italic uppercase">"Glassworth" Portfolio Impact.</h2>
-              <p className="text-xl text-blue-100/60 font-medium italic max-w-2xl mx-auto">
+            <div className="container mx-auto px-6 relative z-10 text-center mb-12 md:mb-24">
+              <h2 className="text-3xl sm:text-4xl md:text-7xl font-black mb-10 leading-[0.9] tracking-tighter italic uppercase">"Glassworth" Portfolio Impact.</h2>
+              <p className="text-lg md:text-xl text-blue-100/60 font-medium italic max-w-2xl mx-auto">
                  Model your own portfolio lift at a 5% exit Cap Rate.
               </p>
-           </div>
+            </div>
            
            <div className="container mx-auto px-6 grid grid-cols-1 lg:grid-cols-3 gap-12 relative z-10 pb-40">
-              <Card className="glass-dark p-12 border-white/10 flex flex-col items-center col-span-1 lg:col-span-1">
-                 <Building2 className="h-16 w-16 text-emerald-400 mb-8" />
-                 <h3 className="text-2xl font-black mb-8 italic uppercase text-center">Your Bed Portfolio</h3>
+              <Card className="glass-dark p-6 md:p-12 border-white/10 flex flex-col items-center col-span-1 lg:col-span-1">
+                 <Building2 className="h-12 w-12 md:h-16 md:w-16 text-emerald-400 mb-6 md:mb-8" />
+                 <h3 className="text-xl md:text-2xl font-black mb-6 md:mb-8 italic uppercase text-center">Your Bed Portfolio</h3>
                  <div className="w-full space-y-6">
                     <div className="relative">
                        <Input 
                           type="number" 
                           value={bedCount}
                           onChange={(e) => setBedCount(Number(e.target.value))}
-                          className="bg-white/5 border-white/10 text-white text-center h-20 text-4xl font-black rounded-3xl"
+                          className="bg-white/5 border-white/10 text-white text-center h-16 md:h-20 text-2xl md:text-4xl font-black rounded-2xl md:rounded-3xl"
                        />
-                       <span className="absolute right-6 top-1/2 -translate-y-1/2 text-xs font-black uppercase text-blue-400 tracking-widest">Beds</span>
+                       <span className="absolute right-4 md:right-6 top-1/2 -translate-y-1/2 text-[10px] font-black uppercase text-blue-400 tracking-widest">Beds</span>
                     </div>
-                     <div className="flex justify-between gap-4">
+                     <div className="grid grid-cols-4 gap-2">
                         {[1000, 5000, 10000, 25000].map(n => (
                           <button 
                              key={n}
                              onClick={() => setBedCount(n)}
-                             className={`flex-1 py-3 rounded-xl text-[10px] font-black transition-all ${bedCount === n ? 'bg-emerald-400 text-[#050249]' : 'bg-white/5 text-blue-200 hover:bg-white/10'}`}
+                             className={`py-3 rounded-xl text-[10px] font-black transition-all ${bedCount === n ? 'bg-emerald-400 text-[#050249]' : 'bg-white/5 text-blue-200 hover:bg-white/10'}`}
                           >
                              {`${n / 1000}K`}
                           </button>
                         ))}
                      </div>
                  </div>
-              </Card>
-
-              <Card className="glass p-12 border-emerald-500/20 col-span-1 lg:col-span-2 shadow-[0_50px_150px_rgba(35,217,176,0.15)] flex flex-col justify-center items-center text-center">
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-16 w-full items-center">
+              </Card>              <Card className="glass p-6 md:p-12 border-emerald-500/20 col-span-1 lg:col-span-2 shadow-[0_50px_150px_rgba(35,217,176,0.15)] flex flex-col justify-center items-center text-center">
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 w-full items-stretch">
                     <motion.div 
-                       key={bedCount}
-                       initial={{ opacity: 0, scale: 0.9 }}
-                       animate={{ opacity: 1, scale: 1 }}
-                       className="space-y-2"
-                    >
-                       <div className="text-[10px] font-black text-emerald-400 uppercase tracking-[0.5em] mb-4">Annual NOI Multiplication</div>
-                       <div className="text-7xl font-black text-[#050249] italic leading-none">${annualNOI}</div>
-                       <p className="text-blue-900/60 text-xs font-bold uppercase tracking-widest italic pt-4">Direct Portfolio Revenue</p>
-                    </motion.div>
-
-                    <motion.div 
-                       key={bedCount + '_lift'}
-                       initial={{ opacity: 0, scale: 0.9 }}
-                       animate={{ opacity: 1, scale: 1 }}
-                       className="space-y-2 p-10 bg-emerald-500 rounded-[3rem] shadow-2xl relative overflow-hidden group"
-                    >
-                       <div className="absolute top-0 right-0 w-32 h-32 bg-white/20 rounded-full blur-3xl -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-700" />
-                       <div className="text-[10px] font-black text-emerald-900 uppercase tracking-[0.5em] mb-4 relative z-10">Asset Valuation Expansion</div>
-                       <div className="text-7xl font-black text-white italic leading-none relative z-10">${assetLift}</div>
-                       <p className="text-white text-xs font-bold uppercase tracking-widest italic pt-4 relative z-10">At 5.0% Exit Cap Rate</p>
-                    </motion.div>
+                        key={bedCount}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="space-y-2 p-6 md:p-10 bg-blue-900/5 rounded-[2rem] md:rounded-[3rem] border border-blue-900/10 flex flex-col justify-center"
+                     >
+                        <div className="text-[10px] font-black text-blue-500 uppercase tracking-[0.3em] mb-4">Annual NOI Multiplication</div>
+                        <div className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-black text-[#050249] italic leading-none whitespace-nowrap tracking-tighter">${annualNOI}</div>
+                        <p className="text-blue-900/40 text-[10px] md:text-xs font-bold uppercase tracking-widest italic pt-4">Direct Portfolio Revenue</p>
+                     </motion.div>
+ 
+                     <motion.div 
+                        key={bedCount + '_lift'}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="space-y-2 p-6 md:p-10 bg-emerald-500 rounded-[2rem] md:rounded-[3rem] shadow-2xl relative overflow-hidden group w-full flex flex-col justify-center"
+                     >
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/20 rounded-full blur-3xl -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-700" />
+                        <div className="text-[10px] font-black text-emerald-900 uppercase tracking-[0.3em] mb-4 relative z-10">Asset Valuation Expansion</div>
+                        <div className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-black text-white italic leading-none relative z-10 whitespace-nowrap tracking-tighter">${assetLift}</div>
+                        <p className="text-emerald-900/60 text-[10px] md:text-xs font-bold uppercase tracking-widest italic pt-4 relative z-10">At 5.0% Exit Cap Rate</p>
+                     </motion.div>
                  </div>
               </Card>
            </div>
