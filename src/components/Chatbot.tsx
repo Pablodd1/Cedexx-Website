@@ -216,7 +216,7 @@ export function Chatbot({ inline = false }: { inline?: boolean }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages: [{ role: 'user', content: text }],
-          provider: 'kimi' // Use Kimi by default
+          provider: 'kimi' // Use Kimi as primary
         })
       });
 
