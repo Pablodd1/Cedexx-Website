@@ -273,7 +273,11 @@ export function Chatbot({ inline = false }: { inline?: boolean }) {
   const chatbotUI = (
     <div className={cn(
       'bg-white flex flex-col overflow-hidden transition-all duration-300',
-      inline ? 'h-full w-full' : cn('fixed right-6 rounded-2xl shadow-2xl z-50 border border-blue-100', isMinimized ? 'bottom-6 h-14 w-80 sm:w-96' : 'bottom-6 h-[520px] w-80 sm:w-96')
+      inline ? 'h-full w-full' : cn(
+        'fixed bottom-0 left-0 right-0 mx-auto',
+        isMinimized ? 'h-14 w-80' : 'h-[520px] w-80'
+      ),
+      'md:w-96 md:max-w-md'
     )}>
       {!inline && (
         <div className="bg-[#050249] px-4 h-14 flex-shrink-0 text-white flex justify-between items-center">

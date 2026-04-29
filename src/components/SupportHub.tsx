@@ -40,17 +40,17 @@ export function SupportHub() {
   ];
 
   return (
-    <div className="fixed bottom-6 right-6 z-[9999] flex flex-col items-end pb-20">
+    <div className="fixed inset-0 z-[9999] flex items-end justify-center px-4 pb-4 md:pb-0 md:justify-end">
       
       {/* ── Hub Content ── */}
-      <AnimatePresence>
+            <AnimatePresence>
         {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="mb-6 w-80 bg-white shadow-[0_30px_100px_rgba(5,2,73,0.2)] rounded-[2.5rem] border border-slate-100 overflow-hidden"
-          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="mb-6 w-full max-w-md bg-white shadow-[0_30px_100px_rgba(5,2,73,0.2)] rounded-[2.5rem] border border-slate-100 overflow-hidden md:w-80"
+            >
             {activeMode === 'menu' && (
               <div className="p-8">
                 <div className="flex items-center justify-between mb-8">
@@ -126,11 +126,11 @@ export function SupportHub() {
           setIsOpen(!isOpen);
           if (!isOpen) setActiveMode('menu');
         }}
-        className={`h-16 w-16 rounded-2xl flex items-center justify-center shadow-2xl transition-all duration-500 ring-2 ring-white/20 ${
+        className={`h-12 w-12 md:h-14 md:w-14 rounded-2xl flex items-center justify-center shadow-2xl transition-all duration-500 ring-2 ring-white/20 ${
           isOpen ? 'bg-red-500 text-white' : 'bg-[#050249] text-white'
         }`}
       >
-        {isOpen ? <X className="h-8 w-8 text-white" /> : <MessageSquare className="h-8 w-8 text-white" />}
+        {isOpen ? <X className="h-6 w-6 text-white" /> : <MessageSquare className="h-6 w-6 text-white" />}
       </motion.button>
 
     </div>
