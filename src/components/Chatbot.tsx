@@ -88,6 +88,31 @@ export function Chatbot({ inline = false }: { inline?: boolean }) {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  // Auto-greeting after 5 seconds when chat opens
+  useEffect(() => {
+    if (isOpen && messages.length === 1) {
+      const timer = setTimeout(() => {
+        const greeting = "Hi there! I'm Cedex, your Cedexx AI Assistant. 👋 I can help you learn about our affordable physician access for families, enrollment options, or connect you with our team. How can I help you today?";
+        setMessages(prev => [...prev, { role: 'model', text: greeting }]);
+        speak(greeting);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, messages.length]);
+
+  // Callback offer after 60 seconds of inactivity
+  useEffect(() => {
+    if (!isOpen || messages.length < 2) return;
+    
+    const inactivityTimer = setTimeout(() => {
+      const callbackMsg = "I haven't heard from you in a while. Would you like me to have our team call you back? Just leave your name and number, and we'll be in touch shortly!";
+      setMessages(prev => [...prev, { role: 'model', text: callbackMsg }]);
+      speak(callbackMsg);
+    }, 60000);
+    
+    return () => clearTimeout(inactivityTimer);
+  }, [isOpen, messages.length]);
+
   const speak = useCallback((text: string) => {
     if (!isVoiceEnabled || !synthRef.current) return;
     
