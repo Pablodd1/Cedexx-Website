@@ -85,7 +85,7 @@ export function SupportHub() {
             )}
 
             {activeMode === 'chat' && (
-              <div className="relative h-[500px]">
+            <div className="relative h-[78vh] min-h-[420px] w-full">
                 <button 
                   onClick={() => setActiveMode('menu')}
                   className="absolute top-4 left-4 z-10 bg-white/80 backdrop-blur-md p-2 rounded-xl text-[#050249] hover:bg-white text-[10px] font-black uppercase tracking-widest border border-slate-100 shadow-sm"

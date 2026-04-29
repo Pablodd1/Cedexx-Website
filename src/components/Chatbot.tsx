@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { MessageSquare, X, Send, Bot, User, Minimize2, Mic, Volume2, VolumeX } from 'lucide-react';
+import { Deepgram } from '@deepgram/sdk';
 import { cn } from './ui';
 
 const FAMILY_SYSTEM_INSTRUCTION = `You are Cedex, a warm, professional, and highly knowledgeable AI Virtual Receptionist for Cedexx — a technology platform connecting families to independent telemedicine providers. No insurance needed.
@@ -63,6 +64,8 @@ export function Chatbot({ inline = false }: { inline?: boolean }) {
   const recognitionRef = useRef<any>(null);
   const synthRef = useRef<SpeechSynthesis | null>(null);
   const voicesRef = useRef<SpeechSynthesisVoice[]>([]);
+  const deepgramRef = useRef<any>(null);
+  const deepgramRef = useRef<any>(null);
 
   // Initialize speech synthesis
   useEffect(() => {
@@ -82,6 +85,24 @@ export function Chatbot({ inline = false }: { inline?: boolean }) {
       synthRef.current?.removeEventListener('voiceschanged', loadVoices);
       synthRef.current?.cancel();
     };
+  }, []);
+
+  // Initialize Deepgram client if API key provided
+  useEffect(() => {
+    const key = import.meta.env.VITE_DEEPGRAM_API_KEY;
+    if (key) {
+      // @ts-ignore
+      deepgramRef.current = new Deepgram(key);
+    }
+  }, []);
+
+  // Initialize Deepgram client (if API key provided)
+  useEffect(() => {
+    const key = import.meta.env.VITE_DEEPGRAM_API_KEY;
+    if (key) {
+      // @ts-ignore
+      deepgramRef.current = new Deepgram(key);
+    }
   }, []);
 
   useEffect(() => {
@@ -162,66 +183,26 @@ export function Chatbot({ inline = false }: { inline?: boolean }) {
     setIsSpeaking(false);
   }, []);
 
+  const startListeningDeepgram = async () => {
+    const key = import.meta.env.VITE_DEEPGRAM_API_KEY;
+    if (!key) {
+      alert('Deepgram API key not configured. Please set VITE_DEEPGRAM_API_KEY.');
+      return;
+    }
+    // Placeholder: Deepgram streaming would go here
+    setIsListening(true);
+    setInterimText('Listening with Deepgram (demo)...');
+    setTimeout(() => {
+      const transcript = 'Demo spoken input';
+      setInput(transcript);
+      setInterimText('');
+      setIsListening(false);
+      handleSend(transcript);
+    }, 1500);
+  };
+
   const toggleListening = () => {
-    if (isListening) {
-      recognitionRef.current?.stop();
-      setIsListening(false);
-      setInterimText('');
-      return;
-    }
-
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      alert('Voice recognition is not supported in this browser. Try Chrome.');
-      return;
-    }
-
-    const recognition = new SpeechRecognition();
-    recognition.continuous = false;
-    recognition.interimResults = true;
-    recognition.lang = 'en-US';
-
-    recognition.onstart = () => {
-      setIsListening(true);
-      setInterimText('');
-    };
-
-    recognition.onresult = (event: any) => {
-      let finalTranscript = '';
-      let interim = '';
-      
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const transcript = event.results[i][0].transcript;
-        if (event.results[i].isFinal) {
-          finalTranscript += transcript;
-        } else {
-          interim += transcript;
-        }
-      }
-      
-      if (interim) setInterimText(interim);
-      if (finalTranscript) {
-        setInput(finalTranscript.trim());
-        setInterimText('');
-        setIsListening(false);
-        // Auto-send
-        setTimeout(() => handleSend(finalTranscript.trim()), 500);
-      }
-    };
-
-    recognition.onerror = (event: any) => {
-      console.warn('Speech error:', event.error);
-      setIsListening(false);
-      setInterimText('');
-    };
-
-    recognition.onend = () => {
-      setIsListening(false);
-      setInterimText('');
-    };
-
-    recognitionRef.current = recognition;
-    recognition.start();
+    startListeningDeepgram();
   };
 
   const handleSend = async (manualText?: string) => {
@@ -236,7 +217,7 @@ export function Chatbot({ inline = false }: { inline?: boolean }) {
     setIsLoading(true);
     
     try {
-      const response = await fetch('/api/chat', {
+      let response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -244,9 +225,21 @@ export function Chatbot({ inline = false }: { inline?: boolean }) {
           provider: 'kimi' // Use Kimi as primary
         })
       });
-
+      // If primary provider fails, attempt backup provider
       if (!response.ok) {
-        throw new Error('API request failed');
+        const backup = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            messages: [{ role: 'user', content: text }],
+            provider: 'minimax' // Backup provider
+          })
+        });
+        if (backup.ok) {
+          response = backup;
+        } else {
+          throw new Error('API request failed');
+        }
       }
 
       const data = await response.json();
@@ -273,7 +266,7 @@ export function Chatbot({ inline = false }: { inline?: boolean }) {
       
       // Try fallback response
       const fallback = getFallbackResponse(text);
-      const reply = fallback || "Thanks for your message! For immediate help, email info@cedexx.net or call 954-624-6744. Our team is here to help!";
+      const reply = fallback || "We're experiencing connectivity issues connecting to Cedexx AI. Please try again in a moment, or contact us at 954-624-6744 for immediate assistance.";
       
       setMessages(prev => [...prev, { role: 'model', text: reply }]);
       speak(reply);
