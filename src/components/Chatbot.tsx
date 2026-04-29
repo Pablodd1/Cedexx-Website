@@ -65,7 +65,6 @@ export function Chatbot({ inline = false }: { inline?: boolean }) {
   const synthRef = useRef<SpeechSynthesis | null>(null);
   const voicesRef = useRef<SpeechSynthesisVoice[]>([]);
   const deepgramRef = useRef<any>(null);
-  const deepgramRef = useRef<any>(null);
 
   // Initialize speech synthesis
   useEffect(() => {
@@ -96,14 +95,7 @@ export function Chatbot({ inline = false }: { inline?: boolean }) {
     }
   }, []);
 
-  // Initialize Deepgram client (if API key provided)
-  useEffect(() => {
-    const key = import.meta.env.VITE_DEEPGRAM_API_KEY;
-    if (key) {
-      // @ts-ignore
-      deepgramRef.current = new Deepgram(key);
-    }
-  }, []);
+  
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
