@@ -1,64 +1,146 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Mic, MicOff, Volume2, Phone, Sparkles, X, MessageSquare } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import Vapi from '@vapi-ai/web';
 
-const vapi = new Vapi(import.meta.env.VITE_VAPI_PUBLIC_KEY || '');
+const SYSTEM_PROMPT = `You are Cedex, the Cedexx Healthcare Virtual Front Desk. You are speaking to a customer on the phone. Be helpful, professional, warm and concise. You can help with:
+- 24/7 doctor access via telemedicine
+- Mental wellness coverage
+- Prescriptions sent to local pharmacy
+- Pricing: $14.99/mo individual, $27.99/mo family (up to 4 members)
+- No insurance needed, HIPAA Secure
+
+For emergencies, direct them to call 911. Be conversational and natural.`;
 
 export function VirtualReceptionist() {
   const [isActive, setIsActive] = useState(false);
   const [status, setStatus] = useState<"idle" | "connecting" | "speaking" | "listening">("idle");
+  const [transcript, setTranscript] = useState("");
+  const recognitionRef = useRef<any>(null);
+  const synthRef = useRef<SpeechSynthesis | null>(null);
+  const voicesRef = useRef<SpeechSynthesisVoice[]>([]);
+  const conversationRef = useRef<{role: string, content: string}[]>([]);
 
   useEffect(() => {
-    vapi.on('call-start', () => {
-      setIsActive(true);
-      setStatus('speaking');
-    });
-
-    vapi.on('call-end', () => {
-      setIsActive(false);
-      setStatus('idle');
-    });
-
-    vapi.on('speech-start', () => setStatus('speaking'));
-    vapi.on('speech-end', () => setStatus('listening'));
-
-    vapi.on('error', (error) => {
-      console.error('Vapi Error:', error);
-      setIsActive(false);
-      setStatus('idle');
-    });
-
+    synthRef.current = window.speechSynthesis;
+    const loadVoices = () => {
+      voicesRef.current = synthRef.current?.getVoices() || [];
+    };
+    loadVoices();
+    synthRef.current?.addEventListener('voiceschanged', loadVoices);
     return () => {
-      vapi.stop();
+      synthRef.current?.cancel();
     };
   }, []);
 
-  const toggleCall = () => {
-    if (!isActive) {
-      setStatus("connecting");
-      // Start the Vapi call
-      vapi.start({
-        name: "Cedexx Front Desk Assistant",
-        model: {
-          provider: "custom-llm", 
-          model: "moonshot-v1-8k",
-          url: "https://cedexx-website.vercel.app/api/chat", 
+  const speak = useCallback((text: string) => {
+    if (!synthRef.current) return;
+    synthRef.current.cancel();
+    const cleanText = text.replace(/[*#_~`]/g, '').replace(/\s+/g, ' ').trim();
+    if (!cleanText) return;
+    
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    const voices = voicesRef.current.length > 0 ? voicesRef.current : synthRef.current.getVoices();
+    const preferredVoice = 
+      voices.find(v => v.name.includes('Google') && v.lang.startsWith('en')) ||
+      voices.find(v => v.name.includes('Samantha') && v.lang.startsWith('en')) ||
+      voices.find(v => v.lang === 'en-US') ||
+      voices[0];
+    if (preferredVoice) utterance.voice = preferredVoice;
+    utterance.rate = 0.95;
+    utterance.pitch = 1.0;
+    
+    utterance.onstart = () => setStatus('speaking');
+    utterance.onend = () => setStatus('listening');
+    utterance.onerror = () => setStatus('listening');
+    
+    setTimeout(() => synthRef.current?.speak(utterance), 100);
+  }, []);
+
+  const sendToAI = async (text: string) => {
+    setStatus("connecting");
+    conversationRef.current.push({ role: 'user', content: text });
+    
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           messages: [
-            {
-              role: "system",
-              content: "You are the Cedexx Healthcare Virtual Front Desk. You are speaking to a customer. Be helpful, professional, and explain that you can help with 24/7 doctor access, prescriptions, and mental wellness coverage. Pricing is $14.99/mo individual, $27.99/mo family. Be concise. Respond using the Kimi AI engine for maximum speed."
-            }
+            { role: 'system', content: SYSTEM_PROMPT },
+            ...conversationRef.current.slice(-10)
           ]
-        },
-        voice: {
-          provider: "google",
-          voiceId: "en-US-Neural2-F" 
-        }
+        })
       });
-    } else {
-      vapi.stop();
+      
+      const data = await response.json();
+      const reply = data.choices?.[0]?.message?.content || data.content?.[0]?.text || data.text || "I apologize, I'm having trouble connecting. Please call 954-624-6744 for immediate assistance.";
+      
+      conversationRef.current.push({ role: 'assistant', content: reply });
+      setTranscript(reply);
+      speak(reply);
+    } catch (error) {
+      const fallback = "I apologize for the inconvenience. Please try again or call us at 954-624-6744.";
+      setTranscript(fallback);
+      speak(fallback);
     }
+  };
+
+  const toggleCall = () => {
+    if (isActive) {
+      // End call
+      recognitionRef.current?.stop();
+      synthRef.current?.cancel();
+      setIsActive(false);
+      setStatus('idle');
+      setTranscript("");
+      conversationRef.current = [];
+      return;
+    }
+
+    // Start call
+    setIsActive(true);
+    setStatus("connecting");
+    
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      setStatus('idle');
+      setIsActive(false);
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = 'en-US';
+
+    recognition.onstart = () => {
+      setStatus('listening');
+      speak("Hello! I'm Cedex, your Cedexx virtual assistant. How can I help you today?");
+    };
+
+    recognition.onresult = async (event: any) => {
+      const lastResult = event.results[event.results.length - 1];
+      if (lastResult.isFinal) {
+        const text = lastResult[0].transcript.trim();
+        if (text) {
+          setStatus("connecting");
+          await sendToAI(text);
+        }
+      }
+    };
+
+    recognition.onerror = () => {
+      setStatus('listening');
+    };
+
+    recognition.onend = () => {
+      if (isActive) {
+        recognition.start();
+      }
+    };
+
+    recognitionRef.current = recognition;
+    recognition.start();
   };
 
   return (
