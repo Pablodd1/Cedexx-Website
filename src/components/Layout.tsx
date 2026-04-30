@@ -50,11 +50,11 @@ export function Layout() {
 
   return (
     <div className="min-h-screen flex flex-col bg-white font-sans text-slate-800 selection:bg-blue-100 overflow-x-hidden">
-      {/* Premium Mouse Effect */}
+      {/* Premium Mouse Effect - z-0 to not block clicks */}
       <div 
-        className="fixed inset-0 pointer-events-none z-[100] transition-opacity duration-300"
+        className="fixed inset-0 pointer-events-none z-0 transition-opacity duration-300"
         style={{
-          background: `radial-gradient(600px circle at var(--mouse-x, 0) px var(--mouse-y, 0) px, rgba(56, 189, 248, 0.05), transparent 80%)` as any
+          background: `radial-gradient(600px circle at var(--mouse-x, 0px) var(--mouse-y, 0px), rgba(56, 189, 248, 0.05), transparent 80%)`
         } as React.CSSProperties}
       />
 
