@@ -8,7 +8,7 @@ const FAMILY_SYSTEM_INSTRUCTION = `You are Cedex, a warm, professional, and high
 COMPANY KNOWLEDGE:
 - Cedexx: technology platform connecting families to independent licensed telemedicine providers
 - Pricing: Individual $14.99/month, Family $27.99/month (up to 4 members)
-- Contact: info@cedexx.net or call 954-624-6744
+- Contact: info@cedexx.net
 - No insurance needed, HIPAA Secure, 24/7 access
 - How it works: Connect in seconds → Provider joins in minutes → Real-time consultation
 
@@ -28,8 +28,8 @@ const FALLBACK_RESPONSES: Record<string, string> = {
   'enroll': "To enroll, visit our website or I can connect you with our team. Would you like me to schedule a call?",
   'signup': "To get started, visit our enrollment page or I can have our team contact you. Which do you prefer?",
   'services': "We offer 24/7 telemedicine, mental wellness support, and digital prescriptions sent to your local pharmacy.",
-  'contact': "You can reach us at info@cedexx.net or call 954-624-6744. We're here Mon-Fri for support!",
-  'phone': "Give us a call at 954-624-6744 or email info@cedexx.net. We'd love to hear from you!",
+  'contact': "You can reach us at info@cedexx.net. We're here Mon-Fri for support!",
+  'phone': "Email us at info@cedexx.net. We'd love to hear from you!",
   'insurance': "No insurance needed! Cedexx works on a simple monthly membership basis. Just pay your plan fee and you're covered!",
   'who are you': "I'm Cedex, your AI assistant for Cedexx. I can answer questions about our services, pricing, and help you get started!",
   'what is cedexx': "Cedexx is a technology platform that connects families to independent telemedicine providers. 24/7 access, no insurance required, affordable monthly plans.",
@@ -258,7 +258,7 @@ export function Chatbot({ inline = false }: { inline?: boolean }) {
       
       // Try fallback response
       const fallback = getFallbackResponse(text);
-      const reply = fallback || "We're experiencing connectivity issues connecting to Cedexx AI. Please try again in a moment, or contact us at 954-624-6744 for immediate assistance.";
+      const reply = fallback || "We're experiencing connectivity issues connecting to Cedexx AI. Please try again in a moment, or email us at info@cedexx.net for assistance.";
       
       setMessages(prev => [...prev, { role: 'model', text: reply }]);
       speak(reply);

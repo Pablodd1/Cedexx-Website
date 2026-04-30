@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Mail, MessageSquare, Phone, X, Bot, Mic } from 'lucide-react';
+import { Mail, MessageSquare, Globe, X, Bot, Mic } from 'lucide-react';
 import { Chatbot } from './Chatbot';
 import { VoiceAssistant } from './VoiceAssistant';
 
@@ -31,11 +31,11 @@ export function SupportHub() {
       onClick: () => window.location.href = 'mailto:info@cedexx.net'
     },
     { 
-      id: 'call', 
-      label: 'Immediate call', 
-      icon: Phone, 
-      desc: '954-624-6744',
-      onClick: () => window.location.href = 'tel:9546246744'
+      id: 'website', 
+      label: 'Visit Website', 
+      icon: Globe, 
+      desc: 'cedexx.net',
+      onClick: () => window.open('https://cedexx.net', '_blank')
     }
   ];
 

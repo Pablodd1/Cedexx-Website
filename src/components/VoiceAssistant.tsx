@@ -14,7 +14,7 @@ COMPANY KNOWLEDGE (FAMILY FOCUS):
 - How It Works: (1) Connect in seconds → (2) Independent provider joins in minutes → (3) Consultation in real time.
 - Pricing: Affordable monthly family plans. Direct callers to our pricing page or to speak with a specialist.
 - Prescriptions: Providers on our platform may prescribe directly to your local pharmacy. No controlled substances.
-- Contact: Email info@cedexx.net or call 954-624-6744.
+- Contact: Email info@cedexx.net.
 - Powered by Cedexx.
 
 IMPORTANT DISCLAIMERS (use when relevant):
