@@ -210,7 +210,7 @@ export function Layout() {
                 <div className="h-10 w-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:bg-[#23d9b0]/20 transition-all duration-500">
                   <Globe className="h-4 w-4 text-blue-400" />
                 </div>
-                <a href="tel:9546246744" className="hover:text-white transition-all text-blue-100 font-bold">(954) 624-6744</a>
+                <a href="https://cedexx.net" className="hover:text-white transition-all text-blue-100 font-bold">cedexx.net</a>
               </li>
             </ul>
           </div>

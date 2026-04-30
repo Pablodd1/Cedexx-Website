@@ -209,7 +209,7 @@ export function About() {
                       Florida Department of Management Services<br />
                       Office of Supplier Development<br />
                       4050 Esplanade Way, Suite 380<br />
-                      Tallahassee, Florida 32399 | 850-487-0915
+                      Tallahassee, Florida 32399
                     </p>
                   </div>
                 </div>
