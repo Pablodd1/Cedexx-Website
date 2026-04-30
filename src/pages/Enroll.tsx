@@ -108,7 +108,7 @@ export function Enroll() {
                     </div>
                     <div className="space-y-3">
                       <label className="text-xs font-black text-[#050249] uppercase tracking-widest">Phone Number</label>
-                      <input type="tel" className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-blue-50 focus:ring-2 focus:ring-[#050249] outline-none transition-all font-medium text-sm" placeholder="(954) 000-0000" />
+                      <input type="tel" className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-blue-50 focus:ring-2 focus:ring-[#050249] outline-none transition-all font-medium text-sm" placeholder="+1 (___) ___-____" />
                     </div>
                     <div className="space-y-3">
                       <label htmlFor="dob" className="text-xs font-black text-[#050249] uppercase tracking-widest">Date of Birth</label>
