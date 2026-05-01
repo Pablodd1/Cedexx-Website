@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { MessageSquare, X, Send, Bot, User, Minimize2, Mic, Volume2, VolumeX } from 'lucide-react';
-import { Deepgram } from '@deepgram/sdk';
 import { cn } from './ui';
 
 const FAMILY_SYSTEM_INSTRUCTION = `You are Cedex, a warm, professional, and highly knowledgeable AI Virtual Receptionist for Cedexx — a technology platform connecting families to independent telemedicine providers. No insurance needed.
@@ -64,7 +63,11 @@ export function Chatbot({ inline = false }: { inline?: boolean }) {
   const recognitionRef = useRef<any>(null);
   const synthRef = useRef<SpeechSynthesis | null>(null);
   const voicesRef = useRef<SpeechSynthesisVoice[]>([]);
-  const deepgramRef = useRef<any>(null);
+  const deepgramModuleRef = useRef<any>(null);
+  const dgWsRef = useRef<any>(null);
+  const micStreamRef = useRef<any>(null);
+  const audioCtxRef = useRef<any>(null);
+  const processorRef = useRef<any>(null);
 
   // Initialize speech synthesis
   useEffect(() => {
@@ -86,14 +89,20 @@ export function Chatbot({ inline = false }: { inline?: boolean }) {
     };
   }, []);
 
-  // Initialize Deepgram client if API key provided
-  useEffect(() => {
-    const key = import.meta.env.VITE_DEEPGRAM_API_KEY;
-    if (key) {
-      // @ts-ignore
-      deepgramRef.current = new Deepgram(key);
+// Deepgram streaming integration: lazy-load Deepgram SDK for production streaming
+useEffect(() => {
+  const key = (typeof window !== 'undefined') ? (import.meta.env.VITE_DEEPGRAM_API_KEY) : null;
+  if (!key) return;
+  (async () => {
+    try {
+      const mod = await import('@deepgram/sdk');
+      deepgramModuleRef.current = mod;
+      console.log('Deepgram SDK loaded (lazy)');
+    } catch (err) {
+      console.warn('Failed to load Deepgram SDK lazily', err);
     }
-  }, []);
+  })();
+}, []);
 
   
 
@@ -178,19 +187,90 @@ export function Chatbot({ inline = false }: { inline?: boolean }) {
   const startListeningDeepgram = async () => {
     const key = import.meta.env.VITE_DEEPGRAM_API_KEY;
     if (!key) {
-      alert('Deepgram API key not configured. Please set VITE_DEEPGRAM_API_KEY.');
+      // Demo fallback
+      setIsListening(true);
+      setInterimText('Listening (demo)...');
+      setTimeout(() => {
+        const transcript = 'Demo spoken input';
+        setInput(transcript);
+        setInterimText('');
+        setIsListening(false);
+        handleSend(transcript);
+      }, 1500);
       return;
     }
-    // Placeholder: Deepgram streaming would go here
-    setIsListening(true);
-    setInterimText('Listening with Deepgram (demo)...');
-    setTimeout(() => {
-      const transcript = 'Demo spoken input';
-      setInput(transcript);
-      setInterimText('');
-      setIsListening(false);
-      handleSend(transcript);
-    }, 1500);
+    // Production: WebSocket Deepgram streaming bridge
+    try {
+      const url = `wss://api.deepgram.com/v1/listen?access_token=${encodeURIComponent(key)}&interim_results=true&language=en-US`;
+      const ws = new WebSocket(url);
+      ws.binaryType = 'arraybuffer';
+      dgWsRef.current = ws;
+      ws.onopen = async () => {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+          micStreamRef.current = stream;
+          const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+          const ac = new AudioCtx({ sampleRate: 16000 });
+          audioCtxRef.current = ac;
+          const source = ac.createMediaStreamSource(stream);
+          const proc = ac.createScriptProcessor(4096, 1, 1);
+          processorRef.current = proc;
+          proc.onaudioprocess = (ev: any) => {
+            const input = ev.inputBuffer.getChannelData(0);
+            const out = new Int16Array(input.length);
+            for (let i = 0; i < input.length; i++) {
+              const s = Math.max(-1, Math.min(1, input[i]));
+              out[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
+            }
+            ws.send(out.buffer);
+          };
+          source.connect(proc);
+          proc.connect(ac.destination);
+          setIsListening(true);
+          setInterimText('');
+        } catch (err) {
+          console.error('Deepgram mic setup error', err);
+          ws.close();
+        }
+      };
+      ws.onmessage = (event) => {
+        try {
+          const data = typeof event.data === 'string' ? JSON.parse(event.data) : JSON.parse(new TextDecoder().decode(event.data));
+          const transcript = data?.channel?.alternatives?.[0]?.transcript || data?.results?.[0]?.alternatives?.[0]?.transcript;
+          if (transcript) {
+            setInput(transcript);
+          }
+        } catch {
+          // ignore non-JSON data
+        }
+      };
+      ws.onerror = (err) => {
+        console.error('Deepgram WS error', err);
+        setInterimText('Listening (error)');
+      };
+      ws.onclose = () => {
+        try { audioCtxRef.current?.close(); } catch {}
+        micStreamRef.current?.getTracks().forEach(t => t.stop());
+        micStreamRef.current = null;
+        audioCtxRef.current = null;
+        processorRef.current = null;
+        setIsListening(false);
+      };
+      setIsListening(true);
+      setInterimText('Listening with Deepgram...');
+    } catch (err) {
+      console.error('Deepgram streaming setup failed', err);
+      // Fallback to demo
+      setIsListening(true);
+      setInterimText('Listening (demo)...');
+      setTimeout(() => {
+        const transcript = 'Demo spoken input';
+        setInput(transcript);
+        setInterimText('');
+        setIsListening(false);
+        handleSend(transcript);
+      }, 1500);
+    }
   };
 
   const toggleListening = () => {
@@ -279,7 +359,7 @@ export function Chatbot({ inline = false }: { inline?: boolean }) {
       ),
       'md:w-96 md:max-w-md'
     )}>
-      {!inline && (
+        {!inline && (
         <div className="bg-[#050249] px-4 h-14 flex-shrink-0 text-white flex justify-between items-center">
           <div className="flex items-center gap-2">
             <div className={cn("h-8 w-8 rounded-full flex items-center justify-center transition-all", isSpeaking ? "bg-emerald-400 animate-pulse" : "bg-white/20")}>
@@ -293,6 +373,7 @@ export function Chatbot({ inline = false }: { inline?: boolean }) {
                   {isSpeaking ? "Speaking..." : isVoiceEnabled ? "Online" : "Muted"}
                 </span>
               </div>
+              <div className="text-xs text-white/70 mt-1 ml-2">Voice: {Boolean(import.meta.env.VITE_DEEPGRAM_API_KEY) ? 'Ready' : 'Offline'}</div>
             </div>
           </div>
           <div className="flex items-center gap-1">

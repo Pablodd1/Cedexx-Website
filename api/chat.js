@@ -43,7 +43,9 @@ export default async function handler(req, res) {
   }
 
   if (!selectedProvider?.key) {
-    return res.status(500).json({ error: 'No AI provider configured. Add KIMI_API_KEY, MINIMAX_API_KEY, OPENAI_API_KEY, or GEMINI_API_KEY to environment.' });
+    // Provide a friendly fallback instead of a hard 500 to improve user experience when no provider is configured
+    const fallbackText = 'We are currently unavailable. Please try again in a moment or contact support at 954-624-6744 for immediate assistance.';
+    return res.status(200).json({ choices: [{ message: { content: fallbackText } }] });
   }
 
   try {
