@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Mail, MessageSquare, Phone, X, Bot, Mic } from 'lucide-react';
+import { Mail, MessageSquare, Globe, X, Bot, Mic } from 'lucide-react';
 import { Chatbot } from './Chatbot';
 import { VoiceAssistant } from './VoiceAssistant';
 
@@ -31,16 +31,16 @@ export function SupportHub() {
       onClick: () => window.location.href = 'mailto:info@cedexx.net'
     },
     { 
-      id: 'call', 
-      label: 'Immediate call', 
-      icon: Phone, 
-      desc: '954-624-6744',
-      onClick: () => window.location.href = 'tel:9546246744'
+      id: 'website', 
+      label: 'Visit Website', 
+      icon: Globe, 
+      desc: 'cedexx.net',
+      onClick: () => window.open('https://cedexx.net', '_blank')
     }
   ];
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-end justify-center px-4 pb-4 md:pb-0 md:justify-end">
+    <div className="fixed inset-0 z-[9999] pointer-events-none flex items-end justify-center px-4 pb-4 md:pb-0 md:justify-end">
       
       {/* ── Hub Content ── */}
             <AnimatePresence>
@@ -49,7 +49,7 @@ export function SupportHub() {
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="mb-6 w-full max-w-md bg-white shadow-[0_30px_100px_rgba(5,2,73,0.2)] rounded-[2.5rem] border border-slate-100 overflow-hidden md:w-80"
+              className="mb-6 w-full max-w-md bg-white shadow-[0_30px_100px_rgba(5,2,73,0.2)] rounded-[2.5rem] border border-slate-100 overflow-hidden md:w-80 pointer-events-auto"
             >
             {activeMode === 'menu' && (
               <div className="p-8">
@@ -126,7 +126,7 @@ export function SupportHub() {
           setIsOpen(!isOpen);
           if (!isOpen) setActiveMode('menu');
         }}
-        className={`h-12 w-12 md:h-14 md:w-14 rounded-2xl flex items-center justify-center shadow-2xl transition-all duration-500 ring-2 ring-white/20 ${
+        className={`h-12 w-12 md:h-14 md:w-14 rounded-2xl flex items-center justify-center shadow-2xl transition-all duration-500 ring-2 ring-white/20 pointer-events-auto ${
           isOpen ? 'bg-red-500 text-white' : 'bg-[#050249] text-white'
         }`}
       >

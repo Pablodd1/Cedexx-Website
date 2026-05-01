@@ -73,13 +73,13 @@ export function VirtualReceptionist() {
       });
       
       const data = await response.json();
-      const reply = data.choices?.[0]?.message?.content || data.content?.[0]?.text || data.text || "I apologize, I'm having trouble connecting. Please call 954-624-6744 for immediate assistance.";
+      const reply = data.choices?.[0]?.message?.content || data.content?.[0]?.text || data.text || "I apologize, I'm having trouble connecting. Please email info@cedexx.net for assistance.";
       
       conversationRef.current.push({ role: 'assistant', content: reply });
       setTranscript(reply);
       speak(reply);
     } catch (error) {
-      const fallback = "I apologize for the inconvenience. Please try again or call us at 954-624-6744.";
+      const fallback = "I apologize for the inconvenience. Please try again or email us at info@cedexx.net.";
       setTranscript(fallback);
       speak(fallback);
     }
