@@ -1,6 +1,6 @@
 // CEDEXX AI Chatbot Widget v1.0
 // Standalone widget — inject into any HTML page
-// Features: Chat, Voice toggle, Booking CTA, EN/ES support
+// Features: Chat, Voice toggle, Booking CTA, EN/ES/RU/HT support
 // Configurable: Set CEDEXX_CONFIG.apiKey before loading
 
 (function() {
@@ -17,11 +17,13 @@
     position: 'bottom-right',
     welcomeMessage: {
       en: "Hi! I'm CEDEXX's AI Health Assistant. I can help with telemedicine info, health blog questions, or connecting you with a virtual provider. How can I help?",
-      es: "¡Hola! Soy el Asistente de Salud AI de CEDEXX. Puedo ayudar con información de telemedicina, preguntas sobre nuestro blog de salud, o conectarte con un proveedor virtual. ¿Cómo puedo ayudarte?"
+      es: "¡Hola! Soy el Asistente de Salud AI de CEDEXX. Puedo ayudar con información de telemedicina, preguntas sobre nuestro blog de salud, o conectarte con un proveedor virtual. ¿Cómo puedo ayudarte?",
+      ru: "Здравствуйте! Я ИИ-помощник по здравоохранению CEDEXX. Я могу помочь с информацией о телемедицине, вопросами о нашем блоге о здоровье или связать вас с виртуальным провайдером. Чем могу помочь?",
+      ht: "Bonjou! Mwen se Asistan Sante AI CEDEXX. Mwen ka ede w ak enfòmasyon sou telemedsin, kesyon sou blog sante nou an, oswa konekte w ak yon founisè vityèl. Kijan mwen ka ede w?"
     },
     bookingUrl: 'https://cedexx.net/consultation',
     voiceEnabled: true,
-    languages: ['en', 'es'],
+    languages: ['en', 'es', 'ru', 'ht'],
     knowledgeBase: {
       en: `You are CEDEXX's AI Health Assistant. CEDEXX is a technology platform connecting families with independent telemedicine providers in Miami and across Florida.
 
@@ -46,7 +48,31 @@ Datos clave:
 - Cobertura: Miami-Dade, Broward y todo Florida
 - Contacto: info@cedexx.net
 
-Sé empático, profesional, y anima a los usuarios a consultar con un proveedor real para emergencias médicas. Nunca proporciones diagnóstico médico.`
+Sé empático, profesional, y anima a los usuarios a consultar con un proveedor real para emergencias médicas. Nunca proporciones diagnóstico médico.`,
+      ru: `Вы — ИИ-помощник по здравоохранению CEDEXX. CEDEXX — это технологическая платформа, которая соединяет семьи с независимыми провайдерами телемедицины в Майами и по всей Флориде.
+
+Ключевые факты:
+- CEDEXX предоставляет круглосутовой доступ к виртуальным провайдерам
+- Для многих услуг страховка не требуется
+- Доступны специалисты по детской телемедицине
+- Блог о здоровье с информацией, подкрепленной исследованиями
+- Услуги: общая телемедицина, детская медицина, консультации по вопросам здоровья, поддержка психического здоровья
+- Охват: округа Майами-Дейд, Броуард и вся Флорида
+- Контакт: info@cedexx.net
+
+Всегда будьте эмпатичны и профессиональны, и призывайте пользователей обращаться к реальному врачу при медицинских чрезвычайных ситуациях. Никогда не ставьте медицинский диагноз.`,
+      ht: `Ou se Asistan Sante AI CEDEXX. CEDEXX se yon platfòm teknoloji ki konekte fanmi ak founisè telemedsin endepandan nan Miami ak atravè Florid.
+
+Fè kle:
+- CEDEXX ofri aksè 24/7 ak founisè vityèl
+- Pa gen asirans ki obligatwa pou anpil sèvis
+- Espesyalis telemedsin pediyatrik disponib
+- Blog sante ak enfòmasyon ki baze sou rechèch
+- Sèvis: telemedsin jeneral, swen pediyatrik, konsiltasyon byennèt, sipò sante mantal
+- Kouvri: Miami-Dade, Broward, ak tout Florid
+- Kontak: info@cedexx.net
+
+Toujou montre konpasyon ak pwofesyonalis, ankouraje itilizatè pou yo konsilte ak yon vre doktè pou ijans medikal. Pa janm bay dyagnostik medikal.`
     }
   };
 
@@ -368,8 +394,10 @@ Sé empático, profesional, y anima a los usuarios a consultar con un proveedor 
   });
 
   // Language toggle
+  const LANG_CYCLE = ['en', 'es', 'ru', 'ht'];
   langBtn.addEventListener('click', () => {
-    currentLang = currentLang === 'en' ? 'es' : 'en';
+    const idx = LANG_CYCLE.indexOf(currentLang);
+    currentLang = LANG_CYCLE[(idx + 1) % LANG_CYCLE.length];
     langBtn.textContent = currentLang.toUpperCase();
     // Re-show welcome in new language
     messagesContainer.innerHTML = '';
@@ -410,10 +438,13 @@ Sé empático, profesional, y anima a los usuarios a consultar con un proveedor 
       }
     }).catch(err => {
       showTyping(false);
-      addMessage('bot', currentLang === 'en'
-        ? "I'm having trouble connecting right now. Please try again or contact us at info@cedexx.net"
-        : "Estoy teniendo problemas de conexión. Por favor intenta de nuevo o contáctanos en info@cedexx.net"
-      );
+      const errorMsgs = {
+        en: "I'm having trouble connecting right now. Please try again or contact us at info@cedexx.net",
+        es: "Estoy teniendo problemas de conexión. Por favor intenta de nuevo o contáctanos en info@cedexx.net",
+        ru: "У меня сейчас проблемы с подключением. Пожалуйста, попробуйте еще раз или свяжитесь с нами по адресу info@cedexx.net",
+        ht: "Mwen gen pwoblèm koneksyon kounye a. Tanpri eseye ankò oswa kontakte nou nan info@cedexx.net"
+      };
+      addMessage('bot', errorMsgs[currentLang] || errorMsgs.en);
       console.error('Chatbot error:', err);
     });
   }
@@ -534,16 +565,16 @@ Sé empático, profesional, y anima a los usuarios a consultar con un proveedor 
     };
 
     const lang = kb[currentLang];
-    if (text.match(/hi|hello|hey|hola|buenas/)) return lang.greeting;
-    if (text.match(/telemedicine|virtual care|virtual doctor|consulta virtual/)) return lang.telemedicine;
-    if (text.match(/pediatric|niño|child|baby|bebé|pediatría/)) return lang.pediatric;
-    if (text.match(/blog|article|article|post/)) return lang.blog;
-    if (text.match(/price|cost|cuánto|pricing|precio/)) return lang.price;
-    if (text.match(/insurance|seguro|coverage|cobertura/)) return lang.insurance;
-    if (text.match(/book|schedule|appointment|cita|reservar|agendar/)) return lang.booking;
-    if (text.match(/contact|email|call|llamar|escribir|phone/)) return lang.contact;
-    if (text.match(/hours|time|horario|disponible|available|24/)) return lang.hours;
-    if (text.match(/location|where|dónde|miami|florida|address/)) return lang.location;
+    if (text.match(/hi|hello|hey|hola|buenas|здравствуй|привет|bonjou|salut/)) return lang.greeting;
+    if (text.match(/telemedicine|virtual care|virtual doctor|consulta virtual|телемедицина|telemedsin/)) return lang.telemedicine;
+    if (text.match(/pediatric|niño|child|baby|bebé|pediatría|педиатрия|timoun|ti bebe/)) return lang.pediatric;
+    if (text.match(/blog|article|post|блог|blog/)) return lang.blog;
+    if (text.match(/price|cost|cuánto|pricing|precio|цена|стоимость|pri|koute/)) return lang.price;
+    if (text.match(/insurance|seguro|coverage|cobertura|страховка|asirans/)) return lang.insurance;
+    if (text.match(/book|schedule|appointment|cita|reservar|agendar|записаться|appointment|ranvou|resève/)) return lang.booking;
+    if (text.match(/contact|email|call|llamar|escribir|phone|контакт|позвонить|kontak|rele/)) return lang.contact;
+    if (text.match(/hours|time|horario|disponible|available|24|часы|доступно|lè|disponib/)) return lang.hours;
+    if (text.match(/location|where|dónde|miami|florida|address|место|где|ki kote|adrès/)) return lang.location;
     return lang.default;
   }
 
@@ -557,7 +588,7 @@ Sé empático, profesional, y anima a los usuarios a consultar con un proveedor 
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     recognition = new SpeechRecognition();
-    recognition.lang = currentLang === 'es' ? 'es-ES' : 'en-US';
+    recognition.lang = currentLang === 'es' ? 'es-ES' : currentLang === 'ru' ? 'ru-RU' : currentLang === 'ht' ? 'ht-HT' : 'en-US';
     recognition.continuous = false;
     recognition.interimResults = false;
 
@@ -603,7 +634,7 @@ Sé empático, profesional, y anima a los usuarios a consultar con un proveedor 
     // Strip HTML
     const cleanText = text.replace(/<[^>]*>/g, '');
     const utterance = new SpeechSynthesisUtterance(cleanText);
-    utterance.lang = currentLang === 'es' ? 'es-ES' : 'en-US';
+    utterance.lang = currentLang === 'es' ? 'es-ES' : currentLang === 'ru' ? 'ru-RU' : currentLang === 'ht' ? 'ht-HT' : 'en-US';
     utterance.rate = 1;
     utterance.pitch = 1;
     synth.speak(utterance);
