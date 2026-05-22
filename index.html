@@ -9,37 +9,119 @@
     <meta name="author" content="Cedexx" />
     <link rel="icon" type="image/png" href="/favicon-bird.png" />
     
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-PLACEHOLDER"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-PLACEHOLDER');
+    </script>
+    
+    <!-- AI Search Optimization (Google May 2026 Guidelines) -->
+    <meta name="ai:description" content="CEDEXX is a telemedicine technology platform connecting families with independent virtual healthcare providers. 24/7 access, no insurance required for many services. Miami-Dade and Broward coverage." />
+    <meta name="ai:service-area" content="Miami-Dade County, Broward County, Florida" />
+    <meta name="ai:contact" content="info@cedexx.net" />
+    <meta name="ai:bot" content="friendly" />
+    <meta name="ai:verified" content="true" />
+    
+    <!-- Additional SEO Meta Tags -->
+    <link rel="canonical" href="https://cedexx.net" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="theme-color" content="#00D4FF" />
+    <meta name="msapplication-TileColor" content="#00D4FF" />
+    <!-- Language Alternates -->
+    <link rel="alternate" hreflang="en" href="https://cedexx.net" />
+    <link rel="alternate" hreflang="es" href="https://cedexx.net" />
+    
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Cedexx | Health Blog & 24/7 Family Telemedicine" />
     <meta property="og:description" content="Research-backed pediatric health insights and 24/7 virtual care access for families. No insurance required." />
-    <meta property="og:image" content="/og-image.png" />
+    <meta property="og:image" content="https://cedexx.net/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="CEDEXX - 24/7 Virtual Healthcare for Families" />
     
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:title" content="Cedexx | Health Blog & Virtual Care" />
     <meta property="twitter:description" content="Stay informed with our Health Blog and get 24/7 provider access for your family—no insurance needed." />
-    <meta property="twitter:image" content="/og-image.png" />
+    <meta property="twitter:image" content="https://cedexx.net/og-image.png" />
 
     <!-- Robots -->
     <meta name="robots" content="index, follow" />
     
-    <!-- Structured Data -->
+    <!-- Structured Data - Enhanced -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "Organization",
-      "name": "Cedexx",
-      "description": "Technology platform connecting families with independent telemedicine providers. Cedexx does not provide medical care directly.",
-      "url": "https://cedexx.net",
-      "logo": "https://cedexx.net/logo.png",
-      "contactPoint": {
-        "@type": "ContactPoint",
-        "email": "info@cedexx.net",
-        "contactType": "customer service"
-      }
+      "@graph": [
+        {
+          "@type": "Organization",
+          "name": "CEDEXX",
+          "description": "Technology platform connecting families with independent telemedicine providers in Miami-Dade and Broward County, Florida.",
+          "url": "https://cedexx.net",
+          "logo": "https://cedexx.net/logo.png",
+          "sameAs": [
+            "https://linkedin.com/company/cedexx",
+            "https://instagram.com/cedexx"
+          ],
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "email": "info@cedexx.net",
+            "contactType": "customer service",
+            "availableLanguage": ["English", "Spanish"]
+          }
+        },
+        {
+          "@type": "WebSite",
+          "name": "CEDEXX",
+          "url": "https://cedexx.net",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://cedexx.net/blog?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        },
+        {
+          "@type": "MedicalWebPage",
+          "name": "CEDEXX - Health Blog & 24/7 Virtual Provider Access",
+          "description": "Research-backed pediatric health insights and 24/7 virtual care access for families. No insurance required.",
+          "url": "https://cedexx.net",
+          "about": {
+            "@type": "MedicalBusiness",
+            "name": "CEDEXX Telemedicine Platform"
+          },
+          "specialty": "Pediatric Telemedicine, Family Medicine, Mental Health"
+        }
+      ]
     }
     </script>
+    <!-- Agentic Website Engine -->
+    <script src="/agentic-config.js"></script>
+    <script src="/agentic-engine.js"></script>
+    
+    <!-- AI Chatbot Widget Config -->
+    <script>
+      window.CEDEXX_CONFIG = {
+        apiKey: '',
+        apiEndpoint: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent',
+        model: 'gemini-1.5-flash',
+        siteName: 'CEDEXX',
+        primaryColor: '#00D4FF',
+        secondaryColor: '#FF6B6B',
+        position: 'bottom-right',
+        welcomeMessage: {
+          en: "Hi! I'm CEDEXX's AI Health Assistant. I can help with telemedicine info, health blog questions, or connecting you with a virtual provider. How can I help?",
+          es: "¡Hola! Soy el Asistente de Salud AI de CEDEXX. Puedo ayudar con información de telemedicina, preguntas sobre nuestro blog de salud, o conectarte con un proveedor virtual. ¿Cómo puedo ayudarte?"
+        },
+        bookingUrl: 'https://cedexx.net/consultation',
+        voiceEnabled: true,
+        languages: ['en', 'es']
+      };
+    </script>
+    <script src="/cedexx-chatbot-widget.js" defer></script>
   </head>
   <body>
     <div id="root"></div>
