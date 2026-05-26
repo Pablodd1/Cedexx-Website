@@ -47,13 +47,15 @@ export function SmartChat() {
     setIsTyping(true);
 
     try {
+    try {
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           language: lang,
+          provider: 'gemini',
           messages: messages.map(m => ({
-            role: m.sender === 'user' ? 'user' : 'assistant',
+            role: m.sender === 'user' ? 'user' : 'model',
             content: m.text
           })).concat({ role: 'user', content: input })
         }),
@@ -68,8 +70,7 @@ export function SmartChat() {
       };
       setMessages(prev => [...prev, botMsg]);
     } catch (error) {
-      console.error('Kimi AI failed:', error);
-      // Fallback
+      console.error('Gemini AI failed:', error);
       setMessages(prev => [...prev, {
         id: Date.now().toString(),
         text: "I'm currently having trouble connecting to the AI brain. Please try again or contact support@cedexx.net.",

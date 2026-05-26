@@ -19,14 +19,14 @@ export default async function handler(req, res) {
 
   // Try providers in order of preference
   const providers = [
-    // Kimi (Moonshot) - Primary
-    { name: 'kimi', key: KIMI_KEY, model: 'moonshot-v1-8k' },
-    // MiniMax - Backup 1
-    { name: 'minimax', key: MINIMAX_KEY, model: 'abab6.5s-chat' },
-    // OpenAI - Backup 2  
+    // Gemini - PRIMARY (fast, cheap, medical-safe)
+    { name: 'gemini', key: GEMINI_KEY, model: 'gemini-1.5-flash' },
+    // OpenAI - Backup 1
     { name: 'openai', key: OPENAI_KEY, model: 'gpt-4o-mini' },
-    // Gemini - Backup 3
-    { name: 'gemini', key: GEMINI_KEY, model: 'gemini-2.0-flash' }
+    // Kimi (Moonshot) - Backup 2
+    { name: 'kimi', key: KIMI_KEY, model: 'moonshot-v1-8k' },
+    // MiniMax - Backup 3
+    { name: 'minimax', key: MINIMAX_KEY, model: 'abab6.5s-chat' }
   ];
 
   // Use requested provider or try available ones
@@ -122,16 +122,20 @@ export default async function handler(req, res) {
       throw new Error('OpenAI failed');
     }
 
-    // Gemini (Google)
+    // Gemini (Google) — PRIMARY
     if (selectedProvider.name === 'gemini' && GEMINI_KEY) {
       const geminiMessages = messages.map(m => ({
-        role: m.role === 'assistant' ? 'model' : 'user',
+        role: m.role === 'assistant' || m.role === 'model' ? 'model' : 'user',
         parts: [{ text: m.content }]
       }));
 
-      geminiMessages.unshift({ role: 'user', parts: [{ text: systemPrompt }] });
+      // Add system prompt as first user message (Gemini doesn't have system role)
+      geminiMessages.unshift({ 
+        role: 'user', 
+        parts: [{ text: `SYSTEM INSTRUCTION: ${systemPrompt}\n\nYou are Cedex. Respond as instructed above.` }] 
+      });
 
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`, {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
