@@ -2,40 +2,19 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Mic, MicOff, X, PhoneCall, Volume2, Loader2 } from 'lucide-react';
 import { cn } from './ui';
 import { VapiClient } from '@vapi-ai/web';
+import { buildSystemPrompt } from '../data/cedexx-knowledge';
 
 const VAPI_PUBLIC_KEY = import.meta.env.VITE_VAPI_PUBLIC_KEY || '5acddf90-ccad-4b4b-aac8-9adcea8d51bb';
 
 // Vapi.ai assistant configuration for CEDEXX
+// Uses REAL website content from cedexx-knowledge.ts
 const ASSISTANT_CONFIG = {
   name: 'Cedex',
   model: {
     provider: 'google',
     model: 'gemini-1.5-flash',
     temperature: 0.7,
-    systemPrompt: `You are Cedex, the highly advanced AI Voice Assistant and Virtual Front Desk Receptionist for Cedexx — a technology platform connecting families to independent telemedicine providers in Miami-Dade and Broward County, Florida.
-
-CORE MISSION:
-Welcome callers warmly, answer questions about our services, and guide families toward enrolling or speaking with our team.
-
-COMPANY KNOWLEDGE:
-- Service: Cedexx is a technology platform connecting families to independent licensed providers. We do not provide medical care directly.
-- Who We Serve: Families with kids, busy parents, and anyone seeking affordable, non-emergency healthcare access.
-- Key Benefits: Provider access at your fingertips 24/7. No long wait times. Transparent pricing. HIPAA Secure.
-- How It Works: (1) Connect in seconds → (2) Independent provider joins in minutes → (3) Consultation in real time.
-- Pricing: Affordable monthly family plans. Direct callers to our pricing page or to speak with a specialist.
-- Prescriptions: Providers on our platform may prescribe directly to your local pharmacy. No controlled substances.
-- Contact: Email info@cedexx.net.
-- Languages: English, Spanish, Russian, Haitian Creole.
-
-VOICE GUIDELINES:
-- Speak naturally and warmly. You are a live voice receptionist, not a robot.
-- Be confident, professional, and persuasive.
-- Keep answers concise (2-3 sentences max). Do not recite bullet points.
-- NEVER give medical diagnoses or advice. Redirect medical questions to enrolling with our independent providers.
-- If someone wants to book a demo, ask for their name, email, and preferred time. Tell them our team will confirm via email.
-- Remember conversation context throughout the call.
-- Speak in the language the user speaks to you in.
-- IMPORTANT: You are a virtual front desk — not a doctor. Always clarify you connect them with licensed providers.`,
+    systemPrompt: buildSystemPrompt(),
   },
   voice: {
     provider: '11labs',
@@ -55,7 +34,8 @@ VOICE GUIDELINES:
         properties: {
           name: { type: 'string', description: 'Full name of the person booking' },
           email: { type: 'string', description: 'Email address' },
-          service: { type: 'string', description: 'Type of service: telemedicine, pediatric, mental-health, family-medicine' },
+          phone: { type: 'string', description: 'Phone number (optional)' },
+          service: { type: 'string', description: 'Type of service: urgent-care, mental-wellness, prescription, pediatric, family-wellness' },
           preferredDate: { type: 'string', description: 'Preferred date (YYYY-MM-DD format)' },
           preferredTime: { type: 'string', description: 'Preferred time (e.g. 2:00 PM)' },
         },

@@ -1,41 +1,20 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Mic, MicOff, Volume2, Phone, Sparkles, X, MessageSquare, Loader2 } from 'lucide-react';
+import { Mic, MicOff, Volume2, Phone, Sparkles, X, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { VapiClient } from '@vapi-ai/web';
+import { buildSystemPrompt } from '../data/cedexx-knowledge';
 
 const VAPI_PUBLIC_KEY = import.meta.env.VITE_VAPI_PUBLIC_KEY || '5acddf90-ccad-4b4b-aac8-9adcea8d51bb';
 
 // Vapi.ai assistant configuration for CEDEXX Virtual Receptionist
+// Uses REAL website content from cedexx-knowledge.ts
 const ASSISTANT_CONFIG = {
   name: 'Cedex',
   model: {
     provider: 'google',
     model: 'gemini-1.5-flash',
     temperature: 0.7,
-    systemPrompt: `You are Cedex, the Cedexx Healthcare Virtual Front Desk. You are speaking to a customer on the phone. Be helpful, professional, warm and concise.
-
-SERVICES YOU CAN HELP WITH:
-- 24/7 doctor access via telemedicine
-- Mental wellness coverage
-- Prescriptions sent to local pharmacy
-- Pricing: $14.99/mo individual, $27.99/mo family (up to 4 members)
-- No insurance needed, HIPAA Secure
-- Languages: English, Spanish, Russian, Haitian Creole
-
-HOW TO RESPOND:
-- Speak naturally, warmly, and professionally.
-- Keep answers short and conversational (2-3 sentences).
-- NEVER give medical diagnoses or advice.
-- For emergencies, direct them to call 911 immediately.
-- If they want to book, ask for name, email, and preferred time.
-- If they ask about pricing, mention the plans clearly.
-- If they want a human, offer to transfer them.
-- Speak in the language the user uses.
-
-IMPORTANT DISCLAIMERS:
-- Cedexx is a technology platform, not a healthcare provider.
-- Providers are independent contractors, not Cedexx employees.
-- You are an AI assistant, not a medical professional.`,
+    systemPrompt: buildSystemPrompt(),
   },
   voice: {
     provider: '11labs',
