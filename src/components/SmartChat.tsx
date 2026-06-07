@@ -86,10 +86,10 @@ export function SmartChat() {
     if (lower.includes('price') || lower.includes('cost') || lower.includes('membership')) 
       return "Cedexx memberships start at $14.99/mo for individuals and $27.99/mo for families of 4. No insurance is needed!";
     if (lower.includes('doctor') || lower.includes('provider') || lower.includes('physician'))
-      return "Our network includes independent licensed providers available 24/7. Most consultations happen in under 15 minutes.";
+      return "Through our partner Lyric Health, you have access to their nationwide network of licensed providers available 24/7. Most consultations happen in under 15 minutes.";
     if (lower.includes('enroll') || lower.includes('start') || lower.includes('join'))
-      return "You can enroll right now! Click the 'Enroll Now' button in the menu to select your plan.";
-    return "I'm here to help with questions about our telehealth services, pricing, or the platform. Would you like to schedule a demo?";
+      return "You can enroll right now! Click the 'Enroll Now' button in the menu to select your plan and get access to Lyric Health's virtual care.";
+    return "I'm here to help with questions about Lyric Health's virtual care services, pricing, or the platform. Would you like to schedule a demo?";
   };
 
   return (

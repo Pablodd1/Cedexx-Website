@@ -39,16 +39,16 @@ export function Terms() {
             <section>
               <h2 className="text-2xl font-bold text-emerald-900 mb-4 flex items-center gap-2">
                 <Shield className="h-6 w-6 text-emerald-500" />
-                1. Platform Nature — We Are Not a Healthcare Provider
+                1. Platform Nature — Powered by Lyric Health
               </h2>
               <div className="bg-amber-50 border border-amber-200 p-5 rounded-xl mb-4 text-amber-900">
-                <p className="font-bold mb-2">IMPORTANT: WE ARE NOT A HEALTHCARE PROVIDER.</p>
-                <p className="text-sm">Cedexx does not provide medical services, medical advice, diagnosis, or treatment. We operate solely as a technology platform that connects users with independent third-party telemedicine providers.</p>
+                <p className="font-bold mb-2">IMPORTANT: CEDEXX IS A TECHNOLOGY PLATFORM POWERED BY LYRIC HEALTH.</p>
+                <p className="text-sm">Cedexx does not provide medical services, medical advice, diagnosis, or treatment. We operate as a technology platform that connects users with Lyric Health, our exclusive telehealth partner.</p>
               </div>
               <ul className="list-disc pl-6 space-y-2">
                 <li><strong>1.1</strong> Cedexx is a technology platform and referral service. We do not provide medical care, medical advice, or healthcare services.</li>
-                <li><strong>1.2</strong> We connect users with independent third-party telemedicine providers who are licensed to practice in their respective jurisdictions.</li>
-                <li><strong>1.3</strong> We do not employ, control, or supervise healthcare providers. Providers are independent contractors solely responsible for their services.</li>
+                <li><strong>1.2</strong> We connect users with Lyric Health licensed providers who are licensed to practice in their respective jurisdictions.</li>
+                <li><strong>1.3</strong> Lyric Health is solely responsible for clinical services. Lyric Health providers are part of their nationwide network solely responsible for their services.</li>
               </ul>
             </section>
 
@@ -88,7 +88,7 @@ export function Terms() {
                 4. Providers Are Independent Contractors
               </h2>
               <p>
-                All healthcare providers accessible through our platform are independent contractors, 
+                All healthcare providers accessible through our platform are part of Lyric Health, 
                 not employees or agents of Cedexx. Each provider is solely responsible for their own services, 
                 advice, and medical decisions. We attempt to verify provider credentials but cannot guarantee 
                 the quality of any medical service.
@@ -126,7 +126,7 @@ export function Terms() {
               <h2 className="text-2xl font-bold text-emerald-900 mb-4">7. Telemedicine Services & Prescriptions</h2>
               <ul className="list-disc pl-6 space-y-2">
                 <li><strong>Provider Relationship:</strong> Using our platform establishes a provider-patient relationship with the specific board-certified doctor or licensed therapist you consult with, not with Cedexx as a corporate entity.</li>
-                <li><strong>Prescription Policy:</strong> Providers on our platform may prescribe medications when medically necessary. However, <strong>they cannot and will not prescribe DEA-controlled substances</strong>, non-therapeutic drugs, or certain other medications that may be harmful because of their potential for abuse.</li>
+                <li><strong>Prescription Policy:</strong> Lyric Health providers may prescribe medications when medically necessary. However, <strong>they cannot and will not prescribe DEA-controlled substances</strong>, non-therapeutic drugs, or certain other medications that may be harmful because of their potential for abuse.</li>
                 <li><strong>Availability:</strong> While we strive for 24/7/365 availability, wait times may vary based on demand. Most consultations begin within 10–15 minutes.</li>
               </ul>
             </section>
@@ -149,8 +149,8 @@ export function Terms() {
             <section>
               <h2 className="text-2xl font-bold text-emerald-900 mb-4">9. Referral Disclosure</h2>
               <p>
-                Cedexx may receive compensation from healthcare providers for referrals. 
-                This does not affect your cost or our neutrality in presenting provider options. 
+                Cedexx may receive compensation from Lyric Health for facilitating connections. 
+                This does not affect your cost or our neutrality in presenting Lyric Health as our sole telehealth partner. 
                 We are a referral service only and do not control provider pricing or availability.
               </p>
             </section>
@@ -160,11 +160,11 @@ export function Terms() {
               <h2 className="text-2xl font-bold text-emerald-900 mb-4">10. Limitation of Liability</h2>
               <p className="mb-3">TO THE MAXIMUM EXTENT PERMITTED BY LAW, CEDEXX DISCLAIMS ALL LIABILITY FOR:</p>
               <ul className="list-disc pl-6 space-y-2">
-                <li>(a) Any medical services provided by third-party providers</li>
+                <li>(a) Any medical services provided by Lyric Health providers</li>
                 <li>(b) Quality of care or treatment outcomes</li>
                 <li>(c) Misdiagnosis, delayed diagnosis, or medical errors</li>
                 <li>(d) Technical failures preventing access to care</li>
-                <li>(e) Actions or omissions of independent providers</li>
+                <li>(e) Actions or omissions of Lyric Health providers</li>
                 <li>(f) Any indirect, incidental, special, consequential, or punitive damages</li>
               </ul>
               <p className="mt-4 text-sm text-slate-500">
@@ -177,7 +177,7 @@ export function Terms() {
             <section>
               <h2 className="text-2xl font-bold text-emerald-900 mb-4">11. No Endorsement</h2>
               <p>
-                We do not endorse, recommend, or guarantee any specific provider, treatment, or medical advice. 
+                We do not endorse, recommend, or guarantee any specific Lyric Health provider, treatment, or medical advice. 
                 Provider selection is your sole responsibility. Verify provider credentials independently.
               </p>
             </section>
@@ -186,7 +186,7 @@ export function Terms() {
             <section>
               <h2 className="text-2xl font-bold text-emerald-900 mb-4">12. Assumption of Risk</h2>
               <p>
-                YOU ASSUME ALL RISK when using this platform and engaging with healthcare providers. 
+                YOU ASSUME ALL RISK when using this platform and engaging with Lyric Health providers. 
                 You agree that Cedexx is not responsible for any harm resulting from medical services 
                 obtained through our platform.
               </p>

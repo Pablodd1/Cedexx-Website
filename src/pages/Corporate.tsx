@@ -11,7 +11,7 @@ export function Corporate() {
           </h1>
           <p className="text-lg text-slate-600">
             Empower your workforce with 24/7 access to board-certified healthcare professionals. 
-            Cedexx offers comprehensive telemedicine packages tailored for businesses of all sizes.
+            Cedexx offers comprehensive Lyric Health virtual care packages tailored for businesses of all sizes.
           </p>
         </div>
 
@@ -36,7 +36,7 @@ export function Corporate() {
 
           <div className="bg-white p-8 rounded-2xl shadow-sm border border-blue-100">
             <Target className="w-12 h-12 text-blue-600 mb-6" />
-            <h3 className="text-xl font-bold text-blue-950 mb-4">Strategic Partnerships</h3>
+            <h3 className="text-xl font-bold text-blue-950 mb-4">Strategic Partnership: Lyric Health</h3>
             <p className="text-slate-600">
               Integrate our telemedicine platform into your existing health and wellness offerings. 
               API access and white-label solutions available.

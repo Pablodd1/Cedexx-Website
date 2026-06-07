@@ -67,7 +67,7 @@ export function About() {
             CEDEXX bridges the <br /> gaps in healthcare.
           </motion.h1>
           <p className="text-xl md:text-3xl text-blue-100/80 font-medium leading-relaxed max-w-3xl mx-auto italic">
-            Connecting families to healthcare with a modern digital standard. A moral choice for families, a strategic advantage for organizations.
+            Connecting families to Lyric Health integrated virtual care with a modern digital standard. A moral choice for families, a strategic advantage for organizations.
           </p>
         </div>
       </section>
@@ -237,7 +237,7 @@ export function About() {
         {/* Secondary Disclaimer */}
         <div className="container mx-auto px-6 mt-20 relative z-10">
            <p className="text-[15px] text-blue-400/30 uppercase tracking-[0.2em] text-center max-w-3xl mx-auto font-black italic leading-relaxed">
-             CEDEXX is a technology platform. We do not provide medical care directly. All services are delivered by independent licensed providers. This platform is not a substitute for health insurance.
+             CEDEXX is a technology platform. Healthcare services are provided by Lyric Health, our exclusive telehealth partner. All services are delivered by Lyric Health licensed providers. This platform is not a substitute for health insurance.
            </p>
         </div>
       </section>

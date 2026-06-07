@@ -390,7 +390,7 @@ export function Home() {
                   { title: t('serve.card1.title'), desc: t('serve.card1.desc'), icon: Smartphone },
                   { title: t('serve.card2.title'), desc: t('serve.card2.desc'), icon: Users },
                   { title: t('serve.card4.title'), desc: t('serve.card4.desc'), icon: Building2 },
-                  { title: 'Physician Opportunities', desc: 'Secure clinical blocks and earn flexible income with our independent provider model.', icon: Heart }
+                  { title: 'Join Lyric Health Provider Network', desc: 'Secure clinical blocks and earn flexible income with our Lyric Health provider network.', icon: Heart }
                 ].map((p, i) => (
                   <div key={i} className="space-y-3 group">
                     <div className="h-12 w-12 rounded-2xl bg-white flex items-center justify-center text-[#050249] shadow-sm border border-slate-100 group-hover:bg-[#050249] group-hover:text-white transition-all">

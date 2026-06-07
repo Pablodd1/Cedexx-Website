@@ -180,7 +180,7 @@ export function Services() {
               { icon: Activity, title: '24/7 Provider Access', desc: 'Secure video or audio consults from home, work, or while traveling.' },
               { icon: TrendingUp, title: 'Save Time & Resources', desc: 'Reduce unnecessary trips to urgent care and miss less time from work or family.' },
               { icon: Users, title: 'Full Family Coverage', desc: 'Our family plan covers your entire household with unlimited provider consultations.' },
-              { icon: Dna, title: 'National Network', desc: 'Independent board-certified providers licensed in your state for high-quality care.' }
+              { icon: Dna, title: 'Lyric Health Nationwide Network', desc: 'Lyric Health board-certified providers licensed in your state for high-quality care.' }
             ].map((value, i) => (
               <Card key={i} className="p-10 border-blue-50 bg-[#EBF3FB] rounded-[2.5rem] hover:shadow-2xl hover:-translate-y-2 transition-all duration-500">
                 <div className="h-16 w-16 mx-auto bg-white rounded-2xl flex items-center justify-center mb-8 text-[#050249] shadow-sm">

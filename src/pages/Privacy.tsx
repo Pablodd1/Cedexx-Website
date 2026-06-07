@@ -31,7 +31,7 @@ export function Privacy() {
               <p>
                 At Cedexx, your privacy and the security of your Protected Health Information (PHI) are our highest priorities. 
                 This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website 
-                or use our platform to connect with independent telemedicine providers. 
+                or use our platform to connect with Lyric Health. 
               </p>
               <p className="mt-4 font-medium text-emerald-800 bg-emerald-50 p-4 rounded-xl border border-emerald-100">
                 <strong>HIPAA Notice:</strong> Cedexx is fully compliant with the Health Insurance Portability and Accountability Act (HIPAA). 
@@ -47,7 +47,7 @@ export function Privacy() {
               <ul className="list-disc pl-6 space-y-2">
                 <li><strong>Personal Identification Information:</strong> Name, email address, phone number, date of birth, and physical address.</li>
                 <li><strong>Health Information (PHI):</strong> Medical history, current symptoms, consultation notes, prescriptions, and therapist evaluations.</li>
-                <li><strong>Payment Information:</strong> Credit card details and billing addresses (processed securely via third-party PCI-compliant gateways; we do not store full credit card numbers).</li>
+                <li><strong>Payment Information:</strong> Credit card details and billing addresses (processed securely via PCI-compliant gateways; we do not store full credit card numbers).</li>
                 <li><strong>Device & Usage Data:</strong> IP address, browser type, operating system, and interaction metrics with our website and AI assistants.</li>
               </ul>
             </section>
@@ -76,8 +76,8 @@ export function Privacy() {
                 We <strong>do not sell</strong> your personal or medical data to third parties. We may share your information only in the following circumstances:
               </p>
               <ul className="list-disc pl-6 space-y-2 mt-4">
-                <li><strong>Healthcare Providers:</strong> With the independent providers, therapists, and pharmacies directly involved in your care.</li>
-                <li><strong>Service Providers:</strong> With trusted third-party vendors who operate under strict Business Associate Agreements (BAAs) to ensure HIPAA compliance.</li>
+                <li><strong>Healthcare Providers:</strong> With Lyric Health providers and pharmacies directly involved in your care.</li>
+                <li><strong>Service Providers:</strong> With trusted Lyric Health vendors who operate under strict Business Associate Agreements (BAAs) to ensure HIPAA compliance.</li>
                 <li><strong>Legal Requirements:</strong> If required by law, subpoena, or other legal processes.</li>
               </ul>
             </section>
