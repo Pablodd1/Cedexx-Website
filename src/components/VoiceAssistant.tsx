@@ -1,71 +1,106 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Mic, MicOff, X, PhoneCall, Volume2 } from 'lucide-react';
+import { Mic, MicOff, X, PhoneCall, Volume2, Loader2 } from 'lucide-react';
 import { cn } from './ui';
+import { VapiClient } from '@vapi-ai/web';
+import { buildSystemPrompt } from '../data/cedexx-knowledge';
 
-const SYSTEM_INSTRUCTION = `You are Cedex, the highly advanced AI Voice Assistant and Virtual Front Desk Receptionist for Cedexx — powered by Lyric Health, our exclusive telehealth partner. No insurance needed.
+const VAPI_PUBLIC_KEY = import.meta.env.VITE_VAPI_PUBLIC_KEY || '5acddf90-ccad-4b4b-aac8-9adcea8d51bb';
 
-CORE MISSION:
-Welcome callers warmly, answer questions about our services, and guide families toward enrolling or speaking with our team.
-
-COMPANY KNOWLEDGE (FAMILY FOCUS):
-- Service: Cedexx is powered by Lyric Health, a leading integrated virtual primary care platform. We connect families to Lyric Health's nationwide network of licensed providers.
-- Lyric Health Offers: 24/7 Urgent Care, Primary Care, Mental Health, Dermatology, Virtual MSK, Care Navigation, Labs, and GLP-1 Weight Loss.
-- Who We Serve: Families with kids, busy parents, and anyone seeking affordable, non-emergency healthcare access.
-- Key Benefits: Provider access at your fingertips 24/7. No long wait times. Transparent pricing. HIPAA Secure through Lyric Health.
-- How It Works: (1) Connect in seconds → (2) Lyric Health provider joins in minutes → (3) Consultation in real time via phone or video.
-- Pricing: Affordable monthly family plans. Individual $14.99/month, Family $27.99/month. Direct callers to our pricing page or to speak with a specialist.
-- Prescriptions: Lyric Health providers may prescribe directly to your local pharmacy. Digital work/school notes available. No controlled substances.
-- Contact: Email info@cedexx.net.
-- Powered by Cedexx + Lyric Health.
-
-IMPORTANT DISCLAIMERS (use when relevant):
-- Cedexx is NOT a healthcare provider. We are the technology platform. Lyric Health delivers all medical care.
-- We do not provide medical advice, diagnoses, or treatment.
-- All providers are part of Lyric Health's nationwide network.
-- For medical emergencies, call 911 immediately.
-
-VOICE GUIDELINES & TONE:
-- SPEAK NATURALLY. You are a live voice receptionist, not a chatbot reading a list.
-- Be WARM, CONFIDENT, PROFESSIONAL, and PERSUASIVE.
-- Keep answers short and conversational. Do not recite bullet points aloud.
-- NEVER give medical diagnoses or advice. Redirect medical questions to enrolling and speaking with Lyric Health providers.
-- If someone wants to book a demo, collect their name and email and let them know our team will email them to confirm.
-- REMEMBER the conversation context throughout the call — reference earlier details naturally.
-- Speak naturally in the language the user speaks to you in.`;
+// Vapi.ai assistant configuration for CEDEXX
+// Uses REAL website content from cedexx-knowledge.ts (updated for Lyric Health partnership)
+const ASSISTANT_CONFIG = {
+  name: 'Cedex',
+  model: {
+    provider: 'google',
+    model: 'gemini-1.5-flash',
+    temperature: 0.7,
+    systemPrompt: buildSystemPrompt(),
+  },
+  voice: {
+    provider: '11labs',
+    voiceId: 'bella', // Warm, professional female voice
+    stability: 0.5,
+    similarityBoost: 0.75,
+  },
+  firstMessage: "Hello! I'm Cedex, your Cedexx virtual receptionist. I'm here to help you with Lyric Health virtual care access, pricing questions, or booking a consultation. How can I assist you today?",
+  endCallFunctionEnabled: true,
+  recordingEnabled: false,
+  functions: [
+    {
+      name: 'bookAppointment',
+      description: 'Book a consultation appointment for the user',
+      parameters: {
+        type: 'object',
+        properties: {
+          name: { type: 'string', description: 'Full name of the person booking' },
+          email: { type: 'string', description: 'Email address' },
+          phone: { type: 'string', description: 'Phone number (optional)' },
+          service: { type: 'string', description: 'Type of service: urgent-care, mental-wellness, prescription, pediatric, family-wellness' },
+          preferredDate: { type: 'string', description: 'Preferred date (YYYY-MM-DD format)' },
+          preferredTime: { type: 'string', description: 'Preferred time (e.g. 2:00 PM)' },
+        },
+        required: ['name', 'email', 'service'],
+      },
+    },
+    {
+      name: 'transferToHuman',
+      description: 'Transfer the call to a human agent when the user requests it or when the issue is complex',
+      parameters: {
+        type: 'object',
+        properties: {
+          reason: { type: 'string', description: 'Reason for transfer' },
+        },
+        required: ['reason'],
+      },
+    },
+    {
+      name: 'sendPricingInfo',
+      description: 'Send pricing information to the user via email',
+      parameters: {
+        type: 'object',
+        properties: {
+          email: { type: 'string', description: 'Email to send pricing to' },
+          plan: { type: 'string', description: 'Plan type: individual, family, corporate' },
+        },
+        required: ['email'],
+      },
+    },
+  ],
+};
 
 export function VoiceAssistant({ inline = false }: { inline?: boolean }) {
   const [isOpen, setIsOpen] = useState(inline);
   const [isConnecting, setIsConnecting] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [transcript, setTranscript] = useState('');
-  const sessionRef = useRef<any>(null);
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const playbackCtxRef = useRef<AudioContext | null>(null);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const vapiRef = useRef<VapiClient | null>(null);
 
-  const endCall = useCallback(() => {
-    if (sessionRef.current) {
-      sessionRef.current = null;
-    }
-    const recognition = (window as any).recognition;
-    if (recognition) {
-      recognition.stop();
-      (window as any).recognition = null;
-    }
-    window.speechSynthesis.cancel();
-    audioContextRef.current?.close();
-    audioContextRef.current = null;
-    playbackCtxRef.current?.close();
-    playbackCtxRef.current = null;
-    setIsConnected(false);
-    setIsConnecting(false);
-    setTranscript('');
-    setIsOpen(false);
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (vapiRef.current) {
+        vapiRef.current.stop();
+        vapiRef.current = null;
+      }
+    };
   }, []);
 
+  const endCall = useCallback(() => {
+    if (vapiRef.current) {
+      vapiRef.current.stop();
+      vapiRef.current = null;
+    }
+    setIsConnected(false);
+    setIsConnecting(false);
+    setIsSpeaking(false);
+    setTranscript('');
+    if (!inline) setIsOpen(false);
+  }, [inline]);
+
   const startCall = async () => {
-    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-    if (!apiKey || apiKey === 'MY_GEMINI_API_KEY') {
-      setTranscript('API key not configured. Voice assistant unavailable.');
+    if (!VAPI_PUBLIC_KEY || VAPI_PUBLIC_KEY.includes('REPLACE')) {
+      setTranscript('Vapi.ai not configured. Please add your public key to .env.local');
       return;
     }
 
@@ -73,72 +108,89 @@ export function VoiceAssistant({ inline = false }: { inline?: boolean }) {
     setTranscript('Connecting to Cedex...');
 
     try {
-      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-      if (!SpeechRecognition) {
-        setTranscript('Voice recognition not supported in this browser.');
+      const vapi = new VapiClient(VAPI_PUBLIC_KEY);
+      vapiRef.current = vapi;
+
+      // Event handlers
+      vapi.on('call-start', () => {
         setIsConnecting(false);
-        return;
-      }
-
-      const recognition = new SpeechRecognition();
-      recognition.continuous = true;
-      recognition.interimResults = true;
-      recognition.lang = 'en-US';
-
-      recognition.onstart = () => {
         setIsConnected(true);
-        setIsConnecting(false);
-        setTranscript('Connected — I am listening.');
-        speak("Hello! I'm Cedex, your AI receptionist. How can I help you today?");
-      };
+        setTranscript("Connected — I'm listening.");
+      });
 
-      recognition.onresult = async (event: any) => {
-        const lastResult = event.results[event.results.length - 1];
-        if (lastResult.isFinal) {
-          const text = lastResult[0].transcript;
-          setTranscript('Thinking...');
-          try {
-            const response = await fetch('/api/chat', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                messages: [{ role: 'user', content: text }],
-                provider: 'kimi'
-              })
-            });
-            const data = await response.json();
-            const responseText = data.choices?.[0]?.message?.content || "I'm sorry, I'm having trouble thinking.";
-            setTranscript(responseText);
-            speak(responseText);
-          } catch (err) {
-            console.error('Gemini error:', err);
-            setTranscript('Sorry, I encountered an error. Please try again.');
-          }
+      vapi.on('speech-start', () => {
+        setIsSpeaking(true);
+      });
+
+      vapi.on('speech-end', () => {
+        setIsSpeaking(false);
+      });
+
+      vapi.on('message', (message) => {
+        if (message.type === 'transcript' && message.transcriptType === 'final') {
+          setTranscript(message.transcript);
         }
-      };
+        if (message.type === 'assistant-message') {
+          setTranscript(message.message);
+        }
+      });
 
-      recognition.onerror = () => endCall();
-      recognition.onend = () => { if (isConnected) recognition.start(); };
-      
-      (window as any).recognition = recognition;
-      recognition.start();
+      vapi.on('function-call', (functionCall) => {
+        handleFunctionCall(functionCall);
+      });
+
+      vapi.on('call-end', () => {
+        endCall();
+      });
+
+      vapi.on('error', (error) => {
+        console.error('Vapi error:', error);
+        setTranscript('Sorry, I encountered a connection issue. Please try again.');
+        setIsConnecting(false);
+      });
+
+      // Start the call
+      await vapi.start(ASSISTANT_CONFIG);
 
     } catch (err) {
       console.error('Start call failed:', err);
-      setTranscript('Connection failed. Please try again.');
+      setTranscript('Connection failed. Please check your microphone permissions and try again.');
       setIsConnecting(false);
     }
   };
 
-  const speak = (text: string) => {
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    const voices = window.speechSynthesis.getVoices();
-    const preferredVoice = voices.find(v => (v.name.includes('Google') || v.name.includes('Samantha') || v.name.includes('Natural')) && v.lang.startsWith('en')) || voices[0];
-    if (preferredVoice) utterance.voice = preferredVoice;
-    utterance.rate = 1.0;
-    utterance.pitch = 1.0;
-    window.speechSynthesis.speak(utterance);
+  const handleFunctionCall = async (functionCall: any) => {
+    const { name, parameters } = functionCall;
+
+    switch (name) {
+      case 'bookAppointment':
+        // TODO: Integrate with Cal.com or your booking system
+        console.log('Booking appointment:', parameters);
+        // Send to your booking API
+        try {
+          await fetch('/api/book-voice', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(parameters),
+          });
+        } catch (e) {
+          console.error('Booking failed:', e);
+        }
+        break;
+
+      case 'transferToHuman':
+        // TODO: Implement human handoff (Twilio, Slack, etc.)
+        console.log('Transfer to human:', parameters.reason);
+        break;
+
+      case 'sendPricingInfo':
+        // TODO: Send email via Brevo/Resend
+        console.log('Send pricing to:', parameters.email);
+        break;
+
+      default:
+        console.log('Unknown function:', name);
+    }
   };
 
   const assistantUI = (
@@ -153,7 +205,7 @@ export function VoiceAssistant({ inline = false }: { inline?: boolean }) {
             <PhoneCall className="h-5 w-5" />
             <div>
               <p className="font-bold text-sm leading-tight">Cedex — AI Receptionist</p>
-              <p className="text-blue-200 text-xs">Cedexx</p>
+              <p className="text-blue-200 text-xs">CEDEXX</p>
             </div>
           </div>
           <button onClick={endCall} title="End call and close" className="text-blue-200 hover:text-white transition-colors">
@@ -170,11 +222,27 @@ export function VoiceAssistant({ inline = false }: { inline?: boolean }) {
           isConnected ? 'bg-[#EBF3FB] pulse-ring' : 'bg-slate-100'
         )}>
           {isConnected ? (
-            <div className="flex items-end gap-1 h-10">
-              {[1, 2, 3, 4, 5].map(i => (
-                <div key={i} className="wave-bar w-1.5 bg-[#050249] rounded-full h-8 origin-bottom" />
-              ))}
-            </div>
+            isSpeaking ? (
+              // Speaking animation
+              <div className="flex items-end gap-1 h-10">
+                {[1, 2, 3, 4, 5].map(i => (
+                  <div 
+                    key={i} 
+                    className="wave-bar w-1.5 bg-[#050249] rounded-full origin-bottom"
+                    style={{
+                      animation: `wave ${0.5 + i * 0.1}s ease-in-out infinite alternate`,
+                      height: `${12 + Math.random() * 20}px`
+                    }}
+                  />
+                ))}
+              </div>
+            ) : (
+              // Listening indicator
+              <div className="relative">
+                <div className="absolute inset-0 bg-[#23d9b0] rounded-full animate-ping opacity-20" />
+                <Mic className="h-8 w-8 text-[#050249]" />
+              </div>
+            )
           ) : (
             <MicOff className="h-10 w-10 text-slate-400" />
           )}
@@ -182,9 +250,10 @@ export function VoiceAssistant({ inline = false }: { inline?: boolean }) {
 
         {/* Status / Transcript */}
         <div className="w-full bg-white rounded-xl border border-blue-100 p-3 min-h-[56px] flex items-center justify-center">
-          {isConnected && <Volume2 className="h-4 w-4 text-[#050249] mr-2 flex-shrink-0" />}
+          {isSpeaking && <Volume2 className="h-4 w-4 text-[#050249] mr-2 flex-shrink-0 animate-pulse" />}
+          {isConnecting && <Loader2 className="h-4 w-4 text-[#050249] mr-2 animate-spin" />}
           <p className="text-center text-sm text-slate-600 leading-snug">
-            {transcript || (isConnecting ? 'Connecting...' : 'Click "Start Call" to speak with Cedex, our AI receptionist.')}
+            {transcript || (isConnecting ? 'Connecting to Cedex...' : 'Click "Start Call" to speak with Cedex, our AI receptionist.')}
           </p>
         </div>
 
@@ -201,7 +270,7 @@ export function VoiceAssistant({ inline = false }: { inline?: boolean }) {
             onClick={endCall}
             className="w-full border border-red-200 text-red-600 hover:bg-red-50 font-semibold rounded-xl py-3 transition-colors"
           >
-            End Call
+            {isConnecting ? 'Cancel' : 'End Call'}
           </button>
         )}
 
@@ -231,7 +300,21 @@ export function VoiceAssistant({ inline = false }: { inline?: boolean }) {
       )}
 
       {(isOpen || inline) && assistantUI}
+
+      {/* Wave animation styles */}
+      <style>{`
+        @keyframes wave {
+          0% { transform: scaleY(0.3); }
+          100% { transform: scaleY(1); }
+        }
+        .pulse-ring {
+          animation: pulse-ring 2s ease-out infinite;
+        }
+        @keyframes pulse-ring {
+          0% { box-shadow: 0 0 0 0 rgba(5, 2, 73, 0.4); }
+          100% { box-shadow: 0 0 0 20px rgba(5, 2, 73, 0); }
+        }
+      `}</style>
     </>
   );
 }
-
