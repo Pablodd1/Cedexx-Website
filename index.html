@@ -313,9 +313,72 @@
 </script>
 <!-- END AISO + Schema.org Injection -->
 
+<!-- Microsoft Clarity - Heatmaps, Session Recordings, AI Insights -->
+<!-- IMPORTANT: Replace CLARITY_CDX with your actual Clarity Project ID from https://clarity.microsoft.com -->
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "CLARITY_CDX");
+</script>
+<!-- End Microsoft Clarity -->
 </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+
+    <!-- ===== AGENTIC WEBSITE ENGINE v3.0 + AI CHATBOT v3.0 ===== -->
+    <script src="/agentic-website-engine-v3.js"></script>
+    <script src="/agentic-chatbot-v3.js"></script>
+    <script>
+      // Initialize Agentic Engine for CEDEXX
+      window._agenticInstance = new AgenticWebsite({
+        siteId: 'cedexx',
+        apiEndpoint: '/api/agentic',
+        abTesting: {
+          enabled: true,
+          variants: {
+            headline: [
+              '24/7 Virtual Healthcare for Your Family',
+              'No Insurance? No Problem.',
+              'Pediatric Care From Home'
+            ],
+            cta: [
+              'See a Doctor Now',
+              'Book Appointment',
+              'Get Started'
+            ]
+          }
+        }
+      });
+
+      // Initialize AI Chatbot for CEDEXX
+      window.AGENTIC_CHATBOT_CONFIG = {
+        siteName: 'CEDEXX',
+        primaryColor: '#00D4FF',
+        secondaryColor: '#0a1628',
+        position: 'bottom-right',
+        languages: ['en', 'es', 'ru', 'ht'],
+        defaultLanguage: 'en',
+        welcomeMessage: {
+          en: "🏥 Welcome to CEDEXX! I'm your virtual health assistant.\n\nI can help you:\n• Access 24/7 virtual providers\n• Learn about our pediatric care\n• Check pricing for visits\n• Compare care options\n• Book an appointment\n\nHow can I help you today?"
+        },
+        knowledgeBase: `You are CEDEXX's AI Health Assistant. You help families access virtual healthcare.\n\nSERVICES:\n• 24/7 Virtual Provider Access - No insurance needed for many services\n• Pediatric Telemedicine - Research-backed pediatric care\n• Health Blog - Evidence-based wellness articles\n• Transparent Pricing - Per-visit pricing, no hidden fees\n\nCOVERAGE: Miami-Dade, Broward, Florida\n\nWhen users ask about pricing, generate a pricing block. When they want to compare options, generate a comparison block. When they want to book, scroll to the appointments section.`,
+        pricingTiers: [
+          { name: 'Single Visit', price: '$49', features: ['24/7 access', '30-min consultation', 'Prescription if needed'], cta: 'Book Now' },
+          { name: 'Family Plan', price: '$99/mo', features: ['Unlimited visits', '4 family members', 'Priority scheduling', 'Pediatric specialists'], cta: 'Start Free Trial', highlighted: true },
+          { name: 'Premium Care', price: '$199/mo', features: ['Everything in Family', 'Mental health', 'Chronic care', 'Specialist referrals'], cta: 'Learn More' }
+        ],
+        suggestions: [
+          'How much does a visit cost?',
+          'Do I need insurance?',
+          'Book an appointment',
+          'What services do you offer?',
+          'Can you help with pediatric care?'
+        ]
+      };
+      window._agenticChatbot = new AgenticChatbot(window.AGENTIC_CHATBOT_CONFIG);
+    </script>
   </body>
 </html>
