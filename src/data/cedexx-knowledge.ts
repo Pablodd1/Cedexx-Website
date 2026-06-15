@@ -32,7 +32,7 @@ export const CEDEXX_KNOWLEDGE = {
 
   pricing: {
     individual: '$14.99 per month',
-    family: '$34.99 per month (covers up to 4 members)',
+    family: '$34.99 per month (covers up to 7 members)',
     notes: [
       'No insurance needed for many services',
       'No co-pays',
@@ -161,7 +161,7 @@ export const CEDEXX_KNOWLEDGE = {
     'Miami-Dade and Broward County coverage',
     'No app download needed — works on any device browser',
     'Scheduled AND on-demand consultations',
-    'Family plans cover up to 4 members',
+    'Family plans cover up to 7 members',
   ],
 
   testimonials: [

@@ -137,7 +137,7 @@ export function Home() {
             className="text-center"
           >
             <p className="text-[#23d9b0] text-xs font-black uppercase tracking-[0.3em] mb-4">
-              One Simple Membership
+              Membership Pricing
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-8 sm:gap-16">
               <div className="text-center">
@@ -151,7 +151,7 @@ export function Home() {
                 <div className="text-5xl md:text-6xl font-black text-white leading-none">
                   $34.99<span className="text-2xl text-blue-400/60">/mo</span>
                 </div>
-                <p className="text-blue-200/60 text-sm font-black uppercase tracking-widest mt-2">Family (up to 4)</p>
+                <p className="text-blue-200/60 text-sm font-black uppercase tracking-widest mt-2">Family (up to 7)</p>
               </div>
             </div>
             <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">

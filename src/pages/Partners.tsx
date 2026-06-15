@@ -77,8 +77,8 @@ export function Partners() {
                      <Smartphone className="h-8 w-8" />
                   </div>
                   <p className="text-slate-600 leading-relaxed font-medium">
-                    <strong className="text-[#050249] block text-xl mb-2 font-black uppercase">{t('partners.ecosystems.gig.title')}</strong>
-                    {t('partners.ecosystems.gig.desc')}
+                    <strong className="text-[#050249] block text-xl mb-2 font-black uppercase">{t('partners.ecosystems.workforce.title')}</strong>
+                    {t('partners.ecosystems.workforce.desc')}
                   </p>
                 </motion.div>
 

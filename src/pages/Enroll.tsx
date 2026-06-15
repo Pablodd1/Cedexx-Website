@@ -138,7 +138,7 @@ export function Enroll() {
                         </div>
                         <div>
                           <h3 className="font-black text-[#050249] text-xl">Family Plan</h3>
-                          <p className="text-slate-500 font-medium text-sm italic underline">Household coverage for up to 4 members</p>
+                          <p className="text-slate-500 font-medium text-sm italic underline">Household coverage for up to 7 members</p>
                         </div>
                       </div>
                       <div className="text-right">

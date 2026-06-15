@@ -23,7 +23,7 @@ export default function VideoLibrary() {
   const faqs = [
     { q: 'How quickly can I connect with a Lyric Health provider?', a: 'In most cases, a Lyric Health provider joins the consultation within 15 minutes of your request — 24 hours a day, 7 days a week, including holidays.' },
     { q: 'Is the platform HIPAA compliant?', a: 'Absolutely. Cedexx is fully HIPAA compliant with military-grade encryption and strict security protocols protecting all patient data and communications.' },
-    { q: 'Can I use this for my entire family?', a: 'Yes. Our Family Plan is designed for your whole household, providing 24/7 access for up to 4 members at one low monthly rate.' },
+    { q: 'Can I use this for my entire family?', a: 'Yes. Our Family Plan is designed for your whole household, providing 24/7 access for up to 7 members at one low monthly rate.' },
     { q: 'Does this replace my primary doctor?', a: 'No — Cedexx augments your existing care by providing immediate support when your regular doctor is unavailable, Lyric Health is available, such as nights, weekends, or while traveling.' },
     { q: 'Can providers prescribe medication through the platform?', a: 'Yes. Lyric Health providers can evaluate you and send prescriptions directly to your local pharmacy in real time. (Note: Controlled substances cannot be prescribed via telemedicine.)' },
     { q: 'How can I get started?', a: 'Simply click "Enroll Now" or email us at info@cedexx.net to connect with our team. We\'ll guide you through a quick onboarding process.' },
