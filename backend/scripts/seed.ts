@@ -50,7 +50,7 @@ async function seed() {
       } else {
         console.log(`   ✅ Executed ${cleanStmt.substring(0, 60)}...`);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.log(`   ⚠️  Skipped: ${err.message}`);
     }
   }

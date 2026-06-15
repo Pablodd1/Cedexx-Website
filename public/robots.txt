@@ -3,4 +3,4 @@ Allow: /
 Disallow: /admin
 Disallow: /private
 
-Sitemap: https://livemedconnect.live/sitemap.xml
+Sitemap: https://cedexx.net/sitemap.xml

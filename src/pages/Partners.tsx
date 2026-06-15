@@ -26,12 +26,30 @@ export function Partners() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8 }}
+            className="flex flex-col items-center gap-8"
           >
-            <h1 className="text-4xl md:text-7xl font-black mb-8 tracking-tighter uppercase italic leading-[0.9]">
-              Strategic <span className="text-[#23d9b0]">Partnerships</span>
-            </h1>
-            <p className="text-xl md:text-2xl text-blue-100 font-medium leading-relaxed italic max-w-2xl mx-auto">
-              Better Care. Here. <span className="text-[#23d9b0]">Now.</span> Keep It in Your Back Pocket.
+            {/* Co-brand logos */}
+            <div className="flex items-center justify-center gap-6 md:gap-10 mb-4 flex-wrap">
+              {/* CEDEXX Logo */}
+              <div className="text-white">
+                <span className="text-3xl md:text-5xl font-black italic tracking-tighter">CEDEXX</span>
+              </div>
+              {/* Partnership connector */}
+              <div className="text-[#23d9b0] text-2xl md:text-3xl font-black">×</div>
+              {/* Lyric Logo - using official image */}
+              <img 
+                src="/images/lyric-logo.png" 
+                alt="Lyric Health"
+                className="h-12 md:h-16 w-auto object-contain"
+              />
+            </div>
+
+            <p className="text-lg md:text-xl text-blue-100 font-medium leading-relaxed italic max-w-3xl mx-auto text-center">
+              CEDEXX is proud to partner with Lyric Health, a top ranked and award-winning virtual care platform. Through this partnership, members receive 24/7 access to licensed physicians nationwide while CEDEXX expands affordable healthcare access across multifamily communities, student housing, hospitality, and modern living environments.
+            </p>
+
+            <p className="text-lg md:text-xl text-[#23d9b0] font-black italic uppercase tracking-tight">
+              CEDEXX. Better Care. Here. Now. Powered by Lyric Health.
             </p>
           </motion.div>
         </div>

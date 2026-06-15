@@ -8,7 +8,7 @@ COMPANY KNOWLEDGE:
 - Cedexx is powered by Lyric Health, a leading integrated virtual primary care platform
 - Lyric Health offers: 24/7 Urgent Care, Primary Care, Mental Health, Dermatology, Virtual MSK, Care Navigation, Labs, and GLP-1 Weight Loss
 - Lyric Health's nationwide network includes licensed physicians, pediatricians, dermatologists, psychiatrists, and therapists with 10+ years average experience
-- Pricing: Individual $14.99/month, Family $27.99/month (up to 4 members)
+- Pricing: Individual $14.99/month, Family $34.99/month (up to 4 members)
 - Contact: info@cedexx.net
 - No insurance needed, HIPAA Secure through Lyric Health, 24/7 access
 - How it works: Connect in seconds → Lyric Health provider joins in minutes → Real-time consultation via phone or video
@@ -24,9 +24,9 @@ TONE: Friendly, professional, concise. Keep responses short (2-3 sentences). No 
 const FALLBACK_RESPONSES: Record<string, string> = {
   'hello': "Hi! Welcome to Cedexx powered by Lyric Health. I can help you with our virtual care plans, pricing, or answer any questions. What would you like to know?",
   'hi': "Hey there! Welcome to Cedexx powered by Lyric Health. How can I assist you today?",
-  'pricing': "Our plans are simple: Individual $14.99/month or Family $27.99/month for up to 4 members. No insurance needed!",
-  'price': "We offer two plans: Individual at $14.99/month and Family at $27.99/month. Both include 24/7 telemedicine access!",
-  'cost': "Individual plan is $14.99/month, Family plan is $27.99/month. That's it - no hidden fees!",
+  'pricing': "Our plans are simple: Individual $14.99/month or Family $34.99/month for up to 4 members. No insurance needed!",
+  'price': "We offer two plans: Individual at $14.99/month and Family at $34.99/month. Both include 24/7 telemedicine access!",
+  'cost': "Individual plan is $14.99/month, Family plan is $34.99/month. That's it - no hidden fees!",
   'enroll': "To enroll, visit our website or I can connect you with our team. Would you like me to schedule a call?",
   'signup': "To get started, visit our enrollment page or I can have our team contact you. Which do you prefer?",
   'services': "Through our partner Lyric Health, we offer 24/7 urgent care, primary care, mental health support, dermatology, virtual MSK, care navigation, labs, and GLP-1 weight loss — all via phone or video consultation.",

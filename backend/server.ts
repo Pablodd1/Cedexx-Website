@@ -12,6 +12,7 @@ import { body, validationResult } from 'express-validator';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
 import { Resend } from 'resend';
+import { createChatRouter } from './routes/chat';
 
 // ──────────────────────────────────────────────
 // 1. ENVIRONMENT & CONFIG
@@ -94,6 +95,9 @@ const limiter = rateLimit({
 });
 app.use('/api/', limiter);
 
+// ── CHAT API ─────────────────────────────────
+app.use('/api/chat', createChatRouter());
+
 // Stricter rate limits for form submissions
 const formLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -108,52 +112,52 @@ const formLimiter = rateLimit({
 interface ContactForm {
   name: string;
   email: string;
-  company?: string;
+  company?: string | null;
   message: string;
-  source?: string;
-  ip_address?: string;
-  user_agent?: string;
+  source?: string | null;
+  ip_address?: string | null;
+  user_agent?: string | null;
 }
 
 interface DemoRequest {
   name: string;
   email: string;
-  company?: string;
-  facility_type?: string;
-  preferred_date?: string;
-  preferred_time?: string;
-  notes?: string;
-  source?: string;
-  ip_address?: string;
-  user_agent?: string;
+  company?: string | null;
+  facility_type?: string | null;
+  preferred_date?: string | null;
+  preferred_time?: string | null;
+  notes?: string | null;
+  source?: string | null;
+  ip_address?: string | null;
+  user_agent?: string | null;
 }
 
 interface Enrollment {
   first_name: string;
   last_name: string;
   email: string;
-  phone?: string;
-  date_of_birth?: string;
+  phone?: string | null;
+  date_of_birth?: string | null;
   role: string;
   plan: string;
-  cardholder_name?: string;
-  billing_address?: string;
-  status?: string;
-  source?: string;
-  ip_address?: string;
-  user_agent?: string;
+  cardholder_name?: string | null;
+  billing_address?: string | null;
+  status?: string | null;
+  source?: string | null;
+  ip_address?: string | null;
+  user_agent?: string | null;
 }
 
 interface PartnerInquiry {
   name: string;
   email: string;
-  phone?: string;
+  phone?: string | null;
   role: string;
   message: string;
-  organization?: string;
-  source?: string;
-  ip_address?: string;
-  user_agent?: string;
+  organization?: string | null;
+  source?: string | null;
+  ip_address?: string | null;
+  user_agent?: string | null;
 }
 
 interface AnalyticsEvent {
@@ -162,8 +166,8 @@ interface AnalyticsEvent {
   event_data: Record<string, any>;
   url: string;
   referrer?: string;
-  user_agent?: string;
-  ip_address?: string;
+  user_agent?: string | null;
+  ip_address?: string | null;
 }
 
 // ──────────────────────────────────────────────
@@ -624,7 +628,7 @@ app.get('/api/admin/dashboard', requireAdmin, async (_req: Request, res: Respons
 
     for (const table of tables) {
       const { count, error } = await supabase
-        .from(table)
+        .from(table as string)
         .select('*', { count: 'exact', head: true });
       counts[table] = error ? 0 : (count || 0);
     }
@@ -636,7 +640,7 @@ app.get('/api/admin/dashboard', requireAdmin, async (_req: Request, res: Respons
 
     const recentPromises = tables.filter(t => t !== 'analytics_events').map(async (table) => {
       const { data, error } = await supabase
-        .from(table)
+        .from(table as string)
         .select('*')
         .gte('created_at', sevenDaysIso)
         .order('created_at', { ascending: false })
@@ -665,7 +669,7 @@ app.get('/api/admin/:table', requireAdmin, async (req: Request, res: Response) =
   const allowedTables = ['contacts', 'demo_requests', 'enrollments', 'partner_inquiries', 'analytics_events'];
   const table = req.params.table;
 
-  if (!allowedTables.includes(table)) {
+  if (!allowedTables.includes(table as string)) {
     return res.status(400).json({ success: false, error: 'Invalid table name' });
   }
 
@@ -680,7 +684,7 @@ app.get('/api/admin/:table', requireAdmin, async (req: Request, res: Response) =
     }
 
     let query = supabase
-      .from(table)
+      .from(table as string)
       .select('*', { count: 'exact' })
       .order('created_at', { ascending: false })
       .range((page - 1) * limit, page * limit - 1);
@@ -718,7 +722,7 @@ app.patch('/api/admin/:table/:id', requireAdmin, async (req: Request, res: Respo
   const table = req.params.table;
   const id = req.params.id;
 
-  if (!allowedTables.includes(table)) {
+  if (!allowedTables.includes(table as string)) {
     return res.status(400).json({ success: false, error: 'Invalid table name' });
   }
 
@@ -733,9 +737,9 @@ app.patch('/api/admin/:table/:id', requireAdmin, async (req: Request, res: Respo
     }
 
     const { data, error } = await supabase
-      .from(table)
+      .from(table as string)
       .update({ status, notes, updated_at: new Date().toISOString() })
-      .eq('id', id)
+      .eq('id', id as string)
       .select()
       .single();
 
@@ -753,7 +757,7 @@ app.delete('/api/admin/:table/:id', requireAdmin, async (req: Request, res: Resp
   const table = req.params.table;
   const id = req.params.id;
 
-  if (!allowedTables.includes(table)) {
+  if (!allowedTables.includes(table as string)) {
     return res.status(400).json({ success: false, error: 'Invalid table name' });
   }
 
@@ -762,7 +766,7 @@ app.delete('/api/admin/:table/:id', requireAdmin, async (req: Request, res: Resp
       return res.json({ success: true, message: 'Fallback mode — no database delete' });
     }
 
-    const { error } = await supabase.from(table).delete().eq('id', id);
+    const { error } = await supabase.from(table as string).delete().eq('id', id as string);
     if (error) throw error;
 
     res.json({ success: true, message: 'Record deleted' });

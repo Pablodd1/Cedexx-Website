@@ -3,13 +3,15 @@
 // Express router modules for clean separation
 // ═══════════════════════════════════════════════
 
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
+import { SupabaseClient } from '@supabase/supabase-js';
+import { Resend } from 'resend';
 import { body, validationResult } from 'express-validator';
 import rateLimit from 'express-rate-limit';
 
-export function createContactRouter(supabase, resend, config) {
+export function createContactRouter(supabase: any, resend: any, config: any) {
   const router = Router();
-  const { sendNotification, buildNotificationHtml, sanitizeText, getClientIp, isValidEmail } = config.helpers;
+  const { sendNotification, buildNotificationHtml, sanitizeText, getClientIp } = config.helpers;
 
   router.post('/',
     rateLimit({ windowMs: 15 * 60 * 1000, max: 10 }),
@@ -19,7 +21,7 @@ export function createContactRouter(supabase, resend, config) {
       body('company').optional().trim().isLength({ max: 100 }),
       body('message').trim().isLength({ min: 10, max: 3000 }),
     ],
-    async (req, res) => {
+    async (req: Request, res: Response) => {
       const errors = validationResult(req);
       if (!errors.isEmpty()) return res.status(400).json({ success: false, errors: errors.array() });
 
@@ -54,7 +56,7 @@ export function createContactRouter(supabase, resend, config) {
         );
 
         res.status(201).json({ success: true, message: 'Submitted successfully', id: dbResult?.id || null });
-      } catch (err) {
+      } catch (err: any) {
         res.status(500).json({ success: false, error: 'Failed to process' });
       }
     }
@@ -63,7 +65,7 @@ export function createContactRouter(supabase, resend, config) {
   return router;
 }
 
-export function createDemoRouter(supabase, resend, config) {
+export function createDemoRouter(supabase: any, resend: any, config: any) {
   const router = Router();
   const { sendNotification, buildNotificationHtml, sanitizeText, getClientIp } = config.helpers;
 
@@ -75,7 +77,7 @@ export function createDemoRouter(supabase, resend, config) {
       body('facility_type').optional().trim(),
       body('notes').optional().trim().isLength({ max: 2000 }),
     ],
-    async (req, res) => {
+    async (req: Request, res: Response) => {
       const errors = validationResult(req);
       if (!errors.isEmpty()) return res.status(400).json({ success: false, errors: errors.array() });
 
@@ -115,7 +117,7 @@ export function createDemoRouter(supabase, resend, config) {
         );
 
         res.status(201).json({ success: true, message: 'Demo request submitted', id: dbResult?.id || null });
-      } catch (err) {
+      } catch (err: any) {
         res.status(500).json({ success: false, error: 'Failed to process demo request' });
       }
     }
@@ -124,7 +126,7 @@ export function createDemoRouter(supabase, resend, config) {
   return router;
 }
 
-export function createEnrollRouter(supabase, resend, config) {
+export function createEnrollRouter(supabase: any, resend: any, config: any) {
   const router = Router();
   const { sendNotification, buildNotificationHtml, sanitizeText, getClientIp } = config.helpers;
 
@@ -137,7 +139,7 @@ export function createEnrollRouter(supabase, resend, config) {
       body('role').isIn(['individual', 'hospitality', 'housing', 'affiliate']),
       body('plan').isIn(['family', 'individual']),
     ],
-    async (req, res) => {
+    async (req: Request, res: Response) => {
       const errors = validationResult(req);
       if (!errors.isEmpty()) return res.status(400).json({ success: false, errors: errors.array() });
 
@@ -174,17 +176,19 @@ export function createEnrollRouter(supabase, resend, config) {
           })
         );
 
+        const planDetails: Record<string, any> = {
+          family: { name: 'Family Plan', price: '$27.99/month', members: 'Up to 4' },
+          individual: { name: 'Individual Plan', price: '$14.99/month', members: '1' },
+        };
+
         res.status(201).json({
           success: true,
           message: 'Enrollment initiated',
           id: dbResult?.id || null,
           next_step: 'payment',
-          plan_details: {
-            family: { name: 'Family Plan', price: '$27.99/month', members: 'Up to 4' },
-            individual: { name: 'Individual Plan', price: '$14.99/month', members: '1' },
-          }[data.plan]
+          plan_details: planDetails[data.plan]
         });
-      } catch (err) {
+      } catch (err: any) {
         res.status(500).json({ success: false, error: 'Failed to process enrollment' });
       }
     }
@@ -193,7 +197,7 @@ export function createEnrollRouter(supabase, resend, config) {
   return router;
 }
 
-export function createPartnerRouter(supabase, resend, config) {
+export function createPartnerRouter(supabase: any, resend: any, config: any) {
   const router = Router();
   const { sendNotification, buildNotificationHtml, sanitizeText, getClientIp } = config.helpers;
 
@@ -205,7 +209,7 @@ export function createPartnerRouter(supabase, resend, config) {
       body('role').trim().isLength({ min: 1, max: 100 }),
       body('message').trim().isLength({ min: 10, max: 3000 }),
     ],
-    async (req, res) => {
+    async (req: Request, res: Response) => {
       const errors = validationResult(req);
       if (!errors.isEmpty()) return res.status(400).json({ success: false, errors: errors.array() });
 
@@ -243,7 +247,7 @@ export function createPartnerRouter(supabase, resend, config) {
         );
 
         res.status(201).json({ success: true, message: 'Inquiry submitted', id: dbResult?.id || null });
-      } catch (err) {
+      } catch (err: any) {
         res.status(500).json({ success: false, error: 'Failed to process inquiry' });
       }
     }
@@ -252,16 +256,16 @@ export function createPartnerRouter(supabase, resend, config) {
   return router;
 }
 
-export function createAdminRouter(supabase, requireAdmin) {
+export function createAdminRouter(supabase: any, requireAdmin: any) {
   const router = Router();
 
   // Dashboard overview
-  router.get('/dashboard', async (req, res) => {
+  router.get('/dashboard', async (req: Request, res: Response) => {
     try {
       if (!supabase) return res.json({ success: true, data: { fallback: true } });
 
       const tables = ['contacts', 'demo_requests', 'enrollments', 'partner_inquiries', 'analytics_events'];
-      const counts = {};
+      const counts: Record<string, any> = {};
       for (const t of tables) {
         const { count } = await supabase.from(t).select('*', { count: 'exact', head: true });
         counts[t] = count || 0;
@@ -271,7 +275,7 @@ export function createAdminRouter(supabase, requireAdmin) {
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
       const recent = await Promise.all(
-        tables.filter(t => t !== 'analytics_events').map(async (table) => {
+        tables.filter(t => t !== 'analytics_events').map(async (table: string) => {
           const { data } = await supabase.from(table)
             .select('*')
             .gte('created_at', sevenDaysAgo.toISOString())
@@ -285,34 +289,34 @@ export function createAdminRouter(supabase, requireAdmin) {
         success: true,
         data: {
           counts,
-          recent_submissions: Object.fromEntries(recent.map(r => [r.table, r.data])),
+          recent_submissions: Object.fromEntries(recent.map((r: any) => [r.table, r.data])),
           last_updated: new Date().toISOString()
         }
       });
-    } catch (err) {
+    } catch (err: any) {
       res.status(500).json({ success: false, error: err.message });
     }
   });
 
   // List table records
-  router.get('/:table', async (req, res) => {
+  router.get('/:table', async (req: Request, res: Response) => {
     const allowed = ['contacts', 'demo_requests', 'enrollments', 'partner_inquiries', 'analytics_events'];
-    const table = req.params.table;
+    const table = req.params.table as string;
     if (!allowed.includes(table)) return res.status(400).json({ error: 'Invalid table' });
 
-    const page = Math.max(1, parseInt(req.query.page) || 1);
-    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20));
-    const status = req.query.status;
-    const search = req.query.search;
+    const page = Math.max(1, parseInt(req.query.page as string) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 20));
+    const status = req.query.status as string;
+    const search = req.query.search as string;
 
     try {
       if (!supabase) return res.json({ success: true, data: [], fallback: true });
 
-      let query = supabase.from(table).select('*', { count: 'exact' })
+      let query = supabase.from(table as string).select('*', { count: 'exact' })
         .order('created_at', { ascending: false })
         .range((page - 1) * limit, page * limit - 1);
 
-      if (status) query = query.eq('status', status);
+      if (status) query = query.eq('status', status as string);
       if (search) query = query.or(`name.ilike.%${search}%,email.ilike.%${search}%,message.ilike.%${search}%`);
 
       const { data, error, count } = await query;
@@ -323,48 +327,48 @@ export function createAdminRouter(supabase, requireAdmin) {
         data,
         pagination: { page, limit, total: count || 0, total_pages: Math.ceil((count || 0) / limit) }
       });
-    } catch (err) {
+    } catch (err: any) {
       res.status(500).json({ success: false, error: err.message });
     }
   });
 
   // Update record
-  router.patch('/:table/:id', async (req, res) => {
+  router.patch('/:table/:id', async (req: Request, res: Response) => {
     const allowed = ['contacts', 'demo_requests', 'enrollments', 'partner_inquiries'];
-    if (!allowed.includes(req.params.table)) return res.status(400).json({ error: 'Invalid table' });
+    if (!allowed.includes(req.params.table as string)) return res.status(400).json({ error: 'Invalid table' });
 
     try {
       if (!supabase) return res.json({ success: true, message: 'Fallback mode' });
       const { data, error } = await supabase
-        .from(req.params.table)
+        .from(req.params.table as string)
         .update({ ...req.body, updated_at: new Date().toISOString() })
-        .eq('id', req.params.id)
+        .eq('id', req.params.id as string)
         .select().single();
       if (error) throw error;
       res.json({ success: true, data });
-    } catch (err) {
+    } catch (err: any) {
       res.status(500).json({ success: false, error: err.message });
     }
   });
 
   // Delete record
-  router.delete('/:table/:id', async (req, res) => {
+  router.delete('/:table/:id', async (req: Request, res: Response) => {
     const allowed = ['contacts', 'demo_requests', 'enrollments', 'partner_inquiries'];
-    if (!allowed.includes(req.params.table)) return res.status(400).json({ error: 'Invalid table' });
+    if (!allowed.includes(req.params.table as string)) return res.status(400).json({ error: 'Invalid table' });
 
     try {
       if (!supabase) return res.json({ success: true, message: 'Fallback mode' });
-      const { error } = await supabase.from(req.params.table).delete().eq('id', req.params.id);
+      const { error } = await supabase.from(req.params.table as string).delete().eq('id', req.params.id as string);
       if (error) throw error;
       res.json({ success: true, message: 'Deleted' });
-    } catch (err) {
+    } catch (err: any) {
       res.status(500).json({ success: false, error: err.message });
     }
   });
 
   // Analytics summary
-  router.get('/analytics/summary', async (req, res) => {
-    const days = Math.min(90, Math.max(1, parseInt(req.query.days) || 30));
+  router.get('/analytics/summary', async (req: Request, res: Response) => {
+    const days = Math.min(90, Math.max(1, parseInt(req.query.days as string) || 30));
     try {
       if (!supabase) return res.json({ success: true, data: [], fallback: true });
 
@@ -376,9 +380,9 @@ export function createAdminRouter(supabase, requireAdmin) {
         .select('event_type, created_at')
         .gte('created_at', startDate.toISOString());
 
-      const daily = {};
-      const eventTypes = {};
-      (events || []).forEach(e => {
+      const daily: Record<string, any> = {};
+      const eventTypes: Record<string, any> = {};
+      (events || []).forEach((e: any) => {
         const day = e.created_at.split('T')[0];
         if (!daily[day]) daily[day] = {};
         if (!daily[day][e.event_type]) daily[day][e.event_type] = 0;
@@ -395,7 +399,7 @@ export function createAdminRouter(supabase, requireAdmin) {
           event_type_summary: eventTypes,
         }
       });
-    } catch (err) {
+    } catch (err: any) {
       res.status(500).json({ success: false, error: err.message });
     }
   });

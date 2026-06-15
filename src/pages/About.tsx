@@ -79,7 +79,7 @@ export function About() {
              <motion.div {...fadeIn}>
                 <h2 className="text-4xl md:text-6xl font-black text-[#050249] mb-10 leading-[1.1] tracking-tighter uppercase italic">Our Mission</h2>
                 <p className="text-xl text-slate-600 mb-10 font-medium leading-relaxed">
-                  CEDEXX was built on a simple truth: millions of families delay care because traditional healthcare is expensive, inconvenient, and often inaccessible when needed most. We close that gap through affordable digital access. Affordable access should not depend on time, insurance, or proximity. CEDEXX makes care available when real life demands it.
+                  CEDEXX was built on a simple truth: millions of families delay care because traditional healthcare is expensive, inconvenient, and often inaccessible when needed most. We close that gap through affordable digital access. Affordable access should not depend on time, insurance, or proximity. CEDEXX makes care available when real life demands it. CEDEXX makes family care affordable by integrating custom wellness solutions into multifamily, student housing, and residential communities—delivering exceptional quality at a fraction of the cost.
                 </p>
                 <div className="space-y-8">
                    {[

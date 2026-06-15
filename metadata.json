@@ -1,6 +1,6 @@
 {
-  "name": "Live Med Connect",
-  "description": "Telemedicine platform providing 24/7 access to board-certified doctors, therapists, and marketing tools.",
+  "name": "CEDEXX",
+  "description": "Healthcare technology platform connecting families with independent telemedicine providers via Lyric Health. 24/7 virtual care, no insurance required.",
   "requestFramePermissions": [
     "camera",
     "microphone",

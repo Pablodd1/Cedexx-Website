@@ -85,7 +85,7 @@ export function SmartChat() {
   const getBotResponse = (text: string) => {
     const lower = text.toLowerCase();
     if (lower.includes('price') || lower.includes('cost') || lower.includes('membership')) 
-      return "Cedexx memberships start at $14.99/mo for individuals and $27.99/mo for families of 4. No insurance is needed!";
+      return "Cedexx memberships start at $14.99/mo for individuals and $34.99/mo for families of 4. No insurance is needed!";
     if (lower.includes('doctor') || lower.includes('provider') || lower.includes('physician'))
       return "Through our partner Lyric Health, you have access to their nationwide network of licensed providers available 24/7. Most consultations happen in under 15 minutes.";
     if (lower.includes('enroll') || lower.includes('start') || lower.includes('join'))

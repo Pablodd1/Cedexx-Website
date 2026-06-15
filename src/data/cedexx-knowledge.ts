@@ -32,7 +32,7 @@ export const CEDEXX_KNOWLEDGE = {
 
   pricing: {
     individual: '$14.99 per month',
-    family: '$27.99 per month (covers up to 4 members)',
+    family: '$34.99 per month (covers up to 4 members)',
     notes: [
       'No insurance needed for many services',
       'No co-pays',
@@ -267,7 +267,7 @@ ${k.criticalRules.map(r => `- ${r}`).join('\n')}
 - NEVER give medical diagnoses or advice
 - ALWAYS clarify that Cedexx is a technology platform, not a healthcare provider
 - If they ask "what do you treat?" — list specific conditions from the 6 core services
-- If they ask about pricing — be specific: $14.99 individual, $27.99 family
+- If they ask about pricing — be specific: $14.99 individual, $34.99 family
 - If they want to book — collect name, email, phone, service type, preferred date/time
 - If they want a human — offer to transfer or have a specialist call back
 - If they ask about the company — mention Daisy Gonzalez (Founder) and Jasmel Acosta (Co-founder)

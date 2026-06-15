@@ -142,7 +142,7 @@ export function Enroll() {
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-3xl font-black text-[#050249]">$27.99</div>
+                        <div className="text-3xl font-black text-[#050249]">$34.99</div>
                         <div className="text-[10px] text-slate-400 font-black uppercase tracking-widest">per month</div>
                       </div>
                     </div>

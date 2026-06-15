@@ -27,7 +27,7 @@ export default function VideoLibrary() {
     { q: 'Does this replace my primary doctor?', a: 'No — Cedexx augments your existing care by providing immediate support when your regular doctor is unavailable, Lyric Health is available, such as nights, weekends, or while traveling.' },
     { q: 'Can providers prescribe medication through the platform?', a: 'Yes. Lyric Health providers can evaluate you and send prescriptions directly to your local pharmacy in real time. (Note: Controlled substances cannot be prescribed via telemedicine.)' },
     { q: 'How can I get started?', a: 'Simply click "Enroll Now" or email us at info@cedexx.net to connect with our team. We\'ll guide you through a quick onboarding process.' },
-    { q: 'What is the cost for an individual or family?', a: 'Our Individual plan starts at $14.99/mo, and our Family Plan is just $27.99/mo. Both provide unlimited 24/7 access with $0 co-pays.' },
+    { q: 'What is the cost for an individual or family?', a: 'Our Individual plan starts at $14.99/mo, and our Family Plan is just $34.99/mo. Both provide unlimited 24/7 access with $0 co-pays.' },
     { q: 'Can I use this for my employees?', a: 'Yes, we have specialized corporate plans designed to reduce absenteeism and provide high-quality healthcare as a premium employee benefit.' },
     { q: 'What devices can I use?', a: 'You can access Cedexx from any smartphone, tablet, or computer with a camera and internet connection. No special hardware is required.' },
     { q: 'Do you provide work or school notes?', a: 'Yes. Lyric Health physicians can provide medically necessary school and work notes digitally after a consultation.' }

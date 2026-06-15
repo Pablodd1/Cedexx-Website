@@ -380,5 +380,12 @@
       };
       window._agenticChatbot = new AgenticChatbot(window.AGENTIC_CHATBOT_CONFIG);
     </script>
+    <script src="/twilio-frontend.js"></script>
+    <script>
+      window.TWILIO_API_BASE = 'https://twilio-cedexx.vercel.app';
+      if (window.TwilioIntegration) {
+        window.TwilioIntegration.setApiBase('https://twilio-cedexx.vercel.app');
+      }
+    </script>
   </body>
 </html>
