@@ -11,6 +11,7 @@ import { PartnerForm } from '../components/PartnerForm';
 import { Logo } from '../components/Logo';
 import { Button } from '../components/ui';
 import { ArrowRight } from 'lucide-react';
+import { GuideCapture } from '../components/GuideCapture';
 
 // Persona Images
 import momImg from '../assets/mom_wfh.png';
@@ -487,6 +488,9 @@ export function Home() {
           </div>
         </div>
       </section>
+
+      {/* ── FREE GUIDE CAPTURE ── */}
+      <GuideCapture />
 
       {/* ── FINAL CTA ── */}
       <section className="py-40 bg-[#050249] text-white relative overflow-hidden">
