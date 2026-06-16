@@ -126,49 +126,6 @@ export function Home() {
         </div>
       </section>
 
-      {/* ── PRICING HERO ── */}
-      <section className="bg-[#050249] py-16 relative z-30">
-        <div className="container mx-auto px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center"
-          >
-            <p className="text-[#23d9b0] text-xs font-black uppercase tracking-[0.3em] mb-4">
-              Membership Pricing
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-8 sm:gap-16">
-              <div className="text-center">
-                <div className="text-5xl md:text-6xl font-black text-white leading-none">
-                  $14.99<span className="text-2xl text-blue-400/60">/mo</span>
-                </div>
-                <p className="text-blue-200/60 text-sm font-black uppercase tracking-widest mt-2">Individual</p>
-              </div>
-              <div className="h-16 w-px bg-white/10 hidden sm:block" />
-              <div className="text-center">
-                <div className="text-5xl md:text-6xl font-black text-white leading-none">
-                  $34.99<span className="text-2xl text-blue-400/60">/mo</span>
-                </div>
-                <p className="text-blue-200/60 text-sm font-black uppercase tracking-widest mt-2">Family (up to 7)</p>
-              </div>
-            </div>
-            <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link
-                to="/enroll"
-                className="bg-[#23d9b0] text-[#050249] hover:bg-[#1bc9a0] font-black px-10 py-4 rounded-2xl transition-all text-sm uppercase tracking-tighter shadow-xl hover:-translate-y-1"
-              >
-                Start Your Membership
-              </Link>
-              <p className="text-blue-400/60 text-xs font-medium italic">
-                No insurance required. Cancel anytime.
-              </p>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
       {/* ── HIGH-CONVERSION FEATURE GRID ── */}
       <section className="bg-white py-24 relative z-30">
         <div className="container mx-auto px-6">
