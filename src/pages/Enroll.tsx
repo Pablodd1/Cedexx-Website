@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { CheckCircle2, Shield, Lock, CreditCard, Activity, Heart, Users, Smartphone, Building2 } from 'lucide-react';
+import { CheckCircle2, Shield, Lock, CreditCard, Activity, Heart, Users, Smartphone, Building2, Brain, Stethoscope } from 'lucide-react';
 
 const fadeIn = {
   initial: { opacity: 0, y: 24 },
@@ -9,10 +9,27 @@ const fadeIn = {
   transition: { duration: 0.55 },
 };
 
+interface PlanOption {
+  id: string;
+  name: string;
+  price: string;
+  desc: string;
+  icon: React.ElementType;
+  highlight?: boolean;
+}
+
+const PLANS: PlanOption[] = [
+  { id: 'carenow', name: 'CareNow', price: '$14.99', desc: 'Virtual Urgent Care for you and your household up to 7 dependents.', icon: Heart },
+  { id: 'carenow-mental', name: 'CareNow + Mental Wellness', price: '$22.99', desc: 'Everything in CareNow, plus mental health support.', icon: Brain, highlight: true },
+  { id: 'mental-wellness', name: 'Mental Wellness', price: '$14.99', desc: 'Standalone mental health support.', icon: Brain },
+  { id: 'carecomplete', name: 'CareComplete', price: '$34.99', desc: 'Complete Virtual Primary Care for individuals.', icon: Stethoscope },
+  { id: 'carecomplete-family', name: 'CareComplete Family', price: '$52.99', desc: 'Complete Family Virtual Care for up to 7 members.', icon: Users },
+];
+
 export function Enroll() {
   const [step, setStep] = React.useState(0);
   const [role, setRole] = React.useState('individual');
-  const [plan, setPlan] = React.useState('family');
+  const [plan, setPlan] = React.useState('carenow-mental');
 
   const roles = [
     { id: 'individual', title: 'Individual / Life Solutions', icon: Heart, desc: 'Everyday care for yourself and your family.' },
@@ -125,48 +142,30 @@ export function Enroll() {
               {step === 2 && (
                 <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
                   <h2 className="text-3xl font-black text-[#050249] mb-8 italic uppercase tracking-tighter">Choose Your Plan</h2>
-                  <div className="space-y-6">
-                    <div 
-                      onClick={() => setPlan('family')}
-                      className={`p-8 rounded-[2.5rem] border-2 transition-all cursor-pointer flex items-center justify-between group ${
-                        plan === 'family' ? 'border-[#050249] bg-[#EBF3FB] shadow-xl' : 'border-slate-100 bg-white hover:border-blue-200'
-                      }`}
-                    >
-                      <div className="flex items-center gap-6">
-                        <div className={`h-12 w-12 rounded-2xl flex items-center justify-center transition-colors ${plan === 'family' ? 'bg-[#050249] text-white' : 'bg-slate-100 text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-500'}`}>
-                           <Heart className="h-6 w-6" />
+                  <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2">
+                    {PLANS.map((p) => (
+                      <div
+                        key={p.id}
+                        onClick={() => setPlan(p.id)}
+                        className={`p-6 rounded-[2.5rem] border-2 transition-all cursor-pointer flex items-center justify-between group ${
+                          plan === p.id ? 'border-[#050249] bg-[#EBF3FB] shadow-xl' : 'border-slate-100 bg-white hover:border-blue-200'
+                        }`}
+                      >
+                        <div className="flex items-center gap-4 flex-1 min-w-1">
+                          <div className={`h-12 w-12 rounded-2xl flex items-center justify-center transition-colors shrink-1 ${plan === p.id ? 'bg-[#050249] text-white' : 'bg-slate-100 text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-500'}`}>
+                            <p.icon className="h-6 w-6" />
+                          </div>
+                          <div className="min-w-1">
+                            <h3 className="font-black text-[#050249] text-lg leading-tight">{p.name}</h3>
+                            <p className="text-slate-500 font-medium text-xs italic leading-snug">{p.desc}</p>
+                          </div>
                         </div>
-                        <div>
-                          <h3 className="font-black text-[#050249] text-xl">Family Plan</h3>
-                          <p className="text-slate-500 font-medium text-sm italic underline">Household coverage for up to 7 members</p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-3xl font-black text-[#050249]">$34.99</div>
-                        <div className="text-[10px] text-slate-400 font-black uppercase tracking-widest">per month</div>
-                      </div>
-                    </div>
-
-                    <div 
-                      onClick={() => setPlan('individual')}
-                      className={`p-8 rounded-[2.5rem] border-2 transition-all cursor-pointer flex items-center justify-between group ${
-                        plan === 'individual' ? 'border-[#050249] bg-[#EBF3FB] shadow-xl' : 'border-slate-100 bg-white hover:border-blue-200'
-                      }`}
-                    >
-                      <div className="flex items-center gap-6">
-                        <div className={`h-12 w-12 rounded-2xl flex items-center justify-center transition-colors ${plan === 'individual' ? 'bg-[#050249] text-white' : 'bg-slate-100 text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-500'}`}>
-                           <Smartphone className="h-6 w-6" />
-                        </div>
-                        <div>
-                          <h3 className="font-black text-[#050249] text-xl">Individual Plan</h3>
-                          <p className="text-slate-500 font-medium text-sm italic underline">Single member 24/7 access</p>
+                        <div className="text-right shrink-0 ml-4">
+                          <div className="text-2xl font-black text-[#050249]">{p.price}</div>
+                          <div className="text-[10px] text-slate-400 font-black uppercase tracking-widest">per month</div>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <div className="text-3xl font-black text-[#050249]">$14.99</div>
-                        <div className="text-[10px] text-slate-400 font-black uppercase tracking-widest">per month</div>
-                      </div>
-                    </div>
+                    ))}
                   </div>
                   <div className="flex flex-col sm:flex-row gap-4 mt-8">
                     <button className="flex-1 py-4 rounded-2xl font-black border-2 border-slate-100 text-slate-400 hover:bg-slate-50 transition-all text-sm italic" onClick={() => setStep(1)}>Back</button>
