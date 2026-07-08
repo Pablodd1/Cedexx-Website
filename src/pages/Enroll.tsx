@@ -19,11 +19,11 @@ interface PlanOption {
 }
 
 const PLANS: PlanOption[] = [
-  { id: 'carenow', name: 'CareNow', price: '$14.99', desc: 'Virtual Urgent Care for you and your household up to 7 dependents.', icon: Heart },
-  { id: 'carenow-mental', name: 'CareNow + Mental Wellness', price: '$22.99', desc: 'Everything in CareNow, plus mental health support.', icon: Brain, highlight: true },
-  { id: 'mental-wellness', name: 'Mental Wellness', price: '$14.99', desc: 'Standalone mental health support.', icon: Brain },
-  { id: 'carecomplete', name: 'CareComplete', price: '$34.99', desc: 'Complete Virtual Primary Care for individuals.', icon: Stethoscope },
-  { id: 'carecomplete-family', name: 'CareComplete Family', price: '$52.99', desc: 'Complete Family Virtual Care for up to 7 members.', icon: Users },
+  { id: 'carenow', name: 'CareNow™', price: '$14.99', desc: 'Virtual Urgent Care for you and your household — up to 7 dependents included.', icon: Heart },
+  { id: 'carenow-mental', name: 'CareNow™ + Mental Wellness', price: '$22.99', desc: 'Everything in CareNow™, plus behavioral health and therapy support.', icon: Brain, highlight: true },
+  { id: 'mental-wellness', name: 'Mental Wellness', price: '$14.99', desc: 'Standalone behavioral health, therapy, and counseling support.', icon: Brain },
+  { id: 'carecomplete', name: 'CareComplete™', price: '$34.99', desc: 'Complete Virtual Primary Care — Individual Membership.', icon: Stethoscope },
+  { id: 'carecomplete-family', name: 'CareComplete™ Family', price: '$52.99', desc: 'Complete Family Virtual Care for up to 7 household members.', icon: Users },
 ];
 
 export function Enroll() {

@@ -35,7 +35,7 @@ const translations: Record<Lang, Record<string, string>> = {
     'features.speed.title': 'See a Doctor in Minutes',
     'features.speed.desc': 'Connect in under 15 minutes.',
     'features.membership.title': 'Membership Pricing',
-    'features.membership.desc': '$14.99 individual / $34.99 family.',
+    'features.membership.desc': 'Starting at $14.99/month. No insurance required.',
     'features.secure.title': 'Secure & Private Platform',
     'features.secure.desc': 'HIPAA-compliant and confidential.',
     'serve.title': 'Our Four Pillars',
