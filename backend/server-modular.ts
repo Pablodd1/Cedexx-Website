@@ -11,13 +11,15 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
+import Stripe from 'stripe';
 import dotenv from 'dotenv';
 import {
   createContactRouter,
   createDemoRouter,
   createEnrollRouter,
   createPartnerRouter,
-  createAdminRouter
+  createAdminRouter,
+  createStripeRouter
 } from './routes';
 
 dotenv.config();
@@ -27,6 +29,7 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 const SUPABASE_URL = process.env.SUPABASE_URL || '';
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || '';
 const RESEND_API_KEY = process.env.RESEND_API_KEY || '';
+const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY || '';
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN || '';
 const ADMIN_SECRET = process.env.ADMIN_SECRET || '';
 
@@ -34,6 +37,7 @@ const ADMIN_SECRET = process.env.ADMIN_SECRET || '';
 const app = express();
 let supabase: SupabaseClient | null = null;
 let resend: Resend | null = null;
+let stripe: Stripe | null = null;
 
 if (SUPABASE_URL && SUPABASE_SERVICE_KEY) {
   supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, {
@@ -42,6 +46,9 @@ if (SUPABASE_URL && SUPABASE_SERVICE_KEY) {
 }
 if (RESEND_API_KEY) {
   resend = new Resend(RESEND_API_KEY);
+}
+if (STRIPE_SECRET_KEY) {
+  stripe = new Stripe(STRIPE_SECRET_KEY, { apiVersion: '2025-06-30.basil' as any });
 }
 
 // ── HELPERS ─────────────────────────────────
@@ -125,13 +132,14 @@ app.use('/api/', limiter);
 // ── ROUTES ────────────────────────────────────
 app.get('/api/health', (_req, res) => res.json({
   success: true, status: 'healthy', timestamp: new Date().toISOString(), version: '1.0.0',
-  services: { supabase: !!supabase, resend: !!resend }
+  services: { supabase: !!supabase, resend: !!resend, stripe: !!stripe }
 }));
 
 app.use('/api/contact', createContactRouter(supabase, resend, { helpers }));
 app.use('/api/demo', createDemoRouter(supabase, resend, { helpers }));
 app.use('/api/enroll', createEnrollRouter(supabase, resend, { helpers }));
 app.use('/api/partner', createPartnerRouter(supabase, resend, { helpers }));
+app.use('/api/stripe', createStripeRouter(supabase, stripe));
 app.use('/api/admin', requireAdmin, createAdminRouter(supabase, requireAdmin));
 
 // ── ERRORS ────────────────────────────────────

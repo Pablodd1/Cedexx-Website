@@ -39,7 +39,7 @@ export function About() {
       name: 'Amos Allen',
       role: 'Chief Operating Officer',
       initials: 'AA',
-      desc: 'With a proven track record of entrepreneurial success, Amos brings extensive executive leadership and operational expertise to the organization. As the founder and leader of a successful multi-million-dollar company, he built the business from the ground up, driving sustained growth, operational excellence, and long-term profitability. His experience in strategic planning, process optimization, team development, and business expansion positions him to lead operations with a focus on innovation, efficiency, and exceptional results.',
+      desc: 'Extensive executive leadership and operational expertise to the organization. As the founder and leader of a successful multi-million-dollar company, he built the business from the ground up, driving sustained growth, operational excellence, and long-term profitability.',
       image: amosImg,
       socials: { linkedin: 'https://linkedin.com', twitter: '#', email: 'amos@cedexx.net' }
     }

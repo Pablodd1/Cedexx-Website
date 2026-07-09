@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { CheckCircle2, Shield, Lock, CreditCard, Activity, Heart, Users, Smartphone, Building2, Brain, Stethoscope } from 'lucide-react';
+import { CheckCircle2, Shield, Lock, CreditCard, Heart, Users, Smartphone, Building2, Brain, Stethoscope, Loader2, AlertCircle } from 'lucide-react';
 
 const fadeIn = {
   initial: { opacity: 0, y: 24 },
@@ -19,17 +19,24 @@ interface PlanOption {
 }
 
 const PLANS: PlanOption[] = [
-  { id: 'carenow', name: 'CareNow', price: '$14.99', desc: 'Virtual Urgent Care for you and your household up to 7 dependents.', icon: Heart },
-  { id: 'carenow-mental', name: 'CareNow + Mental Wellness', price: '$22.99', desc: 'Everything in CareNow, plus mental health support.', icon: Brain, highlight: true },
-  { id: 'mental-wellness', name: 'Mental Wellness', price: '$14.99', desc: 'Standalone mental health support.', icon: Brain },
-  { id: 'carecomplete', name: 'CareComplete', price: '$34.99', desc: 'Complete Virtual Primary Care for individuals.', icon: Stethoscope },
-  { id: 'carecomplete-family', name: 'CareComplete Family', price: '$52.99', desc: 'Complete Family Virtual Care for up to 7 members.', icon: Users },
+  { id: 'carenow', name: 'CareNow™', price: '$14.99', desc: 'Virtual Urgent Care for you and your household — up to 7 dependents included.', icon: Heart },
+  { id: 'carenow-mental', name: 'CareNow™ + Mental Wellness', price: '$22.99', desc: 'Everything in CareNow™, plus behavioral health and therapy support.', icon: Brain, highlight: true },
+  { id: 'mental-wellness', name: 'Mental Wellness', price: '$14.99', desc: 'Standalone behavioral health, therapy, and counseling support.', icon: Brain },
+  { id: 'carecomplete', name: 'CareComplete™', price: '$34.99', desc: 'Complete Virtual Primary Care — Individual Membership.', icon: Stethoscope },
+  { id: 'carecomplete-family', name: 'CareComplete™ Family', price: '$52.99', desc: 'Complete Family Virtual Care for up to 7 household members.', icon: Users },
 ];
 
 export function Enroll() {
   const [step, setStep] = React.useState(0);
   const [role, setRole] = React.useState('individual');
   const [plan, setPlan] = React.useState('carenow-mental');
+  const [firstName, setFirstName] = React.useState('');
+  const [lastName, setLastName] = React.useState('');
+  const [email, setEmail] = React.useState('');
+  const [phone, setPhone] = React.useState('');
+  const [dob, setDob] = React.useState('');
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
 
   const roles = [
     { id: 'individual', title: 'Individual / Life Solutions', icon: Heart, desc: 'Everyday care for yourself and your family.' },
@@ -37,6 +44,41 @@ export function Enroll() {
     { id: 'housing', title: 'Housing / REIT Partner', icon: Building2, desc: 'Residential wellness amenity solutions.' },
     { id: 'affiliate', title: 'Affiliate Partner', icon: Users, desc: 'Strategic marketing and growth partnerships.' }
   ];
+
+  const selectedPlan = PLANS.find(p => p.id === plan);
+
+  const handleCheckout = async () => {
+    if (!firstName.trim() || !lastName.trim() || !email.trim()) {
+      setError('Please complete your personal information in step 2.');
+      return;
+    }
+    setLoading(true);
+    setError(null);
+
+    try {
+      const res = await fetch('/api/stripe/create-checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          plan_id: plan,
+          email: email.trim(),
+          first_name: firstName.trim(),
+          last_name: lastName.trim(),
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success || !data.url) {
+        throw new Error(data.error || 'Failed to start checkout');
+      }
+
+      window.location.href = data.url;
+    } catch (err: any) {
+      setError(err.message || 'Something went wrong. Please try again.');
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] py-24 font-sans">
@@ -113,23 +155,23 @@ export function Enroll() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                     <div className="space-y-3">
                       <label className="text-xs font-black text-[#050249] uppercase tracking-widest">First Name</label>
-                      <input type="text" className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-blue-50 focus:ring-2 focus:ring-[#050249] outline-none transition-all font-medium text-sm" placeholder="John" />
+                      <input type="text" value={firstName} onChange={e => setFirstName(e.target.value)} className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-blue-50 focus:ring-2 focus:ring-[#050249] outline-none transition-all font-medium text-sm" placeholder="John" />
                     </div>
                     <div className="space-y-3">
                       <label className="text-xs font-black text-[#050249] uppercase tracking-widest">Last Name</label>
-                      <input type="text" className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-blue-50 focus:ring-2 focus:ring-[#050249] outline-none transition-all font-medium text-sm" placeholder="Doe" />
+                      <input type="text" value={lastName} onChange={e => setLastName(e.target.value)} className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-blue-50 focus:ring-2 focus:ring-[#050249] outline-none transition-all font-medium text-sm" placeholder="Doe" />
                     </div>
                     <div className="space-y-3 sm:col-span-2">
                       <label className="text-xs font-black text-[#050249] uppercase tracking-widest">Email Address</label>
-                      <input type="email" className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-blue-50 focus:ring-2 focus:ring-[#050249] outline-none transition-all font-medium text-sm" placeholder="john@example.com" />
+                      <input type="email" value={email} onChange={e => setEmail(e.target.value)} className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-blue-50 focus:ring-2 focus:ring-[#050249] outline-none transition-all font-medium text-sm" placeholder="john@example.com" />
                     </div>
                     <div className="space-y-3">
                       <label className="text-xs font-black text-[#050249] uppercase tracking-widest">Phone Number</label>
-                      <input type="tel" className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-blue-50 focus:ring-2 focus:ring-[#050249] outline-none transition-all font-medium text-sm" placeholder="+1 (___) ___-____" />
+                      <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-blue-50 focus:ring-2 focus:ring-[#050249] outline-none transition-all font-medium text-sm" placeholder="+1 (___) ___-____" />
                     </div>
                     <div className="space-y-3">
                       <label htmlFor="dob" className="text-xs font-black text-[#050249] uppercase tracking-widest">Date of Birth</label>
-                      <input id="dob" type="date" className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-blue-50 focus:ring-2 focus:ring-[#050249] outline-none transition-all font-medium text-sm" />
+                      <input id="dob" type="date" value={dob} onChange={e => setDob(e.target.value)} className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-blue-50 focus:ring-2 focus:ring-[#050249] outline-none transition-all font-medium text-sm" />
                     </div>
                   </div>
                   <div className="flex flex-col sm:flex-row gap-4 mt-8">
@@ -176,37 +218,71 @@ export function Enroll() {
 
               {step === 3 && (
                 <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
-                  <h2 className="text-3xl font-black text-[#050249] mb-8 italic uppercase tracking-tighter">Payment Details</h2>
-                  <div className="space-y-8">
-                    <div className="p-6 bg-[#EBF3FB] rounded-[2rem] flex items-center gap-4 text-sm text-[#050249] border border-blue-50 font-bold italic">
-                      <Lock className="h-5 w-5" />
-                      Secure 256-bit SSL Encrypted Transaction
-                    </div>
-                    <div className="space-y-3">
-                      <label className="text-xs font-black text-[#050249] uppercase tracking-widest">Cardholder Name</label>
-                      <input type="text" className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-blue-50 focus:ring-2 focus:ring-[#050249] outline-none transition-all font-medium text-sm" placeholder="John Doe" />
-                    </div>
-                    <div className="space-y-3">
-                      <label className="text-xs font-black text-[#050249] uppercase tracking-widest">Card Number</label>
-                      <div className="relative">
-                        <input type="text" className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-blue-50 focus:ring-2 focus:ring-[#050249] outline-none transition-all font-medium text-sm" placeholder="0000 0000 0000 0000" />
-                        <CreditCard className="absolute right-6 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-8">
-                      <div className="space-y-3">
-                        <label className="text-xs font-black text-[#050249] uppercase tracking-widest">Expiry Date</label>
-                        <input type="text" className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-blue-50 focus:ring-2 focus:ring-[#050249] outline-none transition-all font-medium text-sm" placeholder="MM/YY" />
-                      </div>
-                      <div className="space-y-3">
-                        <label className="text-xs font-black text-[#050249] uppercase tracking-widest">CVV</label>
-                        <input type="text" className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-blue-50 focus:ring-2 focus:ring-[#050249] outline-none transition-all font-medium text-sm" placeholder="123" />
-                      </div>
-                    </div>
+                  <h2 className="text-3xl font-black text-[#050249] mb-8 italic uppercase tracking-tighter">Secure Checkout</h2>
+
+                  <div className="p-6 bg-[#EBF3FB] rounded-[2rem] flex items-center gap-4 text-sm text-[#050249] border border-blue-50 font-bold italic mb-8">
+                    <Lock className="h-5 w-5" />
+                    You will be redirected to Stripe's secure checkout to complete your subscription
                   </div>
-                  <div className="flex flex-col sm:flex-row gap-4 mt-8">
-                    <button className="flex-1 py-4 rounded-2xl font-black border-2 border-slate-100 text-slate-400 hover:bg-slate-50 transition-all text-sm italic" onClick={() => setStep(2)}>Back</button>
-                    <button className="flex-[2] py-4 rounded-2xl font-black bg-[#050249] text-white hover:bg-[#03013b] transition-all shadow-xl text-sm italic">Complete Enrollment</button>
+
+                  {selectedPlan && (
+                    <div className="p-6 rounded-[2.5rem] border-2 border-[#050249] bg-[#EBF3FB] shadow-xl mb-8">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-4">
+                          <div className="h-12 w-12 rounded-2xl bg-[#050249] text-white flex items-center justify-center">
+                            <selectedPlan.icon className="h-6 w-6" />
+                          </div>
+                          <div>
+                            <h3 className="font-black text-[#050249] text-lg leading-tight">{selectedPlan.name}</h3>
+                            <p className="text-slate-500 font-medium text-xs italic">{selectedPlan.desc}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-2xl font-black text-[#050249]">{selectedPlan.price}</div>
+                          <div className="text-[10px] text-slate-400 font-black uppercase tracking-widest">per month</div>
+                        </div>
+                      </div>
+                      <div className="border-t border-blue-200 pt-4 mt-4">
+                        <div className="flex items-center justify-between text-sm font-bold text-[#050249]">
+                          <span>Monthly Total</span>
+                          <span className="text-xl">{selectedPlan.price}</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {error && (
+                    <div className="mb-6 p-4 rounded-2xl bg-red-50 border border-red-100 flex items-start gap-3">
+                      <AlertCircle className="h-5 w-5 text-red-400 shrink-0 mt-0.5" />
+                      <p className="text-sm font-bold text-red-600 italic">{error}</p>
+                    </div>
+                  )}
+
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <button
+                      className="flex-1 py-4 rounded-2xl font-black border-2 border-slate-100 text-slate-400 hover:bg-slate-50 transition-all text-sm italic"
+                      onClick={() => setStep(2)}
+                      disabled={loading}
+                    >
+                      Back
+                    </button>
+                    <button
+                      className="flex-[2] py-4 rounded-2xl font-black bg-[#050249] text-white hover:bg-[#03013b] transition-all shadow-xl text-sm italic inline-flex items-center justify-center gap-2"
+                      onClick={handleCheckout}
+                      disabled={loading}
+                    >
+                      {loading ? (
+                        <>
+                          <Loader2 className="h-5 w-5 animate-spin" />
+                          Redirecting to Secure Checkout...
+                        </>
+                      ) : (
+                        <>
+                          <CreditCard className="h-5 w-5" />
+                          Proceed to Secure Checkout
+                        </>
+                      )}
+                    </button>
                   </div>
                 </motion.div>
               )}
