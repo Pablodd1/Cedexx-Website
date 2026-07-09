@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { Check, Heart, Brain, Shield, Users, Stethoscope, Building2, ChevronDown, ChevronUp, Mail } from 'lucide-react';
+import { Check, Heart, Brain, Shield, Users, Stethoscope, Building2, ChevronDown, ChevronUp, Mail, MousePointer2, UserCheck, Lightbulb, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const fadeIn = {
@@ -30,6 +30,8 @@ interface PricingPlan {
   cta: string;
   ctaLink: string;
   enterprise?: boolean;
+  idealFor?: string;
+  shortTag?: string;
 }
 
 const PLANS: PricingPlan[] = [
@@ -40,6 +42,8 @@ const PLANS: PricingPlan[] = [
     price: '$14.99',
     priceNote: '/month',
     description: 'Virtual Urgent Care for you and your household — up to 7 dependents included.',
+    shortTag: '24/7 Virtual Urgent Care',
+    idealFor: 'Best for busy individuals, families, and anyone needing fast, on-demand care for everyday illnesses and minor injuries.',
     features: [
       { text: '24/7 Virtual Urgent Care' },
       { text: 'Same-Day Appointments' },
@@ -59,6 +63,8 @@ const PLANS: PricingPlan[] = [
     price: '$22.99',
     priceNote: '/month',
     description: 'Everything in CareNow™, plus behavioral health and therapy support.',
+    shortTag: 'Urgent Care + Therapy',
+    idealFor: 'Best for individuals and families who want comprehensive urgent care plus ongoing mental health support.',
     features: [
       { text: 'Everything Included in CareNow™' },
       { text: 'Behavioral Health' },
@@ -79,6 +85,8 @@ const PLANS: PricingPlan[] = [
     price: '$14.99',
     priceNote: '/month',
     description: 'Standalone mental health support for members seeking dedicated behavioral care.',
+    shortTag: 'Behavioral Health & Therapy',
+    idealFor: 'Best for individuals and families seeking convenient access to therapy, counseling, and behavioral health support.',
     features: [
       { text: 'Behavioral Health' },
       { text: 'Individual Therapy' },
@@ -93,13 +101,15 @@ const PLANS: PricingPlan[] = [
   },
   {
     id: 'carecomplete',
-    name: 'CareComplete™',
-    trademark: false,
+    name: 'CareComplete',
+    trademark: true,
     subtitle: 'Complete Virtual Primary Care',
     membershipType: 'Individual Membership',
     price: '$34.99',
     priceNote: '/month',
     description: 'Comprehensive virtual healthcare for preventive care, primary care, chronic condition management, mental wellness, and prescription savings—all in one affordable membership.',
+    shortTag: 'Complete Virtual Primary Care',
+    idealFor: 'Best for individuals who want a dedicated Primary Care Physician, preventive care, wellness, and ongoing health management.',
     features: [
       { text: 'Everything Included in CareNow™' },
       { text: 'Dedicated Virtual Primary Care Physician' },
@@ -134,13 +144,15 @@ const PLANS: PricingPlan[] = [
   },
   {
     id: 'carecomplete-family',
-    name: 'CareComplete™ Family',
-    trademark: false,
+    name: 'CareComplete Family',
+    trademark: true,
     subtitle: 'Complete Virtual Primary Care',
-    membershipType: 'Family Membership (Up to 7 Household Members)',
+    membershipType: 'Family Membership (Up to 7 Members)',
     price: '$52.99',
     priceNote: '/month',
     description: 'One affordable membership providing comprehensive virtual healthcare for your entire household. Every covered family member receives their own personalized care and access to the full suite of healthcare benefits.',
+    shortTag: 'Complete Care for the Whole Family',
+    idealFor: 'Best for households wanting comprehensive virtual care for up to seven members, each with their own Primary Care Physician.',
     features: [
       { text: 'Coverage for Up to 7 Household Members' },
       { text: 'Wellness for the Whole Family' },
@@ -198,15 +210,18 @@ const ENTERPRISE_BENEFITS = [
 
 function PlanCard({ plan, index }: { plan: PricingPlan; index: number }) {
   const [expanded, setExpanded] = useState(false);
-  const PREVIEW_COUNT = 6;
+  const PREVIEW_COUNT = 4;
   const hasMore = plan.features.length > PREVIEW_COUNT;
-  const visibleFeatures = expanded ? plan.features : plan.features.slice(0, PREVIEW_COUNT);
+  const previewFeatures = plan.features.slice(0, PREVIEW_COUNT);
+  const extraFeatures = plan.features.slice(PREVIEW_COUNT);
+
+  const displayName = plan.trademark ? `${plan.name}™` : plan.name;
 
   return (
     <motion.div
       {...fadeIn}
       transition={{ delay: index * 0.08 }}
-      className={`relative flex flex-col rounded-[3rem] border-2 transition-all duration-500 hover:shadow-[0_30px_80px_rgba(0,0,0,0.1)] hover:-translate-y-1 ${
+      className={`group/card relative flex flex-col rounded-[3rem] border-2 transition-all duration-500 hover:shadow-[0_30px_80px_rgba(0,0,0,0.12)] hover:-translate-y-1 ${
         plan.highlight
           ? 'bg-[#050249] border-[#050249] text-white shadow-2xl scale-[1.02]'
           : 'bg-white border-white shadow-xl'
@@ -230,7 +245,7 @@ function PlanCard({ plan, index }: { plan: PricingPlan; index: number }) {
             <h3 className={`text-xl font-black uppercase italic tracking-tighter leading-tight ${
               plan.highlight ? 'text-white' : 'text-[#050249]'
             }`}>
-              {plan.name}
+              {displayName}
             </h3>
             {plan.subtitle && (
               <p className={`text-[10px] font-black uppercase tracking-widest mt-0.5 ${
@@ -273,10 +288,10 @@ function PlanCard({ plan, index }: { plan: PricingPlan; index: number }) {
         {/* Divider */}
         <div className={`h-px w-full mb-5 ${plan.highlight ? 'bg-white/10' : 'bg-slate-100'}`} />
 
-        {/* Features */}
+        {/* Features — Always show preview. Extra features expand on hover (desktop) or via toggle (mobile). */}
         <div className="flex-1">
           <ul className="space-y-2.5">
-            {visibleFeatures.map((feature, idx) => (
+            {previewFeatures.map((feature, idx) => (
               <li key={idx} className="flex items-start gap-3">
                 <div className="mt-0.5 shrink-0">
                   <Check className="h-4 w-4 text-[#23d9b0]" />
@@ -299,11 +314,55 @@ function PlanCard({ plan, index }: { plan: PricingPlan; index: number }) {
             ))}
           </ul>
 
-          {/* Expand / Collapse toggle */}
+          {/* Extra features — hidden by default, expand on hover */}
+          {hasMore && (
+            <div
+              className={`overflow-hidden transition-all duration-500 ease-out
+                ${expanded
+                  ? 'max-h-[2000px] opacity-100 mt-2.5'
+                  : 'max-h-0 opacity-0 mt-0 md:group-hover/card:max-h-[2000px] md:group-hover/card:opacity-100 md:group-hover/card:mt-2.5'
+                }
+              `}
+            >
+              <ul className="space-y-2.5">
+                {extraFeatures.map((feature, idx) => (
+                  <li key={`extra-${idx}`} className="flex items-start gap-3">
+                    <div className="mt-0.5 shrink-0">
+                      <Check className="h-4 w-4 text-[#23d9b0]" />
+                    </div>
+                    <div>
+                      <span className={`text-sm font-semibold leading-snug ${
+                        plan.highlight ? 'text-blue-100' : 'text-slate-700'
+                      }`}>
+                        {feature.text}
+                      </span>
+                      {feature.note && (
+                        <p className={`text-[11px] mt-0.5 leading-snug font-medium ${
+                          plan.highlight ? 'text-blue-300/80' : 'text-slate-400'
+                        }`}>
+                          {feature.note}
+                        </p>
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Hover hint — desktop only, hidden when already expanded */}
+          {hasMore && !expanded && (
+            <div className="hidden md:flex mt-3 items-center gap-2 text-[11px] font-black uppercase tracking-widest opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 text-[#23d9b0]">
+              <MousePointer2 className="h-3.5 w-3.5" />
+              <span>Hover for +{extraFeatures.length} benefits</span>
+            </div>
+          )}
+
+          {/* Toggle button — always visible for mobile / manual control */}
           {hasMore && (
             <button
               onClick={() => setExpanded(!expanded)}
-              className={`mt-4 flex items-center gap-1.5 text-[11px] font-black uppercase tracking-widest transition-colors ${
+              className={`mt-3 flex items-center gap-1.5 text-[11px] font-black uppercase tracking-widest transition-colors ${
                 plan.highlight
                   ? 'text-[#23d9b0] hover:text-white'
                   : 'text-[#050249]/50 hover:text-[#050249]'
@@ -312,7 +371,7 @@ function PlanCard({ plan, index }: { plan: PricingPlan; index: number }) {
               {expanded ? (
                 <><ChevronUp className="h-3.5 w-3.5" /> Show Less</>
               ) : (
-                <><ChevronDown className="h-3.5 w-3.5" /> +{plan.features.length - PREVIEW_COUNT} More Benefits</>
+                <><ChevronDown className="h-3.5 w-3.5" /> Show All Benefits</>
               )}
             </button>
           )}
@@ -329,6 +388,78 @@ function PlanCard({ plan, index }: { plan: PricingPlan; index: number }) {
             }`}
           >
             {plan.cta}
+          </Link>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+function PlanGuideCard({ index }: { index: number }) {
+  return (
+    <motion.div
+      {...fadeIn}
+      transition={{ delay: index * 0.08 }}
+      className="relative flex flex-col rounded-[3rem] border-2 border-[#050249]/10 bg-gradient-to-br from-[#050249] to-[#0a0460] text-white shadow-2xl overflow-hidden"
+    >
+      {/* Decorative glow */}
+      <div className="absolute -top-20 -right-20 h-64 w-64 bg-[#23d9b0]/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-20 -left-20 h-64 w-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+
+      <div className="p-8 md:p-10 flex flex-col flex-1 relative z-10">
+        {/* Header */}
+        <div className="flex items-start gap-4 mb-6">
+          <div className="h-14 w-14 rounded-2xl bg-white/10 flex items-center justify-center shrink-0 border border-white/10">
+            <Lightbulb className="h-7 w-7 text-[#23d9b0]" />
+          </div>
+          <div>
+            <p className="text-[10px] font-black text-[#23d9b0] uppercase tracking-[0.4em] mb-1">Plan Guide</p>
+            <h3 className="text-xl font-black uppercase italic tracking-tighter text-white leading-tight">
+              Choose the Right Plan for You
+            </h3>
+          </div>
+        </div>
+
+        <div className="h-px w-full bg-white/10 mb-6" />
+
+        {/* Ideal candidates list */}
+        <div className="flex-1 space-y-4">
+          {PLANS.map((plan) => {
+            const displayName = plan.trademark ? `${plan.name}™` : plan.name;
+            return (
+              <div key={plan.id} className="group/plan">
+                <div className="flex items-start gap-3">
+                  <div className="mt-0.5 shrink-0">
+                    <plan.icon className="h-4 w-4 text-[#23d9b0]" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-black uppercase italic tracking-tighter text-white leading-snug">
+                      {displayName}
+                    </p>
+                    {plan.shortTag && (
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-[#23d9b0] mt-0.5">
+                        {plan.shortTag}
+                      </p>
+                    )}
+                    <p className="text-[11px] text-blue-200/80 font-medium leading-snug mt-1">
+                      {plan.idealFor}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* CTA */}
+        <div className="mt-8">
+          <Link
+            to="/enroll"
+            className="flex items-center justify-center gap-2 w-full text-center font-black py-4 rounded-2xl bg-[#23d9b0] text-[#050249] text-sm uppercase tracking-tighter italic hover:bg-[#1ec8a0] hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl"
+          >
+            <UserCheck className="h-5 w-5" />
+            Enroll Today
+            <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
       </div>
@@ -455,13 +586,14 @@ export function PricingSection() {
           </p>
         </motion.div>
 
-        {/* Pricing Grid */}
+        {/* Pricing Grid — 5 plans + 1 guide card = 6 cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 max-w-7xl mx-auto">
           {PLANS.map((plan, i) => (
             <PlanCard key={plan.id} plan={plan} index={i} />
           ))}
+          <PlanGuideCard index={PLANS.length} />
           {/* Enterprise full-width card */}
-          <EnterpriseCard index={PLANS.length} />
+          <EnterpriseCard index={PLANS.length + 1} />
         </div>
 
         {/* Bottom Note */}
