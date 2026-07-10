@@ -12,6 +12,7 @@ import { Enroll } from './pages/Enroll';
 import { PaymentSuccess } from './pages/PaymentSuccess';
 import { PaymentCancel } from './pages/PaymentCancel';
 import { Partners } from './pages/Partners';
+import { PressRelease } from './pages/PressRelease';
 import { Contact } from './pages/Contact';
 import { ScheduleDemo } from './pages/ScheduleDemo';
 import VideoLibrary from './pages/VideoLibrary';
@@ -41,6 +42,7 @@ export default function App() {
               <Route path="payment-success" element={<PaymentSuccess />} />
               <Route path="payment-cancel" element={<PaymentCancel />} />
               <Route path="partners" element={<Partners />} />
+              <Route path="press-release" element={<PressRelease />} />
               <Route path="investor-pitch" element={<InvestorPitch />} />
               <Route path="contact" element={<Contact />} />
               <Route path="schedule-demo" element={<ScheduleDemo />} />

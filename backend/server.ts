@@ -12,6 +12,7 @@ import { body, validationResult } from 'express-validator';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
 import { Resend } from 'resend';
+import Stripe from 'stripe';
 import { createChatRouter } from './routes/chat';
 
 // ──────────────────────────────────────────────
@@ -33,6 +34,10 @@ const RESEND_API_KEY = process.env.RESEND_API_KEY || '';
 const ADMIN_SECRET = process.env.ADMIN_SECRET || 'cedexx-admin-secret-2026';
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN || '';
 
+// Stripe
+const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY || '';
+const STRIPE_PUBLISHABLE_KEY = process.env.STRIPE_PUBLISHABLE_KEY || '';
+
 // Rate Limits
 const RATE_LIMIT_WINDOW_MS = parseInt(process.env.RATE_LIMIT_WINDOW_MS || '60000');
 const RATE_LIMIT_MAX = parseInt(process.env.RATE_LIMIT_MAX || '30');
@@ -43,6 +48,7 @@ const RATE_LIMIT_MAX = parseInt(process.env.RATE_LIMIT_MAX || '30');
 const app = express();
 let supabase: SupabaseClient | null = null;
 let resend: Resend | null = null;
+let stripe: Stripe | null = null;
 
 if (SUPABASE_URL && SUPABASE_SERVICE_KEY) {
   supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, {
@@ -56,6 +62,15 @@ if (RESEND_API_KEY) {
   resend = new Resend(RESEND_API_KEY);
 } else {
   console.warn('[WARN] Resend not configured - emails will be logged only');
+}
+
+if (STRIPE_SECRET_KEY) {
+  stripe = new Stripe(STRIPE_SECRET_KEY, {
+    apiVersion: '2025-06-30.basil' as any,
+    appInfo: { name: 'CEDEXX', version: '1.0.0' },
+  });
+} else {
+  console.warn('[WARN] Stripe not configured - checkout will be unavailable');
 }
 
 // ──────────────────────────────────────────────
@@ -170,6 +185,15 @@ interface AnalyticsEvent {
   ip_address?: string | null;
 }
 
+// Stripe Price Map (live mode)
+const PRICE_MAP: Record<string, string> = {
+  'carenow': 'price_1TrKOsRPzCKs3jKTUFu6Klab',
+  'carenow-mental': 'price_1TrKOtRPzCKs3jKTGeylXl0d',
+  'mental-wellness': 'price_1TrKOtRPzCKs3jKTxVTKKIRd',
+  'carecomplete': 'price_1TrKOuRPzCKs3jKTNjuqOOsF',
+  'carecomplete-family': 'price_1TrKOuRPzCKs3jKTU8UdSLC2',
+};
+
 // ──────────────────────────────────────────────
 // 5. HELPER FUNCTIONS
 // ──────────────────────────────────────────────
@@ -261,9 +285,71 @@ app.get('/api/health', (_req: Request, res: Response) => {
     services: {
       supabase: !!supabase,
       resend: !!resend,
+      stripe: !!stripe,
     }
   });
 });
+
+// ── STRIPE CHECKOUT ──────────────────────────
+app.post('/api/stripe/create-checkout',
+  formLimiter,
+  [
+    body('plan').trim().isIn(Object.keys(PRICE_MAP)).withMessage('Invalid plan selected'),
+    body('email').isEmail().normalizeEmail().withMessage('Valid email required'),
+    body('first_name').trim().isLength({ min: 1, max: 50 }).withMessage('First name required'),
+    body('last_name').trim().isLength({ min: 1, max: 50 }).withMessage('Last name required'),
+  ],
+  async (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ success: false, errors: errors.array() });
+    }
+
+    if (!stripe) {
+      return res.status(503).json({ success: false, error: 'Stripe is not configured on this server.' });
+    }
+
+    const { plan, email, first_name, last_name } = req.body;
+    const priceId = PRICE_MAP[plan];
+    if (!priceId) {
+      return res.status(400).json({ success: false, error: 'Unknown plan' });
+    }
+
+    const baseUrl = req.headers.origin || (NODE_ENV === 'development' ? 'http://localhost:5173' : 'https://cedexx.net');
+
+    try {
+      const session = await stripe.checkout.sessions.create({
+        mode: 'subscription',
+        customer_email: email.toLowerCase().trim(),
+        line_items: [{ price: priceId, quantity: 1 }],
+        success_url: `${baseUrl}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${baseUrl}/payment-cancel`,
+        metadata: {
+          plan,
+          first_name: sanitizeText(first_name),
+          last_name: sanitizeText(last_name),
+          email: email.toLowerCase().trim(),
+        },
+        subscription_data: {
+          metadata: {
+            plan,
+            first_name: sanitizeText(first_name),
+            last_name: sanitizeText(last_name),
+          },
+        },
+      });
+
+      res.json({ success: true, url: session.url });
+    } catch (err: any) {
+      console.error('[STRIPE CHECKOUT ERROR]', err);
+      res.status(500).json({
+        success: false,
+        error: 'Unable to create checkout session.',
+        detail: NODE_ENV === 'development' ? err.message : undefined,
+      });
+    }
+  }
+);
 
 // ── CONTACT FORM ─────────────────────────────
 app.post('/api/contact',
@@ -880,6 +966,7 @@ app.listen(PORT, () => {
 ║  Environment: ${NODE_ENV.padEnd(30, ' ')}║
 ║  Supabase: ${(!!supabase ? 'connected' : 'fallback').padEnd(32, ' ')}║
 ║  Resend: ${(!!resend ? 'connected' : 'fallback').padEnd(34, ' ')}║
+║  Stripe: ${(!!stripe ? 'connected' : 'fallback').padEnd(34, ' ')}║
 ╚═══════════════════════════════════════════════╝
   `);
 });

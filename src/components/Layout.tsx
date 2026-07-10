@@ -83,6 +83,7 @@ export function Layout() {
               { to: '/about', label: t('nav.about') },
               { to: '/services', label: t('nav.services') },
               { to: '/blog', label: t('nav.blog') },
+              { to: '/press-release', label: t('nav.press') },
               { to: '/partners', label: t('nav.partners') },
               { to: '/investor-pitch', label: t('nav.pitch') },
               { to: '/contact', label: t('nav.contact') },
@@ -149,11 +150,11 @@ export function Layout() {
             >
               {[
                 'nav.home', 'nav.about', 'nav.services', 'nav.blog', 
-                'nav.partners', 'nav.pitch', 'nav.contact'
+                'nav.press', 'nav.partners', 'nav.pitch', 'nav.contact'
               ].map(key => (
                 <Link 
                   key={key} 
-                  to={`/${key.split('.')[1] === 'home' ? '' : key.split('.')[1].replace('pitch', 'investor-pitch')}`} 
+                  to={`/${key.split('.')[1] === 'home' ? '' : key.split('.')[1].replace('pitch', 'investor-pitch').replace('press', 'press-release')}`} 
                   className="text-2xl font-black text-slate-900 border-b border-slate-50 pb-2"
                 >
                   {t(key)}
@@ -220,6 +221,7 @@ export function Layout() {
               <li><Link to="/about" className="hover:text-white transition-colors">{t('nav.about')}</Link></li>
               <li><Link to="/services" className="hover:text-white transition-colors">{t('nav.services')}</Link></li>
               <li><Link to="/blog" className="hover:text-white transition-colors">{t('nav.blog')}</Link></li>
+              <li><Link to="/press-release" className="hover:text-white transition-colors">{t('nav.press')}</Link></li>
               <li><Link to="/partners" className="hover:text-white transition-colors">{t('nav.partners')}</Link></li>
               <li><Link to="/investor-pitch" className="hover:text-white transition-colors">{t('nav.pitch')}</Link></li>
               <li><Link to="/contact" className="hover:text-white transition-colors">{t('nav.contact')}</Link></li>
