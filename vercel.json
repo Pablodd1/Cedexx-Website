@@ -3,6 +3,26 @@
   "outputDirectory": "dist",
   "rewrites": [
     {
+      "source": "/api/stripe/create-checkout",
+      "destination": "/api/stripe/create-checkout.ts"
+    },
+    {
+      "source": "/api/chat",
+      "destination": "/api/chat.js"
+    },
+    {
+      "source": "/api/send",
+      "destination": "/api/send.js"
+    },
+    {
+      "source": "/api/guide-subscribe",
+      "destination": "/api/guide-subscribe.js"
+    },
+    {
+      "source": "/api/book-voice",
+      "destination": "/api/voice-booking.ts"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
