@@ -32,6 +32,7 @@ interface PricingPlan {
   enterprise?: boolean;
   idealFor?: string;
   shortTag?: string;
+  specialtyNote?: string;
 }
 
 const PLANS: PricingPlan[] = [
@@ -67,6 +68,7 @@ const PLANS: PricingPlan[] = [
     idealFor: 'Best for individuals and families who want comprehensive urgent care plus ongoing mental health support.',
     features: [
       { text: 'Everything Included in CareNow™' },
+      { text: 'Everything Included in Mental Wellness' },
       { text: 'Behavioral Health' },
       { text: 'Individual Therapy' },
       { text: 'Family Counseling' },
@@ -84,17 +86,18 @@ const PLANS: PricingPlan[] = [
     name: 'Mental Wellness',
     price: '$14.99',
     priceNote: '/month',
-    description: 'Standalone mental health support for members seeking dedicated behavioral care.',
+    description: 'Perfect for individuals and families seeking convenient, affordable mental health support.',
     shortTag: 'Behavioral Health & Therapy',
-    idealFor: 'Best for individuals and families seeking convenient access to therapy, counseling, and behavioral health support.',
+    idealFor: 'Perfect for individuals and families seeking convenient, affordable mental health support.',
     features: [
-      { text: 'Behavioral Health' },
-      { text: 'Individual Therapy' },
-      { text: 'Family Counseling' },
-      { text: 'Licensed Mental Health Professionals' },
+      { text: 'Unlimited Access to Licensed Therapists & Counselors' },
+      { text: 'Individual Therapy & Counseling' },
+      { text: 'Behavioral Health Support' },
+      { text: 'Anxiety, Stress & Depression Care' },
+      { text: 'Multilingual Mental Health Professionals' },
       { text: 'Secure HIPAA-Compliant Mobile Platform' },
-      { text: 'Multilingual Member Support' },
     ],
+    specialtyNote: 'Specialty Care When Needed: Psychiatrist and Psychologist appointments are available at transparent, discounted self-pay rates—typically about 50% below traditional market pricing. Appointment fees are displayed before scheduling, so you\'ll always know the cost in advance with no hidden fees. No additional fees for Licensed Therapists & Counselors.',
     icon: Brain,
     cta: 'Start Mental Wellness',
     ctaLink: '/enroll',
@@ -112,6 +115,7 @@ const PLANS: PricingPlan[] = [
     idealFor: 'Best for individuals who want a dedicated Primary Care Physician, preventive care, wellness, and ongoing health management.',
     features: [
       { text: 'Everything Included in CareNow™' },
+      { text: 'Everything Included in Mental Wellness' },
       { text: 'Dedicated Virtual Primary Care Physician' },
       { text: 'Unlimited Virtual Primary Care Visits' },
       { text: '24/7 On-Demand Urgent Care' },
@@ -157,6 +161,7 @@ const PLANS: PricingPlan[] = [
       { text: 'Coverage for Up to 7 Household Members' },
       { text: 'Wellness for the Whole Family' },
       { text: 'Everything Included in CareNow™' },
+      { text: 'Everything Included in Mental Wellness' },
       { text: 'Individual Virtual Primary Care Physician for Each Member' },
       { text: 'Unlimited Virtual Primary Care Visits' },
       { text: '24/7 On-Demand Urgent Care' },
@@ -376,6 +381,17 @@ function PlanCard({ plan, index }: { plan: PricingPlan; index: number }) {
             </button>
           )}
         </div>
+
+        {/* Specialty Note — shown only for Mental Wellness plan */}
+        {plan.specialtyNote && (
+          <div className={`mt-4 rounded-xl p-3 text-[11px] leading-relaxed font-medium italic border ${
+            plan.highlight
+              ? 'bg-white/10 border-white/20 text-blue-100'
+              : 'bg-[#f0fdf9] border-[#23d9b0]/30 text-slate-600'
+          }`}>
+            {plan.specialtyNote}
+          </div>
+        )}
 
         {/* CTA */}
         <div className="mt-8">
