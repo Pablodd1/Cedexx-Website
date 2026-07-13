@@ -36,9 +36,9 @@ export function Partners() {
               </div>
               {/* Partnership connector */}
               <div className="text-[#23d9b0] text-2xl md:text-3xl font-black">×</div>
-              {/* Lyric Logo - white version */}
+              {/* Lyric Logo - original */}
               <img 
-                src="/images/lyric-logo-white.jpg" 
+                src="/images/lyric-logo.png" 
                 alt="Lyric Health"
                 className="h-12 md:h-16 w-auto object-contain"
               />
