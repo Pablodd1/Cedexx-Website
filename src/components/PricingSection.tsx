@@ -91,7 +91,7 @@ const PLANS: PricingPlan[] = [
     idealFor: 'Perfect for individuals and families seeking convenient, affordable mental health support.',
     features: [
       { text: 'Unlimited Access to Licensed Therapists & Counselors' },
-      { text: 'Individual Therapy & Counseling' },
+      { text: 'Family Therapy & Counseling' },
       { text: 'Behavioral Health Support' },
       { text: 'Anxiety, Stress & Depression Care' },
       { text: 'Multilingual Mental Health Professionals' },
