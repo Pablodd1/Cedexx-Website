@@ -314,7 +314,7 @@ export function PressRelease() {
                   </div>
                   <div>
                     <p className="font-black text-[#050249] text-sm uppercase tracking-widest">Rey Colon</p>
-                    <p className="text-xs text-slate-500 font-medium">Co-Founder and CEO, Lyric Health</p>
+                    <p className="text-xs text-slate-500 font-medium">Founder and CEO, Lyric Health</p>
                   </div>
                 </div>
               </div>
