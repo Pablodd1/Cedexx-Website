@@ -1,5 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import fs from 'fs';
+import { notifyAdmin } from './notify';
 
 const DATA_FILE = '/tmp/cedexx-members.json';
 
@@ -16,25 +17,14 @@ function saveMembers(members: any[]) {
   fs.writeFileSync(DATA_FILE, JSON.stringify(members, null, 2), 'utf8');
 }
 
-async function sendTelegramAlert(email: string, reason: string) {
-  const token = process.env.TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.TELEGRAM_CHAT_ID;
-  if (!token || !chatId) return;
-
-  const text = `
-🗑️ DATA DELETION REQUEST — CEDEXX
-📧 ${email}
-📝 Reason: ${reason || 'Not provided'}
-🕒 ${new Date().toLocaleString()}
-  `.trim();
-
-  try {
-    await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML' }),
-    });
-  } catch (_) {}
+async function sendNotifications(email: string, reason: string) {
+  await notifyAdmin({
+    type: 'deletion',
+    first_name: '',
+    last_name: '',
+    email,
+    reason,
+  });
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -58,7 +48,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const deletedCount = beforeCount - filtered.length;
 
   saveMembers(filtered);
-  await sendTelegramAlert(normalizedEmail, reason || '');
+  await sendNotifications(normalizedEmail, reason || '');
 
   return res.status(200).json({
     success: true,

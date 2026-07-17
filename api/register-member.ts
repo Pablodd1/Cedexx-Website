@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import fs from 'fs';
-import path from 'path';
+import { notifyAdmin } from './notify';
 
 const DATA_FILE = '/tmp/cedexx-members.json';
 
@@ -21,29 +21,16 @@ function sanitize(s: string) {
   return (s || '').replace(/[<>]/g, '').trim().substring(0, 200);
 }
 
-async function sendTelegramAlert(member: any) {
-  const token = process.env.TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.TELEGRAM_CHAT_ID;
-  if (!token || !chatId) return;
-
-  const statusIcon = member.status === 'paid' ? '💳 PAID' : '📋 REGISTERED';
-  const text = `
-${statusIcon} — CEDEXX Member
-👤 ${member.first_name} ${member.last_name}
-📧 ${member.email}
-📞 ${member.phone || 'N/A'}
-🎂 DOB: ${member.dob || 'N/A'}
-📦 Plan: ${member.plan}
-🕒 ${new Date(member.registered_at).toLocaleString()}
-  `.trim();
-
-  try {
-    await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML' }),
-    });
-  } catch (_) {}
+async function sendNotifications(member: any) {
+  await notifyAdmin({
+    type: member.status === 'paid' ? 'payment' : 'registration',
+    first_name: member.first_name,
+    last_name: member.last_name,
+    email: member.email,
+    phone: member.phone,
+    plan: member.plan,
+    stripe_session_id: member.stripe_session_id,
+  });
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -94,7 +81,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   saveMembers(members);
-  await sendTelegramAlert(member);
+  await sendNotifications(member);
 
   return res.status(200).json({ success: true, id: member.id });
 }

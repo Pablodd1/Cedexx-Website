@@ -31,6 +31,8 @@ export default function App() {
       <div className={showSplash ? 'hidden' : 'block'}>
         <BrowserRouter>
           <Routes>
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/delete-my-data" element={<DeleteMyData />} />
             <Route path="/" element={<Layout />}>
               <Route index element={<Home />} />
               <Route path="about" element={<About />} />
@@ -50,8 +52,6 @@ export default function App() {
               <Route path="schedule-demo" element={<ScheduleDemo />} />
               <Route path="*" element={<Home />} />
             </Route>
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/delete-my-data" element={<DeleteMyData />} />
           </Routes>
         </BrowserRouter>
       </div>

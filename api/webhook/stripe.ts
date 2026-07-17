@@ -1,6 +1,7 @@
 import Stripe from 'stripe';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import fs from 'fs';
+import { notifyAdmin } from './notify';
 
 const DATA_FILE = '/tmp/cedexx-members.json';
 
@@ -17,28 +18,16 @@ function saveMembers(members: any[]) {
   fs.writeFileSync(DATA_FILE, JSON.stringify(members, null, 2), 'utf8');
 }
 
-async function sendTelegramPaidAlert(data: any) {
-  const token = process.env.TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.TELEGRAM_CHAT_ID;
-  if (!token || !chatId) return;
-
-  const text = `
-💳 PAYMENT CONFIRMED — CEDEXX
-👤 ${data.first_name} ${data.last_name}
-📧 ${data.email}
-📦 Plan: ${data.plan}
-💰 Amount: $${(data.amount / 100).toFixed(2)}
-🆔 Session: ${data.stripe_session_id}
-🕒 ${new Date().toLocaleString()}
-  `.trim();
-
-  try {
-    await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: chatId, text }),
-    });
-  } catch (_) {}
+async function sendNotifications(member: any) {
+  await notifyAdmin({
+    type: 'payment',
+    first_name: member.first_name,
+    last_name: member.last_name,
+    email: member.email,
+    plan: member.plan,
+    amount: member.amount,
+    stripe_session_id: member.stripe_session_id,
+  });
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -96,7 +85,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     }
     saveMembers(members);
-    await sendTelegramPaidAlert(memberData);
+    await sendNotifications(memberData);
   }
 
   res.status(200).json({ received: true });
