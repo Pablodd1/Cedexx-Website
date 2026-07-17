@@ -176,7 +176,7 @@ export function Privacy() {
               <ul className="list-disc pl-6 space-y-2">
                 <li><strong>Access:</strong> Request a copy of all personal data we hold about you.</li>
                 <li><strong>Correction:</strong> Request corrections to inaccurate or incomplete information.</li>
-                <li><strong>Deletion:</strong> Request deletion of your personal data (subject to legal retention requirements).</li>
+                <li><strong>Deletion:</strong> Request deletion of your personal data (subject to legal retention requirements). <a href="/delete-my-data" className="text-emerald-600 font-bold hover:underline">Submit a deletion request here →</a></li>
                 <li><strong>Opt-out:</strong> Opt-out of marketing communications at any time by clicking the unsubscribe link in emails or contacting us.</li>
               </ul>
 
@@ -193,7 +193,7 @@ export function Privacy() {
               <h3 className="text-lg font-bold text-emerald-800 mt-4 mb-2">For California Residents (CCPA):</h3>
               <ul className="list-disc pl-6 space-y-2">
                 <li><strong>Right to Know:</strong> Request disclosure of the categories and specific pieces of personal information we collect.</li>
-                <li><strong>Right to Delete:</strong> Request deletion of personal information subject to certain exceptions.</li>
+                <li><strong>Right to Delete:</strong> Request deletion of personal information subject to certain exceptions. <a href="/delete-my-data" className="text-emerald-600 font-bold hover:underline">Submit a deletion request here →</a></li>
                 <li><strong>Right to Non-Discrimination:</strong> We will not discriminate against you for exercising your privacy rights.</li>
                 <li><strong>Notice at Collection:</strong> At the time of collection, we notify you of the categories of personal information collected and the purposes for which it will be used (this Privacy Policy serves as that notice).</li>
               </ul>

@@ -18,6 +18,7 @@ import { ScheduleDemo } from './pages/ScheduleDemo';
 import VideoLibrary from './pages/VideoLibrary';
 import { InvestorPitch } from './pages/InvestorPitch';
 import { AdminDashboard } from './pages/AdminDashboard';
+import { DeleteMyData } from './pages/DeleteMyData';
 import { LanguageProvider } from './context/LanguageContext';
 import { Splash } from './components/Splash';
 
@@ -50,6 +51,7 @@ export default function App() {
               <Route path="*" element={<Home />} />
             </Route>
             <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/delete-my-data" element={<DeleteMyData />} />
           </Routes>
         </BrowserRouter>
       </div>

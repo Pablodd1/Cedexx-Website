@@ -10,6 +10,7 @@
     { "source": "/api/send", "destination": "/api/send.js" },
     { "source": "/api/guide-subscribe", "destination": "/api/guide-subscribe.js" },
     { "source": "/api/book-voice", "destination": "/api/voice-booking.ts" },
+    { "source": "/api/delete-request", "destination": "/api/delete-request.ts" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
