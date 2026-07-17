@@ -17,6 +17,7 @@ import { Contact } from './pages/Contact';
 import { ScheduleDemo } from './pages/ScheduleDemo';
 import VideoLibrary from './pages/VideoLibrary';
 import { InvestorPitch } from './pages/InvestorPitch';
+import { AdminDashboard } from './pages/AdminDashboard';
 import { LanguageProvider } from './context/LanguageContext';
 import { Splash } from './components/Splash';
 
@@ -48,6 +49,7 @@ export default function App() {
               <Route path="schedule-demo" element={<ScheduleDemo />} />
               <Route path="*" element={<Home />} />
             </Route>
+            <Route path="/admin" element={<AdminDashboard />} />
           </Routes>
         </BrowserRouter>
       </div>

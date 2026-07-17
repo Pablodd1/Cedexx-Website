@@ -19,9 +19,9 @@ interface PlanOption {
 }
 
 const PLANS: PlanOption[] = [
-  { id: 'carenow', name: 'CareNow™', price: '$14.99', desc: 'Virtual Urgent Care for you and your household — up to 7 dependents included.', icon: Heart },
-  { id: 'carenow-mental', name: 'CareNow™ + Mental Wellness', price: '$22.99', desc: 'Everything in CareNow™, plus behavioral health and therapy support.', icon: Brain, highlight: true },
-  { id: 'mental-wellness', name: 'Mental Wellness', price: '$14.99', desc: 'Standalone behavioral health, therapy, and counseling support.', icon: Brain },
+  { id: 'carenow', name: 'CareNow™', price: '$18.99', desc: 'Virtual Urgent Care for you and your household — up to 7 dependents included.', icon: Heart },
+  { id: 'carenow-mental', name: 'CareNow™ + Mental Wellness', price: '$26.99', desc: 'Everything in CareNow™, plus behavioral health and therapy support.', icon: Brain, highlight: true },
+  { id: 'mental-wellness', name: 'Mental Wellness', price: '$18.99', desc: 'Standalone behavioral health, therapy, and counseling support.', icon: Brain },
   { id: 'carecomplete', name: 'CareComplete™', price: '$34.99', desc: 'Complete Virtual Primary Care — Individual Membership.', icon: Stethoscope },
   { id: 'carecomplete-family', name: 'CareComplete™ Family', price: '$52.99', desc: 'Complete Family Virtual Care for up to 7 household members.', icon: Users },
 ];
@@ -46,6 +46,28 @@ export function Enroll() {
   ];
 
   const selectedPlan = PLANS.find(p => p.id === plan);
+
+  const handleRegister = async () => {
+    // Fire-and-forget: log the lead when they move from personal info to plan selection
+    try {
+      await fetch('/api/register-member', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          first_name: firstName.trim(),
+          last_name: lastName.trim(),
+          email: email.trim(),
+          phone: phone.trim(),
+          dob: dob,
+          plan: plan,
+          status: 'registered',
+        }),
+      });
+    } catch (_) {
+      // Non-blocking — never block the user flow
+    }
+    setStep(2);
+  };
 
   const handleCheckout = async () => {
     if (!firstName.trim() || !lastName.trim() || !email.trim()) {
@@ -176,7 +198,7 @@ export function Enroll() {
                   </div>
                   <div className="flex flex-col sm:flex-row gap-4 mt-8">
                     <button className="flex-1 py-4 rounded-2xl font-black border-2 border-slate-100 text-slate-400 hover:bg-slate-50 transition-all text-sm italic" onClick={() => setStep(0)}>Back</button>
-                    <button className="flex-[2] py-4 rounded-2xl font-black bg-[#050249] text-white hover:bg-[#03013b] transition-all shadow-xl text-sm italic" onClick={() => setStep(2)}>Plan Selection</button>
+                    <button className="flex-[2] py-4 rounded-2xl font-black bg-[#050249] text-white hover:bg-[#03013b] transition-all shadow-xl text-sm italic" onClick={handleRegister}>Plan Selection</button>
                   </div>
                 </motion.div>
               )}
