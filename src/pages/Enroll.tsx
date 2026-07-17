@@ -19,9 +19,9 @@ interface PlanOption {
 }
 
 const PLANS: PlanOption[] = [
-  { id: 'carenow', name: 'CareNow™', price: '$14.99', desc: 'Virtual Urgent Care for you and your household — up to 7 dependents included.', icon: Heart },
-  { id: 'carenow-mental', name: 'CareNow™ + Mental Wellness', price: '$22.99', desc: 'Everything in CareNow™, plus behavioral health and therapy support.', icon: Brain, highlight: true },
-  { id: 'mental-wellness', name: 'Mental Wellness', price: '$14.99', desc: 'Standalone behavioral health, therapy, and counseling support.', icon: Brain },
+  { id: 'carenow', name: 'CareNow™', price: '$18.99', desc: 'Virtual Urgent Care for you and your household — up to 7 dependents included.', icon: Heart },
+  { id: 'carenow-mental', name: 'CareNow™ + Mental Wellness', price: '$26.99', desc: 'Everything in CareNow™, plus behavioral health and therapy support.', icon: Brain, highlight: true },
+  { id: 'mental-wellness', name: 'Mental Wellness', price: '$18.99', desc: 'Standalone behavioral health, therapy, and counseling support.', icon: Brain },
   { id: 'carecomplete', name: 'CareComplete™', price: '$34.99', desc: 'Complete Virtual Primary Care — Individual Membership.', icon: Stethoscope },
   { id: 'carecomplete-family', name: 'CareComplete™ Family', price: '$52.99', desc: 'Complete Family Virtual Care for up to 7 household members.', icon: Users },
 ];
@@ -37,6 +37,9 @@ export function Enroll() {
   const [dob, setDob] = React.useState('');
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  const [consentAnalytics, setConsentAnalytics] = React.useState(false);
+  const [consentTOS, setConsentTOS] = React.useState(false);
+  const [consentError, setConsentError] = React.useState<string | null>(null);
 
   const roles = [
     { id: 'individual', title: 'Individual / Life Solutions', icon: Heart, desc: 'Everyday care for yourself and your family.' },
@@ -46,6 +49,41 @@ export function Enroll() {
   ];
 
   const selectedPlan = PLANS.find(p => p.id === plan);
+
+  const handleRegister = async () => {
+    setConsentError(null);
+    if (!consentTOS) {
+      setConsentError('You must agree to the Terms of Service and Privacy Policy to continue.');
+      return;
+    }
+    if (!firstName.trim() || !lastName.trim() || !email.trim() || !dob) {
+      setConsentError('Please complete all required fields: First Name, Last Name, Email, and Date of Birth.');
+      return;
+    }
+    // Fire-and-forget: log the lead when they move from personal info to plan selection
+    try {
+      await fetch('/api/register-member', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          first_name: firstName.trim(),
+          last_name: lastName.trim(),
+          email: email.trim(),
+          phone: phone.trim(),
+          dob: dob,
+          plan: plan,
+          status: 'registered',
+          consent_analytics: consentAnalytics,
+          consent_tos: consentTOS,
+          consent_version: '2.0',
+          consent_timestamp: new Date().toISOString(),
+        }),
+      });
+    } catch (_) {
+      // Non-blocking — never block the user flow
+    }
+    setStep(2);
+  };
 
   const handleCheckout = async () => {
     if (!firstName.trim() || !lastName.trim() || !email.trim()) {
@@ -174,9 +212,42 @@ export function Enroll() {
                       <input id="dob" type="date" value={dob} onChange={e => setDob(e.target.value)} className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-blue-50 focus:ring-2 focus:ring-[#050249] outline-none transition-all font-medium text-sm" />
                     </div>
                   </div>
-                  <div className="flex flex-col sm:flex-row gap-4 mt-8">
+                  {/* Consent Section */}
+                  <div className="mt-8 space-y-4 border-t border-slate-100 pt-6">
+                    <div className="flex items-start gap-3">
+                      <input
+                        id="consent-tos"
+                        type="checkbox"
+                        checked={consentTOS}
+                        onChange={(e) => { setConsentTOS(e.target.checked); if (consentError) setConsentError(null); }}
+                        className="mt-1 h-5 w-5 rounded border-slate-300 text-[#050249] focus:ring-[#050249] cursor-pointer"
+                      />
+                      <label htmlFor="consent-tos" className="text-xs text-slate-600 leading-relaxed cursor-pointer select-none">
+                        I agree to the <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-[#050249] font-bold underline hover:text-[#23d9b0]">Terms of Service</a> and <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-[#050249] font-bold underline hover:text-[#23d9b0]">Privacy Policy</a>. I understand that Cedexx is a technology platform and does not provide medical advice. Clinical services are provided by Lyric Health. <span className="text-red-500 font-bold">*</span>
+                      </label>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <input
+                        id="consent-analytics"
+                        type="checkbox"
+                        checked={consentAnalytics}
+                        onChange={(e) => setConsentAnalytics(e.target.checked)}
+                        className="mt-1 h-5 w-5 rounded border-slate-300 text-[#050249] focus:ring-[#050249] cursor-pointer"
+                      />
+                      <label htmlFor="consent-analytics" className="text-xs text-slate-600 leading-relaxed cursor-pointer select-none">
+                        I consent to Cedexx collecting and using my enrollment information (name, email, phone, DOB, plan choice) for operational analytics and membership tracking. I understand this data is stored securely and used only to improve services. <span className="text-slate-400 italic">(Optional — you may decline and still enroll)</span>
+                      </label>
+                    </div>
+                    {consentError && (
+                      <div className="p-3 rounded-xl bg-red-50 border border-red-100 flex items-start gap-2 text-red-600 text-xs font-bold">
+                        <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" /> {consentError}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-4 mt-6">
                     <button className="flex-1 py-4 rounded-2xl font-black border-2 border-slate-100 text-slate-400 hover:bg-slate-50 transition-all text-sm italic" onClick={() => setStep(0)}>Back</button>
-                    <button className="flex-[2] py-4 rounded-2xl font-black bg-[#050249] text-white hover:bg-[#03013b] transition-all shadow-xl text-sm italic" onClick={() => setStep(2)}>Plan Selection</button>
+                    <button className="flex-[2] py-4 rounded-2xl font-black bg-[#050249] text-white hover:bg-[#03013b] transition-all shadow-xl text-sm italic" onClick={handleRegister}>Plan Selection</button>
                   </div>
                 </motion.div>
               )}

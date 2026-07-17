@@ -17,6 +17,8 @@ import { Contact } from './pages/Contact';
 import { ScheduleDemo } from './pages/ScheduleDemo';
 import VideoLibrary from './pages/VideoLibrary';
 import { InvestorPitch } from './pages/InvestorPitch';
+import { AdminDashboard } from './pages/AdminDashboard';
+import { DeleteMyData } from './pages/DeleteMyData';
 import { LanguageProvider } from './context/LanguageContext';
 import { Splash } from './components/Splash';
 
@@ -29,6 +31,8 @@ export default function App() {
       <div className={showSplash ? 'hidden' : 'block'}>
         <BrowserRouter>
           <Routes>
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/delete-my-data" element={<DeleteMyData />} />
             <Route path="/" element={<Layout />}>
               <Route index element={<Home />} />
               <Route path="about" element={<About />} />
