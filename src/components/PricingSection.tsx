@@ -33,6 +33,7 @@ interface PricingPlan {
   idealFor?: string;
   shortTag?: string;
   specialtyNote?: string;
+  badge?: string;
 }
 
 const PLANS: PricingPlan[] = [
@@ -40,7 +41,7 @@ const PLANS: PricingPlan[] = [
     id: 'carenow',
     name: 'CareNow',
     trademark: true,
-    price: '$14.99',
+    price: '$18.99',
     priceNote: '/month',
     description: 'Virtual Urgent Care for you and your household — up to 7 dependents included.',
     shortTag: '24/7 Virtual Urgent Care',
@@ -61,9 +62,10 @@ const PLANS: PricingPlan[] = [
   {
     id: 'carenow-mental',
     name: 'CareNow + Mental Wellness',
-    price: '$22.99',
+    price: '$26.99',
     priceNote: '/month',
-    description: 'Everything in CareNow™, plus behavioral health and therapy support.',
+    description: 'Add only $8/month to your CareNow™ membership and receive the full Mental Wellness plan.',
+    badge: 'Best Value Bundle',
     shortTag: 'Urgent Care + Therapy',
     idealFor: 'Best for individuals and families who want comprehensive urgent care plus ongoing mental health support.',
     features: [
@@ -84,7 +86,7 @@ const PLANS: PricingPlan[] = [
   {
     id: 'mental-wellness',
     name: 'Mental Wellness',
-    price: '$14.99',
+    price: '$18.99',
     priceNote: '/month',
     description: 'Perfect for individuals and families seeking convenient, affordable mental health support.',
     shortTag: 'Behavioral Health & Therapy',
@@ -288,6 +290,11 @@ function PlanCard({ plan, index }: { plan: PricingPlan; index: number }) {
           }`}>
             {plan.description}
           </p>
+          {plan.badge && (
+            <div className="mt-2 inline-block bg-[#23d9b0] text-[#050249] text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">
+              {plan.badge}
+            </div>
+          )}
         </div>
 
         {/* Divider */}
@@ -595,7 +602,7 @@ export function PricingSection() {
             Simple. Transparent. <span className="text-[#23d9b0]">Affordable.</span>
           </h2>
           <p className="text-2xl md:text-3xl font-black text-[#050249] mb-4 tracking-tight">
-            Starting At <span className="text-[#23d9b0]">$14.99</span>/Month
+            Starting At <span className="text-[#23d9b0]">$18.99</span>/Month
           </p>
           <p className="text-base text-slate-500 font-medium max-w-2xl mx-auto italic">
             Choose the plan that fits your life. All plans include 24/7 access, no hidden fees, and no insurance required.
