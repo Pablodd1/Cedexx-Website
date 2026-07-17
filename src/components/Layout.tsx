@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { Menu, X, Mail, Globe } from 'lucide-react';
+import { Menu, X, Mail, Globe, Shield, Check } from 'lucide-react';
 import { SupportHub } from './SupportHub';
 import { motion, AnimatePresence } from 'motion/react';
 import { Logo } from './Logo';
@@ -17,8 +17,24 @@ export function Layout() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [showCookieBanner, setShowCookieBanner] = useState(false);
   const location = useLocation();
   const { lang, setLang, t } = useLanguage();
+
+  useEffect(() => {
+    const consent = localStorage.getItem('cedexx_cookie_consent');
+    if (!consent) setShowCookieBanner(true);
+  }, []);
+
+  const acceptCookies = () => {
+    localStorage.setItem('cedexx_cookie_consent', 'accepted');
+    setShowCookieBanner(false);
+  };
+
+  const declineCookies = () => {
+    localStorage.setItem('cedexx_cookie_consent', 'declined');
+    setShowCookieBanner(false);
+  };
 
   useEffect(() => { setIsMenuOpen(false); }, [location]);
 
@@ -267,6 +283,42 @@ export function Layout() {
       </footer>
 
       <SupportHub />
+
+      {/* Cookie / Privacy Consent Banner */}
+      {showCookieBanner && (
+        <div className="fixed bottom-0 left-0 right-0 z-[70] bg-white/95 backdrop-blur-xl border-t border-slate-100 shadow-[0_-8px_30px_rgba(0,0,0,0.08)] px-6 py-5 md:py-4">
+          <div className="container mx-auto flex flex-col md:flex-row items-center gap-4 md:gap-8">
+            <div className="flex items-start gap-3 flex-1">
+              <div className="h-10 w-10 rounded-xl bg-[#050249] text-white flex items-center justify-center shrink-0">
+                <Shield className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-[#050249]">Your Privacy Matters</p>
+                <p className="text-xs text-slate-500 mt-1 leading-relaxed max-w-2xl">
+                  We use essential cookies to make the site work and limited analytics to understand enrollment trends.
+                  We do not sell your data or use third-party advertising trackers.
+                  By clicking "Accept", you consent to these practices as described in our{' '}
+                  <Link to="/privacy" className="text-[#050249] font-bold underline hover:text-[#23d9b0]" onClick={() => setShowCookieBanner(false)}>Privacy Policy</Link>.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 shrink-0">
+              <button
+                onClick={declineCookies}
+                className="px-5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-500 hover:bg-slate-50 transition-colors"
+              >
+                Decline Analytics
+              </button>
+              <button
+                onClick={acceptCookies}
+                className="px-5 py-2.5 rounded-xl bg-[#050249] text-white text-xs font-bold hover:bg-[#03013b] transition-colors flex items-center gap-2 shadow-lg"
+              >
+                <Check className="h-3.5 w-3.5" /> Accept All
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -19,6 +19,10 @@ interface Member {
   paid_at: string | null;
   stripe_session_id?: string;
   stripe_customer_id?: string;
+  consent_tos?: boolean;
+  consent_analytics?: boolean;
+  consent_version?: string;
+  consent_timestamp?: string;
 }
 
 interface Stats {
@@ -66,13 +70,17 @@ function calcAge(dob: string) {
 }
 
 function exportCSV(members: Member[]) {
-  const headers = ['ID', 'First Name', 'Last Name', 'Email', 'Phone', 'DOB', 'Age', 'Plan', 'Price', 'Status', 'Registered At', 'Paid At', 'Stripe Session'];
+  const headers = ['ID', 'First Name', 'Last Name', 'Email', 'Phone', 'DOB', 'Age', 'Plan', 'Price', 'Status', 'Registered At', 'Paid At', 'Stripe Session', 'Consent TOS', 'Consent Analytics', 'Consent Version', 'Consent Timestamp'];
   const rows = members.map((m) => [
     m.id, m.first_name, m.last_name, m.email, m.phone, m.dob,
     calcAge(m.dob) ?? '', PLAN_LABELS[m.plan] || m.plan,
     PLAN_PRICES[m.plan] || '', m.status,
     formatDate(m.registered_at), formatDate(m.paid_at),
     m.stripe_session_id || '',
+    m.consent_tos ? 'Yes' : 'No',
+    m.consent_analytics ? 'Yes' : 'No',
+    m.consent_version || '',
+    formatDate(m.consent_timestamp),
   ]);
   const csv = [headers, ...rows].map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
   const blob = new Blob([csv], { type: 'text/csv' });
@@ -345,6 +353,7 @@ export function AdminDashboard() {
                     { label: 'DOB / Age', field: 'dob' as keyof Member },
                     { label: 'Plan', field: 'plan' as keyof Member },
                     { label: 'Status', field: 'status' as keyof Member },
+                    { label: 'Consent', field: 'consent_tos' as keyof Member },
                     { label: 'Registered', field: 'registered_at' as keyof Member },
                     { label: 'Paid At', field: 'paid_at' as keyof Member },
                   ].map((col) => (
@@ -360,9 +369,9 @@ export function AdminDashboard() {
               </thead>
               <tbody>
                 {loading ? (
-                  <tr><td colSpan={8} className="text-center py-16 text-slate-400 font-bold italic">Loading...</td></tr>
+                  <tr><td colSpan={9} className="text-center py-16 text-slate-400 font-bold italic">Loading...</td></tr>
                 ) : sorted.length === 0 ? (
-                  <tr><td colSpan={8} className="text-center py-16 text-slate-400 font-bold italic">No members found</td></tr>
+                  <tr><td colSpan={9} className="text-center py-16 text-slate-400 font-bold italic">No members found</td></tr>
                 ) : sorted.map((m, i) => (
                   <tr key={m.id} className={`border-t border-slate-50 hover:bg-blue-50/30 transition-colors ${i % 2 === 0 ? 'bg-white' : 'bg-slate-50/30'}`}>
                     <td className="px-4 py-3 whitespace-nowrap">
@@ -404,6 +413,20 @@ export function AdminDashboard() {
                         {m.status === 'paid' ? <CreditCard className="h-2.5 w-2.5" /> : <Clock className="h-2.5 w-2.5" />}
                         {m.status}
                       </span>
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest ${
+                        m.consent_tos
+                          ? 'bg-emerald-50 text-emerald-600 border border-emerald-200'
+                          : 'bg-slate-100 text-slate-400 border border-slate-200'
+                      }`}>
+                        {m.consent_tos ? 'TOS' : 'No Consent'}
+                      </span>
+                      {m.consent_analytics && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-blue-50 text-blue-600 border border-blue-200 ml-1">
+                          Analytics
+                        </span>
+                      )}
                     </td>
                     <td className="px-4 py-3 text-slate-500 font-medium text-xs whitespace-nowrap">{formatDate(m.registered_at)}</td>
                     <td className="px-4 py-3 text-slate-500 font-medium text-xs whitespace-nowrap">

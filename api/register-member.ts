@@ -54,7 +54,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { first_name, last_name, email, phone, dob, plan, status = 'registered' } = req.body;
+  const { first_name, last_name, email, phone, dob, plan, status = 'registered', consent_analytics, consent_tos, consent_version, consent_timestamp } = req.body;
 
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return res.status(400).json({ error: 'Valid email required' });
@@ -72,6 +72,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     registered_at: new Date().toISOString(),
     paid_at: status === 'paid' ? new Date().toISOString() : null,
     stripe_session_id: sanitize(req.body.stripe_session_id || ''),
+    consent_tos: !!consent_tos,
+    consent_analytics: !!consent_analytics,
+    consent_version: sanitize(consent_version || '1.0'),
+    consent_timestamp: consent_timestamp || new Date().toISOString(),
   };
 
   const members = loadMembers();
