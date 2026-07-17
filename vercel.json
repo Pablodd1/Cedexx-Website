@@ -11,8 +11,6 @@
     { "source": "/api/guide-subscribe", "destination": "/api/guide-subscribe.js" },
     { "source": "/api/book-voice", "destination": "/api/voice-booking.ts" },
     { "source": "/api/delete-request", "destination": "/api/delete-request.ts" },
-    { "source": "/admin", "destination": "/index.html" },
-    { "source": "/delete-my-data", "destination": "/index.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
