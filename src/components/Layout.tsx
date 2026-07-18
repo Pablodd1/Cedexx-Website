@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { Menu, X, Mail, Globe, Shield, Check } from 'lucide-react';
+import { Menu, X, Mail, Globe, Shield, Check, LayoutDashboard } from 'lucide-react';
 import { SupportHub } from './SupportHub';
 import { motion, AnimatePresence } from 'motion/react';
 import { Logo } from './Logo';
@@ -94,16 +94,17 @@ export function Layout() {
           <nav className={`hidden lg:flex items-center rounded-2xl p-1 gap-1 border transition-all duration-500 ${
             scrolled || location.pathname !== '/' ? 'bg-slate-50 border-slate-100' : 'bg-white/10 border-white/20 backdrop-blur-md'
           }`}>
-            {[
-              { to: '/', label: t('nav.home') },
-              { to: '/about', label: t('nav.about') },
-              { to: '/services', label: t('nav.services') },
-              { to: '/blog', label: t('nav.blog') },
-              { to: '/press-release', label: t('nav.press') },
-              { to: '/partners', label: t('nav.partners') },
-              { to: '/investor-pitch', label: t('nav.pitch') },
-              { to: '/contact', label: t('nav.contact') },
-            ].map((link) => {
+              {[
+                { to: '/', label: t('nav.home') },
+                { to: '/about', label: t('nav.about') },
+                { to: '/services', label: t('nav.services') },
+                { to: '/blog', label: t('nav.blog') },
+                { to: '/press-release', label: t('nav.press') },
+                { to: '/partners', label: t('nav.partners') },
+                { to: '/investor-pitch', label: t('nav.pitch') },
+                { to: '/contact', label: t('nav.contact') },
+                { to: '/admin', label: t('nav.dashboard') },
+              ].map((link) => {
               const isActive = location.pathname === link.to;
               return (
                 <Link 
@@ -165,8 +166,8 @@ export function Layout() {
               className="lg:hidden absolute top-full left-0 w-full border-b border-slate-100 bg-white/95 backdrop-blur-xl px-4 py-8 flex flex-col gap-6 shadow-2xl overflow-y-auto max-h-[80vh]"
             >
               {[
-                'nav.home', 'nav.about', 'nav.services', 'nav.blog', 
-                'nav.press', 'nav.partners', 'nav.pitch', 'nav.contact'
+                'nav.home', 'nav.about', 'nav.services', 'nav.blog',
+                'nav.press', 'nav.partners', 'nav.pitch', 'nav.contact', 'nav.dashboard'
               ].map(key => (
                 <Link 
                   key={key} 
@@ -241,6 +242,7 @@ export function Layout() {
               <li><Link to="/partners" className="hover:text-white transition-colors">{t('nav.partners')}</Link></li>
               <li><Link to="/investor-pitch" className="hover:text-white transition-colors">{t('nav.pitch')}</Link></li>
               <li><Link to="/contact" className="hover:text-white transition-colors">{t('nav.contact')}</Link></li>
+              <li><Link to="/admin" className="hover:text-white transition-colors">{t('nav.dashboard')}</Link></li>
             </ul>
           </div>
 
