@@ -41,6 +41,36 @@ export function Enroll() {
   const [consentTOS, setConsentTOS] = React.useState(false);
   const [consentError, setConsentError] = React.useState<string | null>(null);
 
+  // Track form start — fire once when user first interacts with any field
+  const formStartedRef = React.useRef(false);
+  React.useEffect(() => {
+    if (formStartedRef.current) return;
+    const hasAnyInput = firstName || lastName || email || phone || dob;
+    if (!hasAnyInput) return;
+    formStartedRef.current = true;
+
+    const sendFormStart = async () => {
+      try {
+        await fetch('/api/track-form-start', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            first_name: firstName || '',
+            last_name: lastName || '',
+            email: email || 'anonymous@cedexx.net',
+            phone: phone || '',
+            plan: plan || '',
+            field: firstName ? 'first_name' : lastName ? 'last_name' : email ? 'email' : phone ? 'phone' : 'dob',
+            url: typeof window !== 'undefined' ? window.location.href : '',
+          }),
+        });
+      } catch (_) {
+        // Non-blocking — never block the user flow
+      }
+    };
+    sendFormStart();
+  }, [firstName, lastName, email, phone, dob, plan]);
+
   const roles = [
     { id: 'individual', title: 'Individual / Life Solutions', icon: Heart, desc: 'Everyday care for yourself and your family.' },
     { id: 'hospitality', title: 'Hospitality Partner', icon: Smartphone, desc: 'Concierge healthcare for hotel groups.' },

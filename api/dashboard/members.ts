@@ -38,6 +38,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     total: members.length,
     paid: members.filter((m) => m.status === 'paid').length,
     registered: members.filter((m) => m.status === 'registered').length,
+    form_started: members.filter((m) => m.status === 'form_started').length,
     by_plan: {} as Record<string, number>,
   };
 
@@ -64,8 +65,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     );
   }
 
-  // Sort by most recent first
-  filtered.sort((a, b) => new Date(b.registered_at).getTime() - new Date(a.registered_at).getTime());
+  // Sort by most recent first (use registered_at, then form_started_at, then paid_at as fallback)
+  filtered.sort((a, b) => {
+    const getTime = (m: any) => {
+      const t = m.registered_at || m.form_started_at || m.paid_at || m.created_at || '1970-01-01';
+      return new Date(t).getTime();
+    };
+    return getTime(b) - getTime(a);
+  });
 
   return res.status(200).json({ success: true, stats, members: filtered });
 }

@@ -14,9 +14,13 @@ interface Member {
   phone: string;
   dob: string;
   plan: string;
-  status: 'registered' | 'paid';
-  registered_at: string;
+  status: 'registered' | 'paid' | 'form_started';
+  registered_at: string | null;
   paid_at: string | null;
+  form_started_at?: string | null;
+  form_field?: string;
+  page_url?: string;
+  ip_address?: string;
   stripe_session_id?: string;
   stripe_customer_id?: string;
   consent_tos?: boolean;
@@ -29,6 +33,7 @@ interface Stats {
   total: number;
   paid: number;
   registered: number;
+  form_started: number;
   by_plan: Record<string, number>;
 }
 
@@ -46,6 +51,18 @@ const PLAN_PRICES: Record<string, string> = {
   'mental-wellness': '$18.99',
   'carecomplete': '$34.99',
   'carecomplete-family': '$52.99',
+};
+
+const STATUS_LABELS: Record<string, string> = {
+  'paid': 'Paid',
+  'registered': 'Registered',
+  'form_started': 'Form Started',
+};
+
+const STATUS_STYLES: Record<string, string> = {
+  'paid': 'bg-[#23d9b0]/10 text-[#23d9b0] border border-[#23d9b0]/30',
+  'registered': 'bg-amber-50 text-amber-600 border border-amber-200',
+  'form_started': 'bg-blue-50 text-blue-600 border border-blue-200',
 };
 
 function formatDate(iso: string | null) {
@@ -70,17 +87,22 @@ function calcAge(dob: string) {
 }
 
 function exportCSV(members: Member[]) {
-  const headers = ['ID', 'First Name', 'Last Name', 'Email', 'Phone', 'DOB', 'Age', 'Plan', 'Price', 'Status', 'Registered At', 'Paid At', 'Stripe Session', 'Consent TOS', 'Consent Analytics', 'Consent Version', 'Consent Timestamp'];
+  const headers = ['ID', 'First Name', 'Last Name', 'Email', 'Phone', 'DOB', 'Age', 'Plan', 'Price', 'Status', 'Form Started At', 'Registered At', 'Paid At', 'Form Field', 'Page URL', 'IP Address', 'Stripe Session', 'Consent TOS', 'Consent Analytics', 'Consent Version', 'Consent Timestamp'];
   const rows = members.map((m) => [
     m.id, m.first_name, m.last_name, m.email, m.phone, m.dob,
     calcAge(m.dob) ?? '', PLAN_LABELS[m.plan] || m.plan,
     PLAN_PRICES[m.plan] || '', m.status,
-    formatDate(m.registered_at), formatDate(m.paid_at),
+    formatDate(m.form_started_at || null),
+    formatDate(m.registered_at || null),
+    formatDate(m.paid_at || null),
+    m.form_field || '',
+    m.page_url || '',
+    m.ip_address || '',
     m.stripe_session_id || '',
     m.consent_tos ? 'Yes' : 'No',
     m.consent_analytics ? 'Yes' : 'No',
     m.consent_version || '',
-    formatDate(m.consent_timestamp),
+    formatDate(m.consent_timestamp || null),
   ]);
   const csv = [headers, ...rows].map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
   const blob = new Blob([csv], { type: 'text/csv' });
@@ -256,11 +278,12 @@ export function AdminDashboard() {
 
         {/* Stats Cards */}
         {stats && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
             {[
               { label: 'Total Leads', value: stats.total, icon: Users, color: 'bg-blue-50 text-[#050249]' },
               { label: 'Paid Members', value: stats.paid, icon: CreditCard, color: 'bg-[#23d9b0]/10 text-[#23d9b0]' },
               { label: 'Registered (Unpaid)', value: stats.registered, icon: UserCheck, color: 'bg-amber-50 text-amber-600' },
+              { label: 'Form Started', value: stats.form_started, icon: Clock, color: 'bg-blue-50 text-blue-600' },
               { label: 'Conversion Rate', value: stats.total ? `${Math.round((stats.paid / stats.total) * 100)}%` : '0%', icon: CheckCircle2, color: 'bg-purple-50 text-purple-600' },
             ].map((s, i) => (
               <motion.div
@@ -315,6 +338,7 @@ export function AdminDashboard() {
             <option value="">All Statuses</option>
             <option value="paid">Paid</option>
             <option value="registered">Registered</option>
+            <option value="form_started">Form Started</option>
           </select>
           <select
             value={filterPlan} onChange={(e) => setFilterPlan(e.target.value)}
@@ -354,6 +378,7 @@ export function AdminDashboard() {
                     { label: 'Plan', field: 'plan' as keyof Member },
                     { label: 'Status', field: 'status' as keyof Member },
                     { label: 'Consent', field: 'consent_tos' as keyof Member },
+                    { label: 'Form Started', field: 'form_started_at' as keyof Member },
                     { label: 'Registered', field: 'registered_at' as keyof Member },
                     { label: 'Paid At', field: 'paid_at' as keyof Member },
                   ].map((col) => (
@@ -369,9 +394,9 @@ export function AdminDashboard() {
               </thead>
               <tbody>
                 {loading ? (
-                  <tr><td colSpan={9} className="text-center py-16 text-slate-400 font-bold italic">Loading...</td></tr>
+                  <tr><td colSpan={10} className="text-center py-16 text-slate-400 font-bold italic">Loading...</td></tr>
                 ) : sorted.length === 0 ? (
-                  <tr><td colSpan={9} className="text-center py-16 text-slate-400 font-bold italic">No members found</td></tr>
+                  <tr><td colSpan={10} className="text-center py-16 text-slate-400 font-bold italic">No members found</td></tr>
                 ) : sorted.map((m, i) => (
                   <tr key={m.id} className={`border-t border-slate-50 hover:bg-blue-50/30 transition-colors ${i % 2 === 0 ? 'bg-white' : 'bg-slate-50/30'}`}>
                     <td className="px-4 py-3 whitespace-nowrap">
@@ -405,13 +430,9 @@ export function AdminDashboard() {
                       <div className="text-[10px] text-[#23d9b0] font-black">{PLAN_PRICES[m.plan] || ''}/mo</div>
                     </td>
                     <td className="px-4 py-3">
-                      <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
-                        m.status === 'paid'
-                          ? 'bg-[#23d9b0]/10 text-[#23d9b0] border border-[#23d9b0]/30'
-                          : 'bg-amber-50 text-amber-600 border border-amber-200'
-                      }`}>
-                        {m.status === 'paid' ? <CreditCard className="h-2.5 w-2.5" /> : <Clock className="h-2.5 w-2.5" />}
-                        {m.status}
+                      <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${STATUS_STYLES[m.status] || 'bg-slate-100 text-slate-600 border border-slate-200'}`}>
+                        {m.status === 'paid' ? <CreditCard className="h-2.5 w-2.5" /> : m.status === 'form_started' ? <Clock className="h-2.5 w-2.5" /> : <Clock className="h-2.5 w-2.5" />}
+                        {STATUS_LABELS[m.status] || m.status}
                       </span>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
@@ -427,6 +448,11 @@ export function AdminDashboard() {
                           Analytics
                         </span>
                       )}
+                    </td>
+                    <td className="px-4 py-3 text-slate-500 font-medium text-xs whitespace-nowrap">
+                      {m.form_started_at ? (
+                        <span className="text-blue-600 font-bold">{formatDate(m.form_started_at)}</span>
+                      ) : '—'}
                     </td>
                     <td className="px-4 py-3 text-slate-500 font-medium text-xs whitespace-nowrap">{formatDate(m.registered_at)}</td>
                     <td className="px-4 py-3 text-slate-500 font-medium text-xs whitespace-nowrap">
