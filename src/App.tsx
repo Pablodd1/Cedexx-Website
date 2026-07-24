@@ -23,7 +23,14 @@ import { LanguageProvider } from './context/LanguageContext';
 import { Splash } from './components/Splash';
 
 export default function App() {
-  const [showSplash, setShowSplash] = useState(true);
+  const [showSplash, setShowSplash] = useState(() => {
+    // Skip splash on admin routes for immediate access
+    if (typeof window !== 'undefined') {
+      const path = window.location.pathname;
+      return path !== '/admin' && path !== '/delete-my-data';
+    }
+    return true;
+  });
 
   return (
     <LanguageProvider>
