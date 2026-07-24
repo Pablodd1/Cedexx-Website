@@ -1,7 +1,7 @@
 import { Resend } from 'resend';
 
 interface NotifyData {
-  type: 'registration' | 'payment' | 'deletion';
+  type: 'registration' | 'payment' | 'deletion' | 'form_started';
   first_name: string;
   last_name: string;
   email: string;
@@ -10,6 +10,9 @@ interface NotifyData {
   amount?: number;
   stripe_session_id?: string;
   reason?: string;
+  field?: string;
+  url?: string;
+  ip?: string;
 }
 
 // Shared Resend instance (safe if no key — falls back gracefully)
@@ -33,12 +36,15 @@ async function sendEmailNotification(data: NotifyData) {
 
   const isPayment = data.type === 'payment';
   const isDeletion = data.type === 'deletion';
+  const isFormStart = data.type === 'form_started';
 
   const subject = isPayment
     ? `💳 New CEDEXX Payment — ${data.first_name} ${data.last_name}`
     : isDeletion
       ? `🗑️ Data Deletion Request — ${data.email}`
-      : `📋 New CEDEXX Registration — ${data.first_name} ${data.last_name}`;
+      : isFormStart
+        ? `📝 Lead Started Form — ${data.first_name} ${data.last_name}`
+        : `📋 New CEDEXX Registration — ${data.first_name} ${data.last_name}`;
 
   const rows = [
     ['Name', `${data.first_name} ${data.last_name}`],
@@ -48,6 +54,9 @@ async function sendEmailNotification(data: NotifyData) {
     isPayment && data.amount ? ['Amount', `$${(data.amount / 100).toFixed(2)}`] : null,
     data.stripe_session_id ? ['Session ID', data.stripe_session_id] : null,
     data.reason ? ['Reason', data.reason] : null,
+    data.field ? ['First Field', data.field] : null,
+    data.url ? ['Page URL', data.url] : null,
+    data.ip ? ['IP Address', data.ip] : null,
     ['Time', new Date().toLocaleString()],
   ].filter(Boolean) as [string, string][];
 
@@ -62,7 +71,7 @@ async function sendEmailNotification(data: NotifyData) {
     <div style="font-family:Arial,sans-serif;max-width:600px;margin:20px auto;border:1px solid #e0e0e0;border-radius:16px;overflow:hidden">
       <div style="background:#050249;color:#fff;padding:20px">
         <h2 style="margin:0;font-size:18px">
-          ${isPayment ? '💳 New Payment Received' : isDeletion ? '🗑️ Data Deletion Request' : '📋 New Member Registration'}
+          ${isPayment ? '💳 New Payment Received' : isDeletion ? '🗑️ Data Deletion Request' : isFormStart ? '📝 Lead Started Enrollment Form' : '📋 New Member Registration'}
         </h2>
       </div>
       <table style="width:100%;border-collapse:collapse;font-size:14px">
@@ -94,6 +103,7 @@ async function sendTelegramNotification(data: NotifyData) {
 
   const isPayment = data.type === 'payment';
   const isDeletion = data.type === 'deletion';
+  const isFormStart = data.type === 'form_started';
 
   const text = isPayment
     ? `💳 <b>NEW PAYMENT</b> — CEDEXX
@@ -108,7 +118,16 @@ async function sendTelegramNotification(data: NotifyData) {
 📧 ${data.email}
 📝 Reason: ${data.reason || 'Not provided'}
 🕒 ${new Date().toLocaleString()}`
-      : `📋 <b>NEW REGISTRATION</b> — CEDEXX
+      : isFormStart
+        ? `📝 <b>LEAD STARTED FORM</b> — CEDEXX
+👤 ${data.first_name} ${data.last_name}
+📧 ${data.email}
+📞 ${data.phone || 'N/A'}
+📦 Plan: ${data.plan || 'N/A'}
+🖊️ First Field: ${data.field || 'N/A'}
+🌐 URL: ${data.url || 'N/A'}
+🕒 ${new Date().toLocaleString()}`
+        : `📋 <b>NEW REGISTRATION</b> — CEDEXX
 👤 ${data.first_name} ${data.last_name}
 📧 ${data.email}
 📞 ${data.phone || 'N/A'}
@@ -137,11 +156,14 @@ async function sendSMSNotification(data: NotifyData) {
   if (!number) return;
 
   const isPayment = data.type === 'payment';
+  const isFormStart = data.type === 'form_started';
   const text = isPayment
     ? `CEDEXX: Payment from ${data.first_name} ${data.last_name} — ${data.plan} $${data.amount ? (data.amount / 100).toFixed(2) : 'N/A'}`
     : data.type === 'deletion'
       ? `CEDEXX: Deletion request for ${data.email}`
-      : `CEDEXX: New registration from ${data.first_name} ${data.last_name} — ${data.plan || 'N/A'}`;
+      : isFormStart
+        ? `CEDEXX: Lead started form — ${data.first_name} ${data.last_name}, ${data.email}, field: ${data.field || 'N/A'}`
+        : `CEDEXX: New registration from ${data.first_name} ${data.last_name} — ${data.plan || 'N/A'}`;
 
   // Try TextBelt first (free 1 SMS/day with key=textbelt)
   try {

@@ -67,14 +67,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const members = loadMembers();
 
-  // Upsert: update existing by email if already registered
+  // Upsert: update existing by email if already registered or was a form-started lead
   const existingIdx = members.findIndex((m) => m.email === member.email);
   if (existingIdx >= 0) {
+    const existing = members[existingIdx];
     members[existingIdx] = {
-      ...members[existingIdx],
+      ...existing,
       ...member,
-      id: members[existingIdx].id, // keep original id
-      registered_at: members[existingIdx].registered_at, // keep original reg date
+      id: existing.id, // keep original id
+      // Preserve form-started tracking fields
+      form_started_at: existing.form_started_at || null,
+      form_field: existing.form_field || '',
+      page_url: existing.page_url || '',
+      ip_address: existing.ip_address || '',
+      // If this was previously form_started, now mark registered_at
+      registered_at: existing.registered_at || new Date().toISOString(),
     };
   } else {
     members.push(member);
