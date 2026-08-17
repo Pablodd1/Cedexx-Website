@@ -21,7 +21,9 @@
     "express-rate-limit": "^7.5.0",
     "express-validator": "^7.2.1",
     "helmet": "^8.0.0",
-    "resend": "^4.1.2"
+    "pg": "^8.23.0",
+    "resend": "^4.1.2",
+    "stripe": "^16.0.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",

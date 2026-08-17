@@ -9,6 +9,7 @@ import { Privacy } from './pages/Privacy';
 import { Terms } from './pages/Terms';
 import { Corporate } from './pages/Corporate';
 import { Enroll } from './pages/Enroll';
+import { EnrollSuccess } from './pages/EnrollSuccess';
 import { Partners } from './pages/Partners';
 import { Contact } from './pages/Contact';
 import { ScheduleDemo } from './pages/ScheduleDemo';
@@ -36,6 +37,7 @@ export default function App() {
               <Route path="terms" element={<Terms />} />
               <Route path="corporate" element={<Corporate />} />
               <Route path="enroll" element={<Enroll />} />
+              <Route path="enroll/success" element={<EnrollSuccess />} />
               <Route path="partners" element={<Partners />} />
               <Route path="investor-pitch" element={<InvestorPitch />} />
               <Route path="contact" element={<Contact />} />

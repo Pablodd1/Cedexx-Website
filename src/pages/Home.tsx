@@ -425,7 +425,7 @@ export function Home() {
               { q: 'Do I need insurance to use Cedexx?', a: 'No. Cedexx connects you with providers offering high-quality care without the need for insurance premiums, co-pays, or complex billing.' },
               { q: 'Can I get a doctor’s note for travel insurance?', a: 'Yes. Providers on our platform can issue clinical documentation and notes for travel-related illnesses and non-controlled medical requirements instantly.' },
               { q: 'How do employers benefit from this?', a: 'By connecting employees with 24/7 provider access, you significantly reduce absenteeism and provide an incredible added value for their families.' },
-              { q: 'Are medications covered?', a: 'Providers on our platform can send prescriptions directly to your local pharmacy. While the cost of the medicine is handled by the pharmacy, the consult is free with your membership.' },
+              { q: 'Are medications covered?', a: 'Yes! If your medication falls under our 37 acute medications for common conditions, it is covered with your membership. Providers on our platform can send prescriptions directly to your local pharmacy.' },
               { q: 'Is my medical data secure?', a: 'Cedexx is a fully HIPAA-compliant platform. We use enterprise-level encryption to ensure your family’s privacy is protected at all times.' },
             ].map((faq, idx) => (
               <motion.div 

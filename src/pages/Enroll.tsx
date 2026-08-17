@@ -1,18 +1,37 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { CheckCircle2, Shield, Lock, CreditCard, Activity, Heart, Users, Smartphone, Building2 } from 'lucide-react';
+import { CheckCircle2, Shield, Lock, CreditCard, Activity, Heart, Users, Smartphone, Building2, Loader2 } from 'lucide-react';
 
-const fadeIn = {
-  initial: { opacity: 0, y: 24 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true },
-  transition: { duration: 0.55 },
+const API_BASE_URL = import.meta.env.VITE_API_URL || '';
+
+interface EnrollmentForm {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  dateOfBirth: string;
+  role: string;
+  plan: 'family' | 'individual';
+}
+
+const PLANS = {
+  family: { name: 'Family Plan', price: '$34.99/mo', members: 'Up to 7 members' },
+  individual: { name: 'Individual Plan', price: '$14.99/mo', members: '1 member' },
 };
 
 export function Enroll() {
-  const [step, setStep] = React.useState(0);
-  const [role, setRole] = React.useState('individual');
-  const [plan, setPlan] = React.useState('family');
+  const [step, setStep] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [form, setForm] = useState<EnrollmentForm>({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    dateOfBirth: '',
+    role: 'individual',
+    plan: 'family',
+  });
 
   const roles = [
     { id: 'individual', title: 'Individual / Life Solutions', icon: Heart, desc: 'Everyday care for yourself and your family.' },
@@ -20,6 +39,74 @@ export function Enroll() {
     { id: 'housing', title: 'Housing / REIT Partner', icon: Building2, desc: 'Residential wellness amenity solutions.' },
     { id: 'affiliate', title: 'Affiliate Partner', icon: Users, desc: 'Strategic marketing and growth partnerships.' }
   ];
+
+  const updateForm = (field: keyof EnrollmentForm, value: string) => {
+    setForm(prev => ({ ...prev, [field]: value }));
+    setError('');
+  };
+
+  const validateStep = (currentStep: number): boolean => {
+    switch (currentStep) {
+      case 0:
+        return true; // Role is pre-selected
+      case 1:
+        if (!form.firstName.trim() || !form.lastName.trim()) {
+          setError('First and last name are required');
+          return false;
+        }
+        if (!form.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+          setError('Valid email address is required');
+          return false;
+        }
+        return true;
+      case 2:
+        return true; // Plan is pre-selected
+      default:
+        return true;
+    }
+  };
+
+  const handleNext = () => {
+    if (validateStep(step)) {
+      setStep(step + 1);
+    }
+  };
+
+  const handleSubmit = async () => {
+    setLoading(true);
+    setError('');
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/stripe/create-checkout-session`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          first_name: form.firstName,
+          last_name: form.lastName,
+          email: form.email,
+          phone: form.phone,
+          date_of_birth: form.dateOfBirth,
+          role: form.role,
+          plan: form.plan,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to create checkout session');
+      }
+
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error('No checkout URL returned');
+      }
+    } catch (err: any) {
+      setError(err.message || 'Something went wrong. Please try again.');
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] py-24 font-sans">
@@ -33,7 +120,7 @@ export function Enroll() {
             Join the Network
           </motion.div>
           <h1 className="text-4xl md:text-6xl font-black text-[#050249] mb-6 tracking-tight italic uppercase">Better Care. Here. <span className="text-[#23d9b0]">Now.</span></h1>
-          <p className="text-xl text-slate-500 font-medium max-w-2xl mx-auto italic">Complete your enrollment in under 5 minutes and get immediate 24/7 access to board-certified care.</p>
+          <p className="text-xl text-slate-500 font-medium max-w-2xl mx-auto italic">Complete your enrollment in under 5 minutes and get immediate access to board-certified care.</p>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-12 items-start">
@@ -59,6 +146,17 @@ export function Enroll() {
                 ))}
               </div>
 
+              {/* Error Banner */}
+              {error && (
+                <motion.div 
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mb-6 p-4 bg-red-50 border border-red-200 rounded-2xl text-red-700 text-sm font-medium"
+                >
+                  {error}
+                </motion.div>
+              )}
+
               {step === 0 && (
                 <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
                   <h2 className="text-3xl font-black text-[#050249] mb-8 italic uppercase tracking-tighter">Select Your Role</h2>
@@ -66,13 +164,13 @@ export function Enroll() {
                     {roles.map((r) => (
                       <div 
                         key={r.id}
-                        onClick={() => setRole(r.id)}
+                        onClick={() => updateForm('role', r.id)}
                         className={`p-6 rounded-3xl border-2 cursor-pointer transition-all group ${
-                          role === r.id ? 'border-[#050249] bg-[#EBF3FB] shadow-xl' : 'border-slate-100 hover:border-blue-200 bg-white'
+                          form.role === r.id ? 'border-[#050249] bg-[#EBF3FB] shadow-xl' : 'border-slate-100 hover:border-blue-200 bg-white'
                         }`}
                       >
                         <div className={`h-12 w-12 rounded-2xl flex items-center justify-center mb-4 transition-colors ${
-                          role === r.id ? 'bg-[#050249] text-white' : 'bg-slate-50 text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-500'
+                          form.role === r.id ? 'bg-[#050249] text-white' : 'bg-slate-50 text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-500'
                         }`}>
                           <r.icon className="h-6 w-6" />
                         </div>
@@ -83,7 +181,7 @@ export function Enroll() {
                   </div>
                   <button 
                     className="w-full bg-[#050249] text-white font-black py-4 rounded-2xl hover:bg-[#03013b] transition-all shadow-xl hover:scale-[1.02] active:scale-[0.98] text-base uppercase tracking-tighter italic" 
-                    onClick={() => setStep(1)}
+                    onClick={handleNext}
                   >
                     Continue to Membership Details
                   </button>
@@ -95,29 +193,59 @@ export function Enroll() {
                   <h2 className="text-3xl font-black text-[#050249] mb-8 italic uppercase tracking-tighter">Personal Information</h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                     <div className="space-y-3">
-                      <label className="text-xs font-black text-[#050249] uppercase tracking-widest">First Name</label>
-                      <input type="text" className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-blue-50 focus:ring-2 focus:ring-[#050249] outline-none transition-all font-medium text-sm" placeholder="John" />
+                      <label className="text-xs font-black text-[#050249] uppercase tracking-widest">First Name *</label>
+                      <input 
+                        type="text" 
+                        value={form.firstName}
+                        onChange={(e) => updateForm('firstName', e.target.value)}
+                        className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-blue-50 focus:ring-2 focus:ring-[#050249] outline-none transition-all font-medium text-sm" 
+                        placeholder="John" 
+                      />
                     </div>
                     <div className="space-y-3">
-                      <label className="text-xs font-black text-[#050249] uppercase tracking-widest">Last Name</label>
-                      <input type="text" className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-blue-50 focus:ring-2 focus:ring-[#050249] outline-none transition-all font-medium text-sm" placeholder="Doe" />
+                      <label className="text-xs font-black text-[#050249] uppercase tracking-widest">Last Name *</label>
+                      <input 
+                        type="text" 
+                        value={form.lastName}
+                        onChange={(e) => updateForm('lastName', e.target.value)}
+                        className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-blue-50 focus:ring-2 focus:ring-[#050249] outline-none transition-all font-medium text-sm" 
+                        placeholder="Doe" 
+                      />
                     </div>
                     <div className="space-y-3 sm:col-span-2">
-                      <label className="text-xs font-black text-[#050249] uppercase tracking-widest">Email Address</label>
-                      <input type="email" className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-blue-50 focus:ring-2 focus:ring-[#050249] outline-none transition-all font-medium text-sm" placeholder="john@example.com" />
+                      <label className="text-xs font-black text-[#050249] uppercase tracking-widest">Email Address *</label>
+                      <input 
+                        type="email" 
+                        value={form.email}
+                        onChange={(e) => updateForm('email', e.target.value)}
+                        className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-blue-50 focus:ring-2 focus:ring-[#050249] outline-none transition-all font-medium text-sm" 
+                        placeholder="john@example.com" 
+                      />
                     </div>
                     <div className="space-y-3">
                       <label className="text-xs font-black text-[#050249] uppercase tracking-widest">Phone Number</label>
-                      <input type="tel" className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-blue-50 focus:ring-2 focus:ring-[#050249] outline-none transition-all font-medium text-sm" placeholder="+1 (___) ___-____" />
+                      <input 
+                        type="tel" 
+                        value={form.phone}
+                        onChange={(e) => updateForm('phone', e.target.value)}
+                        className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-blue-50 focus:ring-2 focus:ring-[#050249] outline-none transition-all font-medium text-sm" 
+                        placeholder="+1 (___) ___-____" 
+                      />
                     </div>
                     <div className="space-y-3">
                       <label htmlFor="dob" className="text-xs font-black text-[#050249] uppercase tracking-widest">Date of Birth</label>
-                      <input id="dob" type="date" className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-blue-50 focus:ring-2 focus:ring-[#050249] outline-none transition-all font-medium text-sm" />
+                      <input 
+                        id="dob" 
+                        type="date" 
+                        value={form.dateOfBirth}
+                        onChange={(e) => updateForm('dateOfBirth', e.target.value)}
+                        className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-blue-50 focus:ring-2 focus:ring-[#050249] outline-none transition-all font-medium text-sm" 
+                      />
                     </div>
                   </div>
                   <div className="flex flex-col sm:flex-row gap-4 mt-8">
                     <button className="flex-1 py-4 rounded-2xl font-black border-2 border-slate-100 text-slate-400 hover:bg-slate-50 transition-all text-sm italic" onClick={() => setStep(0)}>Back</button>
-                    <button className="flex-[2] py-4 rounded-2xl font-black bg-[#050249] text-white hover:bg-[#03013b] transition-all shadow-xl text-sm italic" onClick={() => setStep(2)}>Plan Selection</button>
+                    <button className="flex-[2] py-4 rounded-2xl font-black bg-[#050249] text-white hover:bg-[#03013b] transition-all shadow-xl text-sm italic" onClick={handleNext}>Plan Selection</button>
                   </div>
                 </motion.div>
               )}
@@ -127,13 +255,13 @@ export function Enroll() {
                   <h2 className="text-3xl font-black text-[#050249] mb-8 italic uppercase tracking-tighter">Choose Your Plan</h2>
                   <div className="space-y-6">
                     <div 
-                      onClick={() => setPlan('family')}
+                      onClick={() => updateForm('plan', 'family')}
                       className={`p-8 rounded-[2.5rem] border-2 transition-all cursor-pointer flex items-center justify-between group ${
-                        plan === 'family' ? 'border-[#050249] bg-[#EBF3FB] shadow-xl' : 'border-slate-100 bg-white hover:border-blue-200'
+                        form.plan === 'family' ? 'border-[#050249] bg-[#EBF3FB] shadow-xl' : 'border-slate-100 bg-white hover:border-blue-200'
                       }`}
                     >
                       <div className="flex items-center gap-6">
-                        <div className={`h-12 w-12 rounded-2xl flex items-center justify-center transition-colors ${plan === 'family' ? 'bg-[#050249] text-white' : 'bg-slate-100 text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-500'}`}>
+                        <div className={`h-12 w-12 rounded-2xl flex items-center justify-center transition-colors ${form.plan === 'family' ? 'bg-[#050249] text-white' : 'bg-slate-100 text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-500'}`}>
                            <Heart className="h-6 w-6" />
                         </div>
                         <div>
@@ -148,13 +276,13 @@ export function Enroll() {
                     </div>
 
                     <div 
-                      onClick={() => setPlan('individual')}
+                      onClick={() => updateForm('plan', 'individual')}
                       className={`p-8 rounded-[2.5rem] border-2 transition-all cursor-pointer flex items-center justify-between group ${
-                        plan === 'individual' ? 'border-[#050249] bg-[#EBF3FB] shadow-xl' : 'border-slate-100 bg-white hover:border-blue-200'
+                        form.plan === 'individual' ? 'border-[#050249] bg-[#EBF3FB] shadow-xl' : 'border-slate-100 bg-white hover:border-blue-200'
                       }`}
                     >
                       <div className="flex items-center gap-6">
-                        <div className={`h-12 w-12 rounded-2xl flex items-center justify-center transition-colors ${plan === 'individual' ? 'bg-[#050249] text-white' : 'bg-slate-100 text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-500'}`}>
+                        <div className={`h-12 w-12 rounded-2xl flex items-center justify-center transition-colors ${form.plan === 'individual' ? 'bg-[#050249] text-white' : 'bg-slate-100 text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-500'}`}>
                            <Smartphone className="h-6 w-6" />
                         </div>
                         <div>
@@ -170,44 +298,57 @@ export function Enroll() {
                   </div>
                   <div className="flex flex-col sm:flex-row gap-4 mt-8">
                     <button className="flex-1 py-4 rounded-2xl font-black border-2 border-slate-100 text-slate-400 hover:bg-slate-50 transition-all text-sm italic" onClick={() => setStep(1)}>Back</button>
-                    <button className="flex-[2] py-4 rounded-2xl font-black bg-[#050249] text-white hover:bg-[#03013b] transition-all shadow-xl text-sm italic" onClick={() => setStep(3)}>Continue to Payment</button>
+                    <button className="flex-[2] py-4 rounded-2xl font-black bg-[#050249] text-white hover:bg-[#03013b] transition-all shadow-xl text-sm italic" onClick={handleNext}>Continue to Payment</button>
                   </div>
                 </motion.div>
               )}
 
               {step === 3 && (
                 <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
-                  <h2 className="text-3xl font-black text-[#050249] mb-8 italic uppercase tracking-tighter">Payment Details</h2>
-                  <div className="space-y-8">
-                    <div className="p-6 bg-[#EBF3FB] rounded-[2rem] flex items-center gap-4 text-sm text-[#050249] border border-blue-50 font-bold italic">
-                      <Lock className="h-5 w-5" />
-                      Secure 256-bit SSL Encrypted Transaction
-                    </div>
-                    <div className="space-y-3">
-                      <label className="text-xs font-black text-[#050249] uppercase tracking-widest">Cardholder Name</label>
-                      <input type="text" className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-blue-50 focus:ring-2 focus:ring-[#050249] outline-none transition-all font-medium text-sm" placeholder="John Doe" />
-                    </div>
-                    <div className="space-y-3">
-                      <label className="text-xs font-black text-[#050249] uppercase tracking-widest">Card Number</label>
-                      <div className="relative">
-                        <input type="text" className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-blue-50 focus:ring-2 focus:ring-[#050249] outline-none transition-all font-medium text-sm" placeholder="0000 0000 0000 0000" />
-                        <CreditCard className="absolute right-6 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-8">
-                      <div className="space-y-3">
-                        <label className="text-xs font-black text-[#050249] uppercase tracking-widest">Expiry Date</label>
-                        <input type="text" className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-blue-50 focus:ring-2 focus:ring-[#050249] outline-none transition-all font-medium text-sm" placeholder="MM/YY" />
-                      </div>
-                      <div className="space-y-3">
-                        <label className="text-xs font-black text-[#050249] uppercase tracking-widest">CVV</label>
-                        <input type="text" className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-blue-50 focus:ring-2 focus:ring-[#050249] outline-none transition-all font-medium text-sm" placeholder="123" />
-                      </div>
+                  <h2 className="text-3xl font-black text-[#050249] mb-8 italic uppercase tracking-tighter">Confirm & Pay</h2>
+                  
+                  {/* Summary */}
+                  <div className="bg-[#EBF3FB] rounded-2xl p-6 mb-8 border border-blue-50">
+                    <h3 className="font-black text-[#050249] text-sm uppercase tracking-widest mb-4">Enrollment Summary</h3>
+                    <div className="space-y-3 text-sm">
+                      <div className="flex justify-between"><span className="text-slate-500">Name</span><span className="font-medium text-[#050249]">{form.firstName} {form.lastName}</span></div>
+                      <div className="flex justify-between"><span className="text-slate-500">Email</span><span className="font-medium text-[#050249]">{form.email}</span></div>
+                      {form.phone && <div className="flex justify-between"><span className="text-slate-500">Phone</span><span className="font-medium text-[#050249]">{form.phone}</span></div>}
+                      <div className="flex justify-between"><span className="text-slate-500">Plan</span><span className="font-medium text-[#050249]">{PLANS[form.plan].name}</span></div>
+                      <div className="flex justify-between pt-3 border-t border-blue-100"><span className="font-bold text-[#050249]">Total</span><span className="font-black text-[#050249] text-lg">{PLANS[form.plan].price}</span></div>
                     </div>
                   </div>
-                  <div className="flex flex-col sm:flex-row gap-4 mt-8">
-                    <button className="flex-1 py-4 rounded-2xl font-black border-2 border-slate-100 text-slate-400 hover:bg-slate-50 transition-all text-sm italic" onClick={() => setStep(2)}>Back</button>
-                    <button className="flex-[2] py-4 rounded-2xl font-black bg-[#050249] text-white hover:bg-[#03013b] transition-all shadow-xl text-sm italic">Complete Enrollment</button>
+
+                  <div className="p-6 bg-[#EBF3FB] rounded-[2rem] flex items-center gap-4 text-sm text-[#050249] border border-blue-50 font-bold italic mb-8">
+                    <Lock className="h-5 w-5 shrink-0" />
+                    <span>Secure payment via Stripe. Your card details are never stored on our servers.</span>
+                  </div>
+                  
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <button 
+                      className="flex-1 py-4 rounded-2xl font-black border-2 border-slate-100 text-slate-400 hover:bg-slate-50 transition-all text-sm italic" 
+                      onClick={() => setStep(2)}
+                      disabled={loading}
+                    >
+                      Back
+                    </button>
+                    <button 
+                      className="flex-[2] py-4 rounded-2xl font-black bg-[#050249] text-white hover:bg-[#03013b] transition-all shadow-xl text-sm italic flex items-center justify-center gap-2 disabled:opacity-60" 
+                      onClick={handleSubmit}
+                      disabled={loading}
+                    >
+                      {loading ? (
+                        <>
+                          <Loader2 className="h-5 w-5 animate-spin" />
+                          Processing...
+                        </>
+                      ) : (
+                        <>
+                          <CreditCard className="h-5 w-5" />
+                          Pay {PLANS[form.plan].price}
+                        </>
+                      )}
+                    </button>
                   </div>
                 </motion.div>
               )}

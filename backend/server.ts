@@ -1,7 +1,8 @@
 /**
  * CEDEXX Backend API Server
- * Express.js + TypeScript with Supabase PostgreSQL
- * Endpoints: contact, demo-schedule, enroll, partner-inquiry, admin dashboard, analytics
+ * Express.js + TypeScript with Supabase PostgreSQL + Stripe Payments
+ * Endpoints: contact, demo-schedule, enroll, partner-inquiry, admin dashboard, analytics,
+ *            create-checkout-session, stripe-webhook
  */
 
 import express, { Request, Response, NextFunction } from 'express';
@@ -12,6 +13,7 @@ import { body, validationResult } from 'express-validator';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
 import { Resend } from 'resend';
+import Stripe from 'stripe';
 import { createChatRouter } from './routes/chat';
 
 // ──────────────────────────────────────────────
@@ -29,6 +31,12 @@ const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || '';
 // Resend Email
 const RESEND_API_KEY = process.env.RESEND_API_KEY || '';
 
+// Stripe
+const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY || '';
+const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET || '';
+const STRIPE_PRICE_FAMILY = process.env.STRIPE_PRICE_FAMILY || '';
+const STRIPE_PRICE_INDIVIDUAL = process.env.STRIPE_PRICE_INDIVIDUAL || '';
+
 // Admin Auth
 const ADMIN_SECRET = process.env.ADMIN_SECRET || 'cedexx-admin-secret-2026';
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN || '';
@@ -37,12 +45,21 @@ const ADMIN_TOKEN = process.env.ADMIN_TOKEN || '';
 const RATE_LIMIT_WINDOW_MS = parseInt(process.env.RATE_LIMIT_WINDOW_MS || '60000');
 const RATE_LIMIT_MAX = parseInt(process.env.RATE_LIMIT_MAX || '30');
 
+// Frontend URL (for checkout redirects)
+const FRONTEND_URL = process.env.FRONTEND_URL || (
+  NODE_ENV === 'production' ? 'https://cedexx.net' : 'http://localhost:5173'
+);
+
+// Admin notification recipients
+const ADMIN_EMAILS = ['info@cedexx.net', 'jasmelacosta@gmail.com'];
+
 // ──────────────────────────────────────────────
 // 2. INITIALIZE CLIENTS
 // ──────────────────────────────────────────────
 const app = express();
 let supabase: SupabaseClient | null = null;
 let resend: Resend | null = null;
+let stripe: Stripe | null = null;
 
 if (SUPABASE_URL && SUPABASE_SERVICE_KEY) {
   supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, {
@@ -56,6 +73,15 @@ if (RESEND_API_KEY) {
   resend = new Resend(RESEND_API_KEY);
 } else {
   console.warn('[WARN] Resend not configured - emails will be logged only');
+}
+
+if (STRIPE_SECRET_KEY) {
+  stripe = new Stripe(STRIPE_SECRET_KEY, {
+    apiVersion: '2024-12-18.acacia',
+    typescript: true,
+  });
+} else {
+  console.warn('[WARN] Stripe not configured - payment features disabled');
 }
 
 // ──────────────────────────────────────────────
@@ -77,6 +103,10 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Admin-Token'],
 }));
 
+// ── STRIPE WEBHOOK — must use raw body before express.json() ──
+app.post('/api/stripe-webhook', express.raw({ type: 'application/json' }), handleStripeWebhook);
+
+// Global body parsers (everything after webhook)
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 
@@ -97,6 +127,16 @@ app.use('/api/', limiter);
 
 // ── CHAT API ─────────────────────────────────
 app.use('/api/chat', createChatRouter());
+
+// ── STRIPE PAYMENT API ───────────────────────
+// Import AFTER dotenv.config() so env vars are loaded
+import stripeRouter from './routes/stripe';
+
+// Webhook route needs RAW body for Stripe signature verification
+app.use('/api/stripe/webhook', express.raw({ type: 'application/json' }), stripeRouter);
+
+// All other Stripe routes use JSON
+app.use('/api/stripe', express.json({ limit: '10kb' }), stripeRouter);
 
 // Stricter rate limits for form submissions
 const formLimiter = rateLimit({
@@ -170,6 +210,19 @@ interface AnalyticsEvent {
   ip_address?: string | null;
 }
 
+interface CheckoutSessionRequest {
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone?: string | null;
+  date_of_birth?: string | null;
+  role: string;
+  plan: 'family' | 'individual';
+  cardholder_name?: string | null;
+  billing_address?: string | null;
+  source?: string | null;
+}
+
 // ──────────────────────────────────────────────
 // 5. HELPER FUNCTIONS
 // ──────────────────────────────────────────────
@@ -194,19 +247,19 @@ function getClientIp(req: Request): string {
 async function sendNotificationEmail(
   subject: string,
   htmlBody: string,
-  recipient: string = 'info@cedexx.net'
+  recipients: string[] = ['info@cedexx.net']
 ): Promise<boolean> {
   try {
     if (resend) {
       await resend.emails.send({
         from: 'CEDEXX Notifications <notifications@cedexx.net>',
-        to: [recipient],
+        to: recipients,
         subject,
         html: htmlBody,
       });
       return true;
     }
-    console.log('[EMAIL FALLBACK]', { subject, recipient, htmlBody: htmlBody.substring(0, 200) });
+    console.log('[EMAIL FALLBACK]', { subject, recipients, htmlBody: htmlBody.substring(0, 200) });
     return false;
   } catch (err) {
     console.error('[EMAIL ERROR]', err);
@@ -233,6 +286,98 @@ function buildNotificationHtml(title: string, fields: Record<string, string>): s
   `;
 }
 
+function buildPatientConfirmationHtml(enrollment: any): string {
+  const planName = enrollment.plan === 'family' ? 'Family Plan' : 'Individual Plan';
+  const planPrice = enrollment.plan === 'family' ? '$34.99/month' : '$14.99/month';
+  const planMembers = enrollment.plan === 'family' ? 'Up to 7 members' : '1 member';
+
+  return `
+    <div style="font-family:-apple-system,BlinkMacSystemFont,sans-serif;max-width:600px;margin:0 auto;border:1px solid #e2e8f0;border-radius:16px;overflow:hidden">
+      <div style="background:#050249;color:white;padding:32px 24px;text-align:center">
+        <h1 style="margin:0;font-size:24px;font-weight:800">Welcome to CEDEXX</h1>
+        <p style="margin:8px 0 0 0;opacity:0.9;font-size:14px">Your membership is now active</p>
+      </div>
+      <div style="padding:32px 24px">
+        <p style="font-size:16px;color:#1e293b;margin-bottom:24px">Hi ${enrollment.first_name},</p>
+        <p style="font-size:15px;color:#334155;line-height:1.6;margin-bottom:24px">
+          Thank you for joining CEDEXX! Your membership has been activated and you now have <strong>24/7 access</strong> to board-certified care.
+        </p>
+
+        <div style="background:#f8fafc;border-radius:12px;padding:20px;margin-bottom:24px">
+          <h3 style="margin:0 0 16px 0;font-size:14px;font-weight:700;color:#050249;text-transform:uppercase;letter-spacing:0.05em">Plan Details</h3>
+          <table style="width:100%;border-collapse:collapse;font-size:14px">
+            <tr><td style="padding:6px 0;color:#64748b">Plan</td><td style="padding:6px 0;font-weight:600;text-align:right">${planName}</td></tr>
+            <tr><td style="padding:6px 0;color:#64748b">Price</td><td style="padding:6px 0;font-weight:600;text-align:right">${planPrice}</td></tr>
+            <tr><td style="padding:6px 0;color:#64748b">Coverage</td><td style="padding:6px 0;font-weight:600;text-align:right">${planMembers}</td></tr>
+            <tr><td style="padding:6px 0;color:#64748b">Member ID</td><td style="padding:6px 0;font-weight:600;text-align:right;font-family:monospace;font-size:12px">${enrollment.id}</td></tr>
+          </table>
+        </div>
+
+        <div style="background:#ebf3fb;border-radius:12px;padding:20px;margin-bottom:24px">
+          <h3 style="margin:0 0 12px 0;font-size:14px;font-weight:700;color:#050249;text-transform:uppercase;letter-spacing:0.05em">What's Next?</h3>
+          <ul style="margin:0;padding-left:20px;color:#334155;font-size:14px;line-height:1.8">
+            <li>Download the CEDEXX app to access care anytime</li>
+            <li>Complete your health profile for personalized care</li>
+            <li>Save your Member ID — you'll need it for support</li>
+          </ul>
+        </div>
+
+        <p style="font-size:14px;color:#64748b;line-height:1.6;margin-bottom:24px">
+          Have questions? Contact us anytime:<br>
+          📧 <a href="mailto:info@cedexx.net" style="color:#050249;text-decoration:none;font-weight:600">info@cedexx.net</a><br>
+          📞 <a href="tel:954-624-6744" style="color:#050249;text-decoration:none;font-weight:600">954-624-6744</a>
+        </p>
+
+        <p style="font-size:12px;color:#94a3b8;text-align:center;margin-top:32px;padding-top:24px;border-top:1px solid #e2e8f0">
+          CEDEXX — Better Care. Here. Now.<br>
+          <em>This email confirms your active membership. Keep it for your records.</em>
+        </p>
+      </div>
+    </div>
+  `;
+}
+
+function buildAdminEnrollmentHtml(enrollment: any, stripeData?: { customerId?: string; subscriptionId?: string; sessionId?: string; paymentIntentId?: string }): string {
+  const fields: Record<string, string> = {
+    'First Name': enrollment.first_name,
+    'Last Name': enrollment.last_name,
+    Email: enrollment.email,
+    Phone: enrollment.phone || '—',
+    'Date of Birth': enrollment.date_of_birth || '—',
+    Role: enrollment.role,
+    Plan: enrollment.plan,
+    'Enrollment ID': enrollment.id,
+    Status: enrollment.status || 'pending_payment',
+    Source: enrollment.source || 'website',
+    'Created At': new Date(enrollment.created_at).toLocaleString(),
+  };
+
+  if (stripeData) {
+    fields['Stripe Customer ID'] = stripeData.customerId || '—';
+    fields['Stripe Subscription ID'] = stripeData.subscriptionId || '—';
+    fields['Stripe Session ID'] = stripeData.sessionId || '—';
+    fields['Stripe Payment Intent'] = stripeData.paymentIntentId || '—';
+  }
+
+  const rows = Object.entries(fields)
+    .map(([k, v]) => `<tr><td style="padding:8px;border:1px solid #e2e8f0;font-weight:bold;background:#f8fafc;width:30%">${k}</td><td style="padding:8px;border:1px solid #e2e8f0">${v || 'N/A'}</td></tr>`)
+    .join('');
+
+  return `
+    <div style="font-family:-apple-system,BlinkMacSystemFont,sans-serif;max-width:600px;margin:0 auto;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden">
+      <div style="background:#23d9b0;color:#050249;padding:20px 24px">
+        <h2 style="margin:0;font-size:18px">🎉 New CEDEXX Enrollment — ${enrollment.first_name} ${enrollment.last_name}</h2>
+        <p style="margin:8px 0 0 0;font-size:12px;opacity:0.8">${stripeData ? 'Payment confirmed via Stripe' : 'Enrollment submitted — awaiting payment'}</p>
+      </div>
+      <table style="width:100%;border-collapse:collapse;font-size:14px">${rows}</table>
+      <div style="padding:16px 24px;background:#f8fafc;font-size:11px;color:#64748b">
+        <p><a href="${FRONTEND_URL}/admin" style="color:#050249;font-weight:600">View in Admin Dashboard →</a></p>
+        <p>HIPAA Notice: This email contains non-PHI contact information only.</p>
+      </div>
+    </div>
+  `;
+}
+
 // ──────────────────────────────────────────────
 // 6. AUTH MIDDLEWARE
 // ──────────────────────────────────────────────
@@ -248,7 +393,109 @@ function requireAdmin(req: Request, res: Response, next: NextFunction) {
 }
 
 // ──────────────────────────────────────────────
-// 7. API ROUTES — PUBLIC
+// 7. STRIPE WEBHOOK HANDLER
+// ──────────────────────────────────────────────
+async function handleStripeWebhook(req: Request, res: Response) {
+  const sig = req.headers['stripe-signature'] as string;
+  const payload = req.body as Buffer;
+
+  if (!stripe) {
+    console.error('[STRIPE WEBHOOK] Stripe not configured');
+    return res.status(500).send('Stripe not configured');
+  }
+
+  if (!STRIPE_WEBHOOK_SECRET) {
+    console.error('[STRIPE WEBHOOK] Webhook secret not configured');
+    return res.status(500).send('Webhook secret not configured');
+  }
+
+  let event: Stripe.Event;
+
+  try {
+    event = stripe.webhooks.constructEvent(payload, sig, STRIPE_WEBHOOK_SECRET);
+  } catch (err: any) {
+    console.error('[STRIPE WEBHOOK] Signature verification failed:', err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  console.log(`[STRIPE WEBHOOK] Received event: ${event.type}`);
+
+  // Handle checkout session completed
+  if (event.type === 'checkout.session.completed') {
+    const session = event.data.object as Stripe.Checkout.Session;
+
+    try {
+      const enrollmentId = session.metadata?.enrollment_id;
+      const customerId = session.customer as string;
+      const subscriptionId = session.subscription as string;
+      const sessionId = session.id;
+      const paymentIntentId = session.payment_intent as string;
+
+      if (!enrollmentId) {
+        console.error('[STRIPE WEBHOOK] No enrollment_id in session metadata');
+        return res.status(400).send('Missing enrollment_id');
+      }
+
+      // Update enrollment in Supabase
+      if (supabase) {
+        const { data: enrollment, error: updateError } = await supabase
+          .from('enrollments')
+          .update({
+            status: 'active',
+            payment_provider: 'stripe',
+            payment_reference: subscriptionId || paymentIntentId || sessionId,
+            stripe_customer_id: customerId,
+            stripe_subscription_id: subscriptionId,
+            stripe_checkout_session_id: sessionId,
+            stripe_payment_intent_id: paymentIntentId,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', enrollmentId)
+          .select()
+          .single();
+
+        if (updateError) {
+          console.error('[STRIPE WEBHOOK] Failed to update enrollment:', updateError);
+          // Still return 200 so Stripe doesn't retry indefinitely
+          // Log for manual recovery
+        }
+
+        if (enrollment) {
+          // Send patient confirmation email
+          if (resend && isValidEmail(enrollment.email)) {
+            await resend.emails.send({
+              from: 'CEDEXX <hello@cedexx.net>',
+              to: [enrollment.email],
+              subject: 'Welcome to CEDEXX — Your membership is active',
+              html: buildPatientConfirmationHtml(enrollment),
+            }).catch((err: any) => console.error('[EMAIL ERROR] Patient confirmation:', err));
+          }
+
+          // Send admin notification
+          await sendNotificationEmail(
+            `🎉 New CEDEXX Enrollment — ${enrollment.first_name} ${enrollment.last_name}`,
+            buildAdminEnrollmentHtml(enrollment, {
+              customerId,
+              subscriptionId,
+              sessionId,
+              paymentIntentId,
+            }),
+            ADMIN_EMAILS
+          );
+        }
+      }
+    } catch (err: any) {
+      console.error('[STRIPE WEBHOOK] Error processing checkout.session.completed:', err);
+      // Return 200 to prevent Stripe retries — log for manual recovery
+    }
+  }
+
+  // Acknowledge receipt
+  res.status(200).json({ received: true });
+}
+
+// ──────────────────────────────────────────────
+// 8. API ROUTES — PUBLIC
 // ──────────────────────────────────────────────
 
 // Health check
@@ -257,10 +504,11 @@ app.get('/api/health', (_req: Request, res: Response) => {
     success: true,
     status: 'healthy',
     timestamp: new Date().toISOString(),
-    version: '1.0.0',
+    version: '1.1.0',
     services: {
       supabase: !!supabase,
       resend: !!resend,
+      stripe: !!stripe,
     }
   });
 });
@@ -423,7 +671,136 @@ app.post('/api/demo',
   }
 );
 
-// ── ENROLLMENT ───────────────────────────────
+// ── CREATE CHECKOUT SESSION (Stripe) ──────────
+app.post('/api/create-checkout-session',
+  formLimiter,
+  [
+    body('first_name').trim().isLength({ min: 1, max: 50 }).withMessage('First name required'),
+    body('last_name').trim().isLength({ min: 1, max: 50 }).withMessage('Last name required'),
+    body('email').isEmail().normalizeEmail().withMessage('Valid email required'),
+    body('phone').optional().trim().isLength({ max: 30 }),
+    body('date_of_birth').optional().isISO8601().toDate(),
+    body('role').trim().isIn(['individual', 'hospitality', 'housing', 'affiliate']).withMessage('Invalid role'),
+    body('plan').trim().isIn(['family', 'individual']).withMessage('Invalid plan'),
+  ],
+  async (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ success: false, errors: errors.array() });
+    }
+
+    if (!stripe) {
+      return res.status(503).json({ success: false, error: 'Payment service unavailable' });
+    }
+
+    if (!STRIPE_PRICE_FAMILY || !STRIPE_PRICE_INDIVIDUAL) {
+      return res.status(503).json({ success: false, error: 'Payment pricing not configured' });
+    }
+
+    const plan = req.body.plan as 'family' | 'individual';
+    const priceId = plan === 'family' ? STRIPE_PRICE_FAMILY : STRIPE_PRICE_INDIVIDUAL;
+
+    const enrollmentData: Enrollment = {
+      first_name: sanitizeText(req.body.first_name),
+      last_name: sanitizeText(req.body.last_name),
+      email: req.body.email.toLowerCase().trim(),
+      phone: req.body.phone ? sanitizeText(req.body.phone) : null,
+      date_of_birth: req.body.date_of_birth || null,
+      role: req.body.role,
+      plan: plan,
+      cardholder_name: req.body.cardholder_name ? sanitizeText(req.body.cardholder_name) : null,
+      billing_address: req.body.billing_address ? sanitizeText(req.body.billing_address) : null,
+      status: 'pending_payment',
+      source: req.body.source || 'website',
+      ip_address: getClientIp(req),
+      user_agent: req.headers['user-agent']?.substring(0, 500) || null,
+    };
+
+    try {
+      // Save enrollment to Supabase
+      let enrollmentRecord: any = null;
+      if (supabase) {
+        const { data: inserted, error } = await supabase
+          .from('enrollments')
+          .insert(enrollmentData)
+          .select()
+          .single();
+        if (error) throw error;
+        enrollmentRecord = inserted;
+      } else {
+        return res.status(503).json({ success: false, error: 'Database unavailable' });
+      }
+
+      // Create Stripe customer
+      const customer = await stripe.customers.create({
+        email: enrollmentData.email,
+        name: `${enrollmentData.first_name} ${enrollmentData.last_name}`,
+        phone: enrollmentData.phone || undefined,
+        metadata: {
+          enrollment_id: enrollmentRecord.id,
+          plan: enrollmentData.plan,
+        },
+      });
+
+      // Create Stripe checkout session
+      const session = await stripe.checkout.sessions.create({
+        customer: customer.id,
+        payment_method_types: ['card'],
+        line_items: [
+          {
+            price: priceId,
+            quantity: 1,
+          },
+        ],
+        mode: 'subscription',
+        success_url: `${FRONTEND_URL}/success?session_id={CHECKOUT_SESSION_ID}&enrollment_id=${enrollmentRecord.id}`,
+        cancel_url: `${FRONTEND_URL}/enroll?canceled=true`,
+        metadata: {
+          enrollment_id: enrollmentRecord.id,
+          plan: enrollmentData.plan,
+        },
+        subscription_data: {
+          metadata: {
+            enrollment_id: enrollmentRecord.id,
+          },
+        },
+        customer_email: enrollmentData.email,
+      });
+
+      // Update enrollment with checkout session ID
+      await supabase
+        .from('enrollments')
+        .update({
+          stripe_checkout_session_id: session.id,
+          stripe_customer_id: customer.id,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', enrollmentRecord.id);
+
+      // Send admin notification (payment pending)
+      await sendNotificationEmail(
+        `New Enrollment (Pending Payment) — ${enrollmentData.first_name} ${enrollmentData.last_name}`,
+        buildAdminEnrollmentHtml(enrollmentRecord),
+        ADMIN_EMAILS
+      );
+
+      res.status(200).json({
+        success: true,
+        url: session.url,
+        enrollment_id: enrollmentRecord.id,
+      });
+    } catch (err: any) {
+      console.error('[CHECKOUT ERROR]', err);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to create checkout session. Please try again.',
+        detail: NODE_ENV === 'development' ? err.message : undefined,
+      });
+    }
+  }
+);
+
+// ── ENROLLMENT (legacy — still available for direct enroll) ──
 app.post('/api/enroll',
   formLimiter,
   [
@@ -469,6 +846,7 @@ app.post('/api/enroll',
         dbResult = inserted;
       }
 
+      // Send notification to ALL admin emails
       await sendNotificationEmail(
         `New Enrollment — ${data.first_name} ${data.last_name}`,
         buildNotificationHtml('New Enrollment Submission', {
@@ -480,7 +858,8 @@ app.post('/api/enroll',
           Role: data.role,
           Plan: data.plan,
           'Enrollment ID': dbResult?.id || 'fallback',
-        })
+        }),
+        ADMIN_EMAILS
       );
 
       res.status(201).json({
@@ -489,7 +868,7 @@ app.post('/api/enroll',
         id: dbResult?.id || null,
         next_step: 'payment',
         plan_details: {
-          family: { name: 'Family Plan', price: '$27.99/month', members: 'Up to 4' },
+          family: { name: 'Family Plan', price: '$34.99/month', members: 'Up to 7' },
           individual: { name: 'Individual Plan', price: '$14.99/month', members: '1' },
         }[data.plan],
       });
@@ -610,7 +989,7 @@ app.post('/api/analytics',
 );
 
 // ──────────────────────────────────────────────
-// 8. API ROUTES — ADMIN (PROTECTED)
+// 9. API ROUTES — ADMIN (PROTECTED)
 // ──────────────────────────────────────────────
 
 // Admin overview stats
@@ -854,7 +1233,7 @@ app.get('/api/admin/analytics/summary', requireAdmin, async (req: Request, res: 
 });
 
 // ──────────────────────────────────────────────
-// 9. ERROR HANDLING
+// 10. ERROR HANDLING
 // ──────────────────────────────────────────────
 app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
   console.error('[SERVER ERROR]', err);
@@ -870,7 +1249,7 @@ app.use((_req: Request, res: Response) => {
 });
 
 // ──────────────────────────────────────────────
-// 10. START SERVER
+// 11. START SERVER
 // ──────────────────────────────────────────────
 app.listen(PORT, () => {
   console.log(`
@@ -880,6 +1259,7 @@ app.listen(PORT, () => {
 ║  Environment: ${NODE_ENV.padEnd(30, ' ')}║
 ║  Supabase: ${(!!supabase ? 'connected' : 'fallback').padEnd(32, ' ')}║
 ║  Resend: ${(!!resend ? 'connected' : 'fallback').padEnd(34, ' ')}║
+║  Stripe: ${(!!stripe ? 'connected' : 'disabled').padEnd(34, ' ')}║
 ╚═══════════════════════════════════════════════╝
   `);
 });
