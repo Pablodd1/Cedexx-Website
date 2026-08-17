@@ -6,6 +6,7 @@ import { motion } from 'motion/react';
 import { Logo } from '../components/Logo';
 import daisyImg from '../assets/daisy-profile-white.png';
 import jasmelImg from '../assets/jasmel-profile-white.png';
+import amosImg from '../assets/amos-profile-white.png';
 import splashVideo from '../assets/splash.mp4';
 import missionHeroImg from '../assets/mission-hero.png';
 
@@ -33,6 +34,14 @@ export function About() {
       desc: 'Engineering leadership and technology strategy. Expert in scaling secure, high-availability medical infrastructure and digital-first patient experiences.',
       image: jasmelImg,
       socials: { linkedin: 'https://linkedin.com', twitter: '#', email: 'jasmel@cedexx.net' }
+    },
+    {
+      name: 'Amos Allen',
+      role: 'Chief Operating Officer',
+      initials: 'AA',
+      desc: 'Extensive executive leadership and operational expertise to the organization. As the founder and leader of a successful multi-million-dollar company, he built the business from the ground up, driving sustained growth, operational excellence, and long-term profitability.',
+      image: amosImg,
+      socials: { linkedin: 'https://linkedin.com', twitter: '#', email: 'amos@cedexx.net' }
     }
   ];
 
@@ -116,7 +125,7 @@ export function About() {
               <p className="text-base text-slate-500 font-medium max-w-2xl mx-auto italic text-center">The visionary team behind our mission to revolutionize healthcare access.</p>
             </motion.div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-6xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-12 max-w-6xl mx-auto">
               {management.map((v, i) => (
                 <motion.div 
                    key={i}

@@ -1,37 +1,75 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from 'motion/react';
-import { CheckCircle2, Shield, Lock, CreditCard, Activity, Heart, Users, Smartphone, Building2, Loader2 } from 'lucide-react';
+import { CheckCircle2, Shield, Lock, CreditCard, Heart, Users, Smartphone, Building2, Brain, Stethoscope, Loader2, AlertCircle } from 'lucide-react';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || '';
-
-interface EnrollmentForm {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  dateOfBirth: string;
-  role: string;
-  plan: 'family' | 'individual';
-}
-
-const PLANS = {
-  family: { name: 'Family Plan', price: '$34.99/mo', members: 'Up to 7 members' },
-  individual: { name: 'Individual Plan', price: '$14.99/mo', members: '1 member' },
+const fadeIn = {
+  initial: { opacity: 0, y: 24 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true },
+  transition: { duration: 0.55 },
 };
 
+interface PlanOption {
+  id: string;
+  name: string;
+  price: string;
+  desc: string;
+  icon: React.ElementType;
+  highlight?: boolean;
+}
+
+const PLANS: PlanOption[] = [
+  { id: 'carenow', name: 'CareNow™', price: '$18.99', desc: 'Virtual Urgent Care for you and your household — up to 7 dependents included.', icon: Heart },
+  { id: 'carenow-mental', name: 'CareNow™ + Mental Wellness', price: '$26.99', desc: 'Everything in CareNow™, plus behavioral health and therapy support.', icon: Brain, highlight: true },
+  { id: 'mental-wellness', name: 'Mental Wellness', price: '$18.99', desc: 'Standalone behavioral health, therapy, and counseling support.', icon: Brain },
+  { id: 'carecomplete', name: 'CareComplete™', price: '$34.99', desc: 'Complete Virtual Primary Care — Individual Membership.', icon: Stethoscope },
+  { id: 'carecomplete-family', name: 'CareComplete™ Family', price: '$52.99', desc: 'Complete Family Virtual Care for up to 7 household members.', icon: Users },
+];
+
 export function Enroll() {
-  const [step, setStep] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [form, setForm] = useState<EnrollmentForm>({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    dateOfBirth: '',
-    role: 'individual',
-    plan: 'family',
-  });
+  const [step, setStep] = React.useState(0);
+  const [role, setRole] = React.useState('individual');
+  const [plan, setPlan] = React.useState('carenow-mental');
+  const [firstName, setFirstName] = React.useState('');
+  const [lastName, setLastName] = React.useState('');
+  const [email, setEmail] = React.useState('');
+  const [phone, setPhone] = React.useState('');
+  const [dob, setDob] = React.useState('');
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+  const [consentAnalytics, setConsentAnalytics] = React.useState(false);
+  const [consentTOS, setConsentTOS] = React.useState(false);
+  const [consentError, setConsentError] = React.useState<string | null>(null);
+
+  // Track form start — fire once when user first interacts with any field
+  const formStartedRef = React.useRef(false);
+  React.useEffect(() => {
+    if (formStartedRef.current) return;
+    const hasAnyInput = firstName || lastName || email || phone || dob;
+    if (!hasAnyInput) return;
+    formStartedRef.current = true;
+
+    const sendFormStart = async () => {
+      try {
+        await fetch('/api/track-form-start', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            first_name: firstName || '',
+            last_name: lastName || '',
+            email: email || 'anonymous@cedexx.net',
+            phone: phone || '',
+            plan: plan || '',
+            field: firstName ? 'first_name' : lastName ? 'last_name' : email ? 'email' : phone ? 'phone' : 'dob',
+            url: typeof window !== 'undefined' ? window.location.href : '',
+          }),
+        });
+      } catch (_) {
+        // Non-blocking — never block the user flow
+      }
+    };
+    sendFormStart();
+  }, [firstName, lastName, email, phone, dob, plan]);
 
   const roles = [
     { id: 'individual', title: 'Individual / Life Solutions', icon: Heart, desc: 'Everyday care for yourself and your family.' },
@@ -40,68 +78,70 @@ export function Enroll() {
     { id: 'affiliate', title: 'Affiliate Partner', icon: Users, desc: 'Strategic marketing and growth partnerships.' }
   ];
 
-  const updateForm = (field: keyof EnrollmentForm, value: string) => {
-    setForm(prev => ({ ...prev, [field]: value }));
-    setError('');
-  };
+  const selectedPlan = PLANS.find(p => p.id === plan);
 
-  const validateStep = (currentStep: number): boolean => {
-    switch (currentStep) {
-      case 0:
-        return true; // Role is pre-selected
-      case 1:
-        if (!form.firstName.trim() || !form.lastName.trim()) {
-          setError('First and last name are required');
-          return false;
-        }
-        if (!form.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-          setError('Valid email address is required');
-          return false;
-        }
-        return true;
-      case 2:
-        return true; // Plan is pre-selected
-      default:
-        return true;
+  const handleRegister = async () => {
+    setConsentError(null);
+    if (!consentTOS) {
+      setConsentError('You must agree to the Terms of Service and Privacy Policy to continue.');
+      return;
     }
-  };
-
-  const handleNext = () => {
-    if (validateStep(step)) {
-      setStep(step + 1);
+    if (!firstName.trim() || !lastName.trim() || !email.trim() || !dob) {
+      setConsentError('Please complete all required fields: First Name, Last Name, Email, and Date of Birth.');
+      return;
     }
-  };
-
-  const handleSubmit = async () => {
-    setLoading(true);
-    setError('');
-
+    // Fire-and-forget: log the lead when they move from personal info to plan selection
     try {
-      const response = await fetch(`${API_BASE_URL}/api/stripe/create-checkout-session`, {
+      await fetch('/api/register-member', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          first_name: form.firstName,
-          last_name: form.lastName,
-          email: form.email,
-          phone: form.phone,
-          date_of_birth: form.dateOfBirth,
-          role: form.role,
-          plan: form.plan,
+          first_name: firstName.trim(),
+          last_name: lastName.trim(),
+          email: email.trim(),
+          phone: phone.trim(),
+          dob: dob,
+          plan: plan,
+          status: 'registered',
+          consent_analytics: consentAnalytics,
+          consent_tos: consentTOS,
+          consent_version: '2.0',
+          consent_timestamp: new Date().toISOString(),
+        }),
+      });
+    } catch (_) {
+      // Non-blocking — never block the user flow
+    }
+    setStep(2);
+  };
+
+  const handleCheckout = async () => {
+    if (!firstName.trim() || !lastName.trim() || !email.trim()) {
+      setError('Please complete your personal information in step 2.');
+      return;
+    }
+    setLoading(true);
+    setError(null);
+
+    try {
+      const res = await fetch('/api/stripe/create-checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          plan_id: plan,
+          email: email.trim(),
+          first_name: firstName.trim(),
+          last_name: lastName.trim(),
         }),
       });
 
-      const data = await response.json();
+      const data = await res.json();
 
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to create checkout session');
+      if (!res.ok || !data.success || !data.url) {
+        throw new Error(data.error || 'Failed to start checkout');
       }
 
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        throw new Error('No checkout URL returned');
-      }
+      window.location.href = data.url;
     } catch (err: any) {
       setError(err.message || 'Something went wrong. Please try again.');
       setLoading(false);
@@ -120,7 +160,7 @@ export function Enroll() {
             Join the Network
           </motion.div>
           <h1 className="text-4xl md:text-6xl font-black text-[#050249] mb-6 tracking-tight italic uppercase">Better Care. Here. <span className="text-[#23d9b0]">Now.</span></h1>
-          <p className="text-xl text-slate-500 font-medium max-w-2xl mx-auto italic">Complete your enrollment in under 5 minutes and get immediate access to board-certified care.</p>
+          <p className="text-xl text-slate-500 font-medium max-w-2xl mx-auto italic">Complete your enrollment in under 5 minutes and get immediate 24/7 access to board-certified care.</p>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-12 items-start">
@@ -146,17 +186,6 @@ export function Enroll() {
                 ))}
               </div>
 
-              {/* Error Banner */}
-              {error && (
-                <motion.div 
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="mb-6 p-4 bg-red-50 border border-red-200 rounded-2xl text-red-700 text-sm font-medium"
-                >
-                  {error}
-                </motion.div>
-              )}
-
               {step === 0 && (
                 <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
                   <h2 className="text-3xl font-black text-[#050249] mb-8 italic uppercase tracking-tighter">Select Your Role</h2>
@@ -164,13 +193,13 @@ export function Enroll() {
                     {roles.map((r) => (
                       <div 
                         key={r.id}
-                        onClick={() => updateForm('role', r.id)}
+                        onClick={() => setRole(r.id)}
                         className={`p-6 rounded-3xl border-2 cursor-pointer transition-all group ${
-                          form.role === r.id ? 'border-[#050249] bg-[#EBF3FB] shadow-xl' : 'border-slate-100 hover:border-blue-200 bg-white'
+                          role === r.id ? 'border-[#050249] bg-[#EBF3FB] shadow-xl' : 'border-slate-100 hover:border-blue-200 bg-white'
                         }`}
                       >
                         <div className={`h-12 w-12 rounded-2xl flex items-center justify-center mb-4 transition-colors ${
-                          form.role === r.id ? 'bg-[#050249] text-white' : 'bg-slate-50 text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-500'
+                          role === r.id ? 'bg-[#050249] text-white' : 'bg-slate-50 text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-500'
                         }`}>
                           <r.icon className="h-6 w-6" />
                         </div>
@@ -181,7 +210,7 @@ export function Enroll() {
                   </div>
                   <button 
                     className="w-full bg-[#050249] text-white font-black py-4 rounded-2xl hover:bg-[#03013b] transition-all shadow-xl hover:scale-[1.02] active:scale-[0.98] text-base uppercase tracking-tighter italic" 
-                    onClick={handleNext}
+                    onClick={() => setStep(1)}
                   >
                     Continue to Membership Details
                   </button>
@@ -193,59 +222,62 @@ export function Enroll() {
                   <h2 className="text-3xl font-black text-[#050249] mb-8 italic uppercase tracking-tighter">Personal Information</h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                     <div className="space-y-3">
-                      <label className="text-xs font-black text-[#050249] uppercase tracking-widest">First Name *</label>
-                      <input 
-                        type="text" 
-                        value={form.firstName}
-                        onChange={(e) => updateForm('firstName', e.target.value)}
-                        className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-blue-50 focus:ring-2 focus:ring-[#050249] outline-none transition-all font-medium text-sm" 
-                        placeholder="John" 
-                      />
+                      <label className="text-xs font-black text-[#050249] uppercase tracking-widest">First Name</label>
+                      <input type="text" value={firstName} onChange={e => setFirstName(e.target.value)} className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-blue-50 focus:ring-2 focus:ring-[#050249] outline-none transition-all font-medium text-sm" placeholder="John" />
                     </div>
                     <div className="space-y-3">
-                      <label className="text-xs font-black text-[#050249] uppercase tracking-widest">Last Name *</label>
-                      <input 
-                        type="text" 
-                        value={form.lastName}
-                        onChange={(e) => updateForm('lastName', e.target.value)}
-                        className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-blue-50 focus:ring-2 focus:ring-[#050249] outline-none transition-all font-medium text-sm" 
-                        placeholder="Doe" 
-                      />
+                      <label className="text-xs font-black text-[#050249] uppercase tracking-widest">Last Name</label>
+                      <input type="text" value={lastName} onChange={e => setLastName(e.target.value)} className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-blue-50 focus:ring-2 focus:ring-[#050249] outline-none transition-all font-medium text-sm" placeholder="Doe" />
                     </div>
                     <div className="space-y-3 sm:col-span-2">
-                      <label className="text-xs font-black text-[#050249] uppercase tracking-widest">Email Address *</label>
-                      <input 
-                        type="email" 
-                        value={form.email}
-                        onChange={(e) => updateForm('email', e.target.value)}
-                        className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-blue-50 focus:ring-2 focus:ring-[#050249] outline-none transition-all font-medium text-sm" 
-                        placeholder="john@example.com" 
-                      />
+                      <label className="text-xs font-black text-[#050249] uppercase tracking-widest">Email Address</label>
+                      <input type="email" value={email} onChange={e => setEmail(e.target.value)} className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-blue-50 focus:ring-2 focus:ring-[#050249] outline-none transition-all font-medium text-sm" placeholder="john@example.com" />
                     </div>
                     <div className="space-y-3">
                       <label className="text-xs font-black text-[#050249] uppercase tracking-widest">Phone Number</label>
-                      <input 
-                        type="tel" 
-                        value={form.phone}
-                        onChange={(e) => updateForm('phone', e.target.value)}
-                        className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-blue-50 focus:ring-2 focus:ring-[#050249] outline-none transition-all font-medium text-sm" 
-                        placeholder="+1 (___) ___-____" 
-                      />
+                      <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-blue-50 focus:ring-2 focus:ring-[#050249] outline-none transition-all font-medium text-sm" placeholder="+1 (___) ___-____" />
                     </div>
                     <div className="space-y-3">
                       <label htmlFor="dob" className="text-xs font-black text-[#050249] uppercase tracking-widest">Date of Birth</label>
-                      <input 
-                        id="dob" 
-                        type="date" 
-                        value={form.dateOfBirth}
-                        onChange={(e) => updateForm('dateOfBirth', e.target.value)}
-                        className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-blue-50 focus:ring-2 focus:ring-[#050249] outline-none transition-all font-medium text-sm" 
-                      />
+                      <input id="dob" type="date" value={dob} onChange={e => setDob(e.target.value)} className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-blue-50 focus:ring-2 focus:ring-[#050249] outline-none transition-all font-medium text-sm" />
                     </div>
                   </div>
-                  <div className="flex flex-col sm:flex-row gap-4 mt-8">
+                  {/* Consent Section */}
+                  <div className="mt-8 space-y-4 border-t border-slate-100 pt-6">
+                    <div className="flex items-start gap-3">
+                      <input
+                        id="consent-tos"
+                        type="checkbox"
+                        checked={consentTOS}
+                        onChange={(e) => { setConsentTOS(e.target.checked); if (consentError) setConsentError(null); }}
+                        className="mt-1 h-5 w-5 rounded border-slate-300 text-[#050249] focus:ring-[#050249] cursor-pointer"
+                      />
+                      <label htmlFor="consent-tos" className="text-xs text-slate-600 leading-relaxed cursor-pointer select-none">
+                        I agree to the <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-[#050249] font-bold underline hover:text-[#23d9b0]">Terms of Service</a> and <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-[#050249] font-bold underline hover:text-[#23d9b0]">Privacy Policy</a>. I understand that Cedexx is a technology platform and does not provide medical advice. Clinical services are provided by Lyric Health. <span className="text-red-500 font-bold">*</span>
+                      </label>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <input
+                        id="consent-analytics"
+                        type="checkbox"
+                        checked={consentAnalytics}
+                        onChange={(e) => setConsentAnalytics(e.target.checked)}
+                        className="mt-1 h-5 w-5 rounded border-slate-300 text-[#050249] focus:ring-[#050249] cursor-pointer"
+                      />
+                      <label htmlFor="consent-analytics" className="text-xs text-slate-600 leading-relaxed cursor-pointer select-none">
+                        I consent to Cedexx collecting and using my enrollment information (name, email, phone, DOB, plan choice) for operational analytics and membership tracking. I understand this data is stored securely and used only to improve services. <span className="text-slate-400 italic">(Optional — you may decline and still enroll)</span>
+                      </label>
+                    </div>
+                    {consentError && (
+                      <div className="p-3 rounded-xl bg-red-50 border border-red-100 flex items-start gap-2 text-red-600 text-xs font-bold">
+                        <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" /> {consentError}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-4 mt-6">
                     <button className="flex-1 py-4 rounded-2xl font-black border-2 border-slate-100 text-slate-400 hover:bg-slate-50 transition-all text-sm italic" onClick={() => setStep(0)}>Back</button>
-                    <button className="flex-[2] py-4 rounded-2xl font-black bg-[#050249] text-white hover:bg-[#03013b] transition-all shadow-xl text-sm italic" onClick={handleNext}>Plan Selection</button>
+                    <button className="flex-[2] py-4 rounded-2xl font-black bg-[#050249] text-white hover:bg-[#03013b] transition-all shadow-xl text-sm italic" onClick={handleRegister}>Plan Selection</button>
                   </div>
                 </motion.div>
               )}
@@ -253,99 +285,102 @@ export function Enroll() {
               {step === 2 && (
                 <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
                   <h2 className="text-3xl font-black text-[#050249] mb-8 italic uppercase tracking-tighter">Choose Your Plan</h2>
-                  <div className="space-y-6">
-                    <div 
-                      onClick={() => updateForm('plan', 'family')}
-                      className={`p-8 rounded-[2.5rem] border-2 transition-all cursor-pointer flex items-center justify-between group ${
-                        form.plan === 'family' ? 'border-[#050249] bg-[#EBF3FB] shadow-xl' : 'border-slate-100 bg-white hover:border-blue-200'
-                      }`}
-                    >
-                      <div className="flex items-center gap-6">
-                        <div className={`h-12 w-12 rounded-2xl flex items-center justify-center transition-colors ${form.plan === 'family' ? 'bg-[#050249] text-white' : 'bg-slate-100 text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-500'}`}>
-                           <Heart className="h-6 w-6" />
+                  <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2">
+                    {PLANS.map((p) => (
+                      <div
+                        key={p.id}
+                        onClick={() => setPlan(p.id)}
+                        className={`p-6 rounded-[2.5rem] border-2 transition-all cursor-pointer flex items-center justify-between group ${
+                          plan === p.id ? 'border-[#050249] bg-[#EBF3FB] shadow-xl' : 'border-slate-100 bg-white hover:border-blue-200'
+                        }`}
+                      >
+                        <div className="flex items-center gap-4 flex-1 min-w-1">
+                          <div className={`h-12 w-12 rounded-2xl flex items-center justify-center transition-colors shrink-1 ${plan === p.id ? 'bg-[#050249] text-white' : 'bg-slate-100 text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-500'}`}>
+                            <p.icon className="h-6 w-6" />
+                          </div>
+                          <div className="min-w-1">
+                            <h3 className="font-black text-[#050249] text-lg leading-tight">{p.name}</h3>
+                            <p className="text-slate-500 font-medium text-xs italic leading-snug">{p.desc}</p>
+                          </div>
                         </div>
-                        <div>
-                          <h3 className="font-black text-[#050249] text-xl">Family Plan</h3>
-                          <p className="text-slate-500 font-medium text-sm italic underline">Household coverage for up to 7 members</p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-3xl font-black text-[#050249]">$34.99</div>
-                        <div className="text-[10px] text-slate-400 font-black uppercase tracking-widest">per month</div>
-                      </div>
-                    </div>
-
-                    <div 
-                      onClick={() => updateForm('plan', 'individual')}
-                      className={`p-8 rounded-[2.5rem] border-2 transition-all cursor-pointer flex items-center justify-between group ${
-                        form.plan === 'individual' ? 'border-[#050249] bg-[#EBF3FB] shadow-xl' : 'border-slate-100 bg-white hover:border-blue-200'
-                      }`}
-                    >
-                      <div className="flex items-center gap-6">
-                        <div className={`h-12 w-12 rounded-2xl flex items-center justify-center transition-colors ${form.plan === 'individual' ? 'bg-[#050249] text-white' : 'bg-slate-100 text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-500'}`}>
-                           <Smartphone className="h-6 w-6" />
-                        </div>
-                        <div>
-                          <h3 className="font-black text-[#050249] text-xl">Individual Plan</h3>
-                          <p className="text-slate-500 font-medium text-sm italic underline">Single member 24/7 access</p>
+                        <div className="text-right shrink-0 ml-4">
+                          <div className="text-2xl font-black text-[#050249]">{p.price}</div>
+                          <div className="text-[10px] text-slate-400 font-black uppercase tracking-widest">per month</div>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <div className="text-3xl font-black text-[#050249]">$14.99</div>
-                        <div className="text-[10px] text-slate-400 font-black uppercase tracking-widest">per month</div>
-                      </div>
-                    </div>
+                    ))}
                   </div>
                   <div className="flex flex-col sm:flex-row gap-4 mt-8">
                     <button className="flex-1 py-4 rounded-2xl font-black border-2 border-slate-100 text-slate-400 hover:bg-slate-50 transition-all text-sm italic" onClick={() => setStep(1)}>Back</button>
-                    <button className="flex-[2] py-4 rounded-2xl font-black bg-[#050249] text-white hover:bg-[#03013b] transition-all shadow-xl text-sm italic" onClick={handleNext}>Continue to Payment</button>
+                    <button className="flex-[2] py-4 rounded-2xl font-black bg-[#050249] text-white hover:bg-[#03013b] transition-all shadow-xl text-sm italic" onClick={() => setStep(3)}>Continue to Payment</button>
                   </div>
                 </motion.div>
               )}
 
               {step === 3 && (
                 <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
-                  <h2 className="text-3xl font-black text-[#050249] mb-8 italic uppercase tracking-tighter">Confirm & Pay</h2>
-                  
-                  {/* Summary */}
-                  <div className="bg-[#EBF3FB] rounded-2xl p-6 mb-8 border border-blue-50">
-                    <h3 className="font-black text-[#050249] text-sm uppercase tracking-widest mb-4">Enrollment Summary</h3>
-                    <div className="space-y-3 text-sm">
-                      <div className="flex justify-between"><span className="text-slate-500">Name</span><span className="font-medium text-[#050249]">{form.firstName} {form.lastName}</span></div>
-                      <div className="flex justify-between"><span className="text-slate-500">Email</span><span className="font-medium text-[#050249]">{form.email}</span></div>
-                      {form.phone && <div className="flex justify-between"><span className="text-slate-500">Phone</span><span className="font-medium text-[#050249]">{form.phone}</span></div>}
-                      <div className="flex justify-between"><span className="text-slate-500">Plan</span><span className="font-medium text-[#050249]">{PLANS[form.plan].name}</span></div>
-                      <div className="flex justify-between pt-3 border-t border-blue-100"><span className="font-bold text-[#050249]">Total</span><span className="font-black text-[#050249] text-lg">{PLANS[form.plan].price}</span></div>
-                    </div>
-                  </div>
+                  <h2 className="text-3xl font-black text-[#050249] mb-8 italic uppercase tracking-tighter">Secure Checkout</h2>
 
                   <div className="p-6 bg-[#EBF3FB] rounded-[2rem] flex items-center gap-4 text-sm text-[#050249] border border-blue-50 font-bold italic mb-8">
-                    <Lock className="h-5 w-5 shrink-0" />
-                    <span>Secure payment via Stripe. Your card details are never stored on our servers.</span>
+                    <Lock className="h-5 w-5" />
+                    You will be redirected to Stripe's secure checkout to complete your subscription
                   </div>
-                  
+
+                  {selectedPlan && (
+                    <div className="p-6 rounded-[2.5rem] border-2 border-[#050249] bg-[#EBF3FB] shadow-xl mb-8">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-4">
+                          <div className="h-12 w-12 rounded-2xl bg-[#050249] text-white flex items-center justify-center">
+                            <selectedPlan.icon className="h-6 w-6" />
+                          </div>
+                          <div>
+                            <h3 className="font-black text-[#050249] text-lg leading-tight">{selectedPlan.name}</h3>
+                            <p className="text-slate-500 font-medium text-xs italic">{selectedPlan.desc}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-2xl font-black text-[#050249]">{selectedPlan.price}</div>
+                          <div className="text-[10px] text-slate-400 font-black uppercase tracking-widest">per month</div>
+                        </div>
+                      </div>
+                      <div className="border-t border-blue-200 pt-4 mt-4">
+                        <div className="flex items-center justify-between text-sm font-bold text-[#050249]">
+                          <span>Monthly Total</span>
+                          <span className="text-xl">{selectedPlan.price}</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {error && (
+                    <div className="mb-6 p-4 rounded-2xl bg-red-50 border border-red-100 flex items-start gap-3">
+                      <AlertCircle className="h-5 w-5 text-red-400 shrink-0 mt-0.5" />
+                      <p className="text-sm font-bold text-red-600 italic">{error}</p>
+                    </div>
+                  )}
+
                   <div className="flex flex-col sm:flex-row gap-4">
-                    <button 
-                      className="flex-1 py-4 rounded-2xl font-black border-2 border-slate-100 text-slate-400 hover:bg-slate-50 transition-all text-sm italic" 
+                    <button
+                      className="flex-1 py-4 rounded-2xl font-black border-2 border-slate-100 text-slate-400 hover:bg-slate-50 transition-all text-sm italic"
                       onClick={() => setStep(2)}
                       disabled={loading}
                     >
                       Back
                     </button>
-                    <button 
-                      className="flex-[2] py-4 rounded-2xl font-black bg-[#050249] text-white hover:bg-[#03013b] transition-all shadow-xl text-sm italic flex items-center justify-center gap-2 disabled:opacity-60" 
-                      onClick={handleSubmit}
+                    <button
+                      className="flex-[2] py-4 rounded-2xl font-black bg-[#050249] text-white hover:bg-[#03013b] transition-all shadow-xl text-sm italic inline-flex items-center justify-center gap-2"
+                      onClick={handleCheckout}
                       disabled={loading}
                     >
                       {loading ? (
                         <>
                           <Loader2 className="h-5 w-5 animate-spin" />
-                          Processing...
+                          Redirecting to Secure Checkout...
                         </>
                       ) : (
                         <>
                           <CreditCard className="h-5 w-5" />
-                          Pay {PLANS[form.plan].price}
+                          Proceed to Secure Checkout
                         </>
                       )}
                     </button>

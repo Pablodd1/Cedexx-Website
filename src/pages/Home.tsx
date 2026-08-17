@@ -12,6 +12,7 @@ import { Logo } from '../components/Logo';
 import { Button } from '../components/ui';
 import { ArrowRight } from 'lucide-react';
 import { GuideCapture } from '../components/GuideCapture';
+import { PricingSection } from '../components/PricingSection';
 
 // Persona Images
 import momImg from '../assets/mom_wfh.png';
@@ -218,6 +219,9 @@ export function Home() {
           </p>
         </div>
       </section>
+
+      {/* ── PRICING SECTION ── */}
+      <PricingSection />
 
       {/* ── SLOGAN SECTION ── */}
       <section className="py-32 bg-white relative overflow-hidden">

@@ -6,6 +6,7 @@
 import { Router, Request, Response } from 'express';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
+import Stripe from 'stripe';
 import { body, validationResult } from 'express-validator';
 import rateLimit from 'express-rate-limit';
 
@@ -403,6 +404,87 @@ export function createAdminRouter(supabase: any, requireAdmin: any) {
       res.status(500).json({ success: false, error: err.message });
     }
   });
+
+  return router;
+}
+
+// ── Stripe Checkout Router ──────────────────────
+const PRICE_MAP: Record<string, string> = {
+  'carenow': 'price_1TrKOsRPzCKs3jKTUFu6Klab',
+  'carenow-mental': 'price_1TrKOtRPzCKs3jKTGeylXl0d',
+  'mental-wellness': 'price_1TrKOtRPzCKs3jKTxVTKKIRd',
+  'carecomplete': 'price_1TrKOuRPzCKs3jKTNjuqOOsF',
+  'carecomplete-family': 'price_1TrKOuRPzCKs3jKTU8UdSLC2',
+};
+
+export function createStripeRouter(supabase: any, stripe: Stripe | null) {
+  const router = Router();
+
+  router.post('/create-checkout',
+    rateLimit({ windowMs: 15 * 60 * 1000, max: 10 }),
+    [
+      body('plan_id').isIn(Object.keys(PRICE_MAP)),
+      body('email').isEmail().normalizeEmail(),
+      body('first_name').trim().isLength({ min: 1, max: 50 }),
+      body('last_name').trim().isLength({ min: 1, max: 50 }),
+    ],
+    async (req: Request, res: Response) => {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) return res.status(400).json({ success: false, errors: errors.array() });
+
+      if (!stripe) {
+        return res.status(500).json({ success: false, error: 'Stripe not configured' });
+      }
+
+      const { plan_id, email, first_name, last_name } = req.body;
+      const priceId = PRICE_MAP[plan_id as string];
+
+      try {
+        // Store pending enrollment in Supabase
+        let enrollmentId: string | null = null;
+        if (supabase) {
+          const { data: inserted, error } = await supabase
+            .from('enrollments')
+            .insert({
+              first_name: first_name.trim(),
+              last_name: last_name.trim(),
+              email: email.toLowerCase().trim(),
+              plan: plan_id,
+              status: 'pending_payment',
+              source: 'website_stripe',
+            })
+            .select()
+            .single();
+          if (error) {
+            console.error('[Supabase enrollment error]', error);
+          } else {
+            enrollmentId = inserted?.id || null;
+          }
+        }
+
+        const origin = (req.headers.origin as string) || 'https://cedexx.net';
+
+        const session = await stripe.checkout.sessions.create({
+          mode: 'subscription',
+          customer_email: email.toLowerCase().trim(),
+          line_items: [{ price: priceId, quantity: 1 }],
+          success_url: `${origin}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+          cancel_url: `${origin}/payment-cancel`,
+          metadata: {
+            plan_id,
+            enrollment_id: enrollmentId || 'none',
+            first_name: first_name.trim(),
+            last_name: last_name.trim(),
+          },
+        });
+
+        res.status(200).json({ success: true, url: session.url });
+      } catch (err: any) {
+        console.error('[Stripe checkout error]', err);
+        res.status(500).json({ success: false, error: 'Failed to create checkout session' });
+      }
+    }
+  );
 
   return router;
 }

@@ -2,9 +2,16 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
+    { "source": "/api/stripe/create-checkout", "destination": "/api/stripe/create-checkout.ts" },
+    { "source": "/api/register-member", "destination": "/api/register-member.ts" },
+    { "source": "/api/webhook/stripe", "destination": "/api/webhook/stripe.ts" },
+    { "source": "/api/dashboard/members", "destination": "/api/dashboard/members.ts" },
+    { "source": "/api/chat", "destination": "/api/chat.js" },
+    { "source": "/api/send", "destination": "/api/send.js" },
+    { "source": "/api/guide-subscribe", "destination": "/api/guide-subscribe.js" },
+    { "source": "/api/book-voice", "destination": "/api/voice-booking.ts" },
+    { "source": "/api/delete-request", "destination": "/api/delete-request.ts" },
+    { "source": "/admin", "destination": "/admin.html" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

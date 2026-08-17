@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Shield, AlertTriangle, Scale, Users, FileText, Phone, Stethoscope } from 'lucide-react';
+import { Shield, AlertTriangle, Scale, Users, FileText, Phone, Stethoscope, BarChart3 } from 'lucide-react';
 
 export function Terms() {
   return (
@@ -224,6 +224,31 @@ export function Terms() {
                 Cedexx operates under HIPAA-compliant data handling practices. Health information submitted through 
                 the platform is shared only with the providers you select. Please refer to our Privacy Policy for 
                 complete details on data collection, use, and storage.
+              </p>
+            </section>
+
+            {/* SECTION 16: Analytics & Consent */}
+            <section>
+              <h2 className="text-2xl font-bold text-emerald-900 mb-4 flex items-center gap-2">
+                <BarChart3 className="h-6 w-6 text-emerald-500" />
+                16. Analytics, Member Tracking & Consent
+              </h2>
+              <p className="mb-3">
+                By using our enrollment form, you acknowledge that Cedexx collects and processes limited demographic 
+                information (name, email, phone, date of birth, plan selection) for operational purposes:
+              </p>
+              <ul className="list-disc pl-6 space-y-2">
+                <li><strong>Membership Processing:</strong> To create and manage your subscription account.</li>
+                <li><strong>Analytics & Conversion Tracking:</strong> To understand how users interact with our enrollment flow and improve the platform. Aggregate data is used for business intelligence; individual identities are not disclosed in public reports.</li>
+                <li><strong>Administrative Dashboard:</strong> Authorized Cedexx administrators may view enrollment data through a secure, password-protected dashboard for customer support and business planning.</li>
+              </ul>
+              <div className="mt-4 bg-emerald-50 border border-emerald-200 p-4 rounded-xl text-emerald-900 font-medium">
+                <strong>Explicit Consent Required:</strong> Before your enrollment data is logged, you must check a box confirming that you have read our Privacy Policy and agree to our Terms of Service. Optional analytics consent is presented separately and may be declined without affecting your ability to enroll.
+              </div>
+              <p className="mt-4 text-sm text-slate-500">
+                We do not sell your enrollment data to third parties. All data is stored with encryption and access controls 
+                as described in our Privacy Policy. You may request deletion of your personal data at any time by contacting 
+                Daisy@Cedexx.net, subject to legal retention requirements for tax and accounting records.
               </p>
             </section>
 
