@@ -98,6 +98,7 @@ export function Layout() {
                 { to: '/', label: t('nav.home') },
                 { to: '/about', label: t('nav.about') },
                 { to: '/services', label: t('nav.services') },
+                { to: '/pricing', label: 'Pricing' },
                 { to: '/blog', label: t('nav.blog') },
                 { to: '/press-release', label: t('nav.press') },
                 { to: '/partners', label: t('nav.partners') },
@@ -166,15 +167,23 @@ export function Layout() {
               className="lg:hidden absolute top-full left-0 w-full border-b border-slate-100 bg-white/95 backdrop-blur-xl px-4 py-8 flex flex-col gap-6 shadow-2xl overflow-y-auto max-h-[80vh]"
             >
               {[
-                'nav.home', 'nav.about', 'nav.services', 'nav.blog',
-                'nav.press', 'nav.partners', 'nav.pitch', 'nav.contact', 'nav.dashboard'
-              ].map(key => (
+                { key: 'nav.home', to: '/' },
+                { key: 'nav.about', to: '/about' },
+                { key: 'nav.services', to: '/services' },
+                { key: 'Pricing', to: '/pricing' },
+                { key: 'nav.blog', to: '/blog' },
+                { key: 'nav.press', to: '/press-release' },
+                { key: 'nav.partners', to: '/partners' },
+                { key: 'nav.pitch', to: '/investor-pitch' },
+                { key: 'nav.contact', to: '/contact' },
+                { key: 'nav.dashboard', to: '/admin' },
+              ].map(item => (
                 <Link 
-                  key={key} 
-                  to={`/${key.split('.')[1] === 'home' ? '' : key.split('.')[1].replace('pitch', 'investor-pitch').replace('press', 'press-release')}`} 
+                  key={item.to} 
+                  to={item.to} 
                   className="text-2xl font-black text-slate-900 border-b border-slate-50 pb-2"
                 >
-                  {t(key)}
+                  {item.key.startsWith('nav.') ? t(item.key as any) : item.key}
                 </Link>
               ))}
 
@@ -237,6 +246,7 @@ export function Layout() {
               <li><Link to="/" className="hover:text-white transition-colors">{t('nav.home')}</Link></li>
               <li><Link to="/about" className="hover:text-white transition-colors">{t('nav.about')}</Link></li>
               <li><Link to="/services" className="hover:text-white transition-colors">{t('nav.services')}</Link></li>
+              <li><Link to="/pricing" className="hover:text-white transition-colors">Pricing</Link></li>
               <li><Link to="/blog" className="hover:text-white transition-colors">{t('nav.blog')}</Link></li>
               <li><Link to="/press-release" className="hover:text-white transition-colors">{t('nav.press')}</Link></li>
               <li><Link to="/partners" className="hover:text-white transition-colors">{t('nav.partners')}</Link></li>
