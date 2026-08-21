@@ -32,7 +32,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(503).json({ success: false, error: 'Stripe is not configured.' });
   }
 
-  const { plan_id, plan, email, first_name, last_name } = req.body;
+  const { plan_id, plan, email, first_name, last_name, promo_code } = req.body;
 
   // Accept plan_id or plan (frontend sends plan_id)
   const selectedPlan = plan_id || plan;
@@ -59,7 +59,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const baseUrl = req.headers.origin || 'https://cedexx.net';
 
   try {
-    const session = await stripe.checkout.sessions.create({
+    const sessionConfig: Stripe.Checkout.SessionCreateParams = {
       mode: 'subscription',
       customer_email: email.toLowerCase().trim(),
       line_items: [{ price: priceId, quantity: 1 }],
@@ -70,6 +70,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         first_name: sanitizeText(first_name),
         last_name: sanitizeText(last_name),
         email: email.toLowerCase().trim(),
+        promo_code: promo_code ? sanitizeText(promo_code) : '',
       },
       subscription_data: {
         metadata: {
@@ -78,7 +79,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           last_name: sanitizeText(last_name),
         },
       },
-    });
+    };
+
+    // Apply promo code if provided
+    if (promo_code) {
+      // Lookup the promotion code
+      const promoList = await stripe.promotionCodes.list({
+        code: promo_code.toUpperCase().trim(),
+        active: true,
+        limit: 1,
+      });
+
+      if (promoList.data.length === 0) {
+        return res.status(400).json({ success: false, error: 'Invalid or expired promo code.' });
+      }
+
+      sessionConfig.discounts = [{ promotion_code: promoList.data[0].id }];
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionConfig);
 
     return res.status(200).json({ success: true, url: session.url });
   } catch (err: any) {

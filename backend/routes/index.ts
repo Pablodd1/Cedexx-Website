@@ -433,6 +433,7 @@ export function createStripeRouter(supabase: any, stripe: Stripe | null) {
       body('email').isEmail().normalizeEmail(),
       body('first_name').trim().isLength({ min: 1, max: 50 }),
       body('last_name').trim().isLength({ min: 1, max: 50 }),
+      body('promo_code').optional().trim().isLength({ min: 2, max: 50 }),
     ],
     async (req: Request, res: Response) => {
       const errors = validationResult(req);
@@ -442,7 +443,7 @@ export function createStripeRouter(supabase: any, stripe: Stripe | null) {
         return res.status(500).json({ success: false, error: 'Stripe not configured' });
       }
 
-      const { plan_id, email, first_name, last_name } = req.body;
+      const { plan_id, email, first_name, last_name, promo_code } = req.body;
       const priceId = PRICE_MAP[plan_id as string];
 
       try {
@@ -470,7 +471,7 @@ export function createStripeRouter(supabase: any, stripe: Stripe | null) {
 
         const origin = (req.headers.origin as string) || 'https://cedexx.net';
 
-        const session = await stripe.checkout.sessions.create({
+        const sessionConfig: Stripe.Checkout.SessionCreateParams = {
           mode: 'subscription',
           customer_email: email.toLowerCase().trim(),
           line_items: [{ price: priceId, quantity: 1 }],
@@ -481,8 +482,26 @@ export function createStripeRouter(supabase: any, stripe: Stripe | null) {
             enrollment_id: enrollmentId || 'none',
             first_name: first_name.trim(),
             last_name: last_name.trim(),
+            promo_code: promo_code ? promo_code.trim().toUpperCase() : '',
           },
-        });
+        };
+
+        // Apply promo code if provided
+        if (promo_code) {
+          const promoList = await stripe.promotionCodes.list({
+            code: promo_code.toUpperCase().trim(),
+            active: true,
+            limit: 1,
+          });
+
+          if (promoList.data.length === 0) {
+            return res.status(400).json({ success: false, error: 'Invalid or expired promo code.' });
+          }
+
+          sessionConfig.discounts = [{ promotion_code: promoList.data[0].id }];
+        }
+
+        const session = await stripe.checkout.sessions.create(sessionConfig);
 
         res.status(200).json({ success: true, url: session.url });
       } catch (err: any) {

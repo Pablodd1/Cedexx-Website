@@ -304,6 +304,7 @@ app.post('/api/stripe/create-checkout',
     body('email').isEmail().normalizeEmail().withMessage('Valid email required'),
     body('first_name').trim().isLength({ min: 1, max: 50 }).withMessage('First name required'),
     body('last_name').trim().isLength({ min: 1, max: 50 }).withMessage('Last name required'),
+    body('promo_code').optional().trim().isLength({ min: 2, max: 50 }),
   ],
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
@@ -315,7 +316,7 @@ app.post('/api/stripe/create-checkout',
       return res.status(503).json({ success: false, error: 'Stripe is not configured on this server.' });
     }
 
-    const { plan, email, first_name, last_name } = req.body;
+    const { plan, email, first_name, last_name, promo_code } = req.body;
     const priceId = PRICE_MAP[plan];
     if (!priceId) {
       return res.status(400).json({ success: false, error: 'Unknown plan' });
@@ -324,7 +325,7 @@ app.post('/api/stripe/create-checkout',
     const baseUrl = req.headers.origin || (NODE_ENV === 'development' ? 'http://localhost:5173' : 'https://cedexx.net');
 
     try {
-      const session = await stripe.checkout.sessions.create({
+      const sessionConfig: Stripe.Checkout.SessionCreateParams = {
         mode: 'subscription',
         customer_email: email.toLowerCase().trim(),
         line_items: [{ price: priceId, quantity: 1 }],
@@ -335,6 +336,7 @@ app.post('/api/stripe/create-checkout',
           first_name: sanitizeText(first_name),
           last_name: sanitizeText(last_name),
           email: email.toLowerCase().trim(),
+          promo_code: promo_code ? sanitizeText(promo_code) : '',
         },
         subscription_data: {
           metadata: {
@@ -343,7 +345,24 @@ app.post('/api/stripe/create-checkout',
             last_name: sanitizeText(last_name),
           },
         },
-      });
+      };
+
+      // Apply promo code if provided
+      if (promo_code) {
+        const promoList = await stripe.promotionCodes.list({
+          code: promo_code.toUpperCase().trim(),
+          active: true,
+          limit: 1,
+        });
+
+        if (promoList.data.length === 0) {
+          return res.status(400).json({ success: false, error: 'Invalid or expired promo code.' });
+        }
+
+        sessionConfig.discounts = [{ promotion_code: promoList.data[0].id }];
+      }
+
+      const session = await stripe.checkout.sessions.create(sessionConfig);
 
       res.json({ success: true, url: session.url });
     } catch (err: any) {
@@ -353,6 +372,68 @@ app.post('/api/stripe/create-checkout',
         error: 'Unable to create checkout session.',
         detail: NODE_ENV === 'development' ? err.message : undefined,
       });
+    }
+  }
+);
+
+// ── PROMO CODE VALIDATION ──────────────────────
+app.post('/api/stripe/validate-promo',
+  formLimiter,
+  [body('code').trim().isLength({ min: 2, max: 50 }), body('plan').optional().trim()],
+  async (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(400).json({ success: false, errors: errors.array() });
+
+    if (!stripe) return res.status(503).json({ success: false, error: 'Stripe not configured' });
+
+    const { code, plan } = req.body;
+    const normalizedCode = code.toUpperCase().trim();
+
+    // Price map for discount calculation (must match frontend)
+    const PRICE_CENTS: Record<string, number> = {
+      'carenow': 1899,
+      'carenow-mental': 2699,
+      'mental-wellness': 1899,
+      'carecomplete': 3499,
+      'carecomplete-family': 5299,
+    };
+
+    try {
+      const promoList = await stripe.promotionCodes.list({
+        code: normalizedCode,
+        active: true,
+        limit: 1,
+      });
+
+      if (promoList.data.length === 0) {
+        return res.status(400).json({ success: false, error: 'Invalid or expired promo code.' });
+      }
+
+      const promo = promoList.data[0];
+      const coupon = promo.coupon;
+      const planCents = plan ? (PRICE_CENTS[plan] || 0) : 0;
+      let discountedCents = planCents;
+
+      if (coupon.percent_off) {
+        discountedCents = Math.round(planCents * (1 - coupon.percent_off / 100));
+      } else if (coupon.amount_off) {
+        discountedCents = Math.max(0, planCents - coupon.amount_off);
+      }
+
+      res.json({
+        success: true,
+        valid: true,
+        code: normalizedCode,
+        promo_code_id: promo.id,
+        coupon_id: coupon.id,
+        percent_off: coupon.percent_off || null,
+        amount_off: coupon.amount_off || null,
+        original_price: planCents > 0 ? `$${(planCents / 100).toFixed(2)}` : null,
+        discounted_price: planCents > 0 ? `$${(discountedCents / 100).toFixed(2)}` : null,
+      });
+    } catch (err: any) {
+      console.error('[PROMO VALIDATION ERROR]', err);
+      res.status(500).json({ success: false, error: 'Unable to validate promo code.' });
     }
   }
 );

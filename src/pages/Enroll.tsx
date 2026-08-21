@@ -35,6 +35,10 @@ export function Enroll() {
   const [email, setEmail] = React.useState('');
   const [phone, setPhone] = React.useState('');
   const [dob, setDob] = React.useState('');
+  const [promoCode, setPromoCode] = React.useState('');
+  const [promoError, setPromoError] = React.useState<string | null>(null);
+  const [promoApplied, setPromoApplied] = React.useState(false);
+  const [discountedPrice, setDiscountedPrice] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [consentAnalytics, setConsentAnalytics] = React.useState(false);
@@ -132,6 +136,7 @@ export function Enroll() {
           email: email.trim(),
           first_name: firstName.trim(),
           last_name: lastName.trim(),
+          promo_code: promoApplied ? promoCode.trim().toUpperCase() : undefined,
         }),
       });
 
@@ -326,6 +331,55 @@ export function Enroll() {
                     You will be redirected to Stripe's secure checkout to complete your subscription
                   </div>
 
+                  {/* Promo Code */}
+                  <div className="mb-8">
+                    <label className="text-xs font-black text-[#050249] uppercase tracking-widest mb-3 block">Promo Code (Optional)</label>
+                    <div className="flex gap-3">
+                      <input
+                        type="text"
+                        value={promoCode}
+                        onChange={e => { setPromoCode(e.target.value.toUpperCase()); setPromoError(null); setPromoApplied(false); setDiscountedPrice(null); }}
+                        className="flex-1 px-6 py-4 rounded-2xl bg-slate-50 border border-blue-50 focus:ring-2 focus:ring-[#050249] outline-none transition-all font-medium text-sm uppercase tracking-wider"
+                        placeholder="ENTER CODE"
+                        disabled={loading}
+                      />
+                      <button
+                        onClick={async () => {
+                          if (!promoCode.trim()) return;
+                          setPromoError(null);
+                          try {
+                            const res = await fetch('/api/stripe/validate-promo', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ code: promoCode.trim(), plan_id: plan }),
+                            });
+                            const data = await res.json();
+                            if (!res.ok || !data.valid) {
+                              setPromoError(data.error || 'Invalid promo code');
+                              setPromoApplied(false);
+                              setDiscountedPrice(null);
+                              return;
+                            }
+                            setPromoApplied(true);
+                            setDiscountedPrice(data.discounted_price || null);
+                          } catch (err: any) {
+                            setPromoError('Unable to validate code. Please try again.');
+                          }
+                        }}
+                        disabled={!promoCode.trim() || loading}
+                        className="px-6 py-4 rounded-2xl font-black bg-slate-100 text-[#050249] hover:bg-slate-200 transition-all text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Apply
+                      </button>
+                    </div>
+                    {promoError && (
+                      <p className="mt-2 text-xs font-bold text-red-500 italic">{promoError}</p>
+                    )}
+                    {promoApplied && (
+                      <p className="mt-2 text-xs font-bold text-[#23d9b0] italic">✓ Promo code applied successfully</p>
+                    )}
+                  </div>
+
                   {selectedPlan && (
                     <div className="p-6 rounded-[2.5rem] border-2 border-[#050249] bg-[#EBF3FB] shadow-xl mb-8">
                       <div className="flex items-center justify-between mb-4">
@@ -339,15 +393,30 @@ export function Enroll() {
                           </div>
                         </div>
                         <div className="text-right">
-                          <div className="text-2xl font-black text-[#050249]">{selectedPlan.price}</div>
-                          <div className="text-[10px] text-slate-400 font-black uppercase tracking-widest">per month</div>
+                          {promoApplied && discountedPrice ? (
+                            <>
+                              <div className="text-2xl font-black text-[#23d9b0]">{discountedPrice}</div>
+                              <div className="text-sm font-bold text-slate-400 line-through">{selectedPlan.price}</div>
+                            </>
+                          ) : (
+                            <>
+                              <div className="text-2xl font-black text-[#050249]">{selectedPlan.price}</div>
+                              <div className="text-[10px] text-slate-400 font-black uppercase tracking-widest">per month</div>
+                            </>
+                          )}
                         </div>
                       </div>
                       <div className="border-t border-blue-200 pt-4 mt-4">
                         <div className="flex items-center justify-between text-sm font-bold text-[#050249]">
                           <span>Monthly Total</span>
-                          <span className="text-xl">{selectedPlan.price}</span>
+                          <span className="text-xl">{promoApplied && discountedPrice ? discountedPrice : selectedPlan.price}</span>
                         </div>
+                        {promoApplied && (
+                          <div className="flex items-center justify-between text-xs font-bold text-[#23d9b0] mt-1">
+                            <span>Promo Applied</span>
+                            <span>{promoCode.toUpperCase()}</span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}
