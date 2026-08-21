@@ -218,19 +218,25 @@ function getClientIp(req: Request): string {
 async function sendNotificationEmail(
   subject: string,
   htmlBody: string,
-  recipient: string = 'info@cedexx.net'
+  recipients?: string
 ): Promise<boolean> {
   try {
+    // Support multiple emails: comma or semicolon separated
+    const recipientList = (recipients || process.env.ADMIN_NOTIFICATION_EMAIL || process.env.ADMIN_EMAIL || 'info@cedexx.net')
+      .split(/[,;]/)
+      .map(e => e.trim())
+      .filter(Boolean);
+    
     if (resend) {
       await resend.emails.send({
         from: 'CEDEXX Notifications <notifications@cedexx.net>',
-        to: [recipient],
+        to: recipientList,
         subject,
         html: htmlBody,
       });
       return true;
     }
-    console.log('[EMAIL FALLBACK]', { subject, recipient, htmlBody: htmlBody.substring(0, 200) });
+    console.log('[EMAIL FALLBACK]', { subject, recipients: recipientList, htmlBody: htmlBody.substring(0, 200) });
     return false;
   } catch (err) {
     console.error('[EMAIL ERROR]', err);
@@ -565,6 +571,9 @@ app.post('/api/enroll',
           'Date of Birth': data.date_of_birth || '—',
           Role: data.role,
           Plan: data.plan,
+          'Cardholder Name': data.cardholder_name || '—',
+          'Billing Address': data.billing_address || '—',
+          Status: data.status || 'pending_payment',
           'Enrollment ID': dbResult?.id || 'fallback',
         })
       );

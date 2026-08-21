@@ -28,8 +28,13 @@ async function sendNotifications(member: any) {
     last_name: member.last_name,
     email: member.email,
     phone: member.phone,
+    dob: member.dob,
     plan: member.plan,
     stripe_session_id: member.stripe_session_id,
+    consent_tos: member.consent_tos,
+    consent_analytics: member.consent_analytics,
+    consent_version: member.consent_version,
+    consent_timestamp: member.consent_timestamp,
   });
 }
 

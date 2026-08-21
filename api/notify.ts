@@ -6,6 +6,8 @@ interface NotifyData {
   last_name: string;
   email: string;
   phone?: string;
+  dob?: string;
+  role?: string;
   plan?: string;
   amount?: number;
   stripe_session_id?: string;
@@ -13,6 +15,13 @@ interface NotifyData {
   field?: string;
   url?: string;
   ip?: string;
+  consent_tos?: boolean;
+  consent_analytics?: boolean;
+  consent_version?: string;
+  consent_timestamp?: string;
+  cardholder_name?: string;
+  billing_address?: string;
+  user_agent?: string;
 }
 
 // Shared Resend instance (safe if no key — falls back gracefully)
@@ -32,11 +41,15 @@ export async function notifyAdmin(data: NotifyData) {
 // ─── 1. Email via Resend ───
 async function sendEmailNotification(data: NotifyData) {
   if (!resend) return;
-  const adminEmail = process.env.ADMIN_EMAIL || 'info@cedexx.net';
+  
+  // Support multiple admin emails: comma or semicolon separated
+  const adminEmailsRaw = process.env.ADMIN_EMAIL || process.env.ADMIN_NOTIFICATION_EMAIL || 'info@cedexx.net';
+  const adminEmails = adminEmailsRaw.split(/[,;]/).map(e => e.trim()).filter(Boolean);
 
   const isPayment = data.type === 'payment';
   const isDeletion = data.type === 'deletion';
   const isFormStart = data.type === 'form_started';
+  const isRegistration = data.type === 'registration';
 
   const subject = isPayment
     ? `💳 New CEDEXX Payment — ${data.first_name} ${data.last_name}`
@@ -50,13 +63,22 @@ async function sendEmailNotification(data: NotifyData) {
     ['Name', `${data.first_name} ${data.last_name}`],
     ['Email', data.email],
     data.phone ? ['Phone', data.phone] : null,
+    data.dob ? ['Date of Birth', data.dob] : null,
+    data.role ? ['Role', data.role] : null,
     data.plan ? ['Plan', data.plan] : null,
     isPayment && data.amount ? ['Amount', `$${(data.amount / 100).toFixed(2)}`] : null,
+    data.cardholder_name ? ['Cardholder', data.cardholder_name] : null,
+    data.billing_address ? ['Billing Address', data.billing_address] : null,
+    data.consent_tos !== undefined ? ['TOS Consent', data.consent_tos ? 'Yes' : 'No'] : null,
+    data.consent_analytics !== undefined ? ['Analytics Consent', data.consent_analytics ? 'Yes' : 'No'] : null,
+    data.consent_version ? ['Consent Version', data.consent_version] : null,
+    data.consent_timestamp ? ['Consent Time', new Date(data.consent_timestamp).toLocaleString()] : null,
     data.stripe_session_id ? ['Session ID', data.stripe_session_id] : null,
     data.reason ? ['Reason', data.reason] : null,
     data.field ? ['First Field', data.field] : null,
     data.url ? ['Page URL', data.url] : null,
     data.ip ? ['IP Address', data.ip] : null,
+    data.user_agent ? ['User Agent', data.user_agent.substring(0, 100)] : null,
     ['Time', new Date().toLocaleString()],
   ].filter(Boolean) as [string, string][];
 
@@ -86,7 +108,7 @@ async function sendEmailNotification(data: NotifyData) {
   try {
     await resend.emails.send({
       from: 'CEDEXX Notifications <onboarding@resend.dev>',
-      to: [adminEmail],
+      to: adminEmails,
       subject,
       html,
     });
@@ -105,34 +127,23 @@ async function sendTelegramNotification(data: NotifyData) {
   const isDeletion = data.type === 'deletion';
   const isFormStart = data.type === 'form_started';
 
-  const text = isPayment
-    ? `💳 <b>NEW PAYMENT</b> — CEDEXX
-👤 ${data.first_name} ${data.last_name}
-📧 ${data.email}
-📦 Plan: ${data.plan || 'N/A'}
-💰 Amount: $${data.amount ? (data.amount / 100).toFixed(2) : 'N/A'}
-🆔 Session: ${data.stripe_session_id || 'N/A'}
-🕒 ${new Date().toLocaleString()}`
-    : isDeletion
-      ? `🗑️ <b>DATA DELETION REQUEST</b> — CEDEXX
-📧 ${data.email}
-📝 Reason: ${data.reason || 'Not provided'}
-🕒 ${new Date().toLocaleString()}`
-      : isFormStart
-        ? `📝 <b>LEAD STARTED FORM</b> — CEDEXX
-👤 ${data.first_name} ${data.last_name}
-📧 ${data.email}
-📞 ${data.phone || 'N/A'}
-📦 Plan: ${data.plan || 'N/A'}
-🖊️ First Field: ${data.field || 'N/A'}
-🌐 URL: ${data.url || 'N/A'}
-🕒 ${new Date().toLocaleString()}`
-        : `📋 <b>NEW REGISTRATION</b> — CEDEXX
-👤 ${data.first_name} ${data.last_name}
-📧 ${data.email}
-📞 ${data.phone || 'N/A'}
-📦 Plan: ${data.plan || 'N/A'}
-🕒 ${new Date().toLocaleString()}`;
+  const lines = [
+    isPayment ? '💳 <b>NEW PAYMENT</b> — CEDEXX' : isDeletion ? '🗑️ <b>DATA DELETION</b> — CEDEXX' : isFormStart ? '📝 <b>LEAD STARTED FORM</b> — CEDEXX' : '📋 <b>NEW REGISTRATION</b> — CEDEXX',
+    `👤 ${data.first_name} ${data.last_name}`,
+    `📧 ${data.email}`,
+    data.phone ? `📞 ${data.phone}` : null,
+    data.dob ? `🎂 DOB: ${data.dob}` : null,
+    data.role ? `🏷️ Role: ${data.role}` : null,
+    data.plan ? `📦 Plan: ${data.plan}` : null,
+    isPayment && data.amount ? `💰 Amount: $${(data.amount / 100).toFixed(2)}` : null,
+    data.stripe_session_id ? `🆔 Session: ${data.stripe_session_id}` : null,
+    data.field ? `🖊️ First Field: ${data.field}` : null,
+    data.url ? `🌐 URL: ${data.url}` : null,
+    data.ip ? `📍 IP: ${data.ip}` : null,
+    `🕒 ${new Date().toLocaleString()}`,
+  ].filter(Boolean);
+
+  const text = lines.join('\n');
 
   try {
     await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
@@ -157,13 +168,16 @@ async function sendSMSNotification(data: NotifyData) {
 
   const isPayment = data.type === 'payment';
   const isFormStart = data.type === 'form_started';
+  const planInfo = data.plan ? ` (${data.plan})` : '';
+  const amountInfo = isPayment && data.amount ? ` $${(data.amount / 100).toFixed(2)}` : '';
+  
   const text = isPayment
-    ? `CEDEXX: Payment from ${data.first_name} ${data.last_name} — ${data.plan} $${data.amount ? (data.amount / 100).toFixed(2) : 'N/A'}`
+    ? `CEDEXX PAYMENT: ${data.first_name} ${data.last_name}${planInfo}${amountInfo}`
     : data.type === 'deletion'
       ? `CEDEXX: Deletion request for ${data.email}`
       : isFormStart
-        ? `CEDEXX: Lead started form — ${data.first_name} ${data.last_name}, ${data.email}, field: ${data.field || 'N/A'}`
-        : `CEDEXX: New registration from ${data.first_name} ${data.last_name} — ${data.plan || 'N/A'}`;
+        ? `CEDEXX LEAD: ${data.first_name} ${data.last_name}, ${data.email}${planInfo}`
+        : `CEDEXX REG: ${data.first_name} ${data.last_name}, ${data.email}${planInfo}`;
 
   // Try TextBelt first (free 1 SMS/day with key=textbelt)
   try {

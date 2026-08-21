@@ -169,11 +169,14 @@ export function createEnrollRouter(supabase: any, resend: any, config: any) {
         await sendNotification(
           `New Enrollment — ${data.first_name} ${data.last_name}`,
           buildNotificationHtml('New Enrollment', {
-            Name: `${data.first_name} ${data.last_name}`,
+            'First Name': data.first_name,
+            'Last Name': data.last_name,
             Email: data.email,
+            Phone: data.phone || '—',
+            'Date of Birth': data.date_of_birth || '—',
             Role: data.role,
             Plan: data.plan,
-            ID: dbResult?.id || 'fallback'
+            'Enrollment ID': dbResult?.id || 'fallback'
           })
         );
 
