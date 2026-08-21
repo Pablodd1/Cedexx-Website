@@ -187,9 +187,9 @@ interface AnalyticsEvent {
 
 // Stripe Price Map (live mode)
 const PRICE_MAP: Record<string, string> = {
-  'carenow': 'price_1TrKOsRPzCKs3jKTUFu6Klab',
-  'carenow-mental': 'price_1TrKOtRPzCKs3jKTGeylXl0d',
-  'mental-wellness': 'price_1TrKOtRPzCKs3jKTxVTKKIRd',
+  'carenow': 'price_1U6wRRRPzCKs3jKTR9VQCVeS',
+  'carenow-mental': 'price_1U6wRSRPzCKs3jKTq0wKVKZU',
+  'mental-wellness': 'price_1U6wRSRPzCKs3jKT5P4ibSrd',
   'carecomplete': 'price_1TrKOuRPzCKs3jKTNjuqOOsF',
   'carecomplete-family': 'price_1TrKOuRPzCKs3jKTU8UdSLC2',
 };
@@ -519,7 +519,7 @@ app.post('/api/enroll',
     body('phone').optional().trim().isLength({ max: 30 }),
     body('date_of_birth').optional().isISO8601().toDate(),
     body('role').trim().isIn(['individual', 'hospitality', 'housing', 'affiliate']).withMessage('Invalid role'),
-    body('plan').trim().isIn(['family', 'individual']).withMessage('Invalid plan'),
+    body('plan').trim().isIn(['carenow','carenow-mental','mental-wellness','carecomplete','carecomplete-family']).withMessage('Invalid plan'),
   ],
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
@@ -575,8 +575,11 @@ app.post('/api/enroll',
         id: dbResult?.id || null,
         next_step: 'payment',
         plan_details: {
-          family: { name: 'Family Plan', price: '$27.99/month', members: 'Up to 4' },
-          individual: { name: 'Individual Plan', price: '$14.99/month', members: '1' },
+          carenow: { name: 'CareNow™', price: '$18.99/month', members: 'Up to 7' },
+          'carenow-mental': { name: 'CareNow + Mental Wellness', price: '$26.99/month', members: 'Up to 7' },
+          'mental-wellness': { name: 'Mental Wellness', price: '$18.99/month', members: 'Up to 7' },
+          carecomplete: { name: 'CareComplete™', price: '$34.99/month', members: '1' },
+          'carecomplete-family': { name: 'CareComplete Family™', price: '$52.99/month', members: 'Up to 7' },
         }[data.plan],
       });
     } catch (err: any) {

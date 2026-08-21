@@ -101,7 +101,7 @@ const SCHEMA_CONFIG = {
   enrollmentSteps: [
     { name: 'Select Your Role', text: 'Choose between Individual, Hospitality Partner, Housing/REIT Partner, or Affiliate Partner.', url: 'https://cedexx.net/enroll' },
     { name: 'Enter Personal Information', text: 'Fill in your name, email, phone, and date of birth.', url: 'https://cedexx.net/enroll' },
-    { name: 'Choose Your Plan', text: 'Select Family Plan ($27.99/month for up to 4 members) or Individual Plan ($14.99/month).', url: 'https://cedexx.net/enroll' },
+    { name: 'Choose Your Plan', text: 'Select CareNow™ ($18.99/month), CareNow+Mental ($26.99/month), Mental Wellness ($18.99/month), CareComplete™ ($34.99/month), or CareComplete Family™ ($52.99/month).', url: 'https://cedexx.net/enroll' },
     { name: 'Complete Secure Payment', text: 'Enter your payment details through our 256-bit SSL encrypted checkout.', url: 'https://cedexx.net/enroll' }
   ],
   // Breadcrumb map (route → label)
@@ -165,7 +165,7 @@ function buildMedicalBusiness() {
             '@type': 'MedicalBusiness',
             name: 'Individual Plan',
             description: 'Single member 24/7 access to board-certified physicians.',
-            price: '14.99',
+            price: '18.99',
             priceCurrency: 'USD',
             priceValidUntil: '2027-12-31',
             url: `${SCHEMA_CONFIG.siteUrl}/enroll`
@@ -177,7 +177,7 @@ function buildMedicalBusiness() {
             '@type': 'MedicalBusiness',
             name: 'Family Plan',
             description: 'Household coverage for up to 4 members with unlimited consultations.',
-            price: '27.99',
+            price: '52.99',
             priceCurrency: 'USD',
             priceValidUntil: '2027-12-31',
             url: `${SCHEMA_CONFIG.siteUrl}/enroll`
@@ -271,7 +271,7 @@ function buildHowTo() {
     estimatedCost: {
       '@type': 'MonetaryAmount',
       currency: 'USD',
-      value: '14.99'
+      value: '18.99'
     },
     supply: [
       { '@type': 'HowToSupply', name: 'Valid email address' },
@@ -447,7 +447,7 @@ const PAGE_SCHEMAS = {
     () => buildService('Pediatric Care', 'Board-certified pediatric specialists available immediately for your children.', 'https://cedexx.net/services')
   ],
   '/enroll/index.html': [
-    () => buildMedicalWebPage('/enroll', 'Enroll in CEDEXX — 24/7 Healthcare Access', 'Complete your enrollment in under 5 minutes. Choose Individual ($14.99/mo) or Family Plan ($27.99/mo) and get immediate access to board-certified physicians.'),
+    () => buildMedicalWebPage('/enroll', 'Enroll in CEDEXX — 24/7 Healthcare Access', 'Complete your enrollment in under 5 minutes. Choose from CareNow™ ($18.99/mo), CareNow+Mental ($26.99/mo), Mental Wellness ($18.99/mo), CareComplete™ ($34.99/mo), or CareComplete Family™ ($52.99/mo).'),
     buildHowTo,
     () => buildBreadcrumbList('/enroll')
   ],

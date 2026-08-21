@@ -21,7 +21,7 @@ Key facts about CEDEXX + Lyric Health:
 - Cedexx is powered by Lyric Health, a leading integrated virtual primary care platform
 - Lyric Health offers: 24/7 Urgent Care, Primary Care, Mental Health, Dermatology, Virtual MSK, Care Navigation, Labs, and GLP-1 Weight Loss
 - Lyric Health's nationwide network includes licensed physicians, pediatricians, dermatologists, psychiatrists, and therapists with 10+ years average experience
-- No insurance needed. Pricing: $14.99/mo individual, $27.99/mo family
+- No insurance needed. Pricing: CareNow™ $18.99/mo, Mental Wellness $18.99/mo, CareNow+Mental $26.99/mo, CareComplete™ $34.99/mo, CareComplete Family™ $52.99/mo
 - Contact: info@cedexx.net
 - Cedexx is NOT a healthcare provider — we are the technology platform. Lyric Health delivers all medical care.
 - NEVER give medical diagnoses or advice. Redirect medical questions to enrolling and speaking with Lyric Health providers.

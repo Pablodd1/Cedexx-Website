@@ -48,8 +48,8 @@ export default async function handler(req, res) {
             <h2 style="color: #050249; font-size: 20px; margin: 0 0 16px 0;">What's Inside</h2>
             <ul style="color: #444; line-height: 1.8; padding-left: 20px; margin: 0;">
               <li>How to book your first virtual visit in under 5 minutes</li>
-              <li>Understanding your membership options ($14.99 / $34.99)</li>
-              <li>Tips for families: adding up to 4 members</li>
+              <li>Understanding your membership options (CareNow™ $18.99, CareComplete™ $34.99)</li>
+              <li>Tips for families: adding up to 7 members</li>
               <li>What to expect during your consultation</li>
               <li>24/7 support and prescription delivery</li>
             </ul>

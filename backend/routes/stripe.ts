@@ -37,15 +37,30 @@ const router = express.Router();
 // PLAN CONFIGURATION
 // ──────────────────────────────────────────────
 const PLANS: Record<string, { name: string; price: number; description: string }> = {
-  family: {
-    name: 'CEDEXX Family Plan',
-    price: 3499, // $34.99 in cents
-    description: 'Household coverage for up to 7 members — 24/7 unlimited consults, $0 copays'
+  carenow: {
+    name: 'CareNow™',
+    price: 1899, // $18.99 in cents
+    description: '24/7 Virtual Urgent Care for you and your household — up to 7 dependents included'
   },
-  individual: {
-    name: 'CEDEXX Individual Plan',
-    price: 1499, // $14.99 in cents
-    description: 'Single member 24/7 access — Board-certified physicians, instant pharmacy delivery'
+  'carenow-mental': {
+    name: 'CareNow™ + Mental Wellness',
+    price: 2699, // $26.99 in cents
+    description: 'Virtual Urgent Care + Behavioral Health & Therapy — Best value bundle'
+  },
+  'mental-wellness': {
+    name: 'Mental Wellness',
+    price: 1899, // $18.99 in cents
+    description: 'Behavioral Health & Therapy — Unlimited licensed therapists and counselors'
+  },
+  carecomplete: {
+    name: 'CareComplete™',
+    price: 3499, // $34.99 in cents
+    description: 'Complete Virtual Primary Care — Dedicated PCP, preventive care, chronic management'
+  },
+  'carecomplete-family': {
+    name: 'CareComplete Family™',
+    price: 5299, // $52.99 in cents
+    description: 'Complete care for the whole family — Up to 7 members, each with their own PCP'
   }
 };
 

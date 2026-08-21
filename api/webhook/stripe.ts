@@ -1,7 +1,7 @@
 import Stripe from 'stripe';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import fs from 'fs';
-import { notifyAdmin } from './notify';
+import { notifyAdmin } from '../notify';
 
 const DATA_FILE = '/tmp/cedexx-members.json';
 

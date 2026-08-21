@@ -3,9 +3,9 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 // Stripe Price Map (live mode)
 const PRICE_MAP: Record<string, string> = {
-  'carenow': 'price_1TrKOsRPzCKs3jKTUFu6Klab',
-  'carenow-mental': 'price_1TrKOtRPzCKs3jKTGeylXl0d',
-  'mental-wellness': 'price_1TrKOtRPzCKs3jKTxVTKKIRd',
+  'carenow': 'price_1U6wRRRPzCKs3jKTR9VQCVeS',
+  'carenow-mental': 'price_1U6wRSRPzCKs3jKTq0wKVKZU',
+  'mental-wellness': 'price_1U6wRSRPzCKs3jKT5P4ibSrd',
   'carecomplete': 'price_1TrKOuRPzCKs3jKTNjuqOOsF',
   'carecomplete-family': 'price_1TrKOuRPzCKs3jKTU8UdSLC2',
 };

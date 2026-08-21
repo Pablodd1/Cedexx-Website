@@ -138,7 +138,7 @@ export function createEnrollRouter(supabase: any, resend: any, config: any) {
       body('last_name').trim().isLength({ min: 1, max: 50 }),
       body('email').isEmail().normalizeEmail(),
       body('role').isIn(['individual', 'hospitality', 'housing', 'affiliate']),
-      body('plan').isIn(['family', 'individual']),
+      body('plan').isIn(['carenow','carenow-mental','mental-wellness','carecomplete','carecomplete-family']),
     ],
     async (req: Request, res: Response) => {
       const errors = validationResult(req);
@@ -178,8 +178,11 @@ export function createEnrollRouter(supabase: any, resend: any, config: any) {
         );
 
         const planDetails: Record<string, any> = {
-          family: { name: 'Family Plan', price: '$27.99/month', members: 'Up to 4' },
-          individual: { name: 'Individual Plan', price: '$14.99/month', members: '1' },
+          carenow: { name: 'CareNow™', price: '$18.99/month', members: 'Up to 7' },
+          'carenow-mental': { name: 'CareNow + Mental Wellness', price: '$26.99/month', members: 'Up to 7' },
+          'mental-wellness': { name: 'Mental Wellness', price: '$18.99/month', members: 'Up to 7' },
+          carecomplete: { name: 'CareComplete™', price: '$34.99/month', members: '1' },
+          'carecomplete-family': { name: 'CareComplete Family™', price: '$52.99/month', members: 'Up to 7' },
         };
 
         res.status(201).json({
@@ -410,9 +413,9 @@ export function createAdminRouter(supabase: any, requireAdmin: any) {
 
 // ── Stripe Checkout Router ──────────────────────
 const PRICE_MAP: Record<string, string> = {
-  'carenow': 'price_1TrKOsRPzCKs3jKTUFu6Klab',
-  'carenow-mental': 'price_1TrKOtRPzCKs3jKTGeylXl0d',
-  'mental-wellness': 'price_1TrKOtRPzCKs3jKTxVTKKIRd',
+  'carenow': 'price_1U6wRRRPzCKs3jKTR9VQCVeS',
+  'carenow-mental': 'price_1U6wRSRPzCKs3jKTq0wKVKZU',
+  'mental-wellness': 'price_1U6wRSRPzCKs3jKT5P4ibSrd',
   'carecomplete': 'price_1TrKOuRPzCKs3jKTNjuqOOsF',
   'carecomplete-family': 'price_1TrKOuRPzCKs3jKTU8UdSLC2',
 };
