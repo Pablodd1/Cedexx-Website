@@ -39,12 +39,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const normalizedCode = code.toUpperCase().trim();
 
   try {
+    // DEBUG: Show which Stripe account this key belongs to
+    const account = await stripe.accounts.retrieve();
+    console.log('[PROMO DEBUG] Stripe account:', account.id, account.email);
+
     // Look up the promotion code
     const promoList = await stripe.promotionCodes.list({
       code: normalizedCode,
       active: true,
       limit: 1,
     });
+
+    console.log('[PROMO DEBUG] Search for', normalizedCode, 'found', promoList.data.length, 'results');
 
     if (promoList.data.length === 0) {
       return res.status(400).json({ success: false, error: 'Invalid or expired promo code' });

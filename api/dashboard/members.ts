@@ -1,9 +1,10 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import fs from 'fs';
+import * as fs from 'fs';
+import { supabase } from './lib/supabase';
 
 const DATA_FILE = '/tmp/cedexx-members.json';
 
-function loadMembers(): any[] {
+function loadMembersFromFile(): any[] {
   try {
     if (fs.existsSync(DATA_FILE)) {
       return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
@@ -20,20 +21,43 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
 
-  // Password protection via Authorization header or query param
+  // Password protection
   const adminPass = process.env.ADMIN_DASHBOARD_PASSWORD || 'cedexx-admin-2026';
   const authHeader = req.headers['authorization'] || '';
   const queryPass = req.query.pass as string || '';
-
   const providedPass = authHeader.replace('Bearer ', '').trim() || queryPass;
 
   if (providedPass !== adminPass) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  const members = loadMembers();
+  let members: any[] = [];
+  let source = 'unknown';
 
-  // Stats summary
+  // Try Supabase first
+  if (supabase) {
+    try {
+      const { data, error } = await supabase
+        .from('members')
+        .select('*')
+        .order('registered_at', { ascending: false });
+
+      if (!error && data) {
+        members = data;
+        source = 'supabase';
+      }
+    } catch (err) {
+      console.error('[DASHBOARD SUPABASE ERROR]', err);
+    }
+  }
+
+  // Fallback to file
+  if (members.length === 0) {
+    members = loadMembersFromFile();
+    source = 'file';
+  }
+
+  // Stats
   const stats = {
     total: members.length,
     paid: members.filter((m) => m.status === 'paid').length,
@@ -65,7 +89,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     );
   }
 
-  // Sort by most recent first (use registered_at, then form_started_at, then paid_at as fallback)
+  // Sort by most recent
   filtered.sort((a, b) => {
     const getTime = (m: any) => {
       const t = m.registered_at || m.form_started_at || m.paid_at || m.created_at || '1970-01-01';
@@ -74,5 +98,5 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return getTime(b) - getTime(a);
   });
 
-  return res.status(200).json({ success: true, stats, members: filtered });
+  return res.status(200).json({ success: true, stats, members: filtered, source });
 }

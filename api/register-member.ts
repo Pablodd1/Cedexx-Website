@@ -1,5 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import fs from 'fs';
+import * as fs from 'fs';
+import { supabase } from './lib/supabase';
 
 const DATA_FILE = '/tmp/cedexx-members.json';
 
@@ -20,10 +21,8 @@ function sanitize(s: string) {
   return (s || '').replace(/[<>]/g, '').trim().substring(0, 200);
 }
 
-// Simple inline notification to avoid module import issues
 async function sendNotifications(member: any) {
   try {
-    // Send to Telegram if configured
     const token = process.env.TELEGRAM_BOT_TOKEN;
     const chatId = process.env.TELEGRAM_CHAT_ID;
     if (token && chatId) {
@@ -53,48 +52,71 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ error: 'Valid email required' });
   }
 
+  const memberId = `mbr_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+  const now = new Date().toISOString();
+
   const member = {
-    id: `mbr_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+    id: memberId,
     first_name: sanitize(first_name || ''),
     last_name: sanitize(last_name || ''),
     email: email.toLowerCase().trim(),
     phone: sanitize(phone || ''),
     dob: sanitize(dob || ''),
     plan: sanitize(plan || ''),
-    status, // 'registered' | 'paid'
-    registered_at: new Date().toISOString(),
-    paid_at: status === 'paid' ? new Date().toISOString() : null,
+    status,
+    registered_at: now,
+    paid_at: status === 'paid' ? now : null,
     stripe_session_id: sanitize(req.body.stripe_session_id || ''),
     consent_tos: !!consent_tos,
     consent_analytics: !!consent_analytics,
     consent_version: sanitize(consent_version || '1.0'),
-    consent_timestamp: consent_timestamp || new Date().toISOString(),
+    consent_timestamp: consent_timestamp || now,
   };
 
-  const members = loadMembers();
+  // Try Supabase first
+  let savedToSupabase = false;
+  if (supabase) {
+    try {
+      // Check if email already exists
+      const { data: existing } = await supabase
+        .from('members')
+        .select('id')
+        .eq('email', member.email)
+        .single();
 
-  // Upsert: update existing by email if already registered or was a form-started lead
-  const existingIdx = members.findIndex((m) => m.email === member.email);
-  if (existingIdx >= 0) {
-    const existing = members[existingIdx];
-    members[existingIdx] = {
-      ...existing,
-      ...member,
-      id: existing.id, // keep original id
-      // Preserve form-started tracking fields
-      form_started_at: existing.form_started_at || null,
-      form_field: existing.form_field || '',
-      page_url: existing.page_url || '',
-      ip_address: existing.ip_address || '',
-      // If this was previously form_started, now mark registered_at
-      registered_at: existing.registered_at || new Date().toISOString(),
-    };
-  } else {
-    members.push(member);
+      if (existing) {
+        // Update existing
+        const { error } = await supabase
+          .from('members')
+          .update(member)
+          .eq('id', existing.id);
+        if (!error) savedToSupabase = true;
+      } else {
+        // Insert new
+        const { error } = await supabase.from('members').insert(member);
+        if (!error) savedToSupabase = true;
+      }
+    } catch (err) {
+      console.error('[SUPABASE ERROR]', err);
+    }
   }
 
-  saveMembers(members);
+  // Fallback to file if Supabase fails or not configured
+  if (!savedToSupabase) {
+    const members = loadMembers();
+    const existingIdx = members.findIndex((m) => m.email === member.email);
+    if (existingIdx >= 0) {
+      members[existingIdx] = { ...members[existingIdx], ...member };
+    } else {
+      members.push(member);
+    }
+    saveMembers(members);
+    console.log('[FALLBACK] Saved to local file');
+  } else {
+    console.log('[SUPABASE] Saved to database');
+  }
+
   await sendNotifications(member);
 
-  return res.status(200).json({ success: true, id: member.id });
+  return res.status(200).json({ success: true, id: member.id, source: savedToSupabase ? 'supabase' : 'file' });
 }

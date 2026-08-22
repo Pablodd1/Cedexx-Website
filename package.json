@@ -14,6 +14,7 @@
     "@deepgram/sdk": "^3.7.0",
     "@emailjs/browser": "^4.4.1",
     "@google/generative-ai": "^0.21.0",
+    "@supabase/supabase-js": "^2.112.3",
     "@tailwindcss/vite": "^4.1.14",
     "@vapi-ai/web": "^2.5.2",
     "@vercel/node": "^5.8.23",
