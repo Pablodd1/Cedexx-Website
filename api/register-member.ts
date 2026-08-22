@@ -22,20 +22,25 @@ function sanitize(s: string) {
 }
 
 async function sendNotifications(member: any) {
-  await notifyAdmin({
-    type: member.status === 'paid' ? 'payment' : 'registration',
-    first_name: member.first_name,
-    last_name: member.last_name,
-    email: member.email,
-    phone: member.phone,
-    dob: member.dob,
-    plan: member.plan,
-    stripe_session_id: member.stripe_session_id,
-    consent_tos: member.consent_tos,
-    consent_analytics: member.consent_analytics,
-    consent_version: member.consent_version,
-    consent_timestamp: member.consent_timestamp,
-  });
+  try {
+    await notifyAdmin({
+      type: member.status === 'paid' ? 'payment' : 'registration',
+      first_name: member.first_name,
+      last_name: member.last_name,
+      email: member.email,
+      phone: member.phone,
+      dob: member.dob,
+      plan: member.plan,
+      stripe_session_id: member.stripe_session_id,
+      consent_tos: member.consent_tos,
+      consent_analytics: member.consent_analytics,
+      consent_version: member.consent_version,
+      consent_timestamp: member.consent_timestamp,
+    });
+  } catch (err) {
+    console.error('[NOTIFY ERROR]', err);
+    // Don't crash the API if notifications fail
+  }
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
