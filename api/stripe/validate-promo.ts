@@ -43,21 +43,45 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const account = await stripe.accounts.retrieve();
     console.log('[PROMO DEBUG] Stripe account:', account.id, account.email);
 
-    // Look up the promotion code
+    let coupon: Stripe.Coupon | null = null;
+    let promoCodeId: string | null = null;
+
+    // ─── Strategy 1: Look up as a Promotion Code (customer-facing code) ───
     const promoList = await stripe.promotionCodes.list({
       code: normalizedCode,
       active: true,
       limit: 1,
     });
 
-    console.log('[PROMO DEBUG] Search for', normalizedCode, 'found', promoList.data.length, 'results');
+    console.log('[PROMO DEBUG] PromotionCodes.search for', normalizedCode, 'found', promoList.data.length);
 
-    if (promoList.data.length === 0) {
-      return res.status(400).json({ success: false, error: 'Invalid or expired promo code' });
+    if (promoList.data.length > 0) {
+      const promo = promoList.data[0];
+      coupon = promo.coupon;
+      promoCodeId = promo.id;
+      console.log('[PROMO DEBUG] Found via PromotionCode:', promo.id, '→ coupon:', coupon?.id);
     }
 
-    const promo = promoList.data[0];
-    const coupon = promo.coupon;
+    // ─── Strategy 2: Look up as a Coupon (direct coupon ID) ───
+    if (!coupon) {
+      try {
+        const couponResult = await stripe.coupons.retrieve(normalizedCode.toLowerCase());
+        if (couponResult && !couponResult.deleted) {
+          coupon = couponResult;
+          console.log('[PROMO DEBUG] Found via Coupon ID:', coupon.id);
+        }
+      } catch (err) {
+        console.log('[PROMO DEBUG] Coupon lookup failed (expected if not a coupon):', (err as Error).message);
+      }
+    }
+
+    if (!coupon) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid or expired promo code',
+        debug: `Checked account ${account.id}. No promotion code or coupon found for "${normalizedCode}".`,
+      });
+    }
 
     // Calculate discount
     const planCents = plan_id ? (PRICE_CENTS[plan_id] || 0) : 0;
@@ -73,7 +97,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       success: true,
       valid: true,
       code: normalizedCode,
-      promo_code_id: promo.id,
+      promo_code_id: promoCodeId,
       coupon_id: coupon.id,
       percent_off: coupon.percent_off || null,
       amount_off: coupon.amount_off || null,
@@ -82,6 +106,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
   } catch (err: any) {
     console.error('[PROMO VALIDATION ERROR]', err);
-    return res.status(500).json({ success: false, error: 'Unable to validate promo code' });
+    return res.status(500).json({ success: false, error: 'Unable to validate promo code', detail: err.message });
   }
 }
