@@ -1,6 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import fs from 'fs';
-import { notifyAdmin } from './notify';
 
 const DATA_FILE = '/tmp/cedexx-members.json';
 
@@ -21,25 +20,22 @@ function sanitize(s: string) {
   return (s || '').replace(/[<>]/g, '').trim().substring(0, 200);
 }
 
+// Simple inline notification to avoid module import issues
 async function sendNotifications(member: any) {
   try {
-    await notifyAdmin({
-      type: member.status === 'paid' ? 'payment' : 'registration',
-      first_name: member.first_name,
-      last_name: member.last_name,
-      email: member.email,
-      phone: member.phone,
-      dob: member.dob,
-      plan: member.plan,
-      stripe_session_id: member.stripe_session_id,
-      consent_tos: member.consent_tos,
-      consent_analytics: member.consent_analytics,
-      consent_version: member.consent_version,
-      consent_timestamp: member.consent_timestamp,
-    });
+    // Send to Telegram if configured
+    const token = process.env.TELEGRAM_BOT_TOKEN;
+    const chatId = process.env.TELEGRAM_CHAT_ID;
+    if (token && chatId) {
+      const text = `📋 NEW CEDEXX REGISTRATION\n👤 ${member.first_name} ${member.last_name}\n📧 ${member.email}\n📦 Plan: ${member.plan || 'N/A'}`;
+      await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML' }),
+      });
+    }
   } catch (err) {
     console.error('[NOTIFY ERROR]', err);
-    // Don't crash the API if notifications fail
   }
 }
 
