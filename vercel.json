@@ -1,6 +1,9 @@
 {
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
+  "redirects": [
+    { "source": "/", "has": [{ "type": "host", "value": "cedexx.net" }], "destination": "https://www.cedexx.net/", "permanent": true }
+  ],
   "rewrites": [
     { "source": "/api/stripe/validate-promo", "destination": "/api/stripe/validate-promo.ts" },
     { "source": "/api/stripe/create-checkout", "destination": "/api/stripe/create-checkout.ts" },
