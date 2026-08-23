@@ -1,7 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import * as fs from 'fs';
 import { createClient } from '@supabase/supabase-js';
-import { sendWelcomeEmail } from './lib/client-email';
 
 const supabaseUrl = process.env.SUPABASE_URL || '';
 const supabaseKey = process.env.SUPABASE_ANON_KEY || '';
@@ -123,13 +122,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   await sendNotifications(member);
 
-  // Send client welcome email
-  await sendWelcomeEmail({
-    first_name: member.first_name,
-    last_name: member.last_name,
-    email: member.email,
-    plan: member.plan,
-  });
+  // Send client welcome email (fire-and-forget, don't crash on failure)
+  try {
+    const { sendWelcomeEmail } = await import('./lib/client-email');
+    await sendWelcomeEmail({
+      first_name: member.first_name,
+      last_name: member.last_name,
+      email: member.email,
+      plan: member.plan,
+    });
+  } catch (err) {
+    console.error('[EMAIL ERROR]', err);
+  }
 
   return res.status(200).json({ success: true, id: member.id, source: savedToSupabase ? 'supabase' : 'file' });
 }

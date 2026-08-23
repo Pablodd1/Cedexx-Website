@@ -1,9 +1,7 @@
 import Stripe from 'stripe';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import fs from 'fs';
+import * as fs from 'fs';
 import { notifyAdmin } from '../notify';
-
-import { sendPaymentConfirmation } from '../lib/client-email';
 
 const DATA_FILE = '/tmp/cedexx-members.json';
 
@@ -89,15 +87,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     saveMembers(members);
     await sendNotifications(memberData);
 
-    // Send client confirmation email
-    await sendPaymentConfirmation({
-      first_name: memberData.first_name,
-      last_name: memberData.last_name,
-      email: memberData.email,
-      plan: memberData.plan,
-      amount: memberData.amount,
-      stripe_session_id: memberData.stripe_session_id,
-    });
+    // Send client confirmation email (lazy-load, don't crash on failure)
+    try {
+      const { sendPaymentConfirmation } = await import('../lib/client-email');
+      await sendPaymentConfirmation({
+        first_name: memberData.first_name,
+        last_name: memberData.last_name,
+        email: memberData.email,
+        plan: memberData.plan,
+        amount: memberData.amount,
+        stripe_session_id: memberData.stripe_session_id,
+      });
+    } catch (err) {
+      console.error('[EMAIL ERROR]', err);
+    }
   }
 
   res.status(200).json({ received: true });
