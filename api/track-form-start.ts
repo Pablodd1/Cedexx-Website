@@ -1,8 +1,20 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import fs from 'fs';
-import { notifyAdmin } from './notify';
 
 const DATA_FILE = '/tmp/cedexx-members.json';
+
+// Lazy-load notify to avoid import crashes in serverless env
+let notifyAdmin: ((data: any) => Promise<void>) | null = null;
+async function getNotifyAdmin() {
+  if (notifyAdmin) return notifyAdmin;
+  try {
+    const mod = await import('./notify');
+    notifyAdmin = mod.notifyAdmin;
+  } catch (_) {
+    notifyAdmin = null;
+  }
+  return notifyAdmin;
+}
 
 function loadMembers(): any[] {
   try {
@@ -14,7 +26,11 @@ function loadMembers(): any[] {
 }
 
 function saveMembers(members: any[]) {
-  fs.writeFileSync(DATA_FILE, JSON.stringify(members, null, 2), 'utf8');
+  try {
+    fs.writeFileSync(DATA_FILE, JSON.stringify(members, null, 2), 'utf8');
+  } catch (_) {
+    // Silently fail on file write errors
+  }
 }
 
 function sanitize(s: string) {
@@ -36,72 +52,79 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { first_name, last_name, email, phone, plan, field, url, session_id } = req.body;
+  try {
+    const { first_name, last_name, email, phone, plan, field, url, session_id } = req.body;
 
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return res.status(400).json({ error: 'Valid email required' });
-  }
-
-  const clientIp = getClientIp(req);
-  const normalizedEmail = email.toLowerCase().trim();
-  const members = loadMembers();
-
-  // Check if this email already has any record (form_started, registered, or paid)
-  const existingIdx = members.findIndex((m) => m.email === normalizedEmail);
-
-  const lead = {
-    id: `mbr_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
-    first_name: sanitize(first_name || ''),
-    last_name: sanitize(last_name || ''),
-    email: normalizedEmail,
-    phone: sanitize(phone || ''),
-    plan: sanitize(plan || ''),
-    status: 'form_started' as const,
-    form_started_at: new Date().toISOString(),
-    registered_at: null as string | null,
-    paid_at: null as string | null,
-    stripe_session_id: sanitize(session_id || ''),
-    ip_address: clientIp,
-    form_field: sanitize(field || ''),
-    page_url: sanitize(url || ''),
-    consent_tos: false,
-    consent_analytics: false,
-    consent_version: '1.0',
-    consent_timestamp: null as string | null,
-  };
-
-  if (existingIdx >= 0) {
-    // Don't overwrite if already registered or paid — just keep existing record
-    // But update form_started_at if it was a previous form start
-    const existing = members[existingIdx];
-    if (existing.status === 'form_started') {
-      members[existingIdx] = {
-        ...existing,
-        form_started_at: new Date().toISOString(),
-        form_field: lead.form_field,
-        page_url: lead.page_url,
-        ip_address: clientIp,
-      };
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res.status(400).json({ error: 'Valid email required' });
     }
-    // For registered/paid — do nothing, they already have a better record
-    return res.status(200).json({ success: true, id: existing.id, existing: true });
+
+    const clientIp = getClientIp(req);
+    const normalizedEmail = email.toLowerCase().trim();
+    const members = loadMembers();
+
+    // Check if this email already has any record
+    const existingIdx = members.findIndex((m) => m.email === normalizedEmail);
+
+    const lead = {
+      id: `mbr_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+      first_name: sanitize(first_name || ''),
+      last_name: sanitize(last_name || ''),
+      email: normalizedEmail,
+      phone: sanitize(phone || ''),
+      plan: sanitize(plan || ''),
+      status: 'form_started' as const,
+      form_started_at: new Date().toISOString(),
+      registered_at: null as string | null,
+      paid_at: null as string | null,
+      stripe_session_id: sanitize(session_id || ''),
+      ip_address: clientIp,
+      form_field: sanitize(field || ''),
+      page_url: sanitize(url || ''),
+      consent_tos: false,
+      consent_analytics: false,
+      consent_version: '1.0',
+      consent_timestamp: null as string | null,
+    };
+
+    if (existingIdx >= 0) {
+      const existing = members[existingIdx];
+      if (existing.status === 'form_started') {
+        members[existingIdx] = {
+          ...existing,
+          form_started_at: new Date().toISOString(),
+          form_field: lead.form_field,
+          page_url: lead.page_url,
+          ip_address: clientIp,
+        };
+        saveMembers(members);
+      }
+      return res.status(200).json({ success: true, id: existing.id, existing: true });
+    }
+
+    members.push(lead);
+    saveMembers(members);
+
+    // Fire-and-forget notification (don't await, don't fail if it errors)
+    getNotifyAdmin().then((notify) => {
+      if (notify) {
+        notify({
+          type: 'form_started',
+          first_name: lead.first_name || 'Unknown',
+          last_name: lead.last_name || 'Lead',
+          email: lead.email,
+          phone: lead.phone,
+          plan: lead.plan,
+          field: lead.form_field,
+          url: lead.page_url,
+          ip: clientIp,
+        }).catch(() => {});
+      }
+    }).catch(() => {});
+
+    return res.status(200).json({ success: true, id: lead.id });
+  } catch (err: any) {
+    console.error('[TRACK FORM START ERROR]', err);
+    return res.status(500).json({ error: 'Internal server error' });
   }
-
-  members.push(lead);
-  saveMembers(members);
-
-  // Notify admin via all channels
-  await notifyAdmin({
-    type: 'form_started',
-    first_name: lead.first_name || 'Unknown',
-    last_name: lead.last_name || 'Lead',
-    email: lead.email,
-    phone: lead.phone,
-    plan: lead.plan,
-    field: lead.form_field,
-    url: lead.page_url,
-    ip: clientIp,
-  });
-
-  return res.status(200).json({ success: true, id: lead.id });
 }
