@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import fs from 'fs';
+import * as fs from 'fs';
 
 const DATA_FILE = '/tmp/cedexx-members.json';
 
