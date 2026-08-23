@@ -19,7 +19,7 @@ const STRIPE_PUBLISHABLE_KEY = process.env.STRIPE_PUBLISHABLE_KEY || '';
 const SUPABASE_URL = process.env.SUPABASE_URL || '';
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || '';
 const RESEND_API_KEY = process.env.RESEND_API_KEY || '';
-const ADMIN_NOTIFICATION_EMAIL = process.env.ADMIN_NOTIFICATION_EMAIL || 'jasmelacosta@gmail.com';
+const ADMIN_NOTIFICATION_EMAILS = (process.env.ADMIN_NOTIFICATION_EMAIL || 'jasmelacosta@gmail.com,support@cedexx.net').split(',').map(e => e.trim());
 const FRONTEND_URL = process.env.FRONTEND_URL || 'https://cedexx.net';
 
 // ──────────────────────────────────────────────
@@ -74,11 +74,12 @@ function buildPatientWelcomeEmail(data: {
   enrollmentId: string;
   email: string;
 }): string {
+  const planName = PLANS[data.plan]?.name || data.plan;
   return `
     <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:600px;margin:0 auto;border:1px solid #e2e8f0;border-radius:16px;overflow:hidden;background:#ffffff">
       <div style="background:#050249;color:white;padding:32px 24px;text-align:center">
-        <h1 style="margin:0;font-size:24px;font-weight:900;letter-spacing:-0.5px">Welcome to CEDEXX</h1>
-        <p style="margin:8px 0 0 0;opacity:0.8;font-size:14px">Your wellness membership is being prepared</p>
+        <h1 style="margin:0;font-size:24px;font-weight:900;letter-spacing:-0.5px">Welcome to CEDEXX / Bienvenido a CEDEXX</h1>
+        <p style="margin:8px 0 0 0;opacity:0.8;font-size:14px">Your wellness membership is being prepared / Su membresía de bienestar se está preparando</p>
       </div>
       <div style="padding:32px 24px">
         <p style="font-size:16px;color:#1e293b;margin-bottom:24px">Hi <strong>${data.firstName}</strong>,</p>
@@ -87,14 +88,15 @@ function buildPatientWelcomeEmail(data: {
         </p>
         
         <div style="background:#f8fafc;border-radius:12px;padding:20px;margin-bottom:24px">
-          <h3 style="margin:0 0 16px 0;font-size:14px;font-weight:900;color:#050249;text-transform:uppercase;letter-spacing:0.05em">Enrollment Summary</h3>
+          <h3 style="margin:0 0 16px 0;font-size:14px;font-weight:900;color:#050249;text-transform:uppercase;letter-spacing:0.05em">Enrollment Summary / Resumen de Inscripción</h3>
           <table style="width:100%;font-size:14px;color:#334155">
-            <tr><td style="padding:8px 0;font-weight:600">Plan</td><td style="padding:8px 0;text-align:right">${PLANS[data.plan]?.name || data.plan}</td></tr>
-            <tr><td style="padding:8px 0;font-weight:600">Amount Paid</td><td style="padding:8px 0;text-align:right;color:#23d9b0;font-weight:700">${data.amount}</td></tr>
-            <tr><td style="padding:8px 0;font-weight:600">Enrollment ID</td><td style="padding:8px 0;text-align:right;font-family:monospace;font-size:12px">${data.enrollmentId}</td></tr>
+            <tr><td style="padding:8px 0;font-weight:600">Plan</td><td style="padding:8px 0;text-align:right">${planName}</td></tr>
+            <tr><td style="padding:8px 0;font-weight:600">Amount Paid / Monto Pagado</td><td style="padding:8px 0;text-align:right;color:#23d9b0;font-weight:700">${data.amount}</td></tr>
+            <tr><td style="padding:8px 0;font-weight:600">Enrollment ID / ID de Inscripción</td><td style="padding:8px 0;text-align:right;font-family:monospace;font-size:12px">${data.enrollmentId}</td></tr>
           </table>
         </div>
         
+        <!-- ENGLISH -->
         <div style="background:#EBF3FB;border-radius:12px;padding:20px;margin-bottom:24px;border-left:4px solid #050249">
           <h3 style="margin:0 0 12px 0;font-size:14px;font-weight:900;color:#050249">What Happens Next?</h3>
           <p style="margin:0 0 16px 0;color:#334155;font-size:14px;line-height:1.6">Follow these simple steps to access your benefits:</p>
@@ -114,16 +116,37 @@ function buildPatientWelcomeEmail(data: {
           <p style="margin:16px 0 0 0;color:#334155;font-size:14px;line-height:1.6;font-weight:600">That's it! Once activated, you'll be ready to access your CEDEXX wellness benefits through Lyric Health.</p>
         </div>
         
+        <!-- SPANISH -->
+        <div style="background:#FFF8F0;border-radius:12px;padding:20px;margin-bottom:24px;border-left:4px solid #E85D04">
+          <h3 style="margin:0 0 12px 0;font-size:14px;font-weight:900;color:#E85D04">¿Qué Sigue?</h3>
+          <p style="margin:0 0 16px 0;color:#334155;font-size:14px;line-height:1.6">Siga estos simples pasos para acceder a sus beneficios:</p>
+          <ol style="margin:0;padding-left:20px;color:#334155;font-size:14px;line-height:1.8">
+            <li><strong>Espere 24–48 Horas para la Activación</strong><br>Por favor espere 24–48 horas para que su membresía sea accesible a través de la aplicación Lyric Health.</li>
+            <li><strong>Descargue la Aplicación Lyric Health</strong><br>Descargue la aplicación Lyric Health en su dispositivo móvil.</li>
+            <li><strong>Localice Su Membresía</strong><br>Abra la aplicación y seleccione el enlace en la parte inferior derecha, junto a "¿Primer Usuario?" para localizar su membresía.</li>
+            <li><strong>Verifique Su Cuenta</strong><br>Ingrese su:
+              <ul style="margin:8px 0;padding-left:20px">
+                <li>Apellido</li>
+                <li>Fecha de Nacimiento</li>
+                <li>Código ZIP</li>
+              </ul>
+            </li>
+            <li><strong>Revise Su Correo Electrónico</strong><br>Una vez que su cuenta sea localizada y verificada, recibirá un correo electrónico con instrucciones adicionales para completar su registro y acceder a su membresía de bienestar CEDEXX con tecnología de Lyric Health.</li>
+          </ol>
+          <p style="margin:16px 0 0 0;color:#334155;font-size:14px;line-height:1.6;font-weight:600">¡Eso es todo! Una vez activada, estará listo para acceder a sus beneficios de bienestar CEDEXX a través de Lyric Health.</p>
+        </div>
+        
         <p style="font-size:13px;color:#64748b;text-align:center;margin-top:24px">
-          Need help? Contact us at <a href="mailto:info@cedexx.net" style="color:#050249">info@cedexx.net</a> or call <strong>954-624-6744</strong>
+          Need help? / ¿Necesita ayuda?<br>
+          Contact us at <a href="mailto:info@cedexx.net" style="color:#050249">info@cedexx.net</a> or call / llame al <strong>954-624-6744</strong>
         </p>
       </div>
       <div style="background:#f8fafc;padding:20px 24px;text-align:center;font-size:11px;color:#94a3b8;border-top:1px solid #e2e8f0">
-        <p style="margin:0"><strong>CEDEXX — Better Care. Here. Now.</strong></p>
+        <p style="margin:0"><strong>CEDEXX — Better Care. Here. Now. / Mejor Atención. Aquí. Ahora.</strong></p>
         <p style="margin:16px 0 0 0;font-size:12px;color:#334155">
-          Thanks,<br><br>
+          Thanks / Gracias,<br><br>
           <strong>Daisy Gonzalez</strong><br>
-          Founder & CEO<br>
+          Founder & CEO / Fundadora y CEO<br>
           Direct: 954-624-6744<br>
           Website: www.cedexx.net
         </p>
@@ -391,7 +414,7 @@ async function handleSuccessfulPayment(session: Stripe.Checkout.Session) {
         await resend.emails.send({
           from: 'CEDEXX <hello@cedexx.net>',
           to: [enrollment.email],
-          subject: 'Welcome to CEDEXX — Your wellness membership is being prepared',
+          subject: 'Welcome to CEDEXX / Bienvenido a CEDEXX — Your membership is being prepared',
           html: buildPatientWelcomeEmail({
             firstName: enrollment.first_name,
             plan: enrollment.plan,
@@ -415,7 +438,7 @@ async function handleSuccessfulPayment(session: Stripe.Checkout.Session) {
       try {
         await resend.emails.send({
           from: 'CEDEXX Notifications <notifications@cedexx.net>',
-          to: [ADMIN_NOTIFICATION_EMAIL],
+          to: ADMIN_NOTIFICATION_EMAILS,
           subject: `🎉 New CEDEXX Enrollment — ${enrollment.first_name} ${enrollment.last_name}`,
           html: buildAdminNotificationEmail({
             firstName: enrollment.first_name,
@@ -436,7 +459,7 @@ async function handleSuccessfulPayment(session: Stripe.Checkout.Session) {
             enrollmentDate: new Date().toLocaleString(),
           }),
         });
-        console.log(`[EMAIL] Admin notification sent to ${ADMIN_NOTIFICATION_EMAIL}`);
+        console.log(`[EMAIL] Admin notification sent to ${ADMIN_NOTIFICATION_EMAILS.join(', ')}`);
       } catch (emailErr) {
         console.error('[EMAIL ERROR] Failed to send admin notification:', emailErr);
       }

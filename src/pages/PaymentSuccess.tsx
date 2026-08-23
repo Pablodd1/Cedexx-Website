@@ -19,9 +19,13 @@ export function PaymentSuccess() {
           <div className="inline-flex items-center justify-center h-24 w-24 rounded-full bg-[#23d9b0]/10 mb-8">
             <CheckCircle2 className="h-12 w-12 text-[#23d9b0]" />
           </div>
-          <h1 className="text-4xl md:text-6xl font-black text-[#050249] mb-6 tracking-tight italic uppercase">
+          <h1 className="text-4xl md:text-6xl font-black text-[#050249] mb-4 tracking-tight italic uppercase">
             Welcome to <span className="text-[#23d9b0]">CEDEXX</span>
           </h1>
+          <div className="flex items-center justify-center gap-3 mb-6">
+            <span className="text-lg text-slate-500 font-medium italic">powered by</span>
+            <img src="/images/lyric-logo.png" alt="Lyric Health" className="h-8 md:h-10 object-contain" />
+          </div>
           <p className="text-xl text-slate-500 font-medium max-w-2xl mx-auto italic">
             Your enrollment is complete and your membership is now active. You have immediate access to 24/7 care.
           </p>
@@ -66,9 +70,9 @@ export function PaymentSuccess() {
                 <span className="h-8 w-8 rounded-xl bg-white/10 flex items-center justify-center text-sm">@</span>
                 support@cedexx.net
               </a>
-              <a href="tel:1-800-555-0199" className="flex items-center gap-3 text-sm font-bold text-blue-100 hover:text-white transition-colors">
+              <a href="tel:954-624-6744" className="flex items-center gap-3 text-sm font-bold text-blue-100 hover:text-white transition-colors">
                 <span className="h-8 w-8 rounded-xl bg-white/10 flex items-center justify-center text-sm">T</span>
-                1-800-555-0199
+                954-624-6744
               </a>
             </div>
           </motion.div>
