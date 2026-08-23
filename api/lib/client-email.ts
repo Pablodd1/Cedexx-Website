@@ -68,9 +68,9 @@ function baseTemplate(content: string): string {
             <td style="padding:0 40px 32px 40px;text-align:center;border-top:1px solid #f0f0f0;">
               <p style="margin:24px 0 12px 0;color:#6b7280;font-size:12px;text-transform:uppercase;letter-spacing:1px;">Healthcare services provided by</p>
               <img src="${LOGO_URL}" alt="Lyric Health" width="140" style="display:block;margin:0 auto;border:0;" />
-              <p style="margin:16px 0 0 0;color:#9ca3af;font-size:11px;line-height:1.6;">
-                Lyric Health is a licensed healthcare provider.<br>
-                All clinical services are delivered by Lyric Health physicians.
+              <p style="margin:16px 0 0 0;color:#9ca3af;font-size:12px;line-height:1.6;">
+                Your enrollment is now complete. You're on your way to immediate access to care.<br>
+                Please follow the instructions below for your membership access.
               </p>
             </td>
           </tr>
