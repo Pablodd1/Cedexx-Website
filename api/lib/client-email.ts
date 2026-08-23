@@ -115,18 +115,26 @@ export async function sendWelcomeEmail(data: ClientEmailData) {
       <p style="margin:0;color:#6b7280;font-size:14px;">${price}</p>
     </div>
 
-    <h3 style="margin:0 0 12px 0;color:#111827;font-size:16px;font-weight:700;">What's Next?</h3>
-    <ul style="margin:0 0 24px 0;padding-left:20px;color:#374151;font-size:14px;line-height:1.8;">
-      <li>You'll receive your member ID within 24 hours</li>
-      <li>Download the app (coming soon) to book your first consultation</li>
-      <li>24/7 care is available immediately — no waiting period</li>
-    </ul>
+    <h3 style="margin:0 0 12px 0;color:#111827;font-size:16px;font-weight:700;">What Happens Next?</h3>
+    <p style="margin:0 0 16px 0;color:#374151;font-size:14px;line-height:1.6;">
+      Thank you for choosing CEDEXX — Better Care. Here. Now., powered by Lyric Health. Your wellness membership is being prepared for activation.
+    </p>
+    <ol style="margin:0 0 24px 0;padding-left:20px;color:#374151;font-size:14px;line-height:1.8;">
+      <li><strong>Allow 24–48 Hours for Activation</strong><br>Please allow 24–48 hours for your membership to become accessible through the Lyric Health app.</li>
+      <li><strong>Download the Lyric Health App</strong><br>Download the Lyric Health app on your mobile device.</li>
+      <li><strong>Locate Your Membership</strong><br>Open the app and select the link at the bottom right, next to "First Time User?" to locate your membership.</li>
+      <li><strong>Verify Your Account</strong><br>Enter your:<br>• Last Name<br>• Date of Birth<br>• ZIP Code</li>
+      <li><strong>Check Your Email</strong><br>Once your account is located and verified, you will receive an email with additional instructions to complete your registration and access your CEDEXX Powered by Lyric Health wellness membership.</li>
+    </ol>
+    <p style="margin:0 0 24px 0;color:#374151;font-size:14px;line-height:1.6;">
+      That's it! Once activated, you'll be ready to access your CEDEXX wellness benefits through Lyric Health.
+    </p>
 
     <p style="margin:0 0 24px 0;color:#374151;font-size:14px;line-height:1.6;">
       Questions? Reply to this email or visit <a href="${CEDEXX_URL}/contact" style="color:#050249;font-weight:600;text-decoration:none;">our support page</a>.
     </p>
 
-    <a href="${CEDEXX_URL}" style="display:inline-block;background:#050249;color:#ffffff;text-decoration:none;padding:14px 28px;border-radius:10px;font-size:14px;font-weight:600;">Visit Your Dashboard</a>
+    <a href="${CEDEXX_URL}" style="display:inline-block;background:#050249;color:#ffffff;text-decoration:none;padding:14px 28px;border-radius:10px;font-size:14px;font-weight:600;">Visit CEDEXX</a>
   `);
 
   try {
