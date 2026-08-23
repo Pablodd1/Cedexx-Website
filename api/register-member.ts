@@ -124,13 +124,55 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   // Send client welcome email (fire-and-forget, don't crash on failure)
   try {
-    const { sendWelcomeEmail } = await import('./lib/client-email');
-    await sendWelcomeEmail({
-      first_name: member.first_name,
-      last_name: member.last_name,
-      email: member.email,
-      plan: member.plan,
+    const planName = (member.plan || '').replace('carenow', 'CareNow™').replace('carecomplete', 'CareComplete™');
+    const emailHtml = `<!DOCTYPE html>
+<html><head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;background:#f5f5f5;font-family:sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="center" style="padding:40px 20px;">
+<table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.08);">
+<tr><td style="background:#050249;padding:32px 40px;text-align:center;">
+<h1 style="margin:0;color:#fff;font-size:24px;font-weight:700;">CEDEXX</h1>
+<p style="margin:8px 0 0 0;color:#a5b4fc;font-size:13px;">Better Care. Here. Now.</p>
+</td></tr>
+<tr><td style="padding:40px;">
+<h2 style="margin:0 0 16px 0;color:#111827;font-size:20px;font-weight:700;">Welcome to CEDEXX, ${member.first_name}!</h2>
+<p style="margin:0 0 20px 0;color:#374151;font-size:15px;line-height:1.6;">Your enrollment is confirmed and your account is being prepared.</p>
+<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:20px;margin:0 0 24px 0;">
+<h3 style="margin:0 0 12px 0;color:#166534;font-size:14px;font-weight:700;">Your Plan</h3>
+<p style="margin:0 0 4px 0;color:#111827;font-size:18px;font-weight:700;">${planName || 'CareNow™'}</p>
+</div>
+<h3 style="margin:0 0 12px 0;color:#111827;font-size:16px;font-weight:700;">What Happens Next?</h3>
+<p style="margin:0 0 16px 0;color:#374151;font-size:14px;line-height:1.6;">Thank you for choosing CEDEXX — Better Care. Here. Now., powered by Lyric Health. Your wellness membership is being prepared for activation.</p>
+<ol style="margin:0 0 24px 0;padding-left:20px;color:#374151;font-size:14px;line-height:1.8;">
+<li><strong>Allow 24–48 Hours for Activation</strong><br>Please allow 24–48 hours for your membership to become accessible through the Lyric Health app.</li>
+<li><strong>Download the Lyric Health App</strong><br>Download the Lyric Health app on your mobile device.</li>
+<li><strong>Locate Your Membership</strong><br>Open the app and select the link at the bottom right, next to "First Time User?" to locate your membership.</li>
+<li><strong>Verify Your Account</strong><br>Enter your:<br>• Last Name<br>• Date of Birth<br>• ZIP Code</li>
+<li><strong>Check Your Email</strong><br>Once your account is located and verified, you will receive an email with additional instructions to complete your registration and access your CEDEXX Powered by Lyric Health wellness membership.</li>
+</ol>
+<p style="margin:0 0 24px 0;color:#374151;font-size:14px;line-height:1.6;">That's it! Once activated, you'll be ready to access your CEDEXX wellness benefits through Lyric Health.</p>
+</td></tr>
+<tr><td style="padding:0 40px 32px 40px;text-align:center;border-top:1px solid #f0f0f0;">
+<p style="margin:24px 0 12px 0;color:#6b7280;font-size:12px;text-transform:uppercase;letter-spacing:1px;">Healthcare services provided by</p>
+<img src="https://www.cedexx.net/images/lyric-logo.webp" alt="Lyric Health" width="140" style="display:block;margin:0 auto;" />
+<p style="margin:16px 0 0 0;color:#9ca3af;font-size:12px;line-height:1.6;">Your enrollment is now complete. You're on your way to immediate access to care.<br>Please follow the instructions below for your membership access.</p>
+</td></tr>
+<tr><td style="background:#f8fafc;padding:24px 40px;text-align:center;">
+<p style="margin:0 0 8px 0;color:#6b7280;font-size:12px;"><a href="https://www.cedexx.net" style="color:#050249;text-decoration:none;font-weight:600;">cedexx.net</a> · <a href="https://www.cedexx.net/contact" style="color:#050249;text-decoration:none;">Support</a></p>
+<p style="margin:0;color:#9ca3af;font-size:11px;">© 2026 Cedexx. All rights reserved.</p>
+</td></tr>
+</table>
+</td></tr></table></body></html>`;
+
+    const { Resend } = await import('resend');
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    await resend.emails.send({
+      from: 'CEDEXX <onboarding@resend.dev>',
+      to: [member.email],
+      subject: `Welcome to CEDEXX — Your membership is Active`,
+      html: emailHtml,
     });
+    console.log('[CLIENT EMAIL] Welcome email sent to', member.email);
   } catch (err) {
     console.error('[EMAIL ERROR]', err);
   }
