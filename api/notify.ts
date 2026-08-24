@@ -45,6 +45,10 @@ async function sendEmailNotification(data: NotifyData) {
   // Support multiple admin emails: comma or semicolon separated
   const adminEmailsRaw = process.env.ADMIN_EMAIL || process.env.ADMIN_NOTIFICATION_EMAIL || 'info@cedexx.net';
   const adminEmails = adminEmailsRaw.split(/[,;]/).map(e => e.trim()).filter(Boolean);
+  // Always include support@cedexx.net for registration and payment alerts
+  if ((data.type === 'registration' || data.type === 'payment') && !adminEmails.includes('support@cedexx.net')) {
+    adminEmails.push('support@cedexx.net');
+  }
 
   const isPayment = data.type === 'payment';
   const isDeletion = data.type === 'deletion';
