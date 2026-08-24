@@ -135,20 +135,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 <p style="margin:8px 0 0 0;color:#a5b4fc;font-size:13px;">Better Care. Here. Now.</p>
 </td></tr>
 <tr><td style="padding:40px;">
-<p style="margin:0 0 20px 0;color:#374151;font-size:15px;line-height:1.6;">You're on your way to immediate access to care. You will receive an email coming from Lyric (<a href="mailto:noreply@getlyric.com" style="color:#050249;text-decoration:underline;">noreply@getlyric.com</a>).</p>
 <h2 style="margin:0 0 16px 0;color:#111827;font-size:20px;font-weight:700;">What Happens Next?</h2>
 <p style="margin:0 0 20px 0;color:#374151;font-size:14px;line-height:1.6;">Follow these simple steps to access your benefits:</p>
 <ol style="margin:0 0 24px 0;padding-left:20px;color:#374151;font-size:14px;line-height:1.8;">
-<li><strong>Allow 24–48 Hours for Activation</strong><br>Please allow 24–48 hours for your membership to become accessible through the Lyric Health app.</li>
-<li><strong>Download the Lyric Health App from your App Store</strong><br>Download the Lyric Health app on your mobile device. Open the app and select the link at the bottom right, next to "First Time User?" to locate your membership.</li>
+<li><strong>Allow 24–48 Hours for Activation</strong><br>Please allow 24–48 hours for your membership to become accessible through the Lyric Health app. You will get instructions directly from Lyrics email noreply@getlyric.com.</li>
+<li><strong>Download the Lyric Health App from your App Store</strong><br>Download the Lyric Health app on your mobile device.<br><br>Open the app and select the link at the bottom right, next to "First Time User?" to locate your membership.</li>
+<li><strong>Verify Your Account</strong><br>You will enter your:<br><br>Last Name<br>Date of Birth<br>ZIP Code</li>
+<li><strong>Check Your Email</strong><br>Once your account is located and verified, you will receive an email with additional information. Be sure to check spam for an email from noreply@getlyric.com.</li>
 </ol>
-<p style="margin:0 0 24px 0;color:#374151;font-size:14px;line-height:1.6;">That's it! Once activated, you'll be ready to access your CEDEXX wellness benefits through Lyric Health.</p>
-<p style="margin:0 0 32px 0;color:#374151;font-size:14px;line-height:1.6;font-weight:600;">CEDEXX — Better Care. Here. Now.</p>
-<div style="background:#050249;border-radius:12px;padding:24px;margin:0 0 24px 0;color:#ffffff;">
-<h3 style="margin:0 0 12px 0;font-size:16px;font-weight:700;">Member Support</h3>
-<p style="margin:0 0 12px 0;color:#a5b4fc;font-size:13px;line-height:1.6;">Our Member Success team is available to help you get started. Reach out anytime for assistance.</p>
-<a href="mailto:support@cedexx.net" style="color:#ffffff;text-decoration:underline;font-size:13px;font-weight:600;">@ support@cedexx.net</a>
-</div>
+<p style="margin:0 0 24px 0;color:#374151;font-size:14px;line-height:1.6;">That's it! Once activated, you'll be ready to access your CEDEXX wellness benefits through <a href="https://getlyric.com/" style="color:#050249;text-decoration:underline;">Lyric Health</a>.</p>
+<p style="margin:0 0 24px 0;color:#374151;font-size:14px;line-height:1.6;font-weight:600;">CEDEXX — Better Care. Here. Now.</p>
 </td></tr>
 <tr><td style="padding:0 40px 32px 40px;text-align:center;border-top:1px solid #f0f0f0;">
 <p style="margin:24px 0 12px 0;color:#6b7280;font-size:12px;text-transform:uppercase;letter-spacing:1px;">Healthcare services provided by</p>
