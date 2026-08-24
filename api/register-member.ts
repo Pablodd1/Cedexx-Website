@@ -25,21 +25,22 @@ function sanitize(s: string) {
   return (s || '').replace(/[<>]/g, '').trim().substring(0, 200);
 }
 
+import { notifyAdmin } from './notify';
+
 async function sendNotifications(member: any) {
-  try {
-    const token = process.env.TELEGRAM_BOT_TOKEN;
-    const chatId = process.env.TELEGRAM_CHAT_ID;
-    if (token && chatId) {
-      const text = `📋 NEW CEDEXX REGISTRATION\n👤 ${member.first_name} ${member.last_name}\n📧 ${member.email}\n📦 Plan: ${member.plan || 'N/A'}`;
-      await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML' }),
-      });
-    }
-  } catch (err) {
-    console.error('[NOTIFY ERROR]', err);
-  }
+  await notifyAdmin({
+    type: 'registration',
+    first_name: member.first_name,
+    last_name: member.last_name,
+    email: member.email,
+    phone: member.phone,
+    dob: member.dob,
+    plan: member.plan,
+    consent_tos: member.consent_tos,
+    consent_analytics: member.consent_analytics,
+    consent_version: member.consent_version,
+    consent_timestamp: member.consent_timestamp,
+  });
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
