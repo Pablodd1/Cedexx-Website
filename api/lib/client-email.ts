@@ -69,8 +69,7 @@ function baseTemplate(content: string): string {
               <p style="margin:24px 0 12px 0;color:#6b7280;font-size:12px;text-transform:uppercase;letter-spacing:1px;">Healthcare services provided by</p>
               <img src="${LOGO_URL}" alt="Lyric Health" width="140" style="display:block;margin:0 auto;border:0;" />
               <p style="margin:16px 0 0 0;color:#9ca3af;font-size:12px;line-height:1.6;">
-                Your enrollment is now complete. You're on your way to immediate access to care.<br>
-                Please follow the instructions below for your membership access.
+                Your enrollment is now complete! You're on your way to immediate access to care. Please follow the instructions below for your membership access. Thank you for your business, and enjoy your new layer of care.
               </p>
             </td>
           </tr>
@@ -106,14 +105,13 @@ export async function sendWelcomeEmail(data: ClientEmailData) {
   const html = baseTemplate(`
     <h2 style="margin:0 0 16px 0;color:#111827;font-size:20px;font-weight:700;">What Happens Next?</h2>
     <p style="margin:0 0 20px 0;color:#374151;font-size:15px;line-height:1.6;">
-      Thank you for choosing CEDEXX — Better Care. Here. Now., powered by Lyric Health. Your wellness membership is being prepared for activation. Follow these simple steps to access your benefits:
+      Follow these simple steps to access your benefits:
     </p>
     <ol style="margin:0 0 24px 0;padding-left:20px;color:#374151;font-size:14px;line-height:1.8;">
       <li><strong>Allow 24–48 Hours for Activation</strong><br>Please allow 24–48 hours for your membership to become accessible through the Lyric Health app.</li>
-      <li><strong>Download the Lyric Health App</strong><br>Download the Lyric Health app on your mobile device.</li>
-      <li><strong>Locate Your Membership</strong><br>Open the app and select the link at the bottom right, next to "First Time User?" to locate your membership.</li>
-      <li><strong>Verify Your Account</strong><br>Enter your:<br>• Last Name<br>• Date of Birth<br>• ZIP Code</li>
-      <li><strong>Check Your Email</strong><br>Once your account is located and verified, you will receive an email with additional instructions to complete your registration and access your CEDEXX Powered by Lyric Health wellness membership.</li>
+      <li><strong>Download the Lyric Health App</strong><br>Download the Lyric Health app on your mobile device.<br><br>Open the app and select the link at the bottom right, next to "First Time User?" to locate your membership.</li>
+      <li><strong>Verify Your Account</strong><br>Enter your:<br><br>Last Name<br>Date of Birth<br>ZIP Code</li>
+      <li><strong>Check Your Email</strong><br>Once your account is located and verified, you will receive an email with additional information. Be sure to check spam.</li>
     </ol>
     <p style="margin:0 0 24px 0;color:#374151;font-size:14px;line-height:1.6;">
       That's it! Once activated, you'll be ready to access your CEDEXX wellness benefits through Lyric Health.
