@@ -104,20 +104,9 @@ export async function sendWelcomeEmail(data: ClientEmailData) {
   const price = data.plan_price || planPrice(data.plan);
 
   const html = baseTemplate(`
-    <h2 style="margin:0 0 16px 0;color:#111827;font-size:20px;font-weight:700;">Welcome to CEDEXX, ${data.first_name}!</h2>
+    <h2 style="margin:0 0 16px 0;color:#111827;font-size:20px;font-weight:700;">What Happens Next?</h2>
     <p style="margin:0 0 20px 0;color:#374151;font-size:15px;line-height:1.6;">
-      Your enrollment is confirmed and your account is being prepared. You're now part of a healthcare network designed for modern life — accessible, affordable, and always available.
-    </p>
-
-    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:20px;margin:0 0 24px 0;">
-      <h3 style="margin:0 0 12px 0;color:#166534;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">Your Plan</h3>
-      <p style="margin:0 0 4px 0;color:#111827;font-size:18px;font-weight:700;">${planName}</p>
-      <p style="margin:0;color:#6b7280;font-size:14px;">${price}</p>
-    </div>
-
-    <h3 style="margin:0 0 12px 0;color:#111827;font-size:16px;font-weight:700;">What Happens Next?</h3>
-    <p style="margin:0 0 16px 0;color:#374151;font-size:14px;line-height:1.6;">
-      Thank you for choosing CEDEXX — Better Care. Here. Now., powered by Lyric Health. Your wellness membership is being prepared for activation.
+      Thank you for choosing CEDEXX — Better Care. Here. Now., powered by Lyric Health. Your wellness membership is being prepared for activation. Follow these simple steps to access your benefits:
     </p>
     <ol style="margin:0 0 24px 0;padding-left:20px;color:#374151;font-size:14px;line-height:1.8;">
       <li><strong>Allow 24–48 Hours for Activation</strong><br>Please allow 24–48 hours for your membership to become accessible through the Lyric Health app.</li>
@@ -129,19 +118,16 @@ export async function sendWelcomeEmail(data: ClientEmailData) {
     <p style="margin:0 0 24px 0;color:#374151;font-size:14px;line-height:1.6;">
       That's it! Once activated, you'll be ready to access your CEDEXX wellness benefits through Lyric Health.
     </p>
-
-    <p style="margin:0 0 24px 0;color:#374151;font-size:14px;line-height:1.6;">
-      Questions? Reply to this email or visit <a href="${CEDEXX_URL}/contact" style="color:#050249;font-weight:600;text-decoration:none;">our support page</a>.
+    <p style="margin:0 0 24px 0;color:#374151;font-size:14px;line-height:1.6;font-weight:600;">
+      CEDEXX — Better Care. Here. Now.
     </p>
-
-    <a href="${CEDEXX_URL}" style="display:inline-block;background:#050249;color:#ffffff;text-decoration:none;padding:14px 28px;border-radius:10px;font-size:14px;font-weight:600;">Visit CEDEXX</a>
   `);
 
   try {
     await resend.emails.send({
       from: 'CEDEXX <onboarding@resend.dev>',
       to: [data.email],
-      subject: `Welcome to CEDEXX — Your ${planName} is Active`,
+      subject: `CEDEXX — Better Care. Here. Now.`,
       html,
     });
     console.log('[CLIENT EMAIL] Welcome email sent to', data.email);
