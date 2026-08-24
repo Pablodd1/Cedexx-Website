@@ -16,7 +16,7 @@ export default async function handler(req, res) {
   try {
     // Send notification to admin
     await resend.emails.send({
-      from: 'Cedexx <onboarding@resend.dev>',
+      from: 'Cedexx <notifications@cedexx.net>',
       to: ['info@cedexx.net'],
       subject: 'New Guide Download Request',
       html: `
@@ -34,7 +34,7 @@ export default async function handler(req, res) {
 
     // Send welcome email to subscriber with guide
     await resend.emails.send({
-      from: 'Cedexx <onboarding@resend.dev>',
+      from: 'Cedexx <notifications@cedexx.net>',
       to: [email],
       subject: 'Your Cedexx Guide is Here!',
       html: `

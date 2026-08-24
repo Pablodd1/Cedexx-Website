@@ -11,7 +11,7 @@ export default async function handler(req, res) {
 
   try {
     const data = await resend.emails.send({
-      from: 'Cedexx <onboarding@resend.dev>', // Update to your domain in Resend dashboard
+      from: 'Cedexx <notifications@cedexx.net>', // Update to your domain in Resend dashboard
       to: ['info@cedexx.net'],
       subject: subject || `New Message from ${from_name}`,
       reply_to: from_email,

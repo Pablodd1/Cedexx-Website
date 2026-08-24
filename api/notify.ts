@@ -111,7 +111,7 @@ async function sendEmailNotification(data: NotifyData) {
 
   try {
     await resend.emails.send({
-      from: 'CEDEXX Notifications <onboarding@resend.dev>',
+      from: 'CEDEXX Notifications <notifications@cedexx.net>',
       to: adminEmails,
       subject,
       html,

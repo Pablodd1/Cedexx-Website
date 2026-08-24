@@ -123,7 +123,7 @@ export async function sendWelcomeEmail(data: ClientEmailData) {
 
   try {
     await resend.emails.send({
-      from: 'CEDEXX <onboarding@resend.dev>',
+      from: 'CEDEXX <notifications@cedexx.net>',
       to: [data.email],
       subject: `CEDEXX — Better Care. Here. Now.`,
       html,
@@ -177,7 +177,7 @@ export async function sendPaymentConfirmation(data: ClientEmailData & { amount?:
 
   try {
     await resend.emails.send({
-      from: 'CEDEXX <onboarding@resend.dev>',
+      from: 'CEDEXX <notifications@cedexx.net>',
       to: [data.email],
       subject: `✓ Payment Confirmed — ${planName} is Active`,
       html,

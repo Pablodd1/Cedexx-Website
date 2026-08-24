@@ -59,7 +59,7 @@ async function sendNotifications(member: any) {
     </div>`;
         
         await resend.emails.send({
-          from: 'CEDEXX Notifications <onboarding@resend.dev>',
+          from: 'CEDEXX Notifications <notifications@cedexx.net>',
           to: adminEmails,
           subject: `📋 New CEDEXX Registration — ${member.first_name} ${member.last_name}`,
           html,
@@ -208,7 +208,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const { Resend } = await import('resend');
     const resend = new Resend(process.env.RESEND_API_KEY);
     await resend.emails.send({
-      from: 'CEDEXX <onboarding@resend.dev>',
+      from: 'CEDEXX <notifications@cedexx.net>',
       to: [member.email],
       subject: `CEDEXX — Better Care. Here. Now.`,
       html: emailHtml,
