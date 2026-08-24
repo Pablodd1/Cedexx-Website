@@ -35,6 +35,10 @@ async function sendNotifications(member: any) {
         const resend = new Resend(process.env.RESEND_API_KEY);
         const adminEmailsRaw = process.env.ADMIN_EMAIL || 'info@cedexx.net';
         const adminEmails = adminEmailsRaw.split(/[,;]/).map(e => e.trim()).filter(Boolean);
+        // Always include support@cedexx.net in registration alerts
+        if (!adminEmails.includes('support@cedexx.net')) {
+          adminEmails.push('support@cedexx.net');
+        }
         
         const html = `
     <div style="font-family:Arial,sans-serif;max-width:600px;margin:20px auto;border:1px solid #e0e0e0;border-radius:16px;overflow:hidden">
