@@ -25,22 +25,64 @@ function sanitize(s: string) {
   return (s || '').replace(/[<>]/g, '').trim().substring(0, 200);
 }
 
-import { notifyAdmin } from './notify';
-
 async function sendNotifications(member: any) {
-  await notifyAdmin({
-    type: 'registration',
-    first_name: member.first_name,
-    last_name: member.last_name,
-    email: member.email,
-    phone: member.phone,
-    dob: member.dob,
-    plan: member.plan,
-    consent_tos: member.consent_tos,
-    consent_analytics: member.consent_analytics,
-    consent_version: member.consent_version,
-    consent_timestamp: member.consent_timestamp,
-  });
+  // Send admin notification email + Telegram
+  await Promise.allSettled([
+    // Email to admin
+    (async () => {
+      try {
+        const { Resend } = await import('resend');
+        const resend = new Resend(process.env.RESEND_API_KEY);
+        const adminEmailsRaw = process.env.ADMIN_EMAIL || 'info@cedexx.net';
+        const adminEmails = adminEmailsRaw.split(/[,;]/).map(e => e.trim()).filter(Boolean);
+        
+        const html = `
+    <div style="font-family:Arial,sans-serif;max-width:600px;margin:20px auto;border:1px solid #e0e0e0;border-radius:16px;overflow:hidden">
+      <div style="background:#050249;color:#fff;padding:20px">
+        <h2 style="margin:0;font-size:18px">📋 New Member Registration</h2>
+      </div>
+      <table style="width:100%;border-collapse:collapse;font-size:14px">
+        <tr><td style="padding:10px;border-bottom:1px solid #f0f0f0;font-weight:700;width:140px;background:#fafafa">Name</td><td style="padding:10px;border-bottom:1px solid #f0f0f0">${member.first_name} ${member.last_name}</td></tr>
+        <tr><td style="padding:10px;border-bottom:1px solid #f0f0f0;font-weight:700;background:#fafafa">Email</td><td style="padding:10px;border-bottom:1px solid #f0f0f0">${member.email}</td></tr>
+        ${member.phone ? `<tr><td style="padding:10px;border-bottom:1px solid #f0f0f0;font-weight:700;background:#fafafa">Phone</td><td style="padding:10px;border-bottom:1px solid #f0f0f0">${member.phone}</td></tr>` : ''}
+        ${member.dob ? `<tr><td style="padding:10px;border-bottom:1px solid #f0f0f0;font-weight:700;background:#fafafa">DOB</td><td style="padding:10px;border-bottom:1px solid #f0f0f0">${member.dob}</td></tr>` : ''}
+        ${member.plan ? `<tr><td style="padding:10px;border-bottom:1px solid #f0f0f0;font-weight:700;background:#fafafa">Plan</td><td style="padding:10px;border-bottom:1px solid #f0f0f0">${member.plan}</td></tr>` : ''}
+        <tr><td style="padding:10px;border-bottom:1px solid #f0f0f0;font-weight:700;background:#fafafa">Time</td><td style="padding:10px;border-bottom:1px solid #f0f0f0">${new Date().toLocaleString()}</td></tr>
+      </table>
+      <div style="background:#f8fafc;padding:16px;text-align:center;font-size:12px;color:#666">
+        View dashboard: <a href="https://cedexx.net/admin" style="color:#050249;font-weight:700">cedexx.net/admin</a>
+      </div>
+    </div>`;
+        
+        await resend.emails.send({
+          from: 'CEDEXX Notifications <onboarding@resend.dev>',
+          to: adminEmails,
+          subject: `📋 New CEDEXX Registration — ${member.first_name} ${member.last_name}`,
+          html,
+        });
+        console.log('[ADMIN EMAIL] Sent to', adminEmails);
+      } catch (err) {
+        console.error('[ADMIN EMAIL ERROR]', err);
+      }
+    })(),
+    // Telegram notification
+    (async () => {
+      try {
+        const token = process.env.TELEGRAM_BOT_TOKEN;
+        const chatId = process.env.TELEGRAM_CHAT_ID;
+        if (token && chatId) {
+          const text = `📋 NEW CEDEXX REGISTRATION\n👤 ${member.first_name} ${member.last_name}\n📧 ${member.email}\n📦 Plan: ${member.plan || 'N/A'}`;
+          await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML' }),
+          });
+        }
+      } catch (err) {
+        console.error('[TELEGRAM ERROR]', err);
+      }
+    })(),
+  ]);
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
