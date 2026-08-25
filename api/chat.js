@@ -10,6 +10,7 @@ export default async function handler(req, res) {
   const GEMINI_KEY = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
   const OPENAI_KEY = process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY;
   const MINIMAX_KEY = process.env.MINIMAX_API_KEY;
+  const DEEPSEEK_KEY = process.env.DEEPSEEK_API_KEY;
 
   const langInstruction = 
     language === 'es' ? "Responde en español profesional (Latinoamérica). " :
@@ -30,13 +31,15 @@ Key facts about CEDEXX + Lyric Health:
 
   // Try providers in order of preference
   const providers = [
-    // Gemini - PRIMARY (fast, cheap, medical-safe)
+    // DeepSeek - PRIMARY (cheapest, excellent quality)
+    { name: 'deepseek', key: DEEPSEEK_KEY, model: 'deepseek-chat' },
+    // Gemini - Backup 1 (cheap, medical-safe)
     { name: 'gemini', key: GEMINI_KEY, model: 'gemini-1.5-flash' },
-    // OpenAI - Backup 1
+    // OpenAI - Backup 2
     { name: 'openai', key: OPENAI_KEY, model: 'gpt-4o-mini' },
-    // Kimi (Moonshot) - Backup 2
+    // Kimi (Moonshot) - Backup 3
     { name: 'kimi', key: KIMI_KEY, model: 'moonshot-v1-8k' },
-    // MiniMax - Backup 3
+    // MiniMax - Backup 4
     { name: 'minimax', key: MINIMAX_KEY, model: 'abab6.5s-chat' }
   ];
 
@@ -133,7 +136,30 @@ Key facts about CEDEXX + Lyric Health:
       throw new Error('OpenAI failed');
     }
 
-    // Gemini (Google) — PRIMARY
+    // DeepSeek — PRIMARY (cheapest, OpenAI-compatible)
+    if (selectedProvider.name === 'deepseek' && DEEPSEEK_KEY) {
+      const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${DEEPSEEK_KEY}`
+        },
+        body: JSON.stringify({
+          model: 'deepseek-chat',
+          messages: [{ role: 'system', content: systemPrompt }, ...messages],
+          temperature: 0.3,
+          max_tokens: 500
+        })
+      });
+
+      const data = await response.json();
+      if (data.choices?.[0]?.message?.content) {
+        return res.status(200).json(data);
+      }
+      throw new Error('DeepSeek failed');
+    }
+
+    // Gemini (Google) — Backup 1
     if (selectedProvider.name === 'gemini' && GEMINI_KEY) {
       const geminiMessages = messages.map(m => ({
         role: m.role === 'assistant' || m.role === 'model' ? 'model' : 'user',
