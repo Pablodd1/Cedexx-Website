@@ -359,7 +359,7 @@ export async function sendPromoAppliedEmail(data: ClientEmailData & { promo_code
 
 // ─── 4. Admin Notification Email ───
 export async function sendAdminNotification(data: {
-  type: 'registration' | 'payment' | 'contact' | 'deletion';
+  type: 'registration' | 'payment' | 'contact' | 'deletion' | 'form_started';
   first_name?: string;
   last_name?: string;
   email: string;
@@ -370,6 +370,7 @@ export async function sendAdminNotification(data: {
   subject?: string;
   company_name?: string;
   stripe_session_id?: string;
+  reason?: string;
 }) {
   if (!resend) {
     console.log('[ADMIN EMAIL] No Resend API key, skipping');
@@ -379,14 +380,17 @@ export async function sendAdminNotification(data: {
   const adminEmails = getAdminEmails();
   const isPayment = data.type === 'payment';
   const isContact = data.type === 'contact';
+  const isFormStart = data.type === 'form_started';
 
   const subject = isPayment
     ? `💳 New CEDEXX Payment — ${data.first_name} ${data.last_name}`
     : isContact
       ? `📨 New Contact Form — ${data.first_name}`
-      : data.type === 'deletion'
-        ? `🗑️ Data Deletion Request — ${data.email}`
-        : `📋 New CEDEXX Registration — ${data.first_name} ${data.last_name}`;
+      : isFormStart
+        ? `📝 Lead Started Form — ${data.first_name} ${data.last_name}`
+        : data.type === 'deletion'
+          ? `🗑️ Data Deletion Request — ${data.email}`
+          : `📋 New CEDEXX Registration — ${data.first_name} ${data.last_name}`;
 
   const rows = [
     ['Name', `${data.first_name || ''} ${data.last_name || ''}`.trim() || 'N/A'],
@@ -411,7 +415,7 @@ export async function sendAdminNotification(data: {
   const html = `
     <div style="font-family:Arial,sans-serif;max-width:600px;margin:20px auto;border:1px solid #e0e0e0;border-radius:16px;overflow:hidden">
       <div style="background:#050249;color:#fff;padding:20px">
-        <h2 style="margin:0;font-size:18px">${isPayment ? '💳 New Payment' : isContact ? '📨 Contact Form' : data.type === 'deletion' ? '🗑️ Deletion Request' : '📋 New Registration'}</h2>
+        <h2 style="margin:0;font-size:18px">${isPayment ? '💳 New Payment' : isContact ? '📨 Contact Form' : isFormStart ? '📝 Lead Started Form' : data.type === 'deletion' ? '🗑️ Deletion Request' : '📋 New Registration'}</h2>
       </div>
       <table style="width:100%;border-collapse:collapse;font-size:14px">
         ${htmlRows}
