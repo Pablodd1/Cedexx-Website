@@ -90,7 +90,7 @@ export function Home() {
               <h1 className="text-4xl md:text-7xl font-black leading-[0.9] mb-6 tracking-tighter uppercase italic">
                 Better Care. Here. <span className="text-[#23d9b0]">Now.</span>
               </h1>
-              
+
               <h2 className="text-xl md:text-3xl font-bold text-[#23d9b0] mb-8 tracking-tight italic max-w-2xl">
                 {t('hero.subtitle')}
               </h2>
@@ -132,27 +132,27 @@ export function Home() {
         <div className="container mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
-              { 
-                title: t('features.access.title'), 
-                desc: t('features.access.desc'), 
+              {
+                title: t('features.access.title'),
+                desc: t('features.access.desc'),
                 icon: Clock,
                 color: 'bg-blue-50 text-blue-600'
               },
-              { 
-                title: t('features.speed.title'), 
-                desc: t('features.speed.desc'), 
+              {
+                title: t('features.speed.title'),
+                desc: t('features.speed.desc'),
                 icon: Zap,
                 color: 'bg-emerald-50 text-emerald-600'
               },
-              { 
-                title: t('features.membership.title'), 
-                desc: t('features.membership.desc'), 
+              {
+                title: t('features.membership.title'),
+                desc: t('features.membership.desc'),
                 icon: Users,
                 color: 'bg-purple-50 text-purple-600'
               },
-              { 
-                title: t('features.secure.title'), 
-                desc: t('features.secure.desc'), 
+              {
+                title: t('features.secure.title'),
+                desc: t('features.secure.desc'),
                 icon: Shield,
                 color: 'bg-slate-50 text-slate-600'
               }
@@ -188,7 +188,7 @@ export function Home() {
               { title: t('serve.card1.title'), desc: t('serve.card1.desc'), cta: t('serve.card1.cta'), link: '/partners' },
               { title: t('serve.card2.title'), desc: t('serve.card2.desc'), cta: t('serve.card2.cta'), link: '/partners' },
               { title: t('serve.card4.title'), desc: t('serve.card4.desc'), cta: t('serve.card4.cta'), link: '/partners' },
-              { title: 'Travelers & Gig Workers', desc: 'Instant access to licensed physicians—at your hotel or on the move.', cta: 'About Us', link: '/about' }
+              { title: 'Travelers & Gig Workers', desc: 'Instant access to licensed physicians-at your hotel or on the move.', cta: 'About Us', link: '/about' }
             ].map((card, i) => (
               <motion.div
                 key={i}
@@ -231,7 +231,7 @@ export function Home() {
               <h2 className="text-4xl md:text-6xl font-black text-[#050249] mb-12 leading-[1.1] tracking-tighter">
                 {t('pressure.title')}
               </h2>
-              
+
               <div className="space-y-8">
                 <div className="flex items-center gap-4 p-2">
                    <div className="h-3 w-3 rounded-full bg-[#23d9b0]" />
@@ -256,7 +256,7 @@ export function Home() {
             </motion.div>
 
             {/* Rotating Testimonials with Multi-Persona Support */}
-            <motion.div 
+            <motion.div
               className="relative aspect-[4/5] md:aspect-square overflow-hidden rounded-[4rem] group"
               {...fadeIn}
             >
@@ -269,15 +269,15 @@ export function Home() {
                   transition={{ duration: 1, ease: "easeInOut" }}
                   className="absolute inset-0"
                 >
-                  <img 
-                    src={TESTIMONIALS[activeTestimonial].image} 
-                    alt={TESTIMONIALS[activeTestimonial].category} 
+                  <img
+                    src={TESTIMONIALS[activeTestimonial].image}
+                    alt={TESTIMONIALS[activeTestimonial].category}
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#050249] via-transparent to-transparent opacity-90" />
-                  
+
                   <div className="absolute bottom-0 left-0 w-full p-6 md:p-12">
-                    <motion.div 
+                    <motion.div
                       initial={{ y: 20, opacity: 0 }}
                       animate={{ y: 0, opacity: 1 }}
                       transition={{ delay: 0.5 }}
@@ -287,7 +287,7 @@ export function Home() {
                         {TESTIMONIALS[activeTestimonial].category}
                       </div>
                       <p className="text-[#050249] font-black text-lg md:text-2xl leading-tight mb-6">
-                        “{TESTIMONIALS[activeTestimonial].quote}”
+                        "{TESTIMONIALS[activeTestimonial].quote}"
                       </p>
                       <div className="flex items-center justify-between border-t border-slate-100 pt-6">
                         <div>
@@ -317,7 +317,7 @@ export function Home() {
       <section className="py-32 bg-[#050249] text-white relative overflow-hidden">
         {/* Animated Background Pulse */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-blue-500/10 rounded-full blur-[120px] animate-pulse" />
-        
+
         <div className="container mx-auto px-6 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
             <motion.div {...fadeIn}>
@@ -338,8 +338,8 @@ export function Home() {
                     'Secure HIPAA compliant connection',
                     'Medical Notes for work, school & travel insurance'
                   ].map((text, i) => (
-                    <motion.div 
-                      key={i} 
+                    <motion.div
+                      key={i}
                       className="flex items-center gap-6 group"
                       initial={{ opacity: 0, x: -20 }}
                       whileInView={{ opacity: 1, x: 0 }}
@@ -352,8 +352,8 @@ export function Home() {
                 </div>
               </div>
             </motion.div>
-            
-            <motion.div 
+
+            <motion.div
               className="bg-white/5 backdrop-blur-3xl rounded-[4rem] border border-white/10 p-12 md:p-20 shadow-2xl"
               {...fadeIn}
             >
@@ -387,9 +387,9 @@ export function Home() {
                 Strategic Partnerships
               </h2>
               <p className="text-xl text-slate-500 mb-12 font-medium leading-relaxed italic">
-                We partner with leading healthcare organizations and licensed physicians to deliver a premium mobile healthcare experience—seamless, trusted, and always within reach. Keep It in Your <span className="text-[#23d9b0]">Back Pocket.</span>
+                We partner with leading healthcare organizations and licensed physicians to deliver a premium mobile healthcare experience-seamless, trusted, and always within reach. Keep It in Your <span className="text-[#23d9b0]">Back Pocket.</span>
               </p>
-              
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                 {[
                   { title: t('serve.card1.title'), desc: t('serve.card1.desc'), icon: Smartphone },
@@ -422,20 +422,25 @@ export function Home() {
             <h2 className="text-3xl md:text-6xl font-black text-[#050249] mb-8 leading-none tracking-tighter uppercase italic">Frequently Asked Questions</h2>
             <p className="text-base text-slate-500 font-medium italic">Direct answers for families and organizations.</p>
           </div>
-          
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
             {[
               { q: 'Can my children be seen immediately?', a: 'Yes. Most consultations begin in under 15 minutes with a board-certified provider, making it the fastest way to connect for pediatric care.' },
               { q: 'Do I need insurance to use Cedexx?', a: 'No. Cedexx connects you with providers offering high-quality care without the need for insurance premiums, co-pays, or complex billing.' },
-              { q: 'Can I get a doctor’s note for travel insurance?', a: 'Yes. Providers on our platform can issue clinical documentation and notes for travel-related illnesses and non-controlled medical requirements instantly.' },
+              { q: 'Can I get a doctor's note for travel insurance?', a: 'Yes. Providers on our platform can issue clinical documentation and notes for travel-related illnesses and non-controlled medical requirements instantly.' },
               { q: 'How do employers benefit from this?', a: 'By connecting employees with 24/7 provider access, you significantly reduce absenteeism and provide an incredible added value for their families.' },
               { q: 'Are prescriptions covered at no cost?', a: 'Yes. Your membership includes covered medications at no additional cost when prescribed by our platform provider. CareNow includes 37 acute medications for common conditions at no additional cost. CareComplete includes 37 acute medications plus 200 medications for chronic care conditions at no additional cost.' },
               { q: 'How do I receive my medications?', a: 'Your provider will electronically send your prescription to the pharmacy you select. Present your RX discount card at the pharmacy to access your covered medication. Your digital card, including your BIN #, PCN #, and Member ID #, is available in your member portal to print or screenshot.' },
-              { q: 'Is my medical data secure?', a: 'Cedexx is a fully HIPAA-compliant platform. We use enterprise-level encryption to ensure your family’s privacy is protected at all times.' },
+              { q: 'Is my medical data secure?', a: 'Cedexx is a fully HIPAA-compliant platform. We use enterprise-level encryption to ensure your family's privacy is protected at all times.' },
+              { q: 'Who do I contact if I need help accessing my CEDEXX account?', a: 'For assistance accessing your CEDEXX membership account, please contact our support team at support@cedexx.net. We're happy to help you locate your account and resolve any account-related questions.' },
+              { q: 'How do I cancel my membership?', a: 'Membership cancellations are handled by email. Please send your cancellation request to support@cedexx.net with "Cancellation" in the subject line. To help us quickly locate and deactivate your membership, please include your Full Name, Date of Birth, Email Address on File, and Full Address. There are no cancellation penalties or fees. Please note that previously billed monthly membership fees or services are non-refundable.' },
+              { q: 'I already have the Lyric Health app and my CEDEXX membership is active. Who do I contact for support?', a: 'If your CEDEXX membership is already active and you have successfully downloaded and activated the Lyric Health app, please contact Lyric Health Member Services for assistance accessing your available services at 1-866-223-8831.' },
+              { q: 'I want to add another membership or change my plan. Who do I contact?', a: 'For assistance adding a membership, changing your plan, or reviewing available membership options, please contact support@cedexx.net.' },
+              { q: "I just purchased my membership, but I don't have access yet. What should I do?", a: "Don't panic! It can take 24-48 hours for your membership information to be uploaded and activated within the Lyric Health platform. Once at least 48 hours have passed: 1) Download the Lyric Health app, 2) Open the app and select the link at the bottom right next to 'First Time User?', 3) Verify your account with your Last Name, Date of Birth, and ZIP Code, 4) Check your email for instructions from noreply@getlyric.com (check spam/junk folder). If you've waited 48 hours and still can't access your membership, contact support@cedexx.net." },
             ].map((faq, idx) => (
-              <motion.div 
-                key={idx} 
-                {...fadeIn} 
+              <motion.div
+                key={idx}
+                {...fadeIn}
                 transition={{ delay: idx * 0.1 }}
                 className="bg-slate-50 p-10 rounded-[3rem] border border-slate-100 hover:bg-white hover:shadow-2xl transition-all group"
               >
