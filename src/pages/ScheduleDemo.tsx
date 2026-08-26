@@ -89,7 +89,7 @@ export function ScheduleDemo() {
       // 3. Last resort fallback to mailto
       const subject = encodeURIComponent(`Enrollment Inquiry — ${form.name}`);
       const body = encodeURIComponent(`Name: ${form.name}\nEmail: ${form.email}\nNotes: ${form.notes}`);
-      window.location.href = `mailto:info@cedexx.net?subject=${subject}&body=${body}`;
+      window.location.href = `mailto:support@cedexx.net?subject=${subject}&body=${body}`;
     } finally {
       setSending(false);
     }

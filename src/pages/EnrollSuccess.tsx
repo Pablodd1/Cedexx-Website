@@ -30,7 +30,7 @@ export function EnrollSuccess() {
           setError('Payment verification pending. Please check your email for confirmation.');
         }
       } catch (err) {
-        setError('Unable to verify payment. Please contact support at info@cedexx.net');
+        setError('Unable to verify payment. Please contact support at support@cedexx.net');
       } finally {
         setLoading(false);
       }
@@ -133,7 +133,7 @@ export function EnrollSuccess() {
           <div className="mt-8 pt-8 border-t border-slate-100 text-center">
             <p className="text-sm text-slate-400">
               Questions? Contact us at{' '}
-              <a href="mailto:info@cedexx.net" className="text-[#050249] font-medium hover:underline">info@cedexx.net</a>
+              <a href="mailto:support@cedexx.net" className="text-[#050249] font-medium hover:underline">support@cedexx.net</a>
               {' '}or call{' '}
               <a href="tel:954-624-6744" className="text-[#050249] font-medium hover:underline">954-624-6744</a>
             </p>

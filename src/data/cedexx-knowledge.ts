@@ -7,7 +7,7 @@ export const CEDEXX_KNOWLEDGE = {
     tagline: 'Better Care. Here. Now.',
     description: 'A Lyric Health virtual care platform connecting families with Lyric Health licensed healthcare providers nationwide.',
     website: 'cedexx.net',
-    email: 'info@cedexx.net',
+    email: 'support@cedexx.net',
     phone: '954-624-6744',
     coverage: 'Nationwide through Lyric Health network',
     languages: ['English', 'Spanish', 'Russian', 'Haitian Creole'],
@@ -198,6 +198,14 @@ export const CEDEXX_KNOWLEDGE = {
     { name: 'Terms of Service', path: '/terms', description: 'Service terms and conditions' },
   ],
 
+  membershipSupport: {
+    accountAccess: 'For assistance accessing your CEDEXX membership account, contact support@cedexx.net.',
+    cancellation: 'Send cancellation request to support@cedexx.net with "Cancellation" in subject line. Include: Full Name, Date of Birth, Email Address on File, Full Address. No penalties or fees. Previously billed fees are non-refundable.',
+    lyricAppSupport: 'If your CEDEXX membership is active and you have the Lyric Health app, contact Lyric Health Member Services at 1-866-223-8831.',
+    addOrChangePlan: 'For adding a membership or changing your plan, contact support@cedexx.net.',
+    postPurchaseAccess: 'After purchasing, wait 24-48 hours for activation. Then: 1) Download Lyric Health app, 2) Tap "First Time User?" link, 3) Verify with Last Name, DOB, ZIP, 4) Check email (including spam) from noreply@getlyric.com. If still unable after 48 hours, contact support@cedexx.net.',
+  },
+
   criticalRules: [
     'NEVER give medical diagnoses, advice, or treatment recommendations',
     'ALWAYS clarify that Cedexx is a technology platform connecting to independent licensed providers',
@@ -257,6 +265,13 @@ ${k.keyBenefits.map(b => `- ${b}`).join('\n')}
 
 === WEBSITE NAVIGATION ===
 ${k.websitePages.map(p => `- ${p.name} (${p.path}): ${p.description}`).join('\n')}
+
+=== MEMBERSHIP SUPPORT FAQ ===
+- Account Access: ${k.membershipSupport.accountAccess}
+- Cancellation: ${k.membershipSupport.cancellation}
+- Lyric App Support: ${k.membershipSupport.lyricAppSupport}
+- Add/Change Plan: ${k.membershipSupport.addOrChangePlan}
+- Post-Purchase Access: ${k.membershipSupport.postPurchaseAccess}
 
 === CRITICAL RULES ===
 ${k.criticalRules.map(r => `- ${r}`).join('\n')}

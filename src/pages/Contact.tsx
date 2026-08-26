@@ -64,7 +64,7 @@ export function Contact() {
       // 3. Fallback
       const subject = encodeURIComponent(`Cedexx Inquiry from ${form.name}`);
       const body = encodeURIComponent(`Name: ${form.name}\nEmail: ${form.email}\nMessage: ${form.message}`);
-      window.location.href = `mailto:info@cedexx.net?subject=${subject}&body=${body}`;
+      window.location.href = `mailto:support@cedexx.net?subject=${subject}&body=${body}`;
     } finally {
       setSending(false);
     }
@@ -74,8 +74,8 @@ export function Contact() {
     {
       icon: Mail,
       label: 'Email Support',
-      href: 'mailto:info@cedexx.net',
-      display: 'info@cedexx.net',
+      href: 'mailto:support@cedexx.net',
+      display: 'support@cedexx.net',
     },
     {
       icon: MessageCircle,

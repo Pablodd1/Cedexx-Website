@@ -257,7 +257,7 @@ export function Layout() {
                 <div className="h-10 w-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 italic">
                   <Mail className="h-4 w-4 text-blue-400" />
                 </div>
-                <a href="mailto:info@cedexx.net" className="hover:text-white transition-all text-blue-100">info@cedexx.net</a>
+                <a href="mailto:support@cedexx.net" className="hover:text-white transition-all text-blue-100">support@cedexx.net</a>
               </li>
               <li className="flex items-center gap-4 group">
                 <div className="h-10 w-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:bg-[#23d9b0]/20 transition-all duration-500">

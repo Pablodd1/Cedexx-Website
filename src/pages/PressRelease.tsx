@@ -121,8 +121,8 @@ export function PressRelease() {
                 <p className="text-sm text-blue-100/80 leading-relaxed mb-4">
                   For media inquiries, partnership discussions, or additional information about this collaboration:
                 </p>
-                <a href="mailto:info@cedexx.net" className="text-sm font-black text-white hover:text-[#23d9b0] transition-colors">
-                  info@cedexx.net
+                <a href="mailto:support@cedexx.net" className="text-sm font-black text-white hover:text-[#23d9b0] transition-colors">
+                  support@cedexx.net
                 </a>
               </div>
             </div>

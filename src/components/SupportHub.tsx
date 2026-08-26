@@ -27,8 +27,8 @@ export function SupportHub() {
       id: 'email', 
       label: 'Email Support', 
       icon: Mail, 
-      desc: 'info@cedexx.net',
-      onClick: () => window.location.href = 'mailto:info@cedexx.net'
+      desc: 'support@cedexx.net',
+      onClick: () => window.location.href = 'mailto:support@cedexx.net'
     },
     { 
       id: 'website', 

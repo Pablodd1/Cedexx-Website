@@ -9,10 +9,17 @@ COMPANY KNOWLEDGE:
 - Lyric Health offers: 24/7 Urgent Care, Primary Care, Mental Health, Dermatology, Virtual MSK, Care Navigation, Labs, and GLP-1 Weight Loss
 - Lyric Health's nationwide network includes licensed physicians, pediatricians, dermatologists, psychiatrists, and therapists with 10+ years average experience
 - Pricing: Individual $18.99/month, Family $34.99/month (up to 7 members)
-- Contact: info@cedexx.net
+- Contact: support@cedexx.net
 - No insurance needed, HIPAA Secure through Lyric Health, 24/7 access
 - How it works: Connect in seconds → Lyric Health provider joins in minutes → Real-time consultation via phone or video
 - Prescriptions sent to your local pharmacy, digital work/school notes available
+
+MEMBERSHIP SUPPORT FAQ:
+- Account Access Help: Contact support@cedexx.net
+- Cancellation: Email support@cedexx.net with "Cancellation" in subject. Include Full Name, DOB, Email, Full Address. No fees.
+- Lyric App Support (active members): Call Lyric Health Member Services at 1-866-223-8831
+- Add/Change Plan: Contact support@cedexx.net
+- Post-Purchase Access: Wait 24-48 hours, then download Lyric Health app, tap "First Time User?", verify with Last Name/DOB/ZIP, check email (spam too) from noreply@getlyric.com
 
 IMPORTANT DISCLAIMERS:
 - Cedexx is NOT a healthcare provider — we are the technology platform. Lyric Health delivers all medical care.
@@ -30,11 +37,17 @@ const FALLBACK_RESPONSES: Record<string, string> = {
   'enroll': "To enroll, visit our website or I can connect you with our team. Would you like me to schedule a call?",
   'signup': "To get started, visit our enrollment page or I can have our team contact you. Which do you prefer?",
   'services': "Through our partner Lyric Health, we offer 24/7 urgent care, primary care, mental health support, dermatology, virtual MSK, care navigation, labs, and GLP-1 weight loss — all via phone or video consultation.",
-  'contact': "You can reach us at info@cedexx.net. We're here Mon-Fri for support!",
-  'phone': "Email us at info@cedexx.net. We'd love to hear from you!",
+  'contact': "You can reach us at support@cedexx.net. We're here Mon-Fri for support!",
+  'phone': "Our support email is support@cedexx.net. For Lyric Health app support (active members), call 1-866-223-8831.",
   'insurance': "No insurance needed! Cedexx powered by Lyric Health works on a simple monthly membership. Just pay your plan fee and get access to Lyric's nationwide provider network.",
   'who are you': "I'm Cedex, your AI assistant for Cedexx — powered by Lyric Health. I can answer questions about our virtual care services, pricing, and help you get started!",
   'what is cedexx': "Cedexx is a healthcare technology platform powered by Lyric Health. We connect families to Lyric Health's integrated virtual care services including 24/7 urgent care, primary care, mental health, and more. No insurance required, affordable monthly plans.",
+  'cancel': "To cancel, email support@cedexx.net with 'Cancellation' in the subject. Include your Full Name, DOB, Email, and Full Address. No penalties or fees.",
+  'cancellation': "To cancel, email support@cedexx.net with 'Cancellation' in the subject. Include your Full Name, DOB, Email, and Full Address. No penalties or fees.",
+  'account': "For account access help, contact support@cedexx.net. We're happy to help you locate your account.",
+  'access': "After purchasing, wait 24-48 hours for activation. Download the Lyric Health app, tap 'First Time User?', verify with Last Name/DOB/ZIP, and check your email (including spam) from noreply@getlyric.com.",
+  'app': "Download the Lyric Health app from your App Store. Tap 'First Time User?' and enter your Last Name, DOB, and ZIP to locate your membership.",
+  'lyric': "Lyric Health is our exclusive telehealth partner. Active members can contact Lyric Health Member Services at 1-866-223-8831 for app support.",
 };
 
 function getFallbackResponse(input: string): string | null {
@@ -341,7 +354,7 @@ useEffect(() => {
       
       // Try fallback response
       const fallback = getFallbackResponse(text);
-      const reply = fallback || "We're experiencing connectivity issues connecting to Cedexx AI. Please try again in a moment, or email us at info@cedexx.net for assistance.";
+      const reply = fallback || "We're experiencing connectivity issues connecting to Cedexx AI. Please try again in a moment, or email us at support@cedexx.net for assistance.";
       
       setMessages(prev => [...prev, { role: 'model', text: reply }]);
       speak(reply);
