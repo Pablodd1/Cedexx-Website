@@ -9,10 +9,13 @@ export default async function handler(req, res) {
 
   const { from_name, from_email, company_name, message, subject } = req.body;
 
+  // Send to both support and daisy
+  const adminEmails = ['support@cedexx.net', 'daisy@cedexx.net'];
+
   try {
     const data = await resend.emails.send({
-      from: 'Cedexx <notifications@cedexx.net>', // Update to your domain in Resend dashboard
-      to: ['info@cedexx.net'],
+      from: 'CEDEXX Contact <support@cedexx.net>',
+      to: adminEmails,
       subject: subject || `New Message from ${from_name}`,
       reply_to: from_email,
       html: `
@@ -25,7 +28,7 @@ export default async function handler(req, res) {
           <p><strong>Message:</strong></p>
           <p style="white-space: pre-line;">${message}</p>
           <hr />
-          <p style="font-size: 10px; color: #999;">Sent via Cedexx Platform AI Gateway</p>
+          <p style="font-size: 10px; color: #999;">Sent via Cedexx Platform</p>
         </div>
       `,
     });

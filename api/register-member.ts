@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import * as fs from 'fs';
 import { createClient } from '@supabase/supabase-js';
+import { sendWelcomeEmail, sendAdminNotification } from './lib/client-email';
 
 const supabaseUrl = process.env.SUPABASE_URL || '';
 const supabaseKey = process.env.SUPABASE_ANON_KEY || '';
@@ -26,49 +27,17 @@ function sanitize(s: string) {
 }
 
 async function sendNotifications(member: any) {
-  // Send admin notification email + Telegram
+  // Send admin notification email + Telegram in parallel
   await Promise.allSettled([
-    // Email to admin
-    (async () => {
-      try {
-        const { Resend } = await import('resend');
-        const resend = new Resend(process.env.RESEND_API_KEY);
-        const adminEmailsRaw = process.env.ADMIN_EMAIL || 'info@cedexx.net';
-        const adminEmails = adminEmailsRaw.split(/[,;]/).map(e => e.trim()).filter(Boolean);
-        // Always include support@cedexx.net in registration alerts
-        if (!adminEmails.includes('support@cedexx.net')) {
-          adminEmails.push('support@cedexx.net');
-        }
-        
-        const html = `
-    <div style="font-family:Arial,sans-serif;max-width:600px;margin:20px auto;border:1px solid #e0e0e0;border-radius:16px;overflow:hidden">
-      <div style="background:#050249;color:#fff;padding:20px">
-        <h2 style="margin:0;font-size:18px">📋 New Member Registration</h2>
-      </div>
-      <table style="width:100%;border-collapse:collapse;font-size:14px">
-        <tr><td style="padding:10px;border-bottom:1px solid #f0f0f0;font-weight:700;width:140px;background:#fafafa">Name</td><td style="padding:10px;border-bottom:1px solid #f0f0f0">${member.first_name} ${member.last_name}</td></tr>
-        <tr><td style="padding:10px;border-bottom:1px solid #f0f0f0;font-weight:700;background:#fafafa">Email</td><td style="padding:10px;border-bottom:1px solid #f0f0f0">${member.email}</td></tr>
-        ${member.phone ? `<tr><td style="padding:10px;border-bottom:1px solid #f0f0f0;font-weight:700;background:#fafafa">Phone</td><td style="padding:10px;border-bottom:1px solid #f0f0f0">${member.phone}</td></tr>` : ''}
-        ${member.dob ? `<tr><td style="padding:10px;border-bottom:1px solid #f0f0f0;font-weight:700;background:#fafafa">DOB</td><td style="padding:10px;border-bottom:1px solid #f0f0f0">${member.dob}</td></tr>` : ''}
-        ${member.plan ? `<tr><td style="padding:10px;border-bottom:1px solid #f0f0f0;font-weight:700;background:#fafafa">Plan</td><td style="padding:10px;border-bottom:1px solid #f0f0f0">${member.plan}</td></tr>` : ''}
-        <tr><td style="padding:10px;border-bottom:1px solid #f0f0f0;font-weight:700;background:#fafafa">Time</td><td style="padding:10px;border-bottom:1px solid #f0f0f0">${new Date().toLocaleString()}</td></tr>
-      </table>
-      <div style="background:#f8fafc;padding:16px;text-align:center;font-size:12px;color:#666">
-        View dashboard: <a href="https://cedexx.net/admin" style="color:#050249;font-weight:700">cedexx.net/admin</a>
-      </div>
-    </div>`;
-        
-        await resend.emails.send({
-          from: 'CEDEXX Notifications <notifications@cedexx.net>',
-          to: adminEmails,
-          subject: `📋 New CEDEXX Registration — ${member.first_name} ${member.last_name}`,
-          html,
-        });
-        console.log('[ADMIN EMAIL] Sent to', adminEmails);
-      } catch (err) {
-        console.error('[ADMIN EMAIL ERROR]', err);
-      }
-    })(),
+    // Email to admin using shared function
+    sendAdminNotification({
+      type: 'registration',
+      first_name: member.first_name,
+      last_name: member.last_name,
+      email: member.email,
+      phone: member.phone,
+      plan: member.plan,
+    }),
     // Telegram notification
     (async () => {
       try {
@@ -167,55 +136,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     console.log('[SUPABASE] Saved to database');
   }
 
+  // Send admin notifications (email + Telegram)
   await sendNotifications(member);
 
-  // Send client welcome email (fire-and-forget, don't crash on failure)
+  // Send client welcome email using shared function
   try {
-    const planName = (member.plan || '').replace('carenow', 'CareNow™').replace('carecomplete', 'CareComplete™');
-    const emailHtml = `<!DOCTYPE html>
-<html><head><meta charset="utf-8"></head>
-<body style="margin:0;padding:0;background:#f5f5f5;font-family:sans-serif;">
-<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="center" style="padding:40px 20px;">
-<table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.08);">
-<tr><td style="background:#050249;padding:32px 40px;text-align:center;">
-<h1 style="margin:0;color:#fff;font-size:24px;font-weight:700;">CEDEXX</h1>
-<p style="margin:8px 0 0 0;color:#a5b4fc;font-size:13px;">Better Care. Here. Now.</p>
-</td></tr>
-<tr><td style="padding:40px;">
-<h2 style="margin:0 0 16px 0;color:#111827;font-size:20px;font-weight:700;">What Happens Next?</h2>
-<p style="margin:0 0 20px 0;color:#374151;font-size:14px;line-height:1.6;">Follow these simple steps to access your benefits:</p>
-<ol style="margin:0 0 24px 0;padding-left:20px;color:#374151;font-size:14px;line-height:1.8;">
-<li><strong>Allow 24–48 Hours for Activation</strong><br>Please allow 24–48 hours for your membership to become accessible through the Lyric Health app. You will get instructions directly from Lyrics email noreply@getlyric.com.</li>
-<li><strong>Download the Lyric Health App from your App Store</strong><br>Download the Lyric Health app on your mobile device.<br><br>Open the app and select the link at the bottom right, next to "First Time User?" to locate your membership.</li>
-<li><strong>Verify Your Account</strong><br>You will enter your:<br><br>Last Name<br>Date of Birth<br>ZIP Code</li>
-<li><strong>Check Your Email</strong><br>Once your account is located and verified, you will receive an email with additional information. Be sure to check spam for an email from noreply@getlyric.com.</li>
-</ol>
-<p style="margin:0 0 24px 0;color:#374151;font-size:14px;line-height:1.6;">That's it! Once activated, you'll be ready to access your CEDEXX wellness benefits through <a href="https://getlyric.com/" style="color:#050249;text-decoration:underline;">Lyric Health</a>.</p>
-<p style="margin:0 0 24px 0;color:#374151;font-size:14px;line-height:1.6;font-weight:600;">CEDEXX — Better Care. Here. Now.</p>
-</td></tr>
-<tr><td style="padding:0 40px 32px 40px;text-align:center;border-top:1px solid #f0f0f0;">
-<p style="margin:24px 0 12px 0;color:#6b7280;font-size:12px;text-transform:uppercase;letter-spacing:1px;">Healthcare services provided by</p>
-<img src="https://www.cedexx.net/images/lyric-logo.webp" alt="Lyric Health" width="140" style="display:block;margin:0 auto;" />
-<p style="margin:16px 0 0 0;color:#9ca3af;font-size:12px;line-height:1.6;">Your enrollment is now complete! You're on your way to immediate access to care. Please follow the instructions below for your membership access. Thank you for your business, and enjoy your new layer of care.</p>
-</td></tr>
-<tr><td style="background:#f8fafc;padding:24px 40px;text-align:center;">
-<p style="margin:0 0 8px 0;color:#6b7280;font-size:12px;"><a href="https://www.cedexx.net" style="color:#050249;text-decoration:none;font-weight:600;">cedexx.net</a> · <a href="https://www.cedexx.net/contact" style="color:#050249;text-decoration:none;">Support</a></p>
-<p style="margin:0;color:#9ca3af;font-size:11px;">© 2026 Cedexx. All rights reserved.</p>
-</td></tr>
-</table>
-</td></tr></table></body></html>`;
-
-    const { Resend } = await import('resend');
-    const resend = new Resend(process.env.RESEND_API_KEY);
-    await resend.emails.send({
-      from: 'CEDEXX <notifications@cedexx.net>',
-      to: [member.email],
-      subject: `CEDEXX — Better Care. Here. Now.`,
-      html: emailHtml,
+    await sendWelcomeEmail({
+      first_name: member.first_name,
+      last_name: member.last_name,
+      email: member.email,
+      plan: member.plan,
     });
-    console.log('[CLIENT EMAIL] Welcome email sent to', member.email);
   } catch (err) {
-    console.error('[EMAIL ERROR]', err);
+    console.error('[EMAIL ERROR] Failed to send welcome email:', err);
   }
 
   return res.status(200).json({ success: true, id: member.id, source: savedToSupabase ? 'supabase' : 'file' });
