@@ -27,7 +27,7 @@ export function PaymentSuccess() {
             <img src="/images/lyric-logo.webp" alt="Lyric Health" className="h-8 md:h-10 object-contain" />
           </div>
           <p className="text-lg text-slate-600 font-medium max-w-xl mx-auto leading-relaxed">
-            You're on your way to immediate access to care. You will receive an email coming from Lyric (<a href="mailto:noreply@getlyric.com" className="text-[#050249] underline">noreply@getlyric.com</a>).
+            Thank you for your business! You're on your way to immediate access to care. Please follow the instructions below for your membership access.
           </p>
         </motion.div>
 
@@ -53,12 +53,28 @@ export function PaymentSuccess() {
             <li className="flex flex-col gap-1">
               <span className="font-bold text-[#050249] text-base">2. Download the Lyric Health App from your App Store</span>
               <span className="text-slate-600 text-sm leading-relaxed">
-                Download the Lyric Health app on your mobile device. Open the app and select the link at the bottom right, next to "First Time User?" to locate your membership.
+                Download the Lyric Health app on your mobile device.<br />
+                Open the app and select the link at the bottom right, next to "First Time User?" to locate your membership.
+              </span>
+            </li>
+            <li className="flex flex-col gap-1">
+              <span className="font-bold text-[#050249] text-base">3. Verify Your Account</span>
+              <span className="text-slate-600 text-sm leading-relaxed">
+                Enter your:<br />
+                Last Name<br />
+                Date of Birth<br />
+                ZIP Code
+              </span>
+            </li>
+            <li className="flex flex-col gap-1">
+              <span className="font-bold text-[#050249] text-base">4. Check Your Email</span>
+              <span className="text-slate-600 text-sm leading-relaxed">
+                Once your account is located and verified, you will receive an email with additional information. Be sure to check spam for an email from noreply@getlyric.com.
               </span>
             </li>
           </ol>
           <p className="mt-8 text-slate-600 text-sm leading-relaxed">
-            That's it! Once activated, you'll be ready to access your CEDEXX wellness benefits through Lyric Health.
+            That's it! Once activated, you'll be ready to access your CEDEXX wellness benefits through Lyric Health. Upon completion of steps 1-4, Please contact Lyric Health Member Services for assistance accessing your available services at 1-866-223-8831. If you have waited at least 48 hours and are still unable to locate or access your membership, please contact <a href="mailto:support@cedexx.net" className="text-[#050249] underline">support@cedexx.net</a> for assistance.
           </p>
           <p className="mt-4 text-[#050249] font-bold text-sm">
             CEDEXX — Better Care. Here. Now.
