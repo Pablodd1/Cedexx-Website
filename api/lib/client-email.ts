@@ -123,7 +123,8 @@ function baseTemplate(content: string): string {
           <tr>
             <td style="background:#050249;padding:32px 40px;text-align:center;">
               <h1 style="margin:0;color:#ffffff;font-size:24px;font-weight:700;letter-spacing:-0.5px;">CEDEXX</h1>
-              <p style="margin:8px 0 0 0;color:#a5b4fc;font-size:13px;">Better Care. Here. Now.</p>
+              <p style="margin:8px 0 4px 0;color:#a5b4fc;font-size:13px;">Better Care. Here. Now.</p>
+              <p style="margin:0;color:#23d9b0;font-size:12px;font-weight:500;">powered by Lyric Health</p>
             </td>
           </tr>
           <!-- Content -->
@@ -260,7 +261,7 @@ export async function sendPaymentConfirmation(data: ClientEmailData & { amount?:
   const html = baseTemplate(`
     <h2 style="margin:0 0 16px 0;color:#111827;font-size:20px;font-weight:700;">Payment Confirmed, ${data.first_name}!</h2>
     <p style="margin:0 0 20px 0;color:#374151;font-size:15px;line-height:1.6;">
-      Thank you for joining CEDEXX. Your payment has been processed successfully and your <strong>${planName}</strong> membership is now fully active.
+      Thank you for your business! You're on your way to immediate access to care. Please follow the instructions below for your membership access.
     </p>
 
     <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:20px;margin:0 0 24px 0;">
@@ -273,23 +274,49 @@ export async function sendPaymentConfirmation(data: ClientEmailData & { amount?:
       </table>
     </div>
 
-    <h3 style="margin:0 0 12px 0;color:#111827;font-size:16px;font-weight:700;">What You're Getting</h3>
-    <ul style="margin:0 0 24px 0;padding-left:20px;color:#374151;font-size:14px;line-height:1.7;">
-      ${featureList}
-    </ul>
+    <h3 style="margin:0 0 12px 0;color:#111827;font-size:16px;font-weight:700;">What Happens Next?</h3>
+    <p style="margin:0 0 16px 0;color:#374151;font-size:14px;line-height:1.6;">
+      Follow these simple steps to access your benefits:
+    </p>
 
-    <h3 style="margin:0 0 12px 0;color:#111827;font-size:16px;font-weight:700;">Get Started Now</h3>
-    <ol style="margin:0 0 24px 0;padding-left:20px;color:#374151;font-size:14px;line-height:1.8;">
-      <li>Download the <strong>Lyric Health</strong> app from your App Store</li>
-      <li>Tap "First Time User?" and enter your Last Name, DOB, and ZIP</li>
-      <li>Your membership will be located automatically</li>
-      <li>Start booking virtual visits immediately</li>
-    </ol>
+    <div style="margin:0 0 16px 0;">
+      <p style="margin:0 0 8px 0;color:#111827;font-size:14px;font-weight:700;">1. Allow 24–48 Hours for Activation</p>
+      <p style="margin:0;color:#374151;font-size:14px;line-height:1.6;">
+        Please allow 24–48 hours for your membership to become accessible through the Lyric Health app.
+      </p>
+    </div>
 
-    <a href="${CEDEXX_URL}" style="display:inline-block;background:#050249;color:#ffffff;text-decoration:none;padding:14px 28px;border-radius:10px;font-size:14px;font-weight:600;">Access Your Account</a>
+    <div style="margin:0 0 16px 0;">
+      <p style="margin:0 0 8px 0;color:#111827;font-size:14px;font-weight:700;">2. Download the Lyric Health App from your App Store</p>
+      <p style="margin:0;color:#374151;font-size:14px;line-height:1.6;">
+        Download the Lyric Health app on your mobile device.<br><br>
+        Open the app and select the link at the bottom right, next to "First Time User?" to locate your membership.
+      </p>
+    </div>
 
-    <p style="margin:24px 0 0 0;color:#374151;font-size:14px;line-height:1.6;">
-      Need help? Reply to this email or contact <a href="mailto:support@cedexx.net" style="color:#050249;text-decoration:underline;">support@cedexx.net</a>.
+    <div style="margin:0 0 16px 0;">
+      <p style="margin:0 0 8px 0;color:#111827;font-size:14px;font-weight:700;">3. Verify Your Account</p>
+      <p style="margin:0;color:#374151;font-size:14px;line-height:1.6;">
+        Enter your:<br>
+        • Last Name<br>
+        • Date of Birth<br>
+        • ZIP Code
+      </p>
+    </div>
+
+    <div style="margin:0 0 24px 0;">
+      <p style="margin:0 0 8px 0;color:#111827;font-size:14px;font-weight:700;">4. Check Your Email</p>
+      <p style="margin:0;color:#374151;font-size:14px;line-height:1.6;">
+        Once your account is located and verified, you will receive an email with additional information. Be sure to check spam for an email from noreply@getlyric.com.
+      </p>
+    </div>
+
+    <p style="margin:0 0 24px 0;color:#374151;font-size:14px;line-height:1.6;">
+      That's it! Once activated, you'll be ready to access your CEDEXX wellness benefits through Lyric Health. Upon completion of steps 1-4, please contact Lyric Health Member Services for assistance accessing your available services at <strong>1-866-223-8831</strong>. If you have waited at least 48 hours and are still unable to locate or access your membership, please contact <a href="mailto:support@cedexx.net" style="color:#050249;text-decoration:underline;">support@cedexx.net</a> for assistance.
+    </p>
+
+    <p style="margin:0;color:#050249;font-size:14px;font-weight:700;">
+      CEDEXX — Better Care. Here. Now.
     </p>
   `);
 
