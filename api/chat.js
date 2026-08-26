@@ -29,86 +29,63 @@ Key facts about CEDEXX + Lyric Health:
 - For emergencies, call 911
 - Keep responses short (2-3 sentences).`;
 
-  // Try providers in order of preference
-  const providers = [
-    // DeepSeek - PRIMARY (cheapest, excellent quality)
-    { name: 'deepseek', key: DEEPSEEK_KEY, model: 'deepseek-chat' },
-    // Gemini - Backup 1 (cheap, medical-safe)
-    { name: 'gemini', key: GEMINI_KEY, model: 'gemini-1.5-flash' },
-    // OpenAI - Backup 2
-    { name: 'openai', key: OPENAI_KEY, model: 'gpt-4o-mini' },
-    // Kimi (Moonshot) - Backup 3
-    { name: 'kimi', key: KIMI_KEY, model: 'moonshot-v1-8k' },
-    // MiniMax - Backup 4
-    { name: 'minimax', key: MINIMAX_KEY, model: 'abab6.5s-chat' }
-  ];
+  // Build provider list with available keys
+  const availableProviders = [];
+  if (DEEPSEEK_KEY) availableProviders.push({ name: 'deepseek', key: DEEPSEEK_KEY, model: 'deepseek-chat' });
+  if (OPENAI_KEY) availableProviders.push({ name: 'openai', key: OPENAI_KEY, model: 'gpt-4o-mini' });
+  if (KIMI_KEY) availableProviders.push({ name: 'kimi', key: KIMI_KEY, model: 'moonshot-v1-8k' });
+  if (GEMINI_KEY) availableProviders.push({ name: 'gemini', key: GEMINI_KEY, model: 'gemini-1.5-flash' });
+  if (MINIMAX_KEY) availableProviders.push({ name: 'minimax', key: MINIMAX_KEY, model: 'abab6.5s-chat' });
 
-  // Use requested provider or try available ones
-  let selectedProvider = provider;
-  if (!selectedProvider) {
-    for (const p of providers) {
-      if (p.key) {
-        selectedProvider = p;
-        break;
-      }
-    }
+  // Select provider: requested > first available
+  let selectedProvider = null;
+  if (provider) {
+    selectedProvider = availableProviders.find(p => p.name === provider) || availableProviders[0];
   } else {
-    selectedProvider = providers.find(p => p.name === provider) || providers.find(p => p.key);
+    selectedProvider = availableProviders[0];
   }
 
-  if (!selectedProvider?.key) {
-    // Provide a friendly fallback instead of a hard 500 to improve user experience when no provider is configured
+  if (!selectedProvider) {
+    console.error('[CHAT] No AI provider keys configured');
     const fallbackText = 'We are currently unavailable. Please try again in a moment or contact support at 954-624-6744 for immediate assistance.';
     return res.status(200).json({ choices: [{ message: { content: fallbackText } }] });
   }
 
+  console.log(`[CHAT] Using provider: ${selectedProvider.name}`);
+
   try {
-    // Kimi (Moonshot)
-    if (selectedProvider.name === 'kimi' && KIMI_KEY) {
-      const response = await fetch('https://api.moonshot.cn/v1/chat/completions', {
+    // DeepSeek — PRIMARY
+    if (selectedProvider.name === 'deepseek') {
+      const response = await fetch('https://api.deepseek.com/chat/completions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${KIMI_KEY}`
+          'Authorization': `Bearer ${DEEPSEEK_KEY}`
         },
         body: JSON.stringify({
-          model: "moonshot-v1-8k",
-          messages: [{ role: "system", content: systemPrompt }, ...messages],
+          model: 'deepseek-chat',
+          messages: [{ role: 'system', content: systemPrompt }, ...messages],
           temperature: 0.3,
           max_tokens: 500
         })
       });
 
-      const data = await response.json();
-      if (data.choices?.[0]?.message?.content) {
-        return res.status(200).json(data);
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('[CHAT] DeepSeek HTTP error:', response.status, errorText);
+        throw new Error(`DeepSeek HTTP ${response.status}: ${errorText}`);
       }
-      throw new Error('Kimi failed');
-    }
-
-    // MiniMax
-    if (selectedProvider.name === 'minimax' && MINIMAX_KEY) {
-      const response = await fetch('https://api.minimax.chat/v1/text/chatcompletion_v2', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${MINIMAX_KEY}`
-        },
-        body: JSON.stringify({
-          model: 'abab6.5s-chat',
-          messages: [{ role: "system", content: systemPrompt }, ...messages]
-        })
-      });
 
       const data = await response.json();
       if (data.choices?.[0]?.message?.content) {
         return res.status(200).json(data);
       }
-      throw new Error('MiniMax failed');
+      console.error('[CHAT] DeepSeek unexpected response:', JSON.stringify(data).slice(0, 500));
+      throw new Error('DeepSeek invalid response');
     }
 
-    // OpenAI compatible
-    if ((selectedProvider.name === 'openai' || !selectedProvider.name) && OPENAI_KEY) {
+    // OpenAI
+    if (selectedProvider.name === 'openai') {
       const openaiKey = OPENAI_KEY;
       const useAzure = openaiKey.includes('azure') || process.env.AZURE_OPENAI_ENDPOINT;
       
@@ -129,44 +106,53 @@ Key facts about CEDEXX + Lyric Health:
         })
       });
 
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`OpenAI HTTP ${response.status}: ${errorText}`);
+      }
+
       const data = await response.json();
       if (data.choices?.[0]?.message?.content) {
         return res.status(200).json(data);
       }
-      throw new Error('OpenAI failed');
+      throw new Error('OpenAI invalid response');
     }
 
-    // DeepSeek — PRIMARY (cheapest, OpenAI-compatible)
-    if (selectedProvider.name === 'deepseek' && DEEPSEEK_KEY) {
-      const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
+    // Kimi (Moonshot)
+    if (selectedProvider.name === 'kimi') {
+      const response = await fetch('https://api.moonshot.cn/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${DEEPSEEK_KEY}`
+          'Authorization': `Bearer ${KIMI_KEY}`
         },
         body: JSON.stringify({
-          model: 'deepseek-chat',
-          messages: [{ role: 'system', content: systemPrompt }, ...messages],
+          model: "moonshot-v1-8k",
+          messages: [{ role: "system", content: systemPrompt }, ...messages],
           temperature: 0.3,
           max_tokens: 500
         })
       });
 
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Kimi HTTP ${response.status}: ${errorText}`);
+      }
+
       const data = await response.json();
       if (data.choices?.[0]?.message?.content) {
         return res.status(200).json(data);
       }
-      throw new Error('DeepSeek failed');
+      throw new Error('Kimi invalid response');
     }
 
-    // Gemini (Google) — Backup 1
-    if (selectedProvider.name === 'gemini' && GEMINI_KEY) {
+    // Gemini (Google)
+    if (selectedProvider.name === 'gemini') {
       const geminiMessages = messages.map(m => ({
         role: m.role === 'assistant' || m.role === 'model' ? 'model' : 'user',
         parts: [{ text: m.content }]
       }));
 
-      // Add system prompt as first user message (Gemini doesn't have system role)
       geminiMessages.unshift({ 
         role: 'user', 
         parts: [{ text: `SYSTEM INSTRUCTION: ${systemPrompt}\n\nYou are Cedex. Respond as instructed above.` }] 
@@ -181,6 +167,11 @@ Key facts about CEDEXX + Lyric Health:
         })
       });
 
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Gemini HTTP ${response.status}: ${errorText}`);
+      }
+
       const data = await response.json();
       const reply = data.candidates?.[0]?.content?.parts?.[0]?.text;
       
@@ -189,13 +180,45 @@ Key facts about CEDEXX + Lyric Health:
           choices: [{ message: { content: reply } }]
         });
       }
-      throw new Error('Gemini failed');
+      throw new Error('Gemini invalid response');
     }
 
-    throw new Error('All providers failed');
+    // MiniMax
+    if (selectedProvider.name === 'minimax') {
+      const response = await fetch('https://api.minimax.chat/v1/text/chatcompletion_v2', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${MINIMAX_KEY}`
+        },
+        body: JSON.stringify({
+          model: 'abab6.5s-chat',
+          messages: [{ role: "system", content: systemPrompt }, ...messages]
+        })
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`MiniMax HTTP ${response.status}: ${errorText}`);
+      }
+
+      const data = await response.json();
+      if (data.choices?.[0]?.message?.content) {
+        return res.status(200).json(data);
+      }
+      throw new Error('MiniMax invalid response');
+    }
+
+    throw new Error('No matching provider handler');
 
   } catch (error) {
-    console.error('Chat API Error:', error);
-    res.status(500).json({ error: 'Failed to communicate with AI' });
+    console.error('[CHAT] Fatal error:', error.message);
+    // Return a graceful fallback instead of 500
+    const fallbackText = language === 'es' 
+      ? 'Lo siento, estoy teniendo problemas técnicos. Por favor contacta a soporte al 954-624-6744.'
+      : language === 'ht'
+      ? 'Mwen regrèt, mwen gen pwoblèm teknik. Tanpri kontakte sipò nan 954-624-6744.'
+      : 'I apologize, I\'m experiencing technical difficulties. Please contact support at 954-624-6744.';
+    return res.status(200).json({ choices: [{ message: { content: fallbackText } }] });
   }
 }

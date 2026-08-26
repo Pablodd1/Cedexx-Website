@@ -102,9 +102,7 @@ export function Layout() {
                 { to: '/blog', label: t('nav.blog') },
                 { to: '/press-release', label: t('nav.press') },
                 { to: '/partners', label: t('nav.partners') },
-                { to: '/investor-pitch', label: t('nav.pitch') },
                 { to: '/contact', label: t('nav.contact') },
-                { to: '/admin', label: t('nav.dashboard') },
               ].map((link) => {
               const isActive = location.pathname === link.to;
               return (
@@ -174,9 +172,7 @@ export function Layout() {
                 { key: 'nav.blog', to: '/blog' },
                 { key: 'nav.press', to: '/press-release' },
                 { key: 'nav.partners', to: '/partners' },
-                { key: 'nav.pitch', to: '/investor-pitch' },
                 { key: 'nav.contact', to: '/contact' },
-                { key: 'nav.dashboard', to: '/admin' },
               ].map(item => (
                 <Link 
                   key={item.to} 
@@ -250,9 +246,7 @@ export function Layout() {
               <li><Link to="/blog" className="hover:text-white transition-colors">{t('nav.blog')}</Link></li>
               <li><Link to="/press-release" className="hover:text-white transition-colors">{t('nav.press')}</Link></li>
               <li><Link to="/partners" className="hover:text-white transition-colors">{t('nav.partners')}</Link></li>
-              <li><Link to="/investor-pitch" className="hover:text-white transition-colors">{t('nav.pitch')}</Link></li>
               <li><Link to="/contact" className="hover:text-white transition-colors">{t('nav.contact')}</Link></li>
-              <li><Link to="/admin" className="hover:text-white transition-colors">{t('nav.dashboard')}</Link></li>
             </ul>
           </div>
 
