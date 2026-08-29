@@ -26,10 +26,10 @@ import { Splash } from './components/Splash';
 
 export default function App() {
   const [showSplash, setShowSplash] = useState(() => {
-    // Skip splash on admin routes for immediate access
+    // Skip splash on admin and registration routes for immediate access
     if (typeof window !== 'undefined') {
       const path = window.location.pathname;
-      return path !== '/admin' && path !== '/delete-my-data';
+      return path !== '/admin' && path !== '/delete-my-data' && path !== '/member-registration';
     }
     return true;
   });
@@ -42,6 +42,7 @@ export default function App() {
           <Routes>
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/delete-my-data" element={<DeleteMyData />} />
+            <Route path="/member-registration" element={<MemberRegistration />} />
             <Route path="/" element={<Layout />}>
               <Route index element={<Home />} />
               <Route path="about" element={<About />} />
@@ -59,7 +60,6 @@ export default function App() {
               <Route path="press-release" element={<PressRelease />} />
               <Route path="investor-pitch" element={<InvestorPitch />} />
               <Route path="contact" element={<Contact />} />
-              <Route path="member-registration" element={<MemberRegistration />} />
               <Route path="schedule-demo" element={<ScheduleDemo />} />
               <Route path="*" element={<Home />} />
             </Route>
