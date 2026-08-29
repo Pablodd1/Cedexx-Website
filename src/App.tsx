@@ -20,7 +20,7 @@ import VideoLibrary from './pages/VideoLibrary';
 import { InvestorPitch } from './pages/InvestorPitch';
 import { AdminDashboard } from './pages/AdminDashboard';
 import { DeleteMyData } from './pages/DeleteMyData';
-import PatientRegistration from './pages/PatientRegistration';
+import MemberRegistration from './pages/PatientRegistration';
 import { LanguageProvider } from './context/LanguageContext';
 import { Splash } from './components/Splash';
 
@@ -59,7 +59,7 @@ export default function App() {
               <Route path="press-release" element={<PressRelease />} />
               <Route path="investor-pitch" element={<InvestorPitch />} />
               <Route path="contact" element={<Contact />} />
-              <Route path="patient-registration" element={<PatientRegistration />} />
+              <Route path="member-registration" element={<MemberRegistration />} />
               <Route path="schedule-demo" element={<ScheduleDemo />} />
               <Route path="*" element={<Home />} />
             </Route>
