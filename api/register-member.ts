@@ -4,7 +4,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN || '';
 const REPO = 'Pablodd1/Cedexx-Website';
 const FILE_PATH = 'data/members.json';
-const BREVO_KEY = process.env.BREVO_API_KEY || '';
+const RESEND_KEY = process.env.RESEND_API_KEY || '';
 const TELEGRAM_BOT = process.env.TELEGRAM_BOT_TOKEN || '';
 const TELEGRAM_CHAT = process.env.TELEGRAM_CHAT_ID || '';
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'support@cedexx.net';
@@ -72,26 +72,35 @@ async function writeMembers(members: any[]) {
   }
 }
 
-// ─── EMAIL (Brevo API) ───
-async function sendBrevoEmail(to: string, subject: string, html: string, text: string) {
-  if (!BREVO_KEY) return;
+// ─── EMAIL (Resend API) ───
+async function sendResendEmail(to: string, subject: string, html: string, text: string) {
+  if (!RESEND_KEY) {
+    console.log('[EMAIL] No RESEND_API_KEY configured');
+    return;
+  }
   try {
-    await fetch('https://api.brevo.com/v3/smtp/email', {
+    const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'api-key': BREVO_KEY,
+        'Authorization': `Bearer ${RESEND_KEY}`,
       },
       body: JSON.stringify({
-        sender: { name: 'CEDEXX', email: 'support@cedexx.net' },
-        to: [{ email: to }],
+        from: FROM_EMAIL,
+        to: [to],
         subject,
-        htmlContent: html,
-        textContent: text,
+        html,
+        text,
       }),
     });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      console.error('[RESEND ERROR]', res.status, err);
+    } else {
+      console.log('[EMAIL] Sent to', to);
+    }
   } catch (err) {
-    console.error('[BREVO ERROR]', err);
+    console.error('[RESEND ERROR]', err);
   }
 }
 
@@ -118,7 +127,7 @@ async function sendWelcomeEmail(member: any) {
     </div>
   `;
   const text = `Welcome to CEDEXX, ${member.first_name}!\n\nYour registration is confirmed.\nName: ${member.first_name} ${member.last_name}\nEmail: ${member.email}\nPlan: ${member.plan || 'CareNow™'}\n\nYou'll receive another email when your account is fully activated.`;
-  await sendBrevoEmail(member.email, subject, html, text);
+  await sendResendEmail(member.email, subject, html, text);
 }
 
 async function sendAdminNotification(member: any) {
@@ -139,7 +148,7 @@ async function sendAdminNotification(member: any) {
     </div>
   `;
   const text = `New CEDEXX Registration:\n\nName: ${member.first_name} ${member.last_name}\nEmail: ${member.email}\nPhone: ${member.phone || '—'}\nPlan: ${member.plan || '—'}\nStatus: ${member.status}\nTime: ${member.registered_at}`;
-  await sendBrevoEmail(ADMIN_EMAIL, subject, html, text);
+  await sendResendEmail(ADMIN_EMAIL, subject, html, text);
 }
 
 // ─── TELEGRAM ───
