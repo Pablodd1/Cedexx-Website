@@ -1,54 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { readMembers, addMember, updateMember } from './lib/github-db';
-import { sendWelcomeEmail, sendAdminNotification } from './lib/client-email';
 
 function sanitize(s: string) {
   return (s || '').replace(/[<>]/g, '').trim().substring(0, 200);
-}
-
-async function sendNotifications(member: any, isCheckout = false) {
-  const type = isCheckout ? 'checkout_started' : 'registration';
-  const subject = isCheckout ? '💳 CHECKOUT STARTED' : '📋 NEW REGISTRATION';
-
-  // Email to admin
-  await Promise.allSettled([
-    sendAdminNotification({
-      type,
-      first_name: member.first_name,
-      last_name: member.last_name,
-      email: member.email,
-      phone: member.phone,
-      plan: member.plan,
-      stripe_session_id: member.stripe_session_id,
-    }),
-    // Telegram notification
-    (async () => {
-      try {
-        const token = process.env.TELEGRAM_BOT_TOKEN;
-        const chatId = process.env.TELEGRAM_CHAT_ID;
-        if (token && chatId) {
-          const lines = [
-            `${subject} — CEDEXX`,
-            `👤 ${member.first_name} ${member.last_name}`,
-            `📧 ${member.email}`,
-            member.phone ? `📞 ${member.phone}` : null,
-            `📦 Plan: ${member.plan || 'N/A'}`,
-            member.stripe_session_id ? `🆔 Stripe Session: ${member.stripe_session_id}` : null,
-            `⏳ Status: ${member.status}`,
-            `🕒 ${new Date().toLocaleString()}`,
-          ].filter(Boolean);
-
-          await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ chat_id: chatId, text: lines.join('\n'), parse_mode: 'HTML' }),
-          });
-        }
-      } catch (err) {
-        console.error('[TELEGRAM ERROR]', err);
-      }
-    })(),
-  ]);
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -71,14 +25,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const now = new Date().toISOString();
 
   try {
-    // Try to find existing member in GitHub DB
     const members = await readMembers();
     const existingMember = members.find((m) => m.email === normalizedEmail);
 
     if (existingMember) {
-      // Update existing member
       const updates: any = { updated_at: now };
-
       if (is_checkout) {
         updates.status = 'checkout_started';
         updates.checkout_started_at = now;
@@ -95,19 +46,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         if (consent_version) updates.consent_version = consent_version;
         if (consent_timestamp) updates.consent_timestamp = consent_timestamp;
       }
-
       await updateMember(existingMember.id, updates);
-      if (is_checkout) {
-        await sendNotifications({ ...existingMember, ...updates, email: normalizedEmail }, true);
-      }
-
       return res.status(200).json({
         success: true, message: 'Member updated', member_id: existingMember.id,
         status: updates.status || existingMember.status,
       });
     }
 
-    // Create new member
     const newMember = {
       id: `mem_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`,
       first_name: first_name ? sanitize(first_name) : '',
@@ -126,8 +71,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     };
 
     await addMember(newMember);
-    await sendNotifications(newMember, is_checkout);
-    await sendWelcomeEmail({ first_name: newMember.first_name, last_name: newMember.last_name, email: newMember.email, plan: newMember.plan || 'carenow' });
 
     return res.status(200).json({
       success: true, message: is_checkout ? 'Checkout started' : 'Member registered',
