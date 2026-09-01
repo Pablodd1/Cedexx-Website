@@ -206,9 +206,9 @@ function VoiceField({ label, value, onChange, placeholder, required, type = 'tex
 }
 
 /* ─── Select Field ─── */
-function SelectField({ label, value, onChange, options, required, lang }: {
+function SelectField({ label, value, onChange, options, required, lang, hidePlaceholder }: {
   label: string; value: string; onChange: (v: string) => void;
-  options: { value: string; label: string }[]; required?: boolean; lang: Lang;
+  options: { value: string; label: string }[]; required?: boolean; lang: Lang; hidePlaceholder?: boolean;
 }) {
   return (
     <div className="space-y-1.5">
@@ -219,7 +219,7 @@ function SelectField({ label, value, onChange, options, required, lang }: {
         className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#050249] font-medium
                    focus:outline-none focus:ring-2 focus:ring-[#23d9b0] focus:border-transparent transition-all appearance-none"
         style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23050249' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center' }}>
-        <option value="">{T[lang].langSelect}</option>
+        {!hidePlaceholder && <option value="">{T[lang].langSelect}</option>}
         {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
       </select>
     </div>
@@ -262,7 +262,7 @@ export default function MemberRegistration() {
     if (!form.address || !form.city || !form.state || !form.zipcode) return false;
     if (!form.gender || !form.dob) return false;
     if (!form.plan) return false;
-    if (form.action === 'enroll' && !form.effectiveDate) return false;
+    if (!form.email || !form.primaryPhone || !form.effectiveDate) return false;
     return consent;
   };
 
@@ -389,9 +389,9 @@ export default function MemberRegistration() {
           <section>
             <SectionHeader icon={Building2} title="Property Information" />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <SelectField label={t.membershipAction} value={form.action} onChange={v => update('action', v)} required lang={lang}
+              <SelectField label={t.membershipAction} value={form.action} onChange={v => update('action', v)} required lang={lang} hidePlaceholder
                 options={[{ value: 'enroll', label: t.enroll }, { value: 'disenroll', label: t.disenroll }]} />
-              <SelectField label={t.propertyType} value={form.propertyType} onChange={v => update('propertyType', v)} required lang={lang}
+              <SelectField label={t.propertyType} value={form.propertyType} onChange={v => update('propertyType', v)} required lang={lang} hidePlaceholder
                 options={[
                   { value: 'Senior', label: t.senior }, { value: 'Affordable', label: t.affordable },
                   { value: 'Multifamily', label: t.multifamily }, { value: 'Military', label: t.military },
@@ -423,12 +423,12 @@ export default function MemberRegistration() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               <VoiceField label={t.suffix} value={form.suffix} onChange={v => update('suffix', v)} lang={lang} helpText={t.suffixExample} />
-              <SelectField label={t.gender} value={form.gender} onChange={v => update('gender', v)} required lang={lang}
+              <SelectField label={t.gender} value={form.gender} onChange={v => update('gender', v)} required lang={lang} hidePlaceholder
                 options={[{ value: 'M', label: t.male }, { value: 'F', label: t.female }]} />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               <VoiceField label={t.dob} value={form.dob} onChange={v => update('dob', v)} required lang={lang} helpText={t.dobFormat} />
-              <VoiceField label={t.effectiveDate} value={form.effectiveDate} onChange={v => update('effectiveDate', v)} required={form.action === 'enroll'} lang={lang} helpText={form.action === 'enroll' ? t.effectiveRequired : t.effectiveFormat} />
+              <VoiceField label={t.effectiveDate} value={form.effectiveDate} onChange={v => update('effectiveDate', v)} required lang={lang} helpText={t.effectiveFormat} />
             </div>
           </section>
 
@@ -452,11 +452,11 @@ export default function MemberRegistration() {
           <section>
             <SectionHeader icon={Phone} title="Contact Information" />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <VoiceField label={t.primaryPhone} value={form.primaryPhone} onChange={v => update('primaryPhone', v)} lang={lang} type="tel" />
+              <VoiceField label={t.primaryPhone} value={form.primaryPhone} onChange={v => update('primaryPhone', v)} required lang={lang} type="tel" />
               <VoiceField label={t.secondaryPhone} value={form.secondaryPhone} onChange={v => update('secondaryPhone', v)} lang={lang} type="tel" />
             </div>
             <div className="mt-4">
-              <VoiceField label={t.email} value={form.email} onChange={v => update('email', v)} lang={lang} type="email" />
+              <VoiceField label={t.email} value={form.email} onChange={v => update('email', v)} required lang={lang} type="email" />
             </div>
           </section>
 
