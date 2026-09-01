@@ -1,94 +1,114 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { readMembers, addMember, updateMember } from './github-db';
 
-let notifyAdmin: ((data: any) => Promise<void>) | null = null;
-async function getNotifyAdmin() {
-  if (notifyAdmin) return notifyAdmin;
-  try { const mod = await import('./notify'); notifyAdmin = mod.notifyAdmin; } catch (_) { notifyAdmin = null; }
-  return notifyAdmin;
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN || '';
+const REPO = 'Pablodd1/Cedexx-Website';
+const FILE_PATH = 'data/members.json';
+
+async function readMembers() {
+  const res = await fetch(
+    `https://api.github.com/repos/${REPO}/contents/${FILE_PATH}?ref=main`,
+    {
+      headers: {
+        Authorization: `token ${GITHUB_TOKEN}`,
+        Accept: 'application/vnd.github.v3+json',
+      },
+    }
+  );
+  if (!res.ok) {
+    if (res.status === 404) return [];
+    throw new Error(`GitHub read failed: ${res.status}`);
+  }
+  const data = await res.json();
+  return data.content ? JSON.parse(Buffer.from(data.content, 'base64').toString('utf8')).members || [] : [];
 }
 
-function sanitize(s: string) {
-  return (s || '').replace(/[<>]/g, '').trim().substring(0, 200);
-}
+async function writeMembers(members: any[]) {
+  const getRes = await fetch(
+    `https://api.github.com/repos/${REPO}/contents/${FILE_PATH}?ref=main`,
+    {
+      headers: {
+        Authorization: `token ${GITHUB_TOKEN}`,
+        Accept: 'application/vnd.github.v3+json',
+      },
+    }
+  );
+  if (!getRes.ok) throw new Error(`GitHub read for SHA failed: ${getRes.status}`);
+  const fileData = await getRes.json();
+  const sha = fileData.sha;
 
-function getClientIp(req: VercelRequest): string {
-  const forwarded = req.headers['x-forwarded-for'];
-  if (typeof forwarded === 'string') return forwarded.split(',')[0].trim();
-  if (Array.isArray(forwarded)) return forwarded[0].split(',')[0].trim();
-  return req.socket?.remoteAddress || 'unknown';
+  const payload = {
+    members,
+    created_at: fileData.content ? JSON.parse(Buffer.from(fileData.content, 'base64').toString('utf8')).created_at : new Date().toISOString(),
+    version: '1.0',
+  };
+
+  const putRes = await fetch(
+    `https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`,
+    {
+      method: 'PUT',
+      headers: {
+        Authorization: `token ${GITHUB_TOKEN}`,
+        Accept: 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        message: `Track form start`,
+        content: Buffer.from(JSON.stringify(payload, null, 2)).toString('base64'),
+        sha,
+        branch: 'main',
+      }),
+    }
+  );
+  if (!putRes.ok) {
+    const err = await putRes.json().catch(() => ({}));
+    throw new Error(`GitHub write failed: ${putRes.status} — ${err.message || ''}`);
+  }
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
+  const { email, form_field, page_url } = req.body;
+  const now = new Date().toISOString();
+
   try {
-    const { first_name, last_name, email, phone, plan, field, url, session_id } = req.body;
-
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      return res.status(400).json({ error: 'Valid email required' });
-    }
-
-    const clientIp = getClientIp(req);
-    const normalizedEmail = email.toLowerCase().trim();
     const members = await readMembers();
-    const existing = members.find((m) => m.email === normalizedEmail);
+    const existing = members.find((m: any) => m.email === email);
 
     if (existing) {
-      if (existing.status === 'form_started') {
-        await updateMember(existing.id, {
-          form_started_at: new Date().toISOString(),
-          form_field: sanitize(field || ''),
-          page_url: sanitize(url || ''),
-          ip_address: clientIp,
-        });
-      }
-      return res.status(200).json({ success: true, id: existing.id, existing: true });
+      existing.form_started_at = now;
+      existing.form_field = form_field || '';
+      existing.page_url = page_url || '';
+      existing.updated_at = now;
+      await writeMembers(members);
+      return res.status(200).json({ success: true, message: 'Form start tracked' });
     }
 
-    const lead = {
-      id: `mbr_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
-      first_name: sanitize(first_name || ''),
-      last_name: sanitize(last_name || ''),
-      email: normalizedEmail,
-      phone: sanitize(phone || ''),
-      plan: sanitize(plan || ''),
-      status: 'form_started' as const,
-      form_started_at: new Date().toISOString(),
-      registered_at: null as string | null,
-      paid_at: null as string | null,
-      stripe_session_id: sanitize(session_id || ''),
-      ip_address: clientIp,
-      form_field: sanitize(field || ''),
-      page_url: sanitize(url || ''),
+    const newMember = {
+      id: `mem_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`,
+      email,
+      first_name: '', last_name: '', phone: '', dob: '', plan: '',
+      status: 'form_started',
+      registered_at: now,
+      form_started_at: now,
+      form_field: form_field || '',
+      page_url: page_url || '',
       consent_tos: false,
       consent_analytics: false,
       consent_version: '1.0',
-      consent_timestamp: null as string | null,
+      consent_timestamp: now,
     };
 
-    await addMember(lead);
+    members.push(newMember);
+    await writeMembers(members);
 
-    getNotifyAdmin().then((notify) => {
-      if (notify) {
-        notify({
-          type: 'form_started',
-          first_name: lead.first_name || 'Unknown',
-          last_name: lead.last_name || 'Lead',
-          email: lead.email, phone: lead.phone, plan: lead.plan,
-          field: lead.form_field, url: lead.page_url, ip: clientIp,
-        }).catch(() => {});
-      }
-    }).catch(() => {});
-
-    return res.status(200).json({ success: true, id: lead.id });
+    return res.status(200).json({ success: true, message: 'Form start tracked' });
   } catch (err: any) {
-    console.error('[TRACK FORM START ERROR]', err);
-    return res.status(500).json({ error: 'Internal server error' });
+    console.error('[TRACK ERROR]', err);
+    return res.status(500).json({ error: 'Tracking failed', detail: err.message });
   }
 }

@@ -1,79 +1,130 @@
-import Stripe from 'stripe';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { readMembers, updateMember } from './github-db';
-import { notifyAdmin } from '../notify';
 
-async function sendNotifications(member: any, eventType: string) {
-  const isPaid = eventType === 'checkout.session.completed';
-  await notifyAdmin({
-    type: isPaid ? 'payment' : 'registration',
-    first_name: member.first_name || 'Unknown',
-    last_name: member.last_name || 'User',
-    email: member.email,
-    plan: member.plan,
-    amount: member.amount,
-    stripe_session_id: member.stripe_session_id,
-  });
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN || '';
+const REPO = 'Pablodd1/Cedexx-Website';
+const FILE_PATH = 'data/members.json';
+
+async function readMembers() {
+  const res = await fetch(
+    `https://api.github.com/repos/${REPO}/contents/${FILE_PATH}?ref=main`,
+    {
+      headers: {
+        Authorization: `token ${GITHUB_TOKEN}`,
+        Accept: 'application/vnd.github.v3+json',
+      },
+    }
+  );
+  if (!res.ok) {
+    if (res.status === 404) return [];
+    throw new Error(`GitHub read failed: ${res.status}`);
+  }
+  const data = await res.json();
+  return data.content ? JSON.parse(Buffer.from(data.content, 'base64').toString('utf8')).members || [] : [];
+}
+
+async function writeMembers(members: any[]) {
+  const getRes = await fetch(
+    `https://api.github.com/repos/${REPO}/contents/${FILE_PATH}?ref=main`,
+    {
+      headers: {
+        Authorization: `token ${GITHUB_TOKEN}`,
+        Accept: 'application/vnd.github.v3+json',
+      },
+    }
+  );
+  if (!getRes.ok) throw new Error(`GitHub read for SHA failed: ${getRes.status}`);
+  const fileData = await getRes.json();
+  const sha = fileData.sha;
+
+  const payload = {
+    members,
+    created_at: fileData.content ? JSON.parse(Buffer.from(fileData.content, 'base64').toString('utf8')).created_at : new Date().toISOString(),
+    version: '1.0',
+  };
+
+  const putRes = await fetch(
+    `https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`,
+    {
+      method: 'PUT',
+      headers: {
+        Authorization: `token ${GITHUB_TOKEN}`,
+        Accept: 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        message: `Update via Stripe webhook`,
+        content: Buffer.from(JSON.stringify(payload, null, 2)).toString('base64'),
+        sha,
+        branch: 'main',
+      }),
+    }
+  );
+  if (!putRes.ok) {
+    const err = await putRes.json().catch(() => ({}));
+    throw new Error(`GitHub write failed: ${putRes.status} — ${err.message || ''}`);
+  }
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') return res.status(405).end();
 
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', { apiVersion: '2025-06-30.basil' as any });
-  const sig = req.headers['stripe-signature'] || '';
-
-  let event: Stripe.Event;
-  try {
-    event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET || '');
-  } catch (err: any) {
-    console.error('[STRIPE WEBHOOK]', err.message);
-    return res.status(400).json({ error: 'Invalid signature' });
-  }
+  const sig = req.headers['stripe-signature'];
+  const event = req.body;
 
   try {
     const members = await readMembers();
+    let updated = false;
 
-    if (event.type === 'checkout.session.completed') {
-      const session = event.data.object as Stripe.Checkout.Session;
-      const customerEmail = (session.customer_details?.email || '').toLowerCase().trim();
-      const sessionId = session.id;
-
-      let member = members.find((m) => m.stripe_session_id === sessionId);
-      if (!member && customerEmail) member = members.find((m) => m.email === customerEmail);
-
-      if (member) {
-        const amount = (session.amount_total || 0) / 100;
-        await updateMember(member.id, {
-          status: 'paid',
-          paid_at: new Date().toISOString(),
-          stripe_customer_id: typeof session.customer === 'string' ? session.customer : session.customer?.id,
-          stripe_subscription_id: typeof session.subscription === 'string' ? session.subscription : session.subscription?.id,
-          amount,
-        });
-        await sendNotifications({ ...member, amount }, 'checkout.session.completed');
+    switch (event.type) {
+      case 'checkout.session.completed': {
+        const session = event.data.object;
+        const email = session.customer_email || session.customer_details?.email;
+        if (email) {
+          const member = members.find((m: any) => m.email === email);
+          if (member) {
+            member.status = 'paid';
+            member.paid_at = new Date().toISOString();
+            member.stripe_session_id = session.id;
+            member.stripe_customer_id = session.customer;
+            member.stripe_subscription_id = session.subscription;
+            updated = true;
+          }
+        }
+        break;
+      }
+      case 'invoice.payment_failed': {
+        const invoice = event.data.object;
+        const email = invoice.customer_email;
+        if (email) {
+          const member = members.find((m: any) => m.email === email);
+          if (member) {
+            member.status = 'payment_failed';
+            member.payment_failed_at = new Date().toISOString();
+            updated = true;
+          }
+        }
+        break;
+      }
+      case 'customer.subscription.deleted': {
+        const sub = event.data.object;
+        const customerId = sub.customer;
+        const member = members.find((m: any) => m.stripe_customer_id === customerId);
+        if (member) {
+          member.status = 'cancelled';
+          member.cancelled_at = new Date().toISOString();
+          updated = true;
+        }
+        break;
       }
     }
-    else if (event.type === 'checkout.session.expired') {
-      const session = event.data.object as Stripe.Checkout.Session;
-      const member = members.find((m) => m.stripe_session_id === session.id);
-      if (member) {
-        await updateMember(member.id, { status: 'expired', checkout_expired_at: new Date().toISOString() });
-        await sendNotifications(member, 'checkout.session.expired');
-      }
-    }
-    else if (event.type === 'invoice.payment_failed') {
-      const invoice = event.data.object as Stripe.Invoice;
-      const customerId = typeof invoice.customer === 'string' ? invoice.customer : invoice.customer?.id;
-      const member = members.find((m) => m.stripe_customer_id === customerId);
-      if (member) {
-        await updateMember(member.id, { status: 'failed', payment_failed_at: new Date().toISOString() });
-        await sendNotifications(member, 'invoice.payment_failed');
-      }
+
+    if (updated) {
+      await writeMembers(members);
     }
 
-    return res.status(200).json({ received: true });
+    res.status(200).json({ received: true });
   } catch (err: any) {
-    console.error('[WEBHOOK PROCESSING ERROR]', err);
-    return res.status(500).json({ error: 'Webhook processing failed' });
+    console.error('[STRIPE WEBHOOK ERROR]', err);
+    res.status(500).json({ error: err.message });
   }
 }
