@@ -1,26 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import * as fs from 'fs';
-import { createClient } from '@supabase/supabase-js';
+import { readMembers, addMember, updateMember } from './lib/github-db';
 import { sendWelcomeEmail, sendAdminNotification } from './lib/client-email';
-
-const supabaseUrl = process.env.SUPABASE_URL || '';
-const supabaseKey = process.env.SUPABASE_ANON_KEY || '';
-const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
-
-const DATA_FILE = '/tmp/cedexx-members.json';
-
-function loadMembers(): any[] {
-  try {
-    if (fs.existsSync(DATA_FILE)) {
-      return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
-    }
-  } catch (_) {}
-  return [];
-}
-
-function saveMembers(members: any[]) {
-  fs.writeFileSync(DATA_FILE, JSON.stringify(members, null, 2), 'utf8');
-}
 
 function sanitize(s: string) {
   return (s || '').replace(/[<>]/g, '').trim().substring(0, 200);
@@ -29,7 +9,7 @@ function sanitize(s: string) {
 async function sendNotifications(member: any, isCheckout = false) {
   const type = isCheckout ? 'checkout_started' : 'registration';
   const subject = isCheckout ? '💳 CHECKOUT STARTED' : '📋 NEW REGISTRATION';
-  
+
   // Email to admin
   await Promise.allSettled([
     sendAdminNotification({
@@ -57,7 +37,7 @@ async function sendNotifications(member: any, isCheckout = false) {
             `⏳ Status: ${member.status}`,
             `🕒 ${new Date().toLocaleString()}`,
           ].filter(Boolean);
-          
+
           await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -79,7 +59,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { first_name, last_name, email, phone, dob, plan, status = 'registered', 
+  const { first_name, last_name, email, phone, dob, plan, status = 'registered',
           consent_analytics, consent_tos, consent_version, consent_timestamp,
           stripe_session_id, is_checkout } = req.body;
 
@@ -90,119 +70,72 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const normalizedEmail = email.toLowerCase().trim();
   const now = new Date().toISOString();
 
-  // Try to find existing member first
-  let existingMember: any = null;
-  let existingSource: 'supabase' | 'file' | null = null;
+  try {
+    // Try to find existing member in GitHub DB
+    const members = await readMembers();
+    const existingMember = members.find((m) => m.email === normalizedEmail);
 
-  if (supabase) {
-    try {
-      const { data } = await supabase.from('members').select('*').eq('email', normalizedEmail).single();
-      if (data) {
-        existingMember = data;
-        existingSource = 'supabase';
-      }
-    } catch (_) {}
-  }
-
-  if (!existingMember) {
-    const members = loadMembers();
-    const idx = members.findIndex((m) => m.email === normalizedEmail);
-    if (idx >= 0) {
-      existingMember = members[idx];
-      existingSource = 'file';
-    }
-  }
-
-  // Build update payload
-  const updatePayload: any = {
-    first_name: sanitize(first_name || existingMember?.first_name || ''),
-    last_name: sanitize(last_name || existingMember?.last_name || ''),
-    email: normalizedEmail,
-    phone: sanitize(phone || existingMember?.phone || ''),
-    dob: sanitize(dob || existingMember?.dob || ''),
-    plan: sanitize(plan || existingMember?.plan || ''),
-    status: status || existingMember?.status || 'registered',
-    updated_at: now,
-  };
-
-  if (stripe_session_id) {
-    updatePayload.stripe_session_id = sanitize(stripe_session_id);
-  }
-  if (consent_tos !== undefined) {
-    updatePayload.consent_tos = !!consent_tos;
-    updatePayload.consent_version = sanitize(consent_version || '2.0');
-    updatePayload.consent_timestamp = consent_timestamp || now;
-  }
-  if (consent_analytics !== undefined) {
-    updatePayload.consent_analytics = !!consent_analytics;
-  }
-
-  // If this is a checkout update (user clicked "Complete Enrollment")
-  if (is_checkout) {
-    updatePayload.status = 'checkout_started';
-    updatePayload.checkout_started_at = now;
-  } else if (!existingMember) {
-    // New registration from step 1
-    updatePayload.id = `mbr_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
-    updatePayload.registered_at = now;
-    updatePayload.paid_at = null;
-  }
-
-  let savedToSupabase = false;
-
-  // Upsert to Supabase
-  if (supabase) {
-    try {
-      if (existingMember?.id) {
-        const { error } = await supabase.from('members').update(updatePayload).eq('id', existingMember.id);
-        if (!error) savedToSupabase = true;
-      } else {
-        const { error } = await supabase.from('members').insert(updatePayload);
-        if (!error) savedToSupabase = true;
-      }
-    } catch (err) {
-      console.error('[SUPABASE ERROR]', err);
-    }
-  }
-
-  // Fallback to file
-  if (!savedToSupabase) {
-    const members = loadMembers();
     if (existingMember) {
-      const idx = members.findIndex((m) => m.email === normalizedEmail);
-      if (idx >= 0) {
-        members[idx] = { ...members[idx], ...updatePayload };
+      // Update existing member
+      const updates: any = { updated_at: now };
+
+      if (is_checkout) {
+        updates.status = 'checkout_started';
+        updates.checkout_started_at = now;
+        updates.stripe_session_id = stripe_session_id || existingMember.stripe_session_id;
+      } else {
+        if (first_name) updates.first_name = sanitize(first_name);
+        if (last_name) updates.last_name = sanitize(last_name);
+        if (phone) updates.phone = sanitize(phone);
+        if (dob) updates.dob = dob;
+        if (plan) updates.plan = plan;
+        if (status) updates.status = status;
+        if (consent_tos !== undefined) updates.consent_tos = consent_tos;
+        if (consent_analytics !== undefined) updates.consent_analytics = consent_analytics;
+        if (consent_version) updates.consent_version = consent_version;
+        if (consent_timestamp) updates.consent_timestamp = consent_timestamp;
       }
-    } else {
-      members.push(updatePayload);
-    }
-    saveMembers(members);
-    console.log('[FALLBACK] Saved to local file (WARNING: /tmp is ephemeral on Vercel)');
-  } else {
-    console.log('[SUPABASE] Saved to database');
-  }
 
-  // Send notifications
-  await sendNotifications(updatePayload, is_checkout);
+      await updateMember(existingMember.id, updates);
+      if (is_checkout) {
+        await sendNotifications({ ...existingMember, ...updates, email: normalizedEmail }, true);
+      }
 
-  // Send welcome email only on initial registration (not checkout update)
-  if (!is_checkout && !existingMember) {
-    try {
-      await sendWelcomeEmail({
-        first_name: updatePayload.first_name,
-        last_name: updatePayload.last_name,
-        email: updatePayload.email,
-        plan: updatePayload.plan,
+      return res.status(200).json({
+        success: true, message: 'Member updated', member_id: existingMember.id,
+        status: updates.status || existingMember.status,
       });
-    } catch (err) {
-      console.error('[EMAIL ERROR] Failed to send welcome email:', err);
     }
-  }
 
-  return res.status(200).json({ 
-    success: true, 
-    id: updatePayload.id || existingMember?.id, 
-    source: savedToSupabase ? 'supabase' : 'file',
-    status: updatePayload.status,
-  });
+    // Create new member
+    const newMember = {
+      id: `mem_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`,
+      first_name: first_name ? sanitize(first_name) : '',
+      last_name: last_name ? sanitize(last_name) : '',
+      email: normalizedEmail,
+      phone: phone ? sanitize(phone) : '',
+      dob: dob || '', plan: plan || '',
+      status: is_checkout ? 'checkout_started' : (status || 'registered'),
+      registered_at: now,
+      checkout_started_at: is_checkout ? now : null,
+      stripe_session_id: stripe_session_id || null,
+      consent_tos: consent_tos || false,
+      consent_analytics: consent_analytics || false,
+      consent_version: consent_version || '1.0',
+      consent_timestamp: consent_timestamp || now,
+    };
+
+    await addMember(newMember);
+    await sendNotifications(newMember, is_checkout);
+    await sendWelcomeEmail({ first_name: newMember.first_name, email: newMember.email });
+
+    return res.status(200).json({
+      success: true, message: is_checkout ? 'Checkout started' : 'Member registered',
+      member_id: newMember.id, status: newMember.status,
+    });
+
+  } catch (err: any) {
+    console.error('[REGISTER ERROR]', err);
+    return res.status(500).json({ error: 'Registration failed', detail: err.message });
+  }
 }
