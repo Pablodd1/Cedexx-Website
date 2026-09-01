@@ -127,7 +127,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     await addMember(newMember);
     await sendNotifications(newMember, is_checkout);
-    await sendWelcomeEmail({ first_name: newMember.first_name, email: newMember.email });
+    await sendWelcomeEmail({ first_name: newMember.first_name, last_name: newMember.last_name, email: newMember.email, plan: newMember.plan || 'carenow' });
 
     return res.status(200).json({
       success: true, message: is_checkout ? 'Checkout started' : 'Member registered',
