@@ -1,5 +1,5 @@
 import { Resend } from 'resend';
-import { sendAdminNotification } from './lib/client-email';
+import { sendAdminNotification } from './client-email';
 
 interface NotifyData {
   type: 'registration' | 'payment' | 'deletion' | 'form_started' | 'checkout_started';

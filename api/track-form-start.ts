@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { readMembers, addMember, updateMember } from './lib/github-db';
+import { readMembers, addMember, updateMember } from './github-db';
 
 let notifyAdmin: ((data: any) => Promise<void>) | null = null;
 async function getNotifyAdmin() {

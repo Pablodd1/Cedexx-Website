@@ -1,6 +1,6 @@
 import Stripe from 'stripe';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { readMembers, updateMember } from '../lib/github-db';
+import { readMembers, updateMember } from './github-db';
 import { notifyAdmin } from '../notify';
 
 async function sendNotifications(member: any, eventType: string) {
