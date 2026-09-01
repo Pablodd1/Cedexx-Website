@@ -29,7 +29,7 @@ export default function App() {
     // Skip splash on admin and registration routes for immediate access
     if (typeof window !== 'undefined') {
       const path = window.location.pathname;
-      return path !== '/admin' && path !== '/delete-my-data' && path !== '/member-registration';
+      return path !== '/admin' && path !== '/delete-my-data' && path !== '/member-registration' && path !== '/patient-registration';
     }
     return true;
   });
@@ -43,6 +43,7 @@ export default function App() {
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/delete-my-data" element={<DeleteMyData />} />
             <Route path="/member-registration" element={<MemberRegistration />} />
+            <Route path="/patient-registration" element={<MemberRegistration />} />
             <Route path="/" element={<Layout />}>
               <Route index element={<Home />} />
               <Route path="about" element={<About />} />
