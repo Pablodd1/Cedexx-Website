@@ -1,9 +1,16 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
+// ─── CONFIG ───
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN || '';
 const REPO = 'Pablodd1/Cedexx-Website';
 const FILE_PATH = 'data/members.json';
+const BREVO_KEY = process.env.BREVO_API_KEY || '';
+const TELEGRAM_BOT = process.env.TELEGRAM_BOT_TOKEN || '';
+const TELEGRAM_CHAT = process.env.TELEGRAM_CHAT_ID || '';
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'support@cedexx.net';
+const FROM_EMAIL = 'CEDEXX <support@cedexx.net>';
 
+// ─── GITHUB DB ───
 async function readMembers() {
   const res = await fetch(
     `https://api.github.com/repos/${REPO}/contents/${FILE_PATH}?ref=main`,
@@ -23,7 +30,6 @@ async function readMembers() {
 }
 
 async function writeMembers(members: any[]) {
-  // Get current SHA
   const getRes = await fetch(
     `https://api.github.com/repos/${REPO}/contents/${FILE_PATH}?ref=main`,
     {
@@ -66,10 +72,109 @@ async function writeMembers(members: any[]) {
   }
 }
 
+// ─── EMAIL (Brevo API) ───
+async function sendBrevoEmail(to: string, subject: string, html: string, text: string) {
+  if (!BREVO_KEY) return;
+  try {
+    await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'api-key': BREVO_KEY,
+      },
+      body: JSON.stringify({
+        sender: { name: 'CEDEXX', email: 'support@cedexx.net' },
+        to: [{ email: to }],
+        subject,
+        htmlContent: html,
+        textContent: text,
+      }),
+    });
+  } catch (err) {
+    console.error('[BREVO ERROR]', err);
+  }
+}
+
+async function sendWelcomeEmail(member: any) {
+  const subject = 'Welcome to CEDEXX — Your Health, Simplified';
+  const html = `
+    <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1a1a2e;">
+      <div style="background:linear-gradient(135deg,#00D4FF,#7B2FF7);padding:40px 20px;text-align:center;border-radius:12px 12px 0 0;">
+        <h1 style="color:#fff;margin:0;font-size:28px;">Welcome to CEDEXX</h1>
+        <p style="color:rgba(255,255,255,0.9);margin:10px 0 0;font-size:16px;">Your Health, Simplified</p>
+      </div>
+      <div style="padding:30px;background:#fff;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 12px 12px;">
+        <p style="font-size:18px;margin-bottom:20px;">Hi <strong>${member.first_name}</strong>,</p>
+        <p>Welcome to CEDEXX! You've taken the first step toward better health.</p>
+        <div style="background:#f8fafc;padding:20px;border-radius:8px;margin:20px 0;">
+          <p style="margin:0 0 10px;font-weight:600;">Your Registration Details:</p>
+          <p style="margin:5px 0;"><strong>Name:</strong> ${member.first_name} ${member.last_name}</p>
+          <p style="margin:5px 0;"><strong>Email:</strong> ${member.email}</p>
+          <p style="margin:5px 0;"><strong>Plan:</strong> ${member.plan || 'CareNow™'}</p>
+        </div>
+        <p>You'll receive another email when your account is fully activated.</p>
+        <p style="margin-top:30px;color:#6b7280;font-size:14px;">Questions? Reply to this email or contact us at <a href="mailto:support@cedexx.net">support@cedexx.net</a></p>
+      </div>
+    </div>
+  `;
+  const text = `Welcome to CEDEXX, ${member.first_name}!\n\nYour registration is confirmed.\nName: ${member.first_name} ${member.last_name}\nEmail: ${member.email}\nPlan: ${member.plan || 'CareNow™'}\n\nYou'll receive another email when your account is fully activated.`;
+  await sendBrevoEmail(member.email, subject, html, text);
+}
+
+async function sendAdminNotification(member: any) {
+  const subject = `📋 New CEDEXX Registration — ${member.first_name} ${member.last_name}`;
+  const html = `
+    <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
+      <h2 style="color:#7B2FF7;">New Patient Registration</h2>
+      <table style="width:100%;border-collapse:collapse;">
+        <tr><td style="padding:8px;border:1px solid #e5e7eb;font-weight:600;">Name</td><td style="padding:8px;border:1px solid #e5e7eb;">${member.first_name} ${member.last_name}</td></tr>
+        <tr><td style="padding:8px;border:1px solid #e5e7eb;font-weight:600;">Email</td><td style="padding:8px;border:1px solid #e5e7eb;">${member.email}</td></tr>
+        <tr><td style="padding:8px;border:1px solid #e5e7eb;font-weight:600;">Phone</td><td style="padding:8px;border:1px solid #e5e7eb;">${member.phone || '—'}</td></tr>
+        <tr><td style="padding:8px;border:1px solid #e5e7eb;font-weight:600;">DOB</td><td style="padding:8px;border:1px solid #e5e7eb;">${member.dob || '—'}</td></tr>
+        <tr><td style="padding:8px;border:1px solid #e5e7eb;font-weight:600;">Plan</td><td style="padding:8px;border:1px solid #e5e7eb;">${member.plan || '—'}</td></tr>
+        <tr><td style="padding:8px;border:1px solid #e5e7eb;font-weight:600;">Status</td><td style="padding:8px;border:1px solid #e5e7eb;">${member.status}</td></tr>
+        <tr><td style="padding:8px;border:1px solid #e5e7eb;font-weight:600;">Time</td><td style="padding:8px;border:1px solid #e5e7eb;">${member.registered_at}</td></tr>
+      </table>
+      <p style="margin-top:20px;"><a href="https://cedexx.net/admin.html" style="background:#7B2FF7;color:#fff;padding:12px 24px;text-decoration:none;border-radius:6px;display:inline-block;">View Dashboard</a></p>
+    </div>
+  `;
+  const text = `New CEDEXX Registration:\n\nName: ${member.first_name} ${member.last_name}\nEmail: ${member.email}\nPhone: ${member.phone || '—'}\nPlan: ${member.plan || '—'}\nStatus: ${member.status}\nTime: ${member.registered_at}`;
+  await sendBrevoEmail(ADMIN_EMAIL, subject, html, text);
+}
+
+// ─── TELEGRAM ───
+async function sendTelegramNotification(member: any) {
+  if (!TELEGRAM_BOT || !TELEGRAM_CHAT) return;
+  const text = [
+    '📋 <b>NEW REGISTRATION</b> — CEDEXX',
+    `👤 ${member.first_name} ${member.last_name}`,
+    `📧 ${member.email}`,
+    member.phone ? `📞 ${member.phone}` : null,
+    member.plan ? `📦 Plan: ${member.plan}` : null,
+    `🕒 ${new Date().toLocaleString()}`,
+  ].filter(Boolean).join('\n');
+
+  try {
+    await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: TELEGRAM_CHAT,
+        text,
+        parse_mode: 'HTML',
+      }),
+    });
+  } catch (err) {
+    console.error('[TELEGRAM ERROR]', err);
+  }
+}
+
+// ─── UTILS ───
 function sanitize(s: string) {
   return (s || '').replace(/[<>]/g, '').trim().substring(0, 200);
 }
 
+// ─── MAIN HANDLER ───
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -138,6 +243,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     members.push(newMember);
     await writeMembers(members);
+
+    // Send notifications (fire-and-forget)
+    Promise.allSettled([
+      sendWelcomeEmail(newMember),
+      sendAdminNotification(newMember),
+      sendTelegramNotification(newMember),
+    ]).catch(() => {});
 
     return res.status(200).json({
       success: true, message: is_checkout ? 'Checkout started' : 'Member registered',
