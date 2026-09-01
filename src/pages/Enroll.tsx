@@ -127,6 +127,28 @@ export function Enroll() {
     setLoading(true);
     setError(null);
 
+    // First: mark member as checkout_started so admin gets notified
+    try {
+      await fetch('/api/register-member', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          first_name: firstName.trim(),
+          last_name: lastName.trim(),
+          email: email.trim(),
+          phone: phone.trim(),
+          dob: dob,
+          plan: plan,
+          is_checkout: true,
+          consent_tos: consentTOS,
+          consent_version: '2.0',
+          consent_timestamp: new Date().toISOString(),
+        }),
+      });
+    } catch (_) {
+      // Non-blocking — don't stop checkout if this fails
+    }
+
     try {
       const res = await fetch('/api/stripe/create-checkout', {
         method: 'POST',

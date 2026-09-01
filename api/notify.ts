@@ -2,7 +2,7 @@ import { Resend } from 'resend';
 import { sendAdminNotification } from './lib/client-email';
 
 interface NotifyData {
-  type: 'registration' | 'payment' | 'deletion' | 'form_started';
+  type: 'registration' | 'payment' | 'deletion' | 'form_started' | 'checkout_started';
   first_name: string;
   last_name: string;
   email: string;
@@ -53,9 +53,14 @@ async function sendTelegramNotification(data: NotifyData) {
   const isPayment = data.type === 'payment';
   const isDeletion = data.type === 'deletion';
   const isFormStart = data.type === 'form_started';
+  const isCheckoutStart = data.type === 'checkout_started';
 
   const lines = [
-    isPayment ? '💳 <b>NEW PAYMENT</b> — CEDEXX' : isDeletion ? '🗑️ <b>DATA DELETION</b> — CEDEXX' : isFormStart ? '📝 <b>LEAD STARTED FORM</b> — CEDEXX' : '📋 <b>NEW REGISTRATION</b> — CEDEXX',
+    isPayment ? '💳 <b>NEW PAYMENT</b> — CEDEXX' : 
+    isDeletion ? '🗑️ <b>DATA DELETION</b> — CEDEXX' : 
+    isFormStart ? '📝 <b>LEAD STARTED FORM</b> — CEDEXX' :
+    isCheckoutStart ? '💳 <b>CHECKOUT STARTED</b> — CEDEXX' :
+    '📋 <b>NEW REGISTRATION</b> — CEDEXX',
     `👤 ${data.first_name} ${data.last_name}`,
     `📧 ${data.email}`,
     data.phone ? `📞 ${data.phone}` : null,
@@ -95,6 +100,7 @@ async function sendSMSNotification(data: NotifyData) {
 
   const isPayment = data.type === 'payment';
   const isFormStart = data.type === 'form_started';
+  const isCheckoutStart = data.type === 'checkout_started';
   const planInfo = data.plan ? ` (${data.plan})` : '';
   const amountInfo = isPayment && data.amount ? ` $${(data.amount / 100).toFixed(2)}` : '';
   
@@ -102,9 +108,11 @@ async function sendSMSNotification(data: NotifyData) {
     ? `CEDEXX PAYMENT: ${data.first_name} ${data.last_name}${planInfo}${amountInfo}`
     : data.type === 'deletion'
       ? `CEDEXX: Deletion request for ${data.email}`
-      : isFormStart
-        ? `CEDEXX LEAD: ${data.first_name} ${data.last_name}, ${data.email}${planInfo}`
-        : `CEDEXX REG: ${data.first_name} ${data.last_name}, ${data.email}${planInfo}`;
+      : isCheckoutStart
+        ? `CEDEXX CHECKOUT: ${data.first_name} ${data.last_name}, ${data.email}${planInfo}`
+        : isFormStart
+          ? `CEDEXX LEAD: ${data.first_name} ${data.last_name}, ${data.email}${planInfo}`
+          : `CEDEXX REG: ${data.first_name} ${data.last_name}, ${data.email}${planInfo}`;
 
   // Try TextBelt first (free 1 SMS/day with key=textbelt)
   try {

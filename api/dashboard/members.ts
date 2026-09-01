@@ -67,6 +67,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     paid: members.filter((m) => m.status === 'paid').length,
     registered: members.filter((m) => m.status === 'registered').length,
     form_started: members.filter((m) => m.status === 'form_started').length,
+    checkout_started: members.filter((m) => m.status === 'checkout_started').length,
+    checkout_expired: members.filter((m) => m.status === 'checkout_expired').length,
+    payment_failed: members.filter((m) => m.status === 'payment_failed').length,
     by_plan: {} as Record<string, number>,
   };
 

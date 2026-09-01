@@ -14,15 +14,19 @@ interface Member {
   phone: string;
   dob: string;
   plan: string;
-  status: 'registered' | 'paid' | 'form_started';
+  status: 'registered' | 'paid' | 'form_started' | 'checkout_started' | 'checkout_expired' | 'payment_failed';
   registered_at: string | null;
   paid_at: string | null;
   form_started_at?: string | null;
+  checkout_started_at?: string | null;
+  checkout_expired_at?: string | null;
+  payment_failed_at?: string | null;
   form_field?: string;
   page_url?: string;
   ip_address?: string;
   stripe_session_id?: string;
   stripe_customer_id?: string;
+  stripe_subscription_id?: string;
   consent_tos?: boolean;
   consent_analytics?: boolean;
   consent_version?: string;
@@ -34,6 +38,9 @@ interface Stats {
   paid: number;
   registered: number;
   form_started: number;
+  checkout_started: number;
+  checkout_expired: number;
+  payment_failed: number;
   by_plan: Record<string, number>;
 }
 
@@ -54,15 +61,21 @@ const PLAN_PRICES: Record<string, string> = {
 };
 
 const STATUS_LABELS: Record<string, string> = {
-  'paid': 'Paid',
-  'registered': 'Registered',
-  'form_started': 'Form Started',
+  'paid': '✅ Paid',
+  'registered': '📝 Registered (Unpaid)',
+  'form_started': '📋 Form Started',
+  'checkout_started': '💳 Checkout Started',
+  'checkout_expired': '⏰ Checkout Expired',
+  'payment_failed': '❌ Payment Failed',
 };
 
 const STATUS_STYLES: Record<string, string> = {
   'paid': 'bg-[#23d9b0]/10 text-[#23d9b0] border border-[#23d9b0]/30',
   'registered': 'bg-amber-50 text-amber-600 border border-amber-200',
   'form_started': 'bg-blue-50 text-blue-600 border border-blue-200',
+  'checkout_started': 'bg-purple-50 text-purple-600 border border-purple-200',
+  'checkout_expired': 'bg-orange-50 text-orange-600 border border-orange-200',
+  'payment_failed': 'bg-red-50 text-red-600 border border-red-200',
 };
 
 function formatDate(iso: string | null) {
@@ -274,31 +287,72 @@ export function AdminDashboard() {
         </div>
       </div>
 
+      {/* Data Persistence Warning */}
+      <div className="bg-red-50 border-b border-red-200 px-6 py-3">
+        <div className="container mx-auto max-w-7xl flex items-center gap-3">
+          <AlertCircle className="h-4 w-4 text-red-500 shrink-0" />
+          <p className="text-xs font-bold text-red-600">
+            ⚠️ DATA ALERT: Members are stored in temporary memory. 
+            <span className="hidden sm:inline"> On Vercel, data may be lost on redeploy. </span>
+            <span className="font-black">Export CSV regularly</span> or configure Supabase for permanent storage.
+          </p>
+        </div>
+      </div>
+
       <div className="container mx-auto px-6 py-10 max-w-7xl">
 
         {/* Stats Cards */}
         {stats && (
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
-            {[
-              { label: 'Total Leads', value: stats.total, icon: Users, color: 'bg-blue-50 text-[#050249]' },
-              { label: 'Paid Members', value: stats.paid, icon: CreditCard, color: 'bg-[#23d9b0]/10 text-[#23d9b0]' },
-              { label: 'Registered (Unpaid)', value: stats.registered, icon: UserCheck, color: 'bg-amber-50 text-amber-600' },
-              { label: 'Form Started', value: stats.form_started, icon: Clock, color: 'bg-blue-50 text-blue-600' },
-              { label: 'Conversion Rate', value: stats.total ? `${Math.round((stats.paid / stats.total) * 100)}%` : '0%', icon: CheckCircle2, color: 'bg-purple-50 text-purple-600' },
-            ].map((s, i) => (
+          <>
+            {/* Follow-up Alert Banner */}
+            {(stats.registered > 0 || stats.checkout_started > 0 || stats.checkout_expired > 0) && (
               <motion.div
-                key={i} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.07 }}
-                className="bg-white rounded-3xl p-6 shadow-md border border-slate-100"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-6 p-4 rounded-2xl bg-amber-50 border border-amber-200 flex items-center gap-3"
               >
-                <div className={`h-10 w-10 rounded-xl flex items-center justify-center mb-3 ${s.color}`}>
-                  <s.icon className="h-5 w-5" />
+                <AlertCircle className="h-5 w-5 text-amber-600 shrink-0" />
+                <div className="flex-1">
+                  <p className="text-sm font-bold text-amber-700">
+                    ⚠️ Follow-up needed: {stats.registered} registered unpaid, {stats.checkout_started} in checkout, {stats.checkout_expired} expired
+                  </p>
+                  <p className="text-xs text-amber-600 mt-0.5">
+                    These members completed registration but haven't paid. Consider reaching out to help them complete enrollment.
+                  </p>
                 </div>
-                <div className="text-2xl font-black text-[#050249]">{s.value}</div>
-                <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">{s.label}</div>
+                <button
+                  onClick={() => setFilterStatus('registered')}
+                  className="text-xs font-black text-amber-700 bg-amber-100 px-3 py-1.5 rounded-lg hover:bg-amber-200 transition-colors"
+                >
+                  View Unpaid
+                </button>
               </motion.div>
-            ))}
-          </div>
+            )}
+
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 mb-8">
+              {[
+                { label: 'Total', value: stats.total, icon: Users, color: 'bg-blue-50 text-[#050249]' },
+                { label: 'Paid', value: stats.paid, icon: CreditCard, color: 'bg-[#23d9b0]/10 text-[#23d9b0]' },
+                { label: 'Registered', value: stats.registered, icon: UserCheck, color: 'bg-amber-50 text-amber-600' },
+                { label: 'Form Started', value: stats.form_started, icon: Clock, color: 'bg-blue-50 text-blue-600' },
+                { label: 'Checkout', value: stats.checkout_started, icon: CreditCard, color: 'bg-purple-50 text-purple-600' },
+                { label: 'Expired', value: stats.checkout_expired, icon: AlertCircle, color: 'bg-orange-50 text-orange-600' },
+                { label: 'Failed', value: stats.payment_failed, icon: AlertCircle, color: 'bg-red-50 text-red-600' },
+              ].map((s, i) => (
+                <motion.div
+                  key={i} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.05 }}
+                  className="bg-white rounded-2xl p-4 shadow-md border border-slate-100"
+                >
+                  <div className={`h-8 w-8 rounded-lg flex items-center justify-center mb-2 ${s.color}`}>
+                    <s.icon className="h-4 w-4" />
+                  </div>
+                  <div className="text-xl font-black text-[#050249]">{s.value}</div>
+                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">{s.label}</div>
+                </motion.div>
+              ))}
+            </div>
+          </>
         )}
 
         {/* Plan Breakdown */}
@@ -336,9 +390,12 @@ export function AdminDashboard() {
             className="px-4 py-3 rounded-2xl bg-slate-50 border border-slate-100 text-sm font-bold text-[#050249] outline-none focus:ring-2 focus:ring-[#050249]"
           >
             <option value="">All Statuses</option>
-            <option value="paid">Paid</option>
-            <option value="registered">Registered</option>
-            <option value="form_started">Form Started</option>
+            <option value="paid">✅ Paid</option>
+            <option value="registered">📝 Registered (Unpaid)</option>
+            <option value="checkout_started">💳 Checkout Started</option>
+            <option value="checkout_expired">⏰ Checkout Expired</option>
+            <option value="payment_failed">❌ Payment Failed</option>
+            <option value="form_started">📋 Form Started</option>
           </select>
           <select
             value={filterPlan} onChange={(e) => setFilterPlan(e.target.value)}
