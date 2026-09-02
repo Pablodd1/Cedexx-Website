@@ -406,7 +406,7 @@ export default function MemberRegistration() {
           {/* ── Plan Details ── */}
           <section>
             <SectionHeader icon={FileText} title={t.planDetails} />
-            <SelectField label={t.planDetails} value={form.plan} onChange={v => update('plan', v)} required lang={lang}
+            <SelectField label={t.planDetails} value={form.plan} onChange={v => update('plan', v)} required lang={lang} hidePlaceholder
               options={[
                 { value: '1', label: t.planSingle }, { value: '2', label: t.planSpouse }, { value: '3', label: t.planFamily }
               ]} />
