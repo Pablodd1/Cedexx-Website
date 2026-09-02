@@ -115,6 +115,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 stripe_session_id: session.id,
               }),
               notifyAdmin(notifyPayload),
+              // Send to Lyric Health enrollment team
+              fetch('https://cedexx.net/api/bridge/lyric', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ patient_id: member.id }),
+              }).catch(() => {}),
             ]).catch(() => {});
           }
         }
