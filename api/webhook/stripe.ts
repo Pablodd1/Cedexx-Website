@@ -1,4 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { sendPaymentConfirmation, sendAdminNotification } from './client-email';
+import { notifyAdmin } from './notify';
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN || '';
 const REPO = 'Pablodd1/Cedexx-Website';
@@ -79,6 +81,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       case 'checkout.session.completed': {
         const session = event.data.object;
         const email = session.customer_email || session.customer_details?.email;
+        const metadata = session.metadata || {};
         if (email) {
           const member = members.find((m: any) => m.email === email);
           if (member) {
@@ -88,6 +91,31 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             member.stripe_customer_id = session.customer;
             member.stripe_subscription_id = session.subscription;
             updated = true;
+
+            // ─── SEND NOTIFICATIONS ───
+            const notifyPayload = {
+              type: 'payment' as const,
+              first_name: member.first_name || metadata.first_name || '',
+              last_name: member.last_name || metadata.last_name || '',
+              email: member.email,
+              phone: member.phone || '',
+              plan: member.plan || metadata.plan || '',
+              amount: session.amount_total || 0,
+              stripe_session_id: session.id,
+            };
+
+            // Fire-and-forget notifications
+            Promise.allSettled([
+              sendPaymentConfirmation({
+                first_name: member.first_name || metadata.first_name || '',
+                last_name: member.last_name || metadata.last_name || '',
+                email: member.email,
+                plan: member.plan || metadata.plan || '',
+                amount: session.amount_total,
+                stripe_session_id: session.id,
+              }),
+              notifyAdmin(notifyPayload),
+            ]).catch(() => {});
           }
         }
         break;
@@ -101,6 +129,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             member.status = 'payment_failed';
             member.payment_failed_at = new Date().toISOString();
             updated = true;
+
+            // ─── NOTIFY ADMIN OF FAILURE ───
+            Promise.allSettled([
+              notifyAdmin({
+                type: 'payment' as const,
+                first_name: member.first_name,
+                last_name: member.last_name,
+                email: member.email,
+                phone: member.phone || '',
+                plan: member.plan || '',
+                amount: invoice.amount_due || 0,
+                stripe_session_id: invoice.id,
+              }),
+            ]).catch(() => {});
           }
         }
         break;
