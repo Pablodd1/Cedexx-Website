@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Shield, Lock, FileText, Eye, Server, Cookie, BarChart3, Trash2, CalendarDays, Scale, UserX, Bell } from 'lucide-react';
+import { Shield, Lock, FileText, Eye, Server, Cookie, BarChart3, Trash2, CalendarDays, Scale, UserX, Bell, MessageCircle } from 'lucide-react';
 
 export function Privacy() {
   return (
@@ -257,9 +257,45 @@ export function Privacy() {
               </p>
             </section>
 
-            {/* 13. Contact Us */}
+            {/* 13. SMS/Text Messaging Consent */}
+            <section>
+              <h2 className="text-2xl font-bold text-emerald-900 mb-4 flex items-center gap-2">
+                <MessageCircle className="h-6 w-6 text-emerald-500" />
+                13. SMS/Text Messaging Consent
+              </h2>
+              <div className="space-y-4">
+                <p>
+                  <strong>Opt-In Required:</strong> We only send SMS/text messages to individuals who have explicitly consented to receive them.
+                  Consent is obtained in one of two ways:
+                </p>
+                <ol className="list-decimal list-inside space-y-2 ml-4">
+                  <li>
+                    <strong>Verbal Consent (Phone):</strong> When you call our AI front desk at (855) 503-3371, you may be asked:
+                    <em> "Would you like me to text you the enrollment link?"</em> Saying "yes" or similar affirmative response constitutes explicit consent to receive one or more text messages from CEDEXX.
+                  </li>
+                  <li>
+                    <strong>Web Form Consent:</strong> During online enrollment at <a href="https://cedexx.net/enroll" className="text-emerald-600 underline">cedexx.net/enroll</a>,
+                    you must check a box confirming: <em>"I authorize CEDEXX to contact me via SMS/text message for enrollment-related communications."</em>
+                  </li>
+                </ol>
+                <p>
+                  <strong>Message Types:</strong> You will only receive messages related to your CEDEXX membership — enrollment confirmations,
+                  plan information, billing reminders, and appointment notifications. We do not send marketing or promotional texts without separate opt-in.
+                </p>
+                <p>
+                  <strong>Opt-Out:</strong> Reply <strong>STOP</strong> to any text message to unsubscribe immediately. You will receive a confirmation
+                  and no further texts. Reply <strong>HELP</strong> for support. Standard message and data rates may apply.
+                </p>
+                <p>
+                  <strong>Carriers Supported:</strong> All major US carriers (AT&T, Verizon, T-Mobile, Sprint, etc.) and most regional carriers.
+                  Message delivery is not guaranteed and depends on carrier availability.
+                </p>
+              </div>
+            </section>
+
+            {/* 14. Contact Us */}
             <section className="border-t border-slate-100 pt-8 mt-8">
-              <h2 className="text-2xl font-bold text-emerald-900 mb-4">13. Contact Us</h2>
+              <h2 className="text-2xl font-bold text-emerald-900 mb-4">14. Contact Us</h2>
               <p>If you have any questions, concerns, or requests regarding this Privacy Policy or our data practices, please contact our Privacy Officer:</p>
               <div className="bg-slate-50 p-6 rounded-xl mt-4 border border-slate-200">
                 <p className="font-medium text-emerald-900">Cedexx Privacy Officer</p>
