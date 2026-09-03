@@ -334,5 +334,17 @@
     "lang": "en-US",
     "timestamp": "2026-09-03T23:54:25.593Z",
     "sessionId": "sess_1788479665597"
+  },
+  {
+    "id": "v_1788479690199_80zui7",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Mozilla/5.0 (Linux; Android 16; moto g power - 2025 Build/W1VES36H.10-12-9-8-4) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/151.0.7922.165 Mobile Safari/537.36 [FB_IAB/FB4A;FBAV/575.1.0.55.73;IABMV/1;]",
+    "screen": "",
+    "lang": "en-US",
+    "timestamp": "2026-09-03T23:54:50.199Z",
+    "sessionId": "sess_1788479690199"
   }
 ]
