@@ -18,8 +18,12 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 const GEMINI_KEY = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY || '';
 const TWILIO_PHONE = process.env.TWILIO_PHONE_NUMBER || '+18555033371';
+const TWILIO_BACKUP_PHONE = process.env.TWILIO_BACKUP_PHONE || ''; // Local number for SMS during toll-free verification
 const RESEND_KEY = process.env.RESEND_API_KEY || '';
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'support@cedexx.net';
+
+// Use backup number if toll-free is in verification (can't send SMS)
+const SMS_FROM = process.env.TOLL_FREE_VERIFIED === 'true' ? TWILIO_PHONE : (TWILIO_BACKUP_PHONE || TWILIO_PHONE);
 
 function twiml(xml: string) {
   return `<?xml version="1.0" encoding="UTF-8"?><Response>${xml}</Response>`;
@@ -138,7 +142,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         <Say voice="Polly.Joanna">What can I help you with today?</Say>
       </Gather>
       <Say voice="Polly.Joanna">Let me send you a text with our information. Goodbye!</Say>
-      <Sms from="${TWILIO_PHONE}" to="${From}">CEDEXX — Enroll: https://cedexx.net/enroll | Support: support@cedexx.net | Call: (855) 503-3371</Sms>
+      <Sms from="${SMS_FROM}" to="${From}">CEDEXX — Enroll: https://cedexx.net/enroll | Support: support@cedexx.net | Call: (855) 503-3371</Sms>
       <Hangup/>
     `));
     return;
@@ -201,7 +205,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   
   const twilioResponse = `
     <Say voice="Polly.Joanna">${escapeXml(responseText)}</Say>
-    ${isEnrollIntent ? `<Sms from="${TWILIO_PHONE}" to="${From}">CEDEXX Enrollment: https://cedexx.net/enroll | Plans from $18.99/mo | Questions? Reply here.</Sms>` : ''}
+    ${isEnrollIntent ? `<Sms from="${SMS_FROM}" to="${From}">CEDEXX Enrollment: https://cedexx.net/enroll | Plans from $18.99/mo | Questions? Reply here.</Sms>` : ''}
     <Gather input="speech dtmf" action="/api/voice/ai-desk" speechTimeout="auto" speechModel="phone_call" language="en-US" numDigits="1">
       <Say voice="Polly.Joanna">Is there anything else I can help you with? Or press 4 to leave a voicemail.</Say>
     </Gather>
@@ -221,7 +225,7 @@ function handleDigitInput(digit: string, from: string, res: VercelResponse) {
     case '1':
       response = `
         <Say voice="Polly.Joanna">Perfect! You can enroll right now at cedexx dot net slash enroll. I'll send you a text with the link.</Say>
-        <Sms from="${TWILIO_PHONE}" to="${from}">CEDEXX Enrollment: https://cedexx.net/enroll | Plans: CareNow™ $18.99/mo | CareComplete™ $34.99/mo | No insurance needed!</Sms>
+        <Sms from="${SMS_FROM}" to="${from}">CEDEXX Enrollment: https://cedexx.net/enroll | Plans: CareNow™ $18.99/mo | CareComplete™ $34.99/mo | No insurance needed!</Sms>
         <Gather input="speech dtmf" action="/api/voice/ai-desk" speechTimeout="auto" speechModel="phone_call" language="en-US" numDigits="1">
           <Say voice="Polly.Joanna">Is there anything else I can help you with?</Say>
         </Gather>
@@ -240,7 +244,7 @@ function handleDigitInput(digit: string, from: string, res: VercelResponse) {
     case '3':
       response = `
         <Say voice="Polly.Joanna">For billing questions, please email support at cedexx dot net, or visit your account at cedexx dot net. I'll send you our support email via text.</Say>
-        <Sms from="${TWILIO_PHONE}" to="${from}">CEDEXX Billing Support: support@cedexx.net | Account: https://cedexx.net | Reply here for help.</Sms>
+        <Sms from="${SMS_FROM}" to="${from}">CEDEXX Billing Support: support@cedexx.net | Account: https://cedexx.net | Reply here for help.</Sms>
         <Gather input="speech dtmf" action="/api/voice/ai-desk" speechTimeout="auto" speechModel="phone_call" language="en-US" numDigits="1">
           <Say voice="Polly.Joanna">Is there anything else I can help you with?</Say>
         </Gather>
