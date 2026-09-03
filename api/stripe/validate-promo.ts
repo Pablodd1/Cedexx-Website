@@ -8,6 +8,9 @@ const stripe = process.env.STRIPE_SECRET_KEY
     })
   : null;
 
+// ─── FREE ENROLLMENT CODES (skip Stripe entirely) ───
+const FREE_CODES = ['WELCOME1'];
+
 // Price map for calculating discounted amounts
 const PRICE_CENTS: Record<string, number> = {
   'carenow': 1899,
@@ -37,6 +40,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const normalizedCode = code.toUpperCase().trim();
+
+  // ─── Check for FREE enrollment codes first ───
+  if (FREE_CODES.includes(normalizedCode)) {
+    return res.status(200).json({
+      success: true,
+      valid: true,
+      code: normalizedCode,
+      type: 'free',
+      description: 'Complimentary enrollment — Resident Housing Partnership',
+      original_price: plan_id && PRICE_CENTS[plan_id] ? formatPrice(PRICE_CENTS[plan_id]) : null,
+      discounted_price: '$0.00',
+      amount: 0,
+    });
+  }
 
   try {
     // DEBUG: Show which Stripe account this key belongs to
@@ -97,6 +114,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       success: true,
       valid: true,
       code: normalizedCode,
+      type: 'discount',
       promo_code_id: promoCodeId,
       coupon_id: coupon.id,
       percent_off: coupon.percent_off || null,

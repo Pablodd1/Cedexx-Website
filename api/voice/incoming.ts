@@ -2,24 +2,26 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 /**
  * POST /api/voice/incoming
- * Main Twilio webhook for incoming calls
- * Handles IVR menu and routes to appropriate handler
+ * AI Front Desk Assistant — Main Twilio webhook
+ * 
+ * Handles incoming calls with:
+ * 1. Professional greeting
+ * 2. Speech-enabled AI assistant (no WebSocket needed)
+ * 3. Direct enrollment via phone
+ * 4. Voicemail fallback
+ * 5. SMS follow-up
+ * 
+ * Phone: (855) 503-3371
  */
 
-const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID || '';
-const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN || '';
-const TWILIO_PHONE = process.env.TWILIO_PHONE_NUMBER || '';
+const TWILIO_PHONE = process.env.TWILIO_PHONE_NUMBER || '+18555033371';
 
-// Simple Twilio XML response builder
 function twiml(xml: string) {
   return `<?xml version="1.0" encoding="UTF-8"?><Response>${xml}</Response>`;
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // Only accept POST from Twilio
-  if (req.method !== 'POST') {
-    return res.status(405).end();
-  }
+  if (req.method !== 'POST') return res.status(405).end();
 
   const { From, To, CallSid, Direction } = req.body;
 
@@ -31,7 +33,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     timestamp: new Date().toISOString(),
   });
 
-  // Log the call (fire-and-forget)
+  // Log call (fire-and-forget)
   logCall({
     callSid,
     from: From,
@@ -41,22 +43,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     startedAt: new Date().toISOString(),
   }).catch(() => {});
 
-  // IVR Menu
+  // Main greeting + AI assistant prompt
   const greeting = `
     <Say voice="Polly.Joanna">
-      Thank you for calling CEDEXX, powered by Lyric Health. 
-      Your health, simplified.
+      Thank you for calling CEDEXX, powered by Lyric Health. Your health, simplified.
     </Say>
-    <Gather action="/api/voice/menu-choice" numDigits="1" timeout="5">
+    <Say voice="Polly.Joanna">
+      I'm Cedex, your AI front desk assistant. I can help you enroll, answer questions about our plans, or connect you with our team.
+    </Say>
+    <Gather input="speech dtmf" action="/api/voice/ai-desk" speechTimeout="auto" speechModel="phone_call" language="en-US" numDigits="1">
       <Say voice="Polly.Joanna">
-        Press 1 to learn about our membership plans and enroll.
-        Press 2 to speak with our AI assistant about services and pricing.
-        Press 3 for billing and account questions.
-        Press 4 to leave a voicemail for our team.
-        Press 0 to hear this menu again.
+        What can I help you with today? You can say things like: "I want to enroll," "How much does it cost," or "I have a billing question." You can also press 1 to enroll, 2 for pricing, 3 for billing, or 4 to leave a voicemail.
       </Say>
     </Gather>
-    <Say voice="Polly.Joanna">We didn't receive a selection. Please call back or visit cedexx dot net. Goodbye.</Say>
+    <Say voice="Polly.Joanna">I didn't hear a response. Let me send you a text with our enrollment link. Goodbye!</Say>
+    <Sms from="${TWILIO_PHONE}" to="${From}">CEDEXX — Enroll now: https://cedexx.net/enroll | Questions? Reply here or call back. We're here 24/7.</Sms>
     <Hangup/>
   `;
 

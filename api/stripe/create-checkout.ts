@@ -1,5 +1,20 @@
 import Stripe from 'stripe';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { alertCritical } from './critical-alert';
+
+/**
+ * POST /api/stripe/create-checkout
+ * Creates a Stripe Checkout session for subscription
+ * 
+ * Flow:
+ * 1. Validates plan_id, email, names
+ * 2. Looks up Stripe price ID
+ * 3. Applies promo code if provided
+ * 4. Creates checkout session
+ * 5. Returns Stripe checkout URL
+ * 
+ * Critical errors alert Jasmel immediately
+ */
 
 // Stripe Price Map (live mode)
 const PRICE_MAP: Record<string, string> = {
@@ -29,6 +44,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   // Check Stripe is configured
   if (!stripe) {
+    const error = new Error('Stripe is not configured — STRIPE_SECRET_KEY missing');
+    await alertCritical(error, { endpoint: '/api/stripe/create-checkout' });
     return res.status(503).json({ success: false, error: 'Stripe is not configured.' });
   }
 
@@ -83,28 +100,56 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // Apply promo code if provided
     if (promo_code) {
-      // Lookup the promotion code
-      const promoList = await stripe.promotionCodes.list({
-        code: promo_code.toUpperCase().trim(),
-        active: true,
-        limit: 1,
-      });
+      try {
+        const promoList = await stripe.promotionCodes.list({
+          code: promo_code.toUpperCase().trim(),
+          active: true,
+          limit: 1,
+        });
 
-      if (promoList.data.length === 0) {
-        return res.status(400).json({ success: false, error: 'Invalid or expired promo code.' });
+        if (promoList.data.length === 0) {
+          return res.status(400).json({ success: false, error: 'Invalid or expired promo code.' });
+        }
+
+        sessionConfig.discounts = [{ promotion_code: promoList.data[0].id }];
+      } catch (err: any) {
+        console.error('[STRIPE PROMO ERROR]', err);
+        await alertCritical(err, {
+          endpoint: '/api/stripe/create-checkout',
+          patientEmail: email,
+          patientName: `${first_name} ${last_name}`,
+          plan: selectedPlan,
+        });
+        return res.status(400).json({ success: false, error: 'Failed to validate promo code.' });
       }
-
-      sessionConfig.discounts = [{ promotion_code: promoList.data[0].id }];
     }
 
     const session = await stripe.checkout.sessions.create(sessionConfig);
 
+    console.log('[STRIPE CHECKOUT] Session created:', {
+      sessionId: session.id,
+      email: email.toLowerCase().trim(),
+      plan: selectedPlan,
+      promo: promo_code || 'none',
+    });
+
     return res.status(200).json({ success: true, url: session.url });
+
   } catch (err: any) {
     console.error('[STRIPE CHECKOUT ERROR]', err);
+
+    // CRITICAL: Alert Jasmel immediately
+    await alertCritical(err, {
+      endpoint: '/api/stripe/create-checkout',
+      patientEmail: email,
+      patientName: `${first_name} ${last_name}`,
+      plan: selectedPlan,
+    });
+
     return res.status(500).json({
       success: false,
       error: 'Unable to create checkout session.',
+      alert_sent: true,
     });
   }
 }

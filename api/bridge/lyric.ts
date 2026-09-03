@@ -1,4 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { alertCritical } from './critical-alert';
+import { readMembers, writeMembers } from './github-db';
 
 /**
  * POST /api/bridge/lyric
@@ -12,15 +14,15 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
  * - Formatted enrollment data via email (immediate)
  * - API call (when Lyric provides endpoint)
  * - Logs sync status to GitHub DB
+ * 
+ * Critical errors alert Jasmel immediately
  */
 
 const RESEND_KEY = process.env.RESEND_API_KEY || '';
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'support@cedexx.net';
 const LYRIC_EMAIL = process.env.LYRIC_ENROLLMENT_EMAIL || 'enrollment@getlyric.com';
-
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN || '';
-const REPO = 'Pablodd1/Cedexx-Website';
-const FILE_PATH = 'data/members.json';
+const TELEGRAM_BOT = process.env.TELEGRAM_BOT_TOKEN || '';
+const TELEGRAM_CHAT = process.env.TELEGRAM_CHAT_ID || '';
 
 interface PatientData {
   id: string;
@@ -38,68 +40,6 @@ interface PatientData {
   stripe_customer_id?: string;
   stripe_subscription_id?: string;
   paid_at: string;
-}
-
-// ─── Read/Write Members (shared logic) ───
-async function readMembers() {
-  const res = await fetch(
-    `https://api.github.com/repos/${REPO}/contents/${FILE_PATH}?ref=main`,
-    {
-      headers: {
-        Authorization: `token ${GITHUB_TOKEN}`,
-        Accept: 'application/vnd.github.v3+json',
-      },
-    }
-  );
-  if (!res.ok) {
-    if (res.status === 404) return [];
-    throw new Error(`GitHub read failed: ${res.status}`);
-  }
-  const data = await res.json();
-  return data.content ? JSON.parse(Buffer.from(data.content, 'base64').toString('utf8')).members || [] : [];
-}
-
-async function writeMembers(members: any[]) {
-  const getRes = await fetch(
-    `https://api.github.com/repos/${REPO}/contents/${FILE_PATH}?ref=main`,
-    {
-      headers: {
-        Authorization: `token ${GITHUB_TOKEN}`,
-        Accept: 'application/vnd.github.v3+json',
-      },
-    }
-  );
-  if (!getRes.ok) throw new Error(`GitHub read for SHA failed: ${getRes.status}`);
-  const fileData = await getRes.json();
-  const sha = fileData.sha;
-
-  const payload = {
-    members,
-    created_at: fileData.content ? JSON.parse(Buffer.from(fileData.content, 'base64').toString('utf8')).created_at : new Date().toISOString(),
-    version: '1.0',
-  };
-
-  const putRes = await fetch(
-    `https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`,
-    {
-      method: 'PUT',
-      headers: {
-        Authorization: `token ${GITHUB_TOKEN}`,
-        Accept: 'application/vnd.github.v3+json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        message: `Lyric sync: ${new Date().toISOString()}`,
-        content: Buffer.from(JSON.stringify(payload, null, 2)).toString('base64'),
-        sha,
-        branch: 'main',
-      }),
-    }
-  );
-  if (!putRes.ok) {
-    const err = await putRes.json().catch(() => ({}));
-    throw new Error(`GitHub write failed: ${putRes.status} — ${err.message || ''}`);
-  }
 }
 
 // ─── Main Handler ───
@@ -139,8 +79,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           paid_at: member.paid_at || new Date().toISOString(),
         };
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('[LYRIC BRIDGE] Lookup error:', err);
+      await alertCritical(err, {
+        endpoint: '/api/bridge/lyric',
+        patientEmail: patient_id,
+      });
     }
   }
 
@@ -167,15 +111,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   // ─── SYNC TO LYRIC ───
-  const results: any = { email: null, api: null };
+  const results: any = { email: null, api: null, error: null };
 
   try {
     // 1. Send enrollment email to Lyric
     if (RESEND_KEY) {
       results.email = await sendLyricEnrollmentEmail(patientData);
+    } else {
+      throw new Error('RESEND_API_KEY not configured — cannot send enrollment email');
     }
 
     // 2. Call Lyric API (when available)
+    // TODO: Uncomment when Lyric provides API endpoint
     // const apiResult = await callLyricApi(patientData);
     // results.api = apiResult;
 
@@ -200,11 +147,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   } catch (err: any) {
     console.error('[LYRIC BRIDGE ERROR]', err);
 
+    // CRITICAL: Alert Jasmel immediately
+    await alertCritical(err, {
+      endpoint: '/api/bridge/lyric',
+      patientEmail: patientData.email,
+      patientName: `${patientData.first_name} ${patientData.last_name}`,
+      plan: patientData.plan,
+    });
+
     // Update member with failed status
     await updateMemberSyncStatus(patientData.id, {
       lyric_synced: false,
       lyric_sync_error: err.message,
-      lyric_sync_attempts: (patientData as any).lyric_sync_attempts || 0 + 1,
+      lyric_sync_attempts: ((patientData as any).lyric_sync_attempts || 0) + 1,
     });
 
     res.status(500).json({
@@ -292,7 +247,7 @@ async function sendLyricEnrollmentEmail(patient: PatientData) {
 
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      return { sent: false, error: err.message || `HTTP ${res.status}` };
+      throw new Error(err.message || `HTTP ${res.status}`);
     }
 
     return { sent: true, timestamp: new Date().toISOString() };
@@ -350,9 +305,7 @@ async function updateMemberSyncStatus(memberId: string, syncData: any) {
 
 // ─── Notify Admin ───
 async function notifyAdminOfLyricSync(patient: PatientData, results: any) {
-  const TELEGRAM_BOT = process.env.TELEGRAM_BOT_TOKEN || '';
-  const TELEGRAM_CHAT = process.env.TELEGRAM_CHAT_ID || '';
-
+  // 1. Telegram
   if (TELEGRAM_BOT && TELEGRAM_CHAT) {
     try {
       const text = [
@@ -375,6 +328,38 @@ async function notifyAdminOfLyricSync(patient: PatientData, results: any) {
       });
     } catch (err) {
       console.error('[TELEGRAM LYRIC ERROR]', err);
+    }
+  }
+
+  // 2. Email to admin
+  if (RESEND_KEY) {
+    try {
+      await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${RESEND_KEY}`,
+        },
+        body: JSON.stringify({
+          from: 'CEDEXX Alerts <alerts@cedexx.net>',
+          to: [ADMIN_EMAIL],
+          subject: `Lyric Sync: ${patient.first_name} ${patient.last_name}`,
+          html: `
+            <div style="font-family:Arial,sans-serif;max-width:600px;margin:20px auto;">
+              <h2 style="color:#050249;">Lyric Health Sync Completed</h2>
+              <p>Patient enrollment data sent to Lyric Health.</p>
+              <table style="width:100%;border-collapse:collapse;font-size:14px;">
+                <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:700;">Patient</td><td style="padding:8px;border-bottom:1px solid #eee;">${patient.first_name} ${patient.last_name}</td></tr>
+                <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:700;">Email</td><td style="padding:8px;border-bottom:1px solid #eee;">${patient.email}</td></tr>
+                <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:700;">Plan</td><td style="padding:8px;border-bottom:1px solid #eee;">${patient.plan}</td></tr>
+                <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:700;">Status</td><td style="padding:8px;border-bottom:1px solid #eee;">✅ Sent</td></tr>
+              </table>
+            </div>
+          `,
+        }),
+      });
+    } catch (err) {
+      console.error('[ADMIN EMAIL LYRIC ERROR]', err);
     }
   }
 }

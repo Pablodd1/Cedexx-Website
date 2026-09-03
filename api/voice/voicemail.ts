@@ -1,177 +1,206 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { alertCritical } from '../critical-alert';
+import { transcribeAudio } from './deepgram';
 
 /**
  * POST /api/voice/voicemail
- * Handles voicemail recording and transcription
- * Also handles Twilio's transcribeCallback
+ * Handles voicemail recordings with Deepgram transcription
+ * 
+ * Features:
+ * - Twilio voicemail recording
+ * - Deepgram AI transcription (high accuracy)
+ * - Email notification with transcription
+ * - Telegram alert
+ * - GitHub DB logging
  */
 
-const TELEGRAM_BOT = process.env.TELEGRAM_BOT_TOKEN || '';
-const TELEGRAM_CHAT = process.env.TELEGRAM_CHAT_ID || '';
 const RESEND_KEY = process.env.RESEND_API_KEY || '';
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'support@cedexx.net';
-
-function twiml(xml: string) {
-  return `<?xml version="1.0" encoding="UTF-8"?><Response>${xml}</Response>`;
-}
+const JASMEL_EMAIL = process.env.JASMEL_EMAIL || '';
+const TELEGRAM_BOT = process.env.TELEGRAM_BOT_TOKEN || '';
+const TELEGRAM_CHAT = process.env.TELEGRAM_CHAT_ID || '';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') return res.status(405).end();
 
-  // Twilio sends different data depending on whether it's the Record action or transcribeCallback
-  const isTranscriptionCallback = !!req.body.TranscriptionText;
-  
-  const callSid = req.body.CallSid || req.body.CallSid;
-  const from = req.body.From || req.body.Caller;
-  const recordingUrl = req.body.RecordingUrl;
-  const recordingDuration = req.body.RecordingDuration;
-  const transcriptionText = req.body.TranscriptionText;
-  const transcriptionStatus = req.body.TranscriptionStatus;
+  const {
+    CallSid,
+    From,
+    RecordingUrl,
+    RecordingDuration,
+    TranscriptionText,
+    TranscriptionStatus,
+  } = req.body;
 
-  console.log('[VOICE] Voicemail received:', {
-    callSid,
-    from,
-    isTranscription: isTranscriptionCallback,
-    hasTranscription: !!transcriptionText,
-    duration: recordingDuration,
-    timestamp: new Date().toISOString(),
+  console.log('[VOICEMAIL] Received:', {
+    callSid: CallSid,
+    from: From,
+    recordingUrl: RecordingUrl,
+    duration: RecordingDuration,
+    twilioTranscription: TranscriptionText?.substring(0, 100),
+    status: TranscriptionStatus,
   });
 
-  // If this is the initial Record callback (no transcription yet)
-  if (!isTranscriptionCallback && recordingUrl) {
-    // Thank the caller
-    res.setHeader('Content-Type', 'text/xml');
-    res.status(200).send(twiml(`
-      <Say voice="Polly.Joanna">
-        Thank you for your message. Our team will review it and respond within 2 hours. 
-        You can also text us at this number for faster response. Have a great day!
-      </Say>
-      <Hangup/>
-    `));
+  // Always respond with 200 to Twilio immediately
+  res.setHeader('Content-Type', 'text/xml');
+  res.status(200).send(`<?xml version="1.0" encoding="UTF-8"?><Response><Hangup/></Response>`);
 
-    // Send immediate notification (without transcription yet)
-    await notifyVoicemail({
-      callSid,
-      from,
-      recordingUrl,
-      duration: recordingDuration,
-      transcription: null,
-      timestamp: new Date().toISOString(),
-    });
+  // ─── Deepgram Transcription (High Accuracy) ───
+  let deepgramTranscript: string | null = null;
+  let deepgramConfidence: number = 0;
 
-    return;
-  }
-
-  // If this is the transcribeCallback (has transcription)
-  if (isTranscriptionCallback && transcriptionText) {
-    // Update the voicemail record with transcription
-    await updateVoicemailWithTranscription({
-      callSid,
-      from,
-      recordingUrl,
-      transcription: transcriptionText,
-      transcriptionStatus,
-      timestamp: new Date().toISOString(),
-    });
-
-    // Send updated notification with transcription
-    await notifyVoicemail({
-      callSid,
-      from,
-      recordingUrl,
-      duration: recordingDuration,
-      transcription: transcriptionText,
-      timestamp: new Date().toISOString(),
-    });
-
-    res.status(200).json({ received: true });
-    return;
-  }
-
-  // Fallback
-  res.status(200).json({ received: true });
-}
-
-// ─── Notifications ───
-async function notifyVoicemail(data: any) {
-  const { from, recordingUrl, duration, transcription, timestamp } = data;
-
-  const transcriptPreview = transcription 
-    ? `\n\n📝 Transcription:\n${transcription.substring(0, 500)}${transcription.length > 500 ? '...' : ''}`
-    : '\n\n⏳ Transcription processing...';
-
-  // Telegram notification
-  if (TELEGRAM_BOT && TELEGRAM_CHAT) {
+  if (RecordingUrl) {
     try {
-      const text = [
-        '📞 <b>NEW VOICEMAIL</b> — CEDEXX',
-        `📱 From: ${from}`,
-        `⏱️ Duration: ${duration || '?'} seconds`,
-        transcriptPreview,
-        `🔗 Recording: ${recordingUrl || 'N/A'}`,
-        `🕒 ${new Date(timestamp).toLocaleString()}`,
-      ].join('\n');
-
-      await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: TELEGRAM_CHAT,
-          text,
-          parse_mode: 'HTML',
-        }),
-      });
+      console.log('[VOICEMAIL] Sending to Deepgram for transcription...');
+      const deepgramResult = await transcribeAudio(RecordingUrl);
+      
+      if (deepgramResult && deepgramResult.transcript) {
+        deepgramTranscript = deepgramResult.transcript;
+        deepgramConfidence = deepgramResult.confidence;
+        console.log('[VOICEMAIL] Deepgram transcript:', deepgramTranscript.substring(0, 100));
+        console.log('[VOICEMAIL] Deepgram confidence:', deepgramConfidence);
+      }
     } catch (err) {
-      console.error('[TELEGRAM VOICEMAIL ERROR]', err);
+      console.error('[VOICEMAIL] Deepgram transcription failed:', err);
     }
   }
 
-  // Email notification
-  if (RESEND_KEY) {
-    try {
-      await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${RESEND_KEY}`,
-        },
-        body: JSON.stringify({
-          from: 'CEDEXX Voicemail <support@cedexx.net>',
-          to: [ADMIN_EMAIL],
-          subject: `📞 New Voicemail from ${from}`,
-          html: `
-            <div style="font-family:Arial,sans-serif;max-width:600px;margin:20px auto;border:1px solid #e0e0e0;border-radius:16px;overflow:hidden">
-              <div style="background:#050249;color:#fff;padding:20px">
-                <h2 style="margin:0;font-size:18px">📞 New Voicemail</h2>
-              </div>
-              <div style="padding:20px">
-                <p><strong>From:</strong> ${from}</p>
-                <p><strong>Duration:</strong> ${duration || '?'} seconds</p>
-                <p><strong>Time:</strong> ${new Date(timestamp).toLocaleString()}</p>
-                ${recordingUrl ? `<p><a href="${recordingUrl}" style="color:#050249;font-weight:700">Listen to Recording</a></p>` : ''}
-                ${transcription ? `
-                  <div style="background:#f8fafc;padding:16px;border-radius:8px;margin-top:16px">
-                    <h3 style="margin:0 0 8px 0;font-size:14px">Transcription</h3>
-                    <p style="margin:0;color:#374151">${transcription}</p>
-                  </div>
-                ` : '<p style="color:#94a3b8">Transcription pending...</p>'}
-              </div>
-            </div>
-          `,
-        }),
-      });
-    } catch (err) {
-      console.error('[EMAIL VOICEMAIL ERROR]', err);
-    }
+  // Use best available transcription
+  const bestTranscription = deepgramTranscript || TranscriptionText || null;
+  const transcriptionSource = deepgramTranscript ? 'Deepgram AI' : (TranscriptionText ? 'Twilio' : 'Pending');
+
+  // Send notifications (fire-and-forget)
+  try {
+    await Promise.allSettled([
+      sendEmailNotification(From, RecordingUrl, RecordingDuration, bestTranscription, transcriptionSource),
+      sendTelegramNotification(From, RecordingDuration, bestTranscription, transcriptionSource),
+      logVoicemail(CallSid, From, RecordingUrl, RecordingDuration, bestTranscription, deepgramConfidence),
+    ]);
+  } catch (err) {
+    console.error('[VOICEMAIL] Notification error:', err);
   }
 }
 
-// ─── Update voicemail record with transcription ───
-async function updateVoicemailWithTranscription(data: any) {
-  // This would update a database record
-  // For now, we'll just log it
-  console.log('[VOICE] Transcription received:', {
-    callSid: data.callSid,
-    transcription: data.transcription?.substring(0, 100) + '...',
-  });
+// ─── Email Notification ───
+async function sendEmailNotification(
+  from: string,
+  recordingUrl: string,
+  duration: string,
+  transcription: string | null,
+  source: string
+) {
+  if (!RESEND_KEY) return;
+
+  const subject = `🎙️ New Voicemail — CEDEXX Front Desk`;
+  const html = `
+    <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
+      <div style="background:#050249;padding:40px 20px;text-align:center;border-radius:12px 12px 0 0;">
+        <h1 style="color:#fff;margin:0;font-size:24px;">🎙️ New Voicemail</h1>
+        <p style="color:#23d9b0;margin:10px 0 0;font-size:14px;">CEDEXX AI Front Desk</p>
+      </div>
+      <div style="padding:30px;background:#fff;border:1px solid #e5e7eb;">
+        <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">
+          <tr><td style="padding:8px;border:1px solid #e5e7eb;font-weight:600;">From</td><td style="padding:8px;border:1px solid #e5e7eb;">${from}</td></tr>
+          <tr><td style="padding:8px;border:1px solid #e5e7eb;font-weight:600;">Duration</td><td style="padding:8px;border:1px solid #e5e7eb;">${duration || 'N/A'} seconds</td></tr>
+          <tr><td style="padding:8px;border:1px solid #e5e7eb;font-weight:600;">Received</td><td style="padding:8px;border:1px solid #e5e7eb;">${new Date().toLocaleString()}</td></tr>
+          <tr><td style="padding:8px;border:1px solid #e5e7eb;font-weight:600;">Transcription</td><td style="padding:8px;border:1px solid #e5e7eb;color:#166534;font-weight:600;">${source}</td></tr>
+        </table>
+        
+        ${recordingUrl ? `<p style="margin-bottom:20px;"><a href="${recordingUrl}" style="background:#050249;color:#fff;padding:12px 24px;text-decoration:none;border-radius:6px;display:inline-block;">🎧 Listen to Recording</a></p>` : ''}
+        
+        ${transcription ? `
+          <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:20px;margin:20px 0;">
+            <h3 style="margin:0 0 12px 0;color:#166534;font-size:14px;font-weight:700;">📝 Transcription (${source})</h3>
+            <p style="margin:0;color:#374151;font-size:14px;line-height:1.6;">${transcription}</p>
+          </div>
+        ` : '<p style="color:#6b7280;font-size:14px;">⏳ Transcription processing...</p>'}
+        
+        <p style="margin-top:20px;color:#6b7280;font-size:12px;">Reply to this email to respond to the caller.</p>
+      </div>
+    </div>
+  `;
+
+  const toEmails = [ADMIN_EMAIL];
+  if (JASMEL_EMAIL) toEmails.push(JASMEL_EMAIL);
+
+  try {
+    await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${RESEND_KEY}`,
+      },
+      body: JSON.stringify({
+        from: 'CEDEXX Front Desk <support@cedexx.net>',
+        to: toEmails,
+        subject,
+        html,
+        text: `New voicemail from ${from}\nDuration: ${duration}s\nTranscription (${source}): ${transcription || 'Processing...'}\nRecording: ${recordingUrl || 'N/A'}`,
+      }),
+    });
+  } catch (err) {
+    console.error('[VOICEMAIL EMAIL ERROR]', err);
+  }
+}
+
+// ─── Telegram Notification ───
+async function sendTelegramNotification(
+  from: string,
+  duration: string,
+  transcription: string | null,
+  source: string
+) {
+  if (!TELEGRAM_BOT || !TELEGRAM_CHAT) return;
+
+  const text = [
+    '🎙️ <b>NEW VOICEMAIL — CEDEXX Front Desk</b>',
+    `📞 From: ${from}`,
+    `⏱️ Duration: ${duration || 'N/A'}s`,
+    `🤖 Transcription: ${source}`,
+    transcription ? `📝 "${transcription.substring(0, 800)}"` : '⏳ Processing...',
+    `🕒 ${new Date().toLocaleString()}`,
+  ].filter(Boolean).join('\n\n');
+
+  try {
+    await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: TELEGRAM_CHAT,
+        text,
+        parse_mode: 'HTML',
+      }),
+    });
+  } catch (err) {
+    console.error('[VOICEMAIL TELEGRAM ERROR]', err);
+  }
+}
+
+// ─── Log to GitHub DB ───
+async function logVoicemail(
+  callSid: string,
+  from: string,
+  recordingUrl: string,
+  duration: string,
+  transcription: string | null,
+  confidence: number
+) {
+  try {
+    await fetch('https://cedexx.net/api/voice/call-log', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        callSid,
+        from,
+        type: 'voicemail',
+        recordingUrl,
+        duration,
+        transcription,
+        transcriptionConfidence: confidence,
+        timestamp: new Date().toISOString(),
+      }),
+    });
+  } catch (err) {
+    console.error('[VOICEMAIL LOG ERROR]', err);
+  }
 }

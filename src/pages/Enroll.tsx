@@ -44,6 +44,7 @@ export function Enroll() {
   const [consentAnalytics, setConsentAnalytics] = React.useState(false);
   const [consentTOS, setConsentTOS] = React.useState(false);
   const [consentError, setConsentError] = React.useState<string | null>(null);
+  const [isFreeEnrollment, setIsFreeEnrollment] = React.useState(false);
 
   // Track form start — fire once when user first interacts with any field
   const formStartedRef = React.useRef(false);
@@ -127,7 +128,40 @@ export function Enroll() {
     setLoading(true);
     setError(null);
 
-    // First: mark member as checkout_started so admin gets notified
+    // FREE ENROLLMENT: Skip Stripe entirely
+    if (isFreeEnrollment) {
+      try {
+        const res = await fetch('/api/free-enrollment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            first_name: firstName.trim(),
+            last_name: lastName.trim(),
+            email: email.trim(),
+            phone: phone.trim(),
+            dob: dob,
+            plan_id: plan,
+            promo_code: promoCode.trim().toUpperCase(),
+          }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || 'Failed to activate free enrollment');
+        }
+
+        // Redirect to success page for free enrollment
+        window.location.href = '/payment-success?free=true&plan=' + plan;
+        return;
+      } catch (err: any) {
+        setError(err.message || 'Something went wrong. Please try again.');
+        setLoading(false);
+        return;
+      }
+    }
+
+    // PAID ENROLLMENT: Normal Stripe flow
     try {
       await fetch('/api/register-member', {
         method: 'POST',
@@ -146,7 +180,7 @@ export function Enroll() {
         }),
       });
     } catch (_) {
-      // Non-blocking — don't stop checkout if this fails
+      // Non-blocking
     }
 
     try {
@@ -350,7 +384,11 @@ export function Enroll() {
 
                   <div className="p-6 bg-[#EBF3FB] rounded-[2rem] flex items-center gap-4 text-sm text-[#050249] border border-blue-50 font-bold italic mb-8">
                     <Lock className="h-5 w-5" />
-                    You will be redirected to Stripe's secure checkout to complete your subscription
+                    {isFreeEnrollment ? (
+                      <>Your complimentary enrollment is ready for activation</>
+                    ) : (
+                      <>You will be redirected to Stripe's secure checkout to complete your subscription</>
+                    )}
                   </div>
 
                   {/* Promo Code */}
@@ -360,7 +398,7 @@ export function Enroll() {
                       <input
                         type="text"
                         value={promoCode}
-                        onChange={e => { setPromoCode(e.target.value.toUpperCase()); setPromoError(null); setPromoApplied(false); setDiscountedPrice(null); }}
+                        onChange={e => { setPromoCode(e.target.value.toUpperCase()); setPromoError(null); setPromoApplied(false); setDiscountedPrice(null); setIsFreeEnrollment(false); }}
                         className="flex-1 px-6 py-4 rounded-2xl bg-slate-50 border border-blue-50 focus:ring-2 focus:ring-[#050249] outline-none transition-all font-medium text-sm uppercase tracking-wider"
                         placeholder="ENTER CODE"
                         disabled={loading}
@@ -384,6 +422,12 @@ export function Enroll() {
                             }
                             setPromoApplied(true);
                             setDiscountedPrice(data.discounted_price || null);
+                            // Detect free enrollment codes
+                            if (data.type === 'free') {
+                              setIsFreeEnrollment(true);
+                            } else {
+                              setIsFreeEnrollment(false);
+                            }
                           } catch (err: any) {
                             setPromoError('Unable to validate code. Please try again.');
                           }
@@ -398,7 +442,9 @@ export function Enroll() {
                       <p className="mt-2 text-xs font-bold text-red-500 italic">{promoError}</p>
                     )}
                     {promoApplied && (
-                      <p className="mt-2 text-xs font-bold text-[#23d9b0] italic">✓ Promo code applied successfully</p>
+                      <p className="mt-2 text-xs font-bold text-[#23d9b0] italic">
+                        ✓ {isFreeEnrollment ? 'Complimentary enrollment activated' : 'Promo code applied successfully'}
+                      </p>
                     )}
                   </div>
 
@@ -415,7 +461,13 @@ export function Enroll() {
                           </div>
                         </div>
                         <div className="text-right">
-                          {promoApplied && discountedPrice ? (
+                          {isFreeEnrollment ? (
+                            <>
+                              <div className="text-2xl font-black text-[#23d9b0]">$0.00</div>
+                              <div className="text-sm font-bold text-slate-400 line-through">{selectedPlan.price}</div>
+                              <div className="text-[10px] text-[#23d9b0] font-black uppercase tracking-widest">Complimentary</div>
+                            </>
+                          ) : promoApplied && discountedPrice ? (
                             <>
                               <div className="text-2xl font-black text-[#23d9b0]">{discountedPrice}</div>
                               <div className="text-sm font-bold text-slate-400 line-through">{selectedPlan.price}</div>
@@ -431,11 +483,13 @@ export function Enroll() {
                       <div className="border-t border-blue-200 pt-4 mt-4">
                         <div className="flex items-center justify-between text-sm font-bold text-[#050249]">
                           <span>Monthly Total</span>
-                          <span className="text-xl">{promoApplied && discountedPrice ? discountedPrice : selectedPlan.price}</span>
+                          <span className="text-xl">
+                            {isFreeEnrollment ? '$0.00' : (promoApplied && discountedPrice ? discountedPrice : selectedPlan.price)}
+                          </span>
                         </div>
                         {promoApplied && (
                           <div className="flex items-center justify-between text-xs font-bold text-[#23d9b0] mt-1">
-                            <span>Promo Applied</span>
+                            <span>{isFreeEnrollment ? 'Complimentary Enrollment' : 'Promo Applied'}</span>
                             <span>{promoCode.toUpperCase()}</span>
                           </div>
                         )}
@@ -466,12 +520,21 @@ export function Enroll() {
                       {loading ? (
                         <>
                           <Loader2 className="h-5 w-5 animate-spin" />
-                          Redirecting to Secure Checkout...
+                          {isFreeEnrollment ? 'Activating...' : 'Redirecting to Secure Checkout...'}
                         </>
                       ) : (
                         <>
-                          <CreditCard className="h-5 w-5" />
-                          Proceed to Secure Checkout
+                          {isFreeEnrollment ? (
+                            <>
+                              <Heart className="h-5 w-5" />
+                              Activate Free Membership
+                            </>
+                          ) : (
+                            <>
+                              <CreditCard className="h-5 w-5" />
+                              Proceed to Secure Checkout
+                            </>
+                          )}
                         </>
                       )}
                     </button>

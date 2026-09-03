@@ -1,76 +1,30 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { alertCritical } from './critical-alert';
+import { readMembers, writeMembers } from './github-db';
 
-// ─── CONFIG ───
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN || '';
-const REPO = 'Pablodd1/Cedexx-Website';
-const FILE_PATH = 'data/members.json';
+/**
+ * POST /api/register-member
+ * Registers or updates a member in the GitHub DB
+ * 
+ * Flow:
+ * 1. User fills enrollment form → status = 'registered'
+ * 2. User proceeds to checkout → status = 'checkout_started'
+ * 3. Stripe webhook updates → status = 'paid'
+ * 
+ * Notifications:
+ * - Welcome email on registration
+ * - Admin email on registration
+ * - Telegram on registration
+ * - Checkout started email + notification
+ * 
+ * Critical errors alert Jasmel immediately
+ */
+
 const RESEND_KEY = process.env.RESEND_API_KEY || '';
 const TELEGRAM_BOT = process.env.TELEGRAM_BOT_TOKEN || '';
 const TELEGRAM_CHAT = process.env.TELEGRAM_CHAT_ID || '';
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'support@cedexx.net';
 const FROM_EMAIL = 'CEDEXX <support@cedexx.net>';
-
-// ─── GITHUB DB ───
-async function readMembers() {
-  const res = await fetch(
-    `https://api.github.com/repos/${REPO}/contents/${FILE_PATH}?ref=main`,
-    {
-      headers: {
-        Authorization: `token ${GITHUB_TOKEN}`,
-        Accept: 'application/vnd.github.v3+json',
-      },
-    }
-  );
-  if (!res.ok) {
-    if (res.status === 404) return [];
-    throw new Error(`GitHub read failed: ${res.status}`);
-  }
-  const data = await res.json();
-  return data.content ? JSON.parse(Buffer.from(data.content, 'base64').toString('utf8')).members || [] : [];
-}
-
-async function writeMembers(members: any[]) {
-  const getRes = await fetch(
-    `https://api.github.com/repos/${REPO}/contents/${FILE_PATH}?ref=main`,
-    {
-      headers: {
-        Authorization: `token ${GITHUB_TOKEN}`,
-        Accept: 'application/vnd.github.v3+json',
-      },
-    }
-  );
-  if (!getRes.ok) throw new Error(`GitHub read for SHA failed: ${getRes.status}`);
-  const fileData = await getRes.json();
-  const sha = fileData.sha;
-
-  const payload = {
-    members,
-    created_at: fileData.content ? JSON.parse(Buffer.from(fileData.content, 'base64').toString('utf8')).created_at : new Date().toISOString(),
-    version: '1.0',
-  };
-
-  const putRes = await fetch(
-    `https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`,
-    {
-      method: 'PUT',
-      headers: {
-        Authorization: `token ${GITHUB_TOKEN}`,
-        Accept: 'application/vnd.github.v3+json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        message: `Update members DB`,
-        content: Buffer.from(JSON.stringify(payload, null, 2)).toString('base64'),
-        sha,
-        branch: 'main',
-      }),
-    }
-  );
-  if (!putRes.ok) {
-    const err = await putRes.json().catch(() => ({}));
-    throw new Error(`GitHub write failed: ${putRes.status} — ${err.message || ''}`);
-  }
-}
 
 // ─── EMAIL (Resend API) ───
 async function sendResendEmail(to: string, subject: string, html: string, text: string) {
@@ -130,11 +84,35 @@ async function sendWelcomeEmail(member: any) {
   await sendResendEmail(member.email, subject, html, text);
 }
 
-async function sendAdminNotification(member: any) {
-  const subject = `📋 New CEDEXX Registration — ${member.first_name} ${member.last_name}`;
+async function sendCheckoutStartedEmail(member: any) {
+  const subject = 'Complete Your CEDEXX Enrollment';
   const html = `
     <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
-      <h2 style="color:#7B2FF7;">New Patient Registration</h2>
+      <div style="background:#050249;padding:40px 20px;text-align:center;">
+        <h1 style="color:#fff;margin:0;font-size:24px;">Complete Your Enrollment</h1>
+      </div>
+      <div style="padding:30px;background:#fff;border:1px solid #e5e7eb;">
+        <p style="font-size:16px;">Hi <strong>${member.first_name}</strong>,</p>
+        <p>You're almost there! Please complete your payment to activate your CEDEXX membership.</p>
+        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:16px;margin:20px 0;text-align:center;">
+          <p style="margin:0;font-size:18px;font-weight:600;color:#166534;">✓ Your plan is reserved</p>
+          <p style="margin:8px 0 0;color:#374151;">Complete payment within 24 hours</p>
+        </div>
+        <p style="margin-top:20px;color:#6b7280;font-size:14px;">Questions? Contact us at <a href="mailto:support@cedexx.net">support@cedexx.net</a></p>
+      </div>
+    </div>
+  `;
+  await sendResendEmail(member.email, subject, html, `Hi ${member.first_name}, please complete your CEDEXX enrollment at cedexx.net`);
+}
+
+async function sendAdminNotification(member: any, type: 'registration' | 'checkout') {
+  const subject = type === 'checkout' 
+    ? `💳 Checkout Started — ${member.first_name} ${member.last_name}`
+    : `📋 New CEDEXX Registration — ${member.first_name} ${member.last_name}`;
+  
+  const html = `
+    <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
+      <h2 style="color:#7B2FF7;">${type === 'checkout' ? 'Checkout Started' : 'New Registration'}</h2>
       <table style="width:100%;border-collapse:collapse;">
         <tr><td style="padding:8px;border:1px solid #e5e7eb;font-weight:600;">Name</td><td style="padding:8px;border:1px solid #e5e7eb;">${member.first_name} ${member.last_name}</td></tr>
         <tr><td style="padding:8px;border:1px solid #e5e7eb;font-weight:600;">Email</td><td style="padding:8px;border:1px solid #e5e7eb;">${member.email}</td></tr>
@@ -142,20 +120,19 @@ async function sendAdminNotification(member: any) {
         <tr><td style="padding:8px;border:1px solid #e5e7eb;font-weight:600;">DOB</td><td style="padding:8px;border:1px solid #e5e7eb;">${member.dob || '—'}</td></tr>
         <tr><td style="padding:8px;border:1px solid #e5e7eb;font-weight:600;">Plan</td><td style="padding:8px;border:1px solid #e5e7eb;">${member.plan || '—'}</td></tr>
         <tr><td style="padding:8px;border:1px solid #e5e7eb;font-weight:600;">Status</td><td style="padding:8px;border:1px solid #e5e7eb;">${member.status}</td></tr>
-        <tr><td style="padding:8px;border:1px solid #e5e7eb;font-weight:600;">Time</td><td style="padding:8px;border:1px solid #e5e7eb;">${member.registered_at}</td></tr>
       </table>
-      <p style="margin-top:20px;"><a href="https://cedexx.net/admin.html" style="background:#7B2FF7;color:#fff;padding:12px 24px;text-decoration:none;border-radius:6px;display:inline-block;">View Dashboard</a></p>
+      <p style="margin-top:20px;"><a href="https://cedexx.net/admin.html" style="background:#7B2FF7;color:#fff;padding:12px 24px;text-decoration:none;border-radius:6px;">View Dashboard</a></p>
     </div>
   `;
-  const text = `New CEDEXX Registration:\n\nName: ${member.first_name} ${member.last_name}\nEmail: ${member.email}\nPhone: ${member.phone || '—'}\nPlan: ${member.plan || '—'}\nStatus: ${member.status}\nTime: ${member.registered_at}`;
-  await sendResendEmail(ADMIN_EMAIL, subject, html, text);
+  await sendResendEmail(ADMIN_EMAIL, subject, html, `New ${type}: ${member.first_name} ${member.last_name}`);
 }
 
 // ─── TELEGRAM ───
-async function sendTelegramNotification(member: any) {
+async function sendTelegramNotification(member: any, type: 'registration' | 'checkout') {
   if (!TELEGRAM_BOT || !TELEGRAM_CHAT) return;
+  
   const text = [
-    '📋 <b>NEW REGISTRATION</b> — CEDEXX',
+    type === 'checkout' ? '💳 <b>CHECKOUT STARTED</b> — CEDEXX' : '📋 <b>NEW REGISTRATION</b> — CEDEXX',
     `👤 ${member.first_name} ${member.last_name}`,
     `📧 ${member.email}`,
     member.phone ? `📞 ${member.phone}` : null,
@@ -192,9 +169,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { first_name, last_name, email, phone, dob, plan, status = 'registered',
-          consent_analytics, consent_tos, consent_version, consent_timestamp,
-          stripe_session_id, is_checkout } = req.body;
+  const { 
+    first_name, last_name, email, phone, dob, plan, 
+    status = 'registered',
+    consent_analytics, consent_tos, consent_version, consent_timestamp,
+    stripe_session_id, is_checkout 
+  } = req.body;
 
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return res.status(400).json({ error: 'Valid email required' });
@@ -209,6 +189,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (existing) {
       const updates: any = { updated_at: now };
+      
       if (is_checkout) {
         updates.status = 'checkout_started';
         updates.checkout_started_at = now;
@@ -225,21 +206,36 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         if (consent_version) updates.consent_version = consent_version;
         if (consent_timestamp) updates.consent_timestamp = consent_timestamp;
       }
+      
       Object.assign(existing, updates);
       await writeMembers(members);
+
+      // Send checkout notification if applicable
+      if (is_checkout) {
+        Promise.allSettled([
+          sendCheckoutStartedEmail(existing),
+          sendAdminNotification(existing, 'checkout'),
+          sendTelegramNotification(existing, 'checkout'),
+        ]).catch(() => {});
+      }
+
       return res.status(200).json({
-        success: true, message: 'Member updated', member_id: existing.id,
+        success: true,
+        message: is_checkout ? 'Checkout started' : 'Member updated',
+        member_id: existing.id,
         status: updates.status || existing.status,
       });
     }
 
+    // Create new member
     const newMember = {
       id: `mem_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`,
       first_name: first_name ? sanitize(first_name) : '',
       last_name: last_name ? sanitize(last_name) : '',
       email: normalizedEmail,
       phone: phone ? sanitize(phone) : '',
-      dob: dob || '', plan: plan || '',
+      dob: dob || '',
+      plan: plan || '',
       status: is_checkout ? 'checkout_started' : (status || 'registered'),
       registered_at: now,
       checkout_started_at: is_checkout ? now : null,
@@ -254,19 +250,35 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     await writeMembers(members);
 
     // Send notifications (fire-and-forget)
+    const notificationType = is_checkout ? 'checkout' : 'registration';
     Promise.allSettled([
-      sendWelcomeEmail(newMember),
-      sendAdminNotification(newMember),
-      sendTelegramNotification(newMember),
+      is_checkout ? sendCheckoutStartedEmail(newMember) : sendWelcomeEmail(newMember),
+      sendAdminNotification(newMember, notificationType),
+      sendTelegramNotification(newMember, notificationType),
     ]).catch(() => {});
 
     return res.status(200).json({
-      success: true, message: is_checkout ? 'Checkout started' : 'Member registered',
-      member_id: newMember.id, status: newMember.status,
+      success: true,
+      message: is_checkout ? 'Checkout started' : 'Member registered',
+      member_id: newMember.id,
+      status: newMember.status,
     });
 
   } catch (err: any) {
     console.error('[REGISTER ERROR]', err);
-    return res.status(500).json({ error: 'Registration failed', detail: err.message });
+
+    // CRITICAL: Alert Jasmel immediately
+    await alertCritical(err, {
+      endpoint: '/api/register-member',
+      patientEmail: normalizedEmail,
+      patientName: `${first_name || ''} ${last_name || ''}`.trim(),
+      plan: plan,
+    });
+
+    return res.status(500).json({ 
+      error: 'Registration failed', 
+      detail: err.message,
+      alert_sent: true,
+    });
   }
 }

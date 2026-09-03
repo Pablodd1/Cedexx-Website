@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { Mail, Clock, Send, CheckCircle2, Linkedin, Globe, Shield, MessageCircle } from 'lucide-react';
+import { Mail, Clock, Send, CheckCircle2, Linkedin, Globe, Shield, MessageCircle, Phone } from 'lucide-react';
 import { Button } from '../components/ui';
 import { useLanguage } from '../context/LanguageContext';
 import { VirtualReceptionist } from '../components/VirtualReceptionist';
@@ -71,6 +71,12 @@ export function Contact() {
   };
 
   const contactItems = [
+    {
+      icon: Phone,
+      label: 'Call Us',
+      href: 'tel:+18555033371',
+      display: '(855) 503-3371',
+    },
     {
       icon: Mail,
       label: 'Email Support',
