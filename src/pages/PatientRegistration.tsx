@@ -129,7 +129,7 @@ const T: Record<Lang, Record<string, string>> = {
     spanish: 'Español (es)',
     whyInfo: '¿Por qué recopilamos esta información?',
     whyInfoText: 'Lyric Health requiere esta información para crear y administrar su membresía. Se almacena de forma segura y se transmite por canales compatibles con HIPAA.',
-    consent: 'Autorizo a CEDEXX a enviar esta información a Lyric Health para la inscripción de membresía y doy mi consentimiento para recibir mensajes SMS relacionados con la inscripción.',,
+    consent: 'Autorizo a CEDEXX a enviar esta información a Lyric Health para la inscripción de membresía y doy mi consentimiento para recibir mensajes SMS relacionados con la inscripción.',
     consentRequired: 'Se requiere autorización para continuar.',
     privacyLink: 'Ver nuestra Política de Privacidad',
     submit: 'Enviar Registro',
