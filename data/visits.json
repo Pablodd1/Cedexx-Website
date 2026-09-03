@@ -166,5 +166,17 @@
     "lang": "en-US",
     "timestamp": "2026-09-03T19:11:33.810Z",
     "sessionId": "sess_1788462693810"
+  },
+  {
+    "id": "v_1788462818606_h2tvfa",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "screen": "",
+    "lang": "en-US",
+    "timestamp": "2026-09-03T19:13:38.606Z",
+    "sessionId": "sess_1788462818608"
   }
 ]
