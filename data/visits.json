@@ -814,5 +814,17 @@
     "lang": "en-US",
     "timestamp": "2026-09-04T15:28:02.618Z",
     "sessionId": "sess_1788535682621"
+  },
+  {
+    "id": "v_1788536137375_88wi5f",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "node",
+    "screen": "",
+    "lang": "*",
+    "timestamp": "2026-09-04T15:35:37.375Z",
+    "sessionId": "sess_1788536137377"
   }
 ]
