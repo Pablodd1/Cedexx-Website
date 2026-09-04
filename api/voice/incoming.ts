@@ -11,10 +11,10 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
  * 4. Voicemail fallback
  * 5. SMS follow-up
  * 
- * Phone: (855) 503-3371
+ * Phone: (754) 432-2201
  */
 
-const TWILIO_PHONE = process.env.TWILIO_PHONE_NUMBER || '+18555033371';
+const TWILIO_PHONE = process.env.TWILIO_PHONE_NUMBER || '+17544322201';
 
 function twiml(xml: string) {
   return `<?xml version="1.0" encoding="UTF-8"?><Response>${xml}</Response>`;

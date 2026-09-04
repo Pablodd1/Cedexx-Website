@@ -135,7 +135,7 @@ export function EnrollSuccess() {
               Questions? Contact us at{' '}
               <a href="mailto:support@cedexx.net" className="text-[#050249] font-medium hover:underline">support@cedexx.net</a>
               {' '}or call{' '}
-              <a href="tel:954-624-6744" className="text-[#050249] font-medium hover:underline">954-624-6744</a>
+              <a href="tel:754-432-2201" className="text-[#050249] font-medium hover:underline">(754) 432-2201</a>
             </p>
           </div>
         </motion.div>

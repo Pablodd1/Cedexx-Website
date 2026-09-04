@@ -64,7 +64,7 @@ assert(fs.existsSync(chatbotFile), 'Chatbot component exists');
 const chatbotContent = fs.readFileSync(chatbotFile, 'utf8');
 assert(chatbotContent.includes('emergency'), 'Chatbot contains medical emergency / 911 safeguards');
 assert(chatbotContent.includes('human') || chatbotContent.includes('agent'), 'Chatbot contains live human escalation triggers');
-assert(chatbotContent.includes('(855) 503-3371'), 'Chatbot provides telephone support contact');
+assert(chatbotContent.includes('(754) 432-2201'), 'Chatbot provides telephone support contact');
 
 // ─────────────────────────────────────────────────────────────
 // 4. USER SIMULATION: Paperwork Memorization & Tracking

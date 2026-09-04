@@ -270,7 +270,7 @@ export function Privacy() {
                 </p>
                 <ol className="list-decimal list-inside space-y-2 ml-4">
                   <li>
-                    <strong>Verbal Consent (Phone):</strong> When you call our AI front desk at (855) 503-3371, you may be asked:
+                    <strong>Verbal Consent (Phone):</strong> When you call our AI front desk at (754) 432-2201, you may be asked:
                     <em> "Would you like me to text you the enrollment link?"</em> Saying "yes" or similar affirmative response constitutes explicit consent to receive one or more text messages from CEDEXX.
                   </li>
                   <li>

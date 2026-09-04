@@ -611,7 +611,7 @@ function CallsTab({ calls, stats, loading }: { calls: Call[]; stats: any; loadin
               {loading ? (
                 <tr><td colSpan={6} className="text-center py-16 text-slate-400 font-bold italic">Loading calls...</td></tr>
               ) : calls.length === 0 ? (
-                <tr><td colSpan={6} className="text-center py-16 text-slate-400 font-bold italic">No calls yet. Calls will appear here when people start calling (855) 503-3371.</td></tr>
+                <tr><td colSpan={6} className="text-center py-16 text-slate-400 font-bold italic">No calls yet. Calls will appear here when people start calling (754) 432-2201.</td></tr>
               ) : calls.map((call, i) => (
                 <React.Fragment key={call.callSid || i}>
                   <tr className={`border-t border-slate-50 hover:bg-blue-50/30 transition-colors cursor-pointer ${i % 2 === 0 ? 'bg-white' : 'bg-slate-50/30'}`}

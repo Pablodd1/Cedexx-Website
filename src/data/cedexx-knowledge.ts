@@ -8,7 +8,7 @@ export const CEDEXX_KNOWLEDGE = {
     description: 'A Lyric Health virtual care platform connecting families with Lyric Health licensed healthcare providers nationwide.',
     website: 'cedexx.net',
     email: 'support@cedexx.net',
-    phone: '954-624-6744',
+    phone: '754-432-2201',
     coverage: 'Nationwide through Lyric Health network',
     languages: ['English', 'Spanish', 'Russian', 'Haitian Creole'],
     compliance: 'HIPAA compliant and secure',

@@ -15,7 +15,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
  */
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'support@cedexx.net';
-const TWILIO_PHONE = process.env.TWILIO_PHONE_NUMBER || '+18555033371';
+const TWILIO_PHONE = process.env.TWILIO_PHONE_NUMBER || '+17544322201';
 
 // Simple in-memory opt-out list (resets on deploy; use DB for production)
 // In production, store this in GitHub DB or a proper database
@@ -70,7 +70,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     } catch { /* silent fail */ }
 
     return res.status(200).setHeader('Content-Type', 'text/xml').send(twiml(
-      `You have been unsubscribed from CEDEXX SMS messages. You will no longer receive texts. To re-subscribe, reply START. For help: support@cedexx.net or (855) 503-3371.`
+      `You have been unsubscribed from CEDEXX SMS messages. You will no longer receive texts. To re-subscribe, reply START. For help: support@cedexx.net or (754) 432-2201.`
     ));
   }
 
@@ -86,7 +86,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // ─── HELP / INFO ───
   if (['HELP', 'INFO', 'SUPPORT', 'ASSISTANCE'].includes(body)) {
     return res.status(200).setHeader('Content-Type', 'text/xml').send(twiml(
-      `CEDEXX Support:\n📞 (855) 503-3371\n✉️ support@cedexx.net\n🌐 cedexx.net\n\nReply STOP to unsubscribe. Msg&data rates may apply.`
+      `CEDEXX Support:\n📞 (754) 432-2201\n✉️ support@cedexx.net\n🌐 cedexx.net\n\nReply STOP to unsubscribe. Msg&data rates may apply.`
     ));
   }
 
@@ -106,6 +106,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   } catch { /* silent fail */ }
 
   return res.status(200).setHeader('Content-Type', 'text/xml').send(twiml(
-    `Thanks for your message! Our team has been notified and will follow up if needed.\n\nFor immediate help: (855) 503-3371 or support@cedexx.net\nReply HELP for options. Reply STOP to unsubscribe.`
+    `Thanks for your message! Our team has been notified and will follow up if needed.\n\nFor immediate help: (754) 432-2201 or support@cedexx.net\nReply HELP for options. Reply STOP to unsubscribe.`
   ));
 }

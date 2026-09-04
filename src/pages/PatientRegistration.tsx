@@ -359,8 +359,8 @@ export default function MemberRegistration() {
               <h4 className="font-black text-[#050249] mb-3">{t.contactSupport}</h4>
               <p className="text-sm text-slate-500 mb-4">{t.contactText}</p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <a href="tel:954-624-6744" className="inline-flex items-center justify-center gap-2 bg-[#050249] text-white font-bold py-3 px-6 rounded-2xl text-sm">
-                  <Phone className="w-4 h-4" /> 954-624-6744
+                <a href="tel:754-432-2201" className="inline-flex items-center justify-center gap-2 bg-[#050249] text-white font-bold py-3 px-6 rounded-2xl text-sm">
+                  <Phone className="w-4 h-4" /> (754) 432-2201
                 </a>
                 <a href="mailto:support@cedexx.net" className="inline-flex items-center justify-center gap-2 bg-slate-100 text-[#050249] font-bold py-3 px-6 rounded-2xl text-sm hover:bg-slate-200 transition-all">
                   <Mail className="w-4 h-4" /> support@cedexx.net
@@ -539,8 +539,8 @@ export default function MemberRegistration() {
         <div className="mt-8 text-center">
           <p className="text-sm text-slate-500 font-medium mb-3">{t.contactSupport}</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <a href="tel:954-624-6744" className="inline-flex items-center justify-center gap-2 text-[#050249] font-bold text-sm hover:text-[#23d9b0] transition-colors">
-              <Phone className="w-4 h-4" /> 954-624-6744
+            <a href="tel:754-432-2201" className="inline-flex items-center justify-center gap-2 text-[#050249] font-bold text-sm hover:text-[#23d9b0] transition-colors">
+              <Phone className="w-4 h-4" /> (754) 432-2201
             </a>
             <span className="hidden sm:block text-slate-300">|</span>
             <a href="mailto:support@cedexx.net" className="inline-flex items-center justify-center gap-2 text-[#050249] font-bold text-sm hover:text-[#23d9b0] transition-colors">

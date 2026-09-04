@@ -74,8 +74,8 @@ export function Contact() {
     {
       icon: Phone,
       label: 'Call Us',
-      href: 'tel:+18555033371',
-      display: '(855) 503-3371',
+      href: 'tel:+17544322201',
+      display: '(754) 432-2201',
     },
     {
       icon: Mail,

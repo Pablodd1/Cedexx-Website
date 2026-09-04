@@ -17,7 +17,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
  */
 
 const GEMINI_KEY = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY || '';
-const TWILIO_PHONE = process.env.TWILIO_PHONE_NUMBER || '+18555033371';
+const TWILIO_PHONE = process.env.TWILIO_PHONE_NUMBER || '+17544322201';
 const TWILIO_BACKUP_PHONE = process.env.TWILIO_BACKUP_PHONE || ''; // Local number for SMS during toll-free verification
 const RESEND_KEY = process.env.RESEND_API_KEY || '';
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'support@cedexx.net';
@@ -35,7 +35,7 @@ You are Cedex, the CEDEXX Healthcare AI Front Desk Assistant.
 
 COMPANY:
 - CEDEXX is powered by Lyric Health, a leading integrated virtual primary care platform
-- Phone: (855) 503-3371
+- Phone: (754) 432-2201
 - Website: cedexx.net
 - Email: support@cedexx.net
 
@@ -142,7 +142,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         <Say voice="Polly.Joanna">What can I help you with today?</Say>
       </Gather>
       <Say voice="Polly.Joanna">Let me send you a text with our information. Goodbye!</Say>
-      <Sms from="${SMS_FROM}" to="${From}">CEDEXX — Enroll: https://cedexx.net/enroll | Support: support@cedexx.net | Call: (855) 503-3371</Sms>
+      <Sms from="${SMS_FROM}" to="${From}">CEDEXX — Enroll: https://cedexx.net/enroll | Support: support@cedexx.net | Call: (754) 432-2201</Sms>
       <Hangup/>
     `));
     return;

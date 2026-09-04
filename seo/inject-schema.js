@@ -39,8 +39,8 @@ const SCHEMA_CONFIG = {
     { '@type': 'Person', name: 'Daisy Gonzalez', jobTitle: 'Founder', url: 'https://linkedin.com/company/cedexx-healthcare' },
     { '@type': 'Person', name: 'Jasmel Acosta', jobTitle: 'Co-founder', url: 'https://linkedin.com/company/cedexx-healthcare' }
   ],
-  email: 'info@cedexx.net',
-  phone: '+1-954-624-6744',
+  email: 'support@cedexx.net',
+  phone: '+1-754-432-2201',
   address: {
     '@type': 'PostalAddress',
     addressLocality: 'Miami',

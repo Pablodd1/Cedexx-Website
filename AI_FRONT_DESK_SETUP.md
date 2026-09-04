@@ -1,7 +1,7 @@
 # CEDEXX AI Front Desk Assistant — Setup Guide
 
 ## Phone Number
-**📞 (855) 503-3371**
+**📞 (754) 432-2201**
 
 ---
 
@@ -22,7 +22,7 @@ The AI Front Desk Assistant handles incoming calls to CEDEXX with:
 ## Call Flow
 
 ```
-Caller dials (855) 503-3371
+Caller dials (754) 432-2201
   │
   ▼
 AI: "Thank you for calling CEDEXX... I'm Cedex, your AI assistant."
@@ -70,7 +70,7 @@ AI: "What can I help you with? Press 1 to enroll, 2 for pricing, 3 for billing, 
 ### 1. Buy a Phone Number
 - Go to Twilio Console → Phone Numbers → Buy a Number
 - Choose a US toll-free or local number
-- **Recommended: (855) 503-3371** (toll-free)
+- **Active Line: (754) 432-2201**
 
 ### 2. Configure Webhook URL
 In Twilio Console → Phone Numbers → Manage → Active Numbers → [Your Number]:
@@ -100,7 +100,7 @@ Add these to Vercel:
 |----------|-------|----------|
 | `TWILIO_ACCOUNT_SID` | `AC...` from Twilio Console | ✅ Yes |
 | `TWILIO_AUTH_TOKEN` | `...` from Twilio Console | ✅ Yes |
-| `TWILIO_PHONE_NUMBER` | `+18555033371` | ✅ Yes |
+| `TWILIO_PHONE_NUMBER` | `+17544322201` | ✅ Yes |
 | `GEMINI_API_KEY` | Your Gemini API key | ✅ Yes |
 | `RESEND_API_KEY` | Your Resend API key | ✅ Yes |
 | `GITHUB_TOKEN` | GitHub token for DB | ✅ Yes |
@@ -118,7 +118,7 @@ Add these to Vercel:
 ```bash
 curl -X POST https://cedexx.net/api/voice/incoming \
   -d "From=+15551234567" \
-  -d "To=+18555033371" \
+  -d "To=+17544322201" \
   -d "CallSid=test123" \
   -d "Direction=inbound"
 ```
@@ -192,7 +192,7 @@ curl -X POST https://cedexx.net/api/voice/ai-desk \
 
 1. ✅ **Deploy** — Push to GitHub, deploy to Vercel
 2. ✅ **Configure Twilio** — Set webhook URL to `https://cedexx.net/api/voice/incoming`
-3. ✅ **Test** — Call (855) 503-3371 and test all flows
+3. ✅ **Test** — Call (754) 432-2201 and test all flows
 4. ⏳ **Train AI** — Review call logs, improve responses
 5. ⏳ **Add outbound** — Schedule follow-up calls to leads
 
