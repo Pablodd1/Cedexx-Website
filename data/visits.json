@@ -934,5 +934,17 @@
     "lang": "en-US",
     "timestamp": "2026-09-04T17:47:04.660Z",
     "sessionId": "sess_1788544024662"
+  },
+  {
+    "id": "v_1788544385624_2jtd0h",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1 (compatible; meta-externalads/1.1 (+https://developers.facebook.com/docs/sharing/webmasters/crawler))",
+    "screen": "",
+    "lang": "en-US",
+    "timestamp": "2026-09-04T17:53:05.624Z",
+    "sessionId": "sess_1788544385627"
   }
 ]
