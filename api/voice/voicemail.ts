@@ -4,6 +4,7 @@ const DEEPGRAM_API_KEY = process.env.DEEPGRAM_API_KEY || 'b0e085008baa62122bb769
 const RESEND_KEY = process.env.RESEND_API_KEY || '';
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'support@cedexx.net';
 const JASMEL_EMAIL = process.env.JASMEL_EMAIL || 'jasmelacosta@gmail.com';
+const DAISY_EMAIL = process.env.DAISY_EMAIL || 'daisy@cedexx.net';
 const TELEGRAM_BOT = process.env.TELEGRAM_BOT_TOKEN || '';
 const TELEGRAM_CHAT = process.env.TELEGRAM_CHAT_ID || '';
 
@@ -166,8 +167,8 @@ async function sendEmailNotification(
     </div>
   `;
 
-  const toEmails = [ADMIN_EMAIL];
-  if (JASMEL_EMAIL) toEmails.push(JASMEL_EMAIL);
+  const toEmails = [ADMIN_EMAIL, DAISY_EMAIL];
+  if (JASMEL_EMAIL && !toEmails.includes(JASMEL_EMAIL)) toEmails.push(JASMEL_EMAIL);
 
   try {
     await fetch('https://api.resend.com/emails', {

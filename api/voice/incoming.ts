@@ -2,21 +2,21 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 /**
  * POST /api/voice/incoming
- * AI Front Desk Assistant — Main Twilio webhook
+ * AI Front Desk Receptionist — Main Twilio Webhook
  * 
- * Handles incoming calls with:
- * 1. Professional Polly.Joanna voice greeting
+ * Flow:
+ * 1. Warm, natural receptionist greeting (Polly.Joanna)
  * 2. Speech recognition & DTMF keypad gather
- * 3. Direct routing to AI Desk
- * 4. Automatic call logging & Telegram notification
+ * 3. Answers questions quickly & acts as front-desk buffer
+ * 4. Transfers to Daisy (+1 954-624-6744) when requested
+ * 5. Instant Telegram alert on incoming call
  * 
- * Phone: (754) 432-2201
+ * Front Desk Line: (754) 432-2201
+ * Daisy's Line: (954) 624-6744
  */
 
 const TELEGRAM_BOT = process.env.TELEGRAM_BOT_TOKEN || '';
 const TELEGRAM_CHAT = process.env.TELEGRAM_CHAT_ID || '';
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN || '';
-const REPO = 'Pablodd1/Cedexx-Website';
 
 function twiml(xml: string) {
   return `<?xml version="1.0" encoding="UTF-8"?>\n<Response>\n${xml}\n</Response>`;
@@ -33,33 +33,35 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const CallSid = data.CallSid || data.callSid || `call_${Date.now()}`;
   const Direction = data.Direction || data.direction || 'inbound';
 
-  console.log('[VOICE] Incoming call:', { from: From, to: To, callSid: CallSid, direction: Direction });
+  console.log('[VOICE] Incoming front desk call:', { from: From, to: To, callSid: CallSid, direction: Direction });
 
-  // Fire-and-forget notification to Telegram
+  // Instant notification to Telegram
   if (TELEGRAM_BOT && TELEGRAM_CHAT) {
     fetch(`https://api.telegram.org/bot${TELEGRAM_BOT}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         chat_id: TELEGRAM_CHAT,
-        text: `📞 <b>INCOMING CALL</b> — CEDEXX Front Desk\n👤 From: <code>${From}</code>\n📍 To: <code>${To}</code>\n🆔 SID: ${CallSid}\n🕒 ${new Date().toLocaleString()}`,
+        text: `📞 <b>INCOMING CALL — FRONT DESK</b>\n👤 Caller: <code>${From}</code>\n📍 Line: <code>${To}</code>\n🆔 SID: <code>${CallSid}</code>\n🕒 ${new Date().toLocaleString()}`,
         parse_mode: 'HTML',
       }),
     }).catch(() => {});
   }
 
-  // Pure Voice TwiML — 100% compliant with Twilio Voice standards
+  // Pure Voice TwiML — Friendly, natural front desk receptionist
   const greeting = `
-    <Say voice="Polly.Joanna" language="en-US">
-      Thank you for calling CEDEXX, powered by Lyric Health. Your health, simplified.
-    </Say>
     <Gather input="speech dtmf" action="https://www.cedexx.net/api/voice/ai-desk" method="POST" speechTimeout="auto" speechModel="phone_call" language="en-US" numDigits="1" timeout="5">
       <Say voice="Polly.Joanna" language="en-US">
-        I am Cedex, your AI receptionist. How can I help you today? You can say things like, I want to enroll, tell me about pricing, or speak to support. Or press 1 to enroll, 2 for pricing, 3 for billing, or 4 to leave a voicemail.
+        Hi! Thank you for calling CEDEXX, powered by Lyric Health. My name is Cedex, your virtual front desk receptionist. How can I help you today?
+      </Say>
+    </Gather>
+    <Gather input="speech dtmf" action="https://www.cedexx.net/api/voice/ai-desk" method="POST" speechTimeout="auto" speechModel="phone_call" language="en-US" numDigits="1" timeout="6">
+      <Say voice="Polly.Joanna" language="en-US">
+        I'm still here! I can answer questions about our plans, pricing, virtual doctor visits, or connect you directly with Daisy. What can I do for you?
       </Say>
     </Gather>
     <Say voice="Polly.Joanna" language="en-US">
-      I did not hear a response. To explore our plans or enroll online anytime, visit cedexx dot net slash enroll. Thank you for calling CEDEXX. Goodbye!
+      I didn't catch a response. You can visit us online anytime at cedexx dot net slash enroll, or call back whenever you're ready. Thank you for calling CEDEXX. Have a wonderful day!
     </Say>
     <Hangup/>
   `;
