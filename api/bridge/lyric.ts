@@ -1,28 +1,116 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { alertCritical } from '../critical-alert';
-import { readMembers, writeMembers } from '../github-db';
 
-/**
- * POST /api/bridge/lyric
- * Bridge to send paid patient data to Lyric Health
- * 
- * Triggers:
- * - Called from webhook/stripe.ts on payment success
- * - Can be called manually from dashboard
- * 
- * Sends:
- * - Formatted enrollment data via email (immediate)
- * - API call (when Lyric provides endpoint)
- * - Logs sync status to GitHub DB
- * 
- * Critical errors alert Jasmel immediately
- */
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN || '';
+const REPO = 'Pablodd1/Cedexx-Website';
+const FILE_PATH = 'data/members.json';
 
 const RESEND_KEY = process.env.RESEND_API_KEY || '';
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'support@cedexx.net';
+const JASMEL_EMAIL = process.env.JASMEL_EMAIL || 'jasmelacosta@gmail.com';
 const LYRIC_EMAIL = process.env.LYRIC_ENROLLMENT_EMAIL || 'enrollment@getlyric.com';
 const TELEGRAM_BOT = process.env.TELEGRAM_BOT_TOKEN || '';
 const TELEGRAM_CHAT = process.env.TELEGRAM_CHAT_ID || '';
+
+async function readMembers() {
+  if (!GITHUB_TOKEN) return [];
+  try {
+    const res = await fetch(
+      `https://api.github.com/repos/${REPO}/contents/${FILE_PATH}?ref=main`,
+      {
+        headers: {
+          Authorization: `token ${GITHUB_TOKEN}`,
+          Accept: 'application/vnd.github.v3+json',
+        },
+      }
+    );
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.content ? JSON.parse(Buffer.from(data.content, 'base64').toString('utf8')).members || [] : [];
+  } catch (e) {
+    console.error('[LYRIC DB READ ERROR]', e);
+    return [];
+  }
+}
+
+async function writeMembers(members: any[]) {
+  if (!GITHUB_TOKEN) return;
+  try {
+    const getRes = await fetch(
+      `https://api.github.com/repos/${REPO}/contents/${FILE_PATH}?ref=main`,
+      {
+        headers: {
+          Authorization: `token ${GITHUB_TOKEN}`,
+          Accept: 'application/vnd.github.v3+json',
+        },
+      }
+    );
+    let sha: string | undefined;
+    let created_at = new Date().toISOString();
+    if (getRes.ok) {
+      const fileData = await getRes.json();
+      sha = fileData.sha;
+      if (fileData.content) {
+        try {
+          const parsed = JSON.parse(Buffer.from(fileData.content, 'base64').toString('utf8'));
+          if (parsed.created_at) created_at = parsed.created_at;
+        } catch (_) {}
+      }
+    }
+
+    const payload = { members, created_at, version: '1.0' };
+    await fetch(
+      `https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`,
+      {
+        method: 'PUT',
+        headers: {
+          Authorization: `token ${GITHUB_TOKEN}`,
+          Accept: 'application/vnd.github.v3+json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: `Update Lyric sync status`,
+          content: Buffer.from(JSON.stringify(payload, null, 2)).toString('base64'),
+          sha,
+          branch: 'main',
+        }),
+      }
+    );
+  } catch (e) {
+    console.error('[LYRIC DB WRITE ERROR]', e);
+  }
+}
+
+async function alertCritical(error: any, context: any) {
+  const msg = error instanceof Error ? error.message : String(error);
+  console.error('[CRITICAL ALERT]', msg, context);
+  if (RESEND_KEY) {
+    fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${RESEND_KEY}`,
+      },
+      body: JSON.stringify({
+        from: 'CEDEXX Alerts <alerts@cedexx.net>',
+        to: [JASMEL_EMAIL, ADMIN_EMAIL],
+        subject: `🚨 CRITICAL ERROR — /api/bridge/lyric`,
+        html: `<p>Error: ${msg}</p><p>Context: ${JSON.stringify(context)}</p>`,
+        text: `Error: ${msg}\nContext: ${JSON.stringify(context)}`,
+      }),
+    }).catch(() => {});
+  }
+  if (TELEGRAM_BOT && TELEGRAM_CHAT) {
+    fetch(`https://api.telegram.org/bot${TELEGRAM_BOT}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: TELEGRAM_CHAT,
+        text: `🚨 <b>CRITICAL ERROR</b>\n${msg}\n📍 Endpoint: /api/bridge/lyric`,
+        parse_mode: 'HTML',
+      }),
+    }).catch(() => {});
+  }
+}
 
 interface PatientData {
   id: string;

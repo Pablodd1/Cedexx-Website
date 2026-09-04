@@ -1,20 +1,43 @@
 import Stripe from 'stripe';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { alertCritical } from '../critical-alert';
 
-/**
- * POST /api/stripe/create-checkout
- * Creates a Stripe Checkout session for subscription
- * 
- * Flow:
- * 1. Validates plan_id, email, names
- * 2. Looks up Stripe price ID
- * 3. Applies promo code if provided
- * 4. Creates checkout session
- * 5. Returns Stripe checkout URL
- * 
- * Critical errors alert Jasmel immediately
- */
+const RESEND_KEY = process.env.RESEND_API_KEY || '';
+const TELEGRAM_BOT = process.env.TELEGRAM_BOT_TOKEN || '';
+const TELEGRAM_CHAT = process.env.TELEGRAM_CHAT_ID || '';
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'support@cedexx.net';
+const JASMEL_EMAIL = process.env.JASMEL_EMAIL || 'jasmelacosta@gmail.com';
+
+async function alertCritical(error: any, context: any) {
+  const msg = error instanceof Error ? error.message : String(error);
+  console.error('[CRITICAL ALERT]', msg, context);
+  if (RESEND_KEY) {
+    fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${RESEND_KEY}`,
+      },
+      body: JSON.stringify({
+        from: 'CEDEXX Alerts <alerts@cedexx.net>',
+        to: [JASMEL_EMAIL, ADMIN_EMAIL],
+        subject: `🚨 CRITICAL ERROR — /api/stripe/create-checkout`,
+        html: `<p>Error: ${msg}</p><p>Context: ${JSON.stringify(context)}</p>`,
+        text: `Error: ${msg}\nContext: ${JSON.stringify(context)}`,
+      }),
+    }).catch(() => {});
+  }
+  if (TELEGRAM_BOT && TELEGRAM_CHAT) {
+    fetch(`https://api.telegram.org/bot${TELEGRAM_BOT}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: TELEGRAM_CHAT,
+        text: `🚨 <b>CRITICAL ERROR</b>\n${msg}\n📍 Endpoint: /api/stripe/create-checkout`,
+        parse_mode: 'HTML',
+      }),
+    }).catch(() => {});
+  }
+}
 
 // Stripe Price Map (live mode)
 const PRICE_MAP: Record<string, string> = {

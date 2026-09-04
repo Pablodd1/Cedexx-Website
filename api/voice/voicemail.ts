@@ -1,24 +1,70 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { alertCritical } from '../critical-alert';
-import { transcribeAudio } from './deepgram';
 
-/**
- * POST /api/voice/voicemail
- * Handles voicemail recordings with Deepgram transcription
- * 
- * Features:
- * - Twilio voicemail recording
- * - Deepgram AI transcription (high accuracy)
- * - Email notification with transcription
- * - Telegram alert
- * - GitHub DB logging
- */
-
+const DEEPGRAM_API_KEY = process.env.DEEPGRAM_API_KEY || 'b0e085008baa62122bb769ac64c4dbaf2f49831b';
 const RESEND_KEY = process.env.RESEND_API_KEY || '';
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'support@cedexx.net';
-const JASMEL_EMAIL = process.env.JASMEL_EMAIL || '';
+const JASMEL_EMAIL = process.env.JASMEL_EMAIL || 'jasmelacosta@gmail.com';
 const TELEGRAM_BOT = process.env.TELEGRAM_BOT_TOKEN || '';
 const TELEGRAM_CHAT = process.env.TELEGRAM_CHAT_ID || '';
+
+async function transcribeAudio(audioUrl: string): Promise<{ transcript: string; confidence: number } | null> {
+  try {
+    const response = await fetch(
+      'https://api.deepgram.com/v1/listen?punctuate=true&utterances=true&diarize=true&model=nova-2&smart_format=true',
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Token ${DEEPGRAM_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ url: audioUrl }),
+      }
+    );
+    if (!response.ok) return null;
+    const data = await response.json();
+    const result = data.results?.channels?.[0]?.alternatives?.[0];
+    if (!result) return null;
+    return {
+      transcript: result.transcript || '',
+      confidence: result.confidence || 0,
+    };
+  } catch (err) {
+    console.error('[DEEPGRAM ERROR]', err);
+    return null;
+  }
+}
+
+async function alertCritical(error: any, context: any) {
+  const msg = error instanceof Error ? error.message : String(error);
+  console.error('[CRITICAL ALERT]', msg, context);
+  if (RESEND_KEY) {
+    fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${RESEND_KEY}`,
+      },
+      body: JSON.stringify({
+        from: 'CEDEXX Alerts <alerts@cedexx.net>',
+        to: [JASMEL_EMAIL, ADMIN_EMAIL],
+        subject: `🚨 CRITICAL ERROR — /api/voice/voicemail`,
+        html: `<p>Error: ${msg}</p><p>Context: ${JSON.stringify(context)}</p>`,
+        text: `Error: ${msg}\nContext: ${JSON.stringify(context)}`,
+      }),
+    }).catch(() => {});
+  }
+  if (TELEGRAM_BOT && TELEGRAM_CHAT) {
+    fetch(`https://api.telegram.org/bot${TELEGRAM_BOT}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: TELEGRAM_CHAT,
+        text: `🚨 <b>CRITICAL ERROR</b>\n${msg}\n📍 Endpoint: /api/voice/voicemail`,
+        parse_mode: 'HTML',
+      }),
+    }).catch(() => {});
+  }
+}
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') return res.status(405).end();

@@ -1,15 +1,10 @@
-import { Resend } from 'resend';
-
 /**
  * CRITICAL ERROR ALERT SYSTEM
  * Sends immediate email + Telegram when critical errors occur
- * This file should be imported in ALL API endpoints
+ * Fully self-contained with zero external dependencies
  */
 
-const resend = process.env.RESEND_API_KEY
-  ? new Resend(process.env.RESEND_API_KEY)
-  : null;
-
+const RESEND_KEY = process.env.RESEND_API_KEY || '';
 const TELEGRAM_BOT = process.env.TELEGRAM_BOT_TOKEN || '';
 const TELEGRAM_CHAT = process.env.TELEGRAM_CHAT_ID || '';
 const JASMEL_EMAIL = process.env.JASMEL_EMAIL || 'jasmelacosta@gmail.com';
@@ -51,7 +46,7 @@ async function sendCriticalEmail(
   context: ErrorContext,
   timestamp: string
 ) {
-  if (!resend) {
+  if (!RESEND_KEY) {
     console.error('[CRITICAL EMAIL] No Resend API key configured');
     return;
   }
@@ -85,14 +80,25 @@ async function sendCriticalEmail(
   `;
 
   try {
-    await resend.emails.send({
-      from: 'CEDEXX Alerts <alerts@cedexx.net>',
-      to: [JASMEL_EMAIL, ADMIN_EMAIL],
-      subject,
-      html,
-      text: `CRITICAL ERROR: ${errorMessage}\n\nEndpoint: ${context.endpoint}\nTime: ${timestamp}\n\nPatient: ${context.patientName || 'N/A'}\nEmail: ${context.patientEmail || 'N/A'}\nPlan: ${context.plan || 'N/A'}\n\nStack: ${errorStack || 'N/A'}`,
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${RESEND_KEY}`,
+      },
+      body: JSON.stringify({
+        from: 'CEDEXX Alerts <alerts@cedexx.net>',
+        to: [JASMEL_EMAIL, ADMIN_EMAIL],
+        subject,
+        html,
+        text: `CRITICAL ERROR: ${errorMessage}\n\nEndpoint: ${context.endpoint}\nTime: ${timestamp}\n\nPatient: ${context.patientName || 'N/A'}\nEmail: ${context.patientEmail || 'N/A'}\nPlan: ${context.plan || 'N/A'}\n\nStack: ${errorStack || 'N/A'}`,
+      }),
     });
-    console.log('[CRITICAL EMAIL] Sent to', JASMEL_EMAIL, ADMIN_EMAIL);
+    if (res.ok) {
+      console.log('[CRITICAL EMAIL] Sent to', JASMEL_EMAIL, ADMIN_EMAIL);
+    } else {
+      console.error('[CRITICAL EMAIL FAILED]', res.status, await res.text().catch(() => ''));
+    }
   } catch (err) {
     console.error('[CRITICAL EMAIL FAILED]', err);
   }

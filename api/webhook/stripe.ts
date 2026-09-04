@@ -1,22 +1,180 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { sendPaymentConfirmation, sendAdminNotification } from '../client-email';
-import { notifyAdmin } from '../notify';
-import { alertCritical } from '../critical-alert';
-import { readMembers, writeMembers } from '../github-db';
 
-/**
- * POST /api/webhook/stripe
- * Stripe webhook handler for payment events
- * 
- * Flow:
- * 1. Receives Stripe event (checkout completed, payment failed, subscription cancelled)
- * 2. Updates member status in GitHub DB
- * 3. Sends confirmation email to patient
- * 4. Sends admin notification (email + Telegram)
- * 5. Triggers Lyric Health bridge
- * 
- * Critical errors alert Jasmel immediately
- */
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN || '';
+const REPO = 'Pablodd1/Cedexx-Website';
+const FILE_PATH = 'data/members.json';
+
+const RESEND_KEY = process.env.RESEND_API_KEY || '';
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'support@cedexx.net';
+const JASMEL_EMAIL = process.env.JASMEL_EMAIL || 'jasmelacosta@gmail.com';
+const TELEGRAM_BOT = process.env.TELEGRAM_BOT_TOKEN || '';
+const TELEGRAM_CHAT = process.env.TELEGRAM_CHAT_ID || '';
+
+async function readMembers() {
+  if (!GITHUB_TOKEN) return [];
+  try {
+    const res = await fetch(
+      `https://api.github.com/repos/${REPO}/contents/${FILE_PATH}?ref=main`,
+      {
+        headers: {
+          Authorization: `token ${GITHUB_TOKEN}`,
+          Accept: 'application/vnd.github.v3+json',
+        },
+      }
+    );
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.content ? JSON.parse(Buffer.from(data.content, 'base64').toString('utf8')).members || [] : [];
+  } catch (e) {
+    console.error('[STRIPE WEBHOOK DB READ ERROR]', e);
+    return [];
+  }
+}
+
+async function writeMembers(members: any[]) {
+  if (!GITHUB_TOKEN) return;
+  try {
+    const getRes = await fetch(
+      `https://api.github.com/repos/${REPO}/contents/${FILE_PATH}?ref=main`,
+      {
+        headers: {
+          Authorization: `token ${GITHUB_TOKEN}`,
+          Accept: 'application/vnd.github.v3+json',
+        },
+      }
+    );
+    let sha: string | undefined;
+    let created_at = new Date().toISOString();
+    if (getRes.ok) {
+      const fileData = await getRes.json();
+      sha = fileData.sha;
+      if (fileData.content) {
+        try {
+          const parsed = JSON.parse(Buffer.from(fileData.content, 'base64').toString('utf8'));
+          if (parsed.created_at) created_at = parsed.created_at;
+        } catch (_) {}
+      }
+    }
+
+    const payload = { members, created_at, version: '1.0' };
+    await fetch(
+      `https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`,
+      {
+        method: 'PUT',
+        headers: {
+          Authorization: `token ${GITHUB_TOKEN}`,
+          Accept: 'application/vnd.github.v3+json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: `Update member payment status`,
+          content: Buffer.from(JSON.stringify(payload, null, 2)).toString('base64'),
+          sha,
+          branch: 'main',
+        }),
+      }
+    );
+  } catch (e) {
+    console.error('[STRIPE WEBHOOK DB WRITE ERROR]', e);
+  }
+}
+
+async function alertCritical(error: any, context: any) {
+  const msg = error instanceof Error ? error.message : String(error);
+  console.error('[CRITICAL ALERT]', msg, context);
+  if (RESEND_KEY) {
+    fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${RESEND_KEY}`,
+      },
+      body: JSON.stringify({
+        from: 'CEDEXX Alerts <alerts@cedexx.net>',
+        to: [JASMEL_EMAIL, ADMIN_EMAIL],
+        subject: `🚨 CRITICAL ERROR — /api/webhook/stripe`,
+        html: `<p>Error: ${msg}</p><p>Context: ${JSON.stringify(context)}</p>`,
+        text: `Error: ${msg}\nContext: ${JSON.stringify(context)}`,
+      }),
+    }).catch(() => {});
+  }
+  if (TELEGRAM_BOT && TELEGRAM_CHAT) {
+    fetch(`https://api.telegram.org/bot${TELEGRAM_BOT}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: TELEGRAM_CHAT,
+        text: `🚨 <b>CRITICAL ERROR</b>\n${msg}\n📍 Endpoint: /api/webhook/stripe`,
+        parse_mode: 'HTML',
+      }),
+    }).catch(() => {});
+  }
+}
+
+async function sendPaymentConfirmation(data: any) {
+  if (!RESEND_KEY) return;
+  const amountStr = data.amount ? `$${(data.amount / 100).toFixed(2)}` : '$18.99/mo';
+  const html = `
+    <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1a1a2e;">
+      <div style="background:linear-gradient(135deg,#00D4FF,#7B2FF7);padding:40px 20px;text-align:center;border-radius:12px 12px 0 0;">
+        <h1 style="color:#fff;margin:0;font-size:26px;">Payment Confirmed</h1>
+        <p style="color:rgba(255,255,255,0.9);margin:8px 0 0;font-size:15px;">Your CEDEXX membership is now active!</p>
+      </div>
+      <div style="padding:30px;background:#fff;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 12px 12px;">
+        <p style="font-size:16px;">Hi <strong>${data.first_name}</strong>,</p>
+        <p>Thank you for your payment of <strong>${amountStr}</strong> for the <strong>${data.plan}</strong> plan.</p>
+        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:16px;margin:20px 0;">
+          <p style="margin:0;font-size:16px;font-weight:600;color:#166534;">✓ Membership Active</p>
+          <p style="margin:6px 0 0;color:#374151;font-size:14px;">Download the Lyric Health app from the App Store or Google Play and tap "First Time User?" to connect your account.</p>
+        </div>
+        <p style="color:#6b7280;font-size:14px;">Questions? Contact us anytime at <a href="mailto:support@cedexx.net">support@cedexx.net</a> or call (754) 432-2201.</p>
+      </div>
+    </div>
+  `;
+  fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${RESEND_KEY}`,
+    },
+    body: JSON.stringify({
+      from: 'CEDEXX Support <support@cedexx.net>',
+      to: [data.email],
+      subject: `✓ Payment Confirmed — Your ${data.plan} Membership is Active`,
+      html,
+    }),
+  }).catch(() => {});
+}
+
+async function notifyAdmin(data: any) {
+  if (RESEND_KEY) {
+    fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${RESEND_KEY}`,
+      },
+      body: JSON.stringify({
+        from: 'CEDEXX Notifications <support@cedexx.net>',
+        to: [ADMIN_EMAIL],
+        subject: `💳 Payment Received — ${data.first_name} ${data.last_name}`,
+        html: `<h2>New Payment</h2><p><strong>Name:</strong> ${data.first_name} ${data.last_name}</p><p><strong>Email:</strong> ${data.email}</p><p><strong>Plan:</strong> ${data.plan}</p><p><strong>Amount:</strong> $${((data.amount || 0) / 100).toFixed(2)}</p>`,
+      }),
+    }).catch(() => {});
+  }
+  if (TELEGRAM_BOT && TELEGRAM_CHAT) {
+    const text = `💳 <b>NEW PAYMENT</b> — CEDEXX\n👤 ${data.first_name} ${data.last_name}\n📧 ${data.email}\n📦 Plan: ${data.plan}\n💰 Amount: $${((data.amount || 0) / 100).toFixed(2)}\n🕒 ${new Date().toLocaleString()}`;
+    fetch(`https://api.telegram.org/bot${TELEGRAM_BOT}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: TELEGRAM_CHAT,
+        text,
+        parse_mode: 'HTML',
+      }),
+    }).catch(() => {});
+  }
+}
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {

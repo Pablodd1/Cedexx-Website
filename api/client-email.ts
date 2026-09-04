@@ -1,8 +1,47 @@
-import { Resend } from 'resend';
+const RESEND_KEY = process.env.RESEND_API_KEY || '';
 
-const resend = process.env.RESEND_API_KEY
-  ? new Resend(process.env.RESEND_API_KEY)
-  : null;
+async function sendViaResend({
+  from,
+  to,
+  subject,
+  html,
+  replyTo,
+}: {
+  from: string;
+  to: string[];
+  subject: string;
+  html: string;
+  replyTo?: string;
+}) {
+  if (!RESEND_KEY) {
+    console.log('[CLIENT EMAIL] No RESEND_API_KEY configured');
+    return;
+  }
+  try {
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${RESEND_KEY}`,
+      },
+      body: JSON.stringify({
+        from,
+        to,
+        subject,
+        html,
+        ...(replyTo ? { reply_to: replyTo } : {}),
+      }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      console.error('[CLIENT EMAIL ERROR]', res.status, err);
+    } else {
+      console.log('[CLIENT EMAIL] Sent to', to);
+    }
+  } catch (err) {
+    console.error('[CLIENT EMAIL FAILED]', err);
+  }
+}
 
 const LOGO_URL = 'https://www.cedexx.net/images/lyric-logo.webp';
 const CEDEXX_URL = 'https://www.cedexx.net';
@@ -193,11 +232,6 @@ function baseTemplate(content: string): string {
 
 // ─── 1. Welcome Email (After Registration) ───
 export async function sendWelcomeEmail(data: ClientEmailData) {
-  if (!resend) {
-    console.log('[CLIENT EMAIL] No Resend API key, skipping welcome email');
-    return;
-  }
-
   const planName = planDisplayName(data.plan);
   const features = planFeatures(data.plan);
   const featureList = features.map(f => `<li style="margin-bottom:6px;">${f}</li>`).join('');
@@ -231,27 +265,17 @@ export async function sendWelcomeEmail(data: ClientEmailData) {
     </p>
   `);
 
-  try {
-    await resend.emails.send({
-      from: FROM_CLIENT,
-      to: [data.email],
-      subject: `Welcome to CEDEXX — Your ${planName} Membership`,
-      html,
-      replyTo: 'support@cedexx.net',
-    });
-    console.log('[CLIENT EMAIL] Welcome email sent to', data.email);
-  } catch (err) {
-    console.error('[CLIENT EMAIL] Failed to send welcome email:', err);
-  }
+  await sendViaResend({
+    from: FROM_CLIENT,
+    to: [data.email],
+    subject: `Welcome to CEDEXX — Your ${planName} Membership`,
+    html,
+    replyTo: 'support@cedexx.net',
+  });
 }
 
 // ─── 2. Payment Confirmation ───
 export async function sendPaymentConfirmation(data: ClientEmailData & { amount?: number; stripe_session_id?: string }) {
-  if (!resend) {
-    console.log('[CLIENT EMAIL] No Resend API key, skipping payment confirmation');
-    return;
-  }
-
   const planName = planDisplayName(data.plan);
   const price = data.plan_price || planPrice(data.plan);
   const amountText = data.amount ? `$${(data.amount / 100).toFixed(2)}` : price;
@@ -320,27 +344,17 @@ export async function sendPaymentConfirmation(data: ClientEmailData & { amount?:
     </p>
   `);
 
-  try {
-    await resend.emails.send({
-      from: FROM_CLIENT,
-      to: [data.email],
-      subject: `✓ Payment Confirmed — ${planName} is Active`,
-      html,
-      replyTo: 'support@cedexx.net',
-    });
-    console.log('[CLIENT EMAIL] Payment confirmation sent to', data.email);
-  } catch (err) {
-    console.error('[CLIENT EMAIL] Failed to send payment confirmation:', err);
-  }
+  await sendViaResend({
+    from: FROM_CLIENT,
+    to: [data.email],
+    subject: `✓ Payment Confirmed — ${planName} is Active`,
+    html,
+    replyTo: 'support@cedexx.net',
+  });
 }
 
 // ─── 3. Promo / Discount Applied Email ───
 export async function sendPromoAppliedEmail(data: ClientEmailData & { promo_code: string; discount_amount?: string; original_price?: string; discounted_price?: string }) {
-  if (!resend) {
-    console.log('[CLIENT EMAIL] No Resend API key, skipping promo email');
-    return;
-  }
-
   const planName = planDisplayName(data.plan);
 
   const html = baseTemplate(`
@@ -370,18 +384,13 @@ export async function sendPromoAppliedEmail(data: ClientEmailData & { promo_code
     </p>
   `);
 
-  try {
-    await resend.emails.send({
-      from: FROM_DAISY,
-      to: [data.email],
-      subject: `🎉 Promo Code ${data.promo_code} Applied — ${planName}`,
-      html,
-      replyTo: 'daisy@cedexx.net',
-    });
-    console.log('[CLIENT EMAIL] Promo email sent to', data.email);
-  } catch (err) {
-    console.error('[CLIENT EMAIL] Failed to send promo email:', err);
-  }
+  await sendViaResend({
+    from: FROM_DAISY,
+    to: [data.email],
+    subject: `🎉 Promo Code ${data.promo_code} Applied — ${planName}`,
+    html,
+    replyTo: 'daisy@cedexx.net',
+  });
 }
 
 // ─── 4. Admin Notification Email ───
@@ -399,11 +408,6 @@ export async function sendAdminNotification(data: {
   stripe_session_id?: string;
   reason?: string;
 }) {
-  if (!resend) {
-    console.log('[ADMIN EMAIL] No Resend API key, skipping');
-    return;
-  }
-
   const adminEmails = getAdminEmails();
   const isPayment = data.type === 'payment';
   const isContact = data.type === 'contact';
@@ -456,26 +460,16 @@ export async function sendAdminNotification(data: {
     </div>
   `;
 
-  try {
-    await resend.emails.send({
-      from: FROM_NOTIFICATIONS,
-      to: adminEmails,
-      subject,
-      html,
-    });
-    console.log('[ADMIN EMAIL] Sent to', adminEmails);
-  } catch (err) {
-    console.error('[ADMIN EMAIL ERROR]', err);
-  }
+  await sendViaResend({
+    from: FROM_NOTIFICATIONS,
+    to: adminEmails,
+    subject,
+    html,
+  });
 }
 
 // ─── 5. Membership Activation Email ───
 export async function sendActivationEmail(data: ClientEmailData) {
-  if (!resend) {
-    console.log('[CLIENT EMAIL] No Resend API key, skipping activation email');
-    return;
-  }
-
   const planName = planDisplayName(data.plan);
   const features = planFeatures(data.plan);
   const featureList = features.map(f => `<li style="margin-bottom:6px;">${f}</li>`).join('');
@@ -508,16 +502,11 @@ export async function sendActivationEmail(data: ClientEmailData) {
     </p>
   `);
 
-  try {
-    await resend.emails.send({
-      from: FROM_CLIENT,
-      to: [data.email],
-      subject: `✓ Your ${planName} Membership is Now Active`,
-      html,
-      replyTo: 'support@cedexx.net',
-    });
-    console.log('[CLIENT EMAIL] Activation email sent to', data.email);
-  } catch (err) {
-    console.error('[CLIENT EMAIL] Failed to send activation email:', err);
-  }
+  await sendViaResend({
+    from: FROM_CLIENT,
+    to: [data.email],
+    subject: `✓ Your ${planName} Membership is Now Active`,
+    html,
+    replyTo: 'support@cedexx.net',
+  });
 }
