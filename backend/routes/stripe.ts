@@ -25,7 +25,7 @@ const FRONTEND_URL = process.env.FRONTEND_URL || 'https://cedexx.net';
 // ──────────────────────────────────────────────
 // INITIALIZE CLIENTS
 // ──────────────────────────────────────────────
-const stripe = STRIPE_SECRET_KEY ? new Stripe(STRIPE_SECRET_KEY, { apiVersion: '2024-12-18.acacia' }) : null;
+const stripe = STRIPE_SECRET_KEY ? new Stripe(STRIPE_SECRET_KEY, { apiVersion: '2024-12-18.acacia' as any }) : null;
 const supabase = SUPABASE_URL && SUPABASE_SERVICE_KEY
   ? createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, { auth: { autoRefreshToken: false, persistSession: false } })
   : null;

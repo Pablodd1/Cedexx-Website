@@ -215,7 +215,7 @@ const ENTERPRISE_BENEFITS = [
   'Dedicated implementation and portfolio-wide rollout with ongoing management & support',
 ];
 
-function PlanCard({ plan, index }: { plan: PricingPlan; index: number }) {
+function PlanCard({ plan, index }: { plan: PricingPlan; index: number; key?: React.Key }) {
   const [expanded, setExpanded] = useState(false);
   const PREVIEW_COUNT = 4;
   const hasMore = plan.features.length > PREVIEW_COUNT;

@@ -31,6 +31,12 @@ interface MemberRecord {
   form_field?: string;
   page_url?: string;
   ip_address?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  zipcode?: string;
+  gender?: string;
+  cancelled_at?: string | null;
   updated_at?: string;
 }
 

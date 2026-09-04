@@ -1,8 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { sendPaymentConfirmation, sendAdminNotification } from './client-email';
-import { notifyAdmin } from './notify';
-import { alertCritical } from './critical-alert';
-import { readMembers, writeMembers } from './github-db';
+import { sendPaymentConfirmation, sendAdminNotification } from '../client-email';
+import { notifyAdmin } from '../notify';
+import { alertCritical } from '../critical-alert';
+import { readMembers, writeMembers } from '../github-db';
 
 /**
  * POST /api/webhook/stripe

@@ -1,6 +1,6 @@
 import Stripe from 'stripe';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { alertCritical } from './critical-alert';
+import { alertCritical } from '../critical-alert';
 
 /**
  * POST /api/stripe/create-checkout

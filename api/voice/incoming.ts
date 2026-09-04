@@ -35,7 +35,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   // Log call (fire-and-forget)
   logCall({
-    callSid,
+    callSid: CallSid,
     from: From,
     to: To,
     direction: Direction || 'inbound',

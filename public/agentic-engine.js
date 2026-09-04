@@ -549,7 +549,6 @@ class AgenticWebsite {
     });
   }
 }
-}
 
 // Initialize on page load
 window.AgenticWebsite = AgenticWebsite;

@@ -409,7 +409,7 @@ app.post('/api/stripe/validate-promo',
         return res.status(400).json({ success: false, error: 'Invalid or expired promo code.' });
       }
 
-      const promo = promoList.data[0];
+      const promo: any = promoList.data[0];
       const coupon = promo.coupon;
       const planCents = plan ? (PRICE_CENTS[plan] || 0) : 0;
       let discountedCents = planCents;

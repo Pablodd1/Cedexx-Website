@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Mic, MicOff, X, PhoneCall, Volume2, Loader2 } from 'lucide-react';
 import { cn } from './ui';
-import { VapiClient } from '@vapi-ai/web';
+import Vapi from '@vapi-ai/web';
 import { buildSystemPrompt } from '../data/cedexx-knowledge';
 
 const VAPI_PUBLIC_KEY = import.meta.env.VITE_VAPI_PUBLIC_KEY || '5acddf90-ccad-4b4b-aac8-9adcea8d51bb';
@@ -74,7 +74,7 @@ export function VoiceAssistant({ inline = false }: { inline?: boolean }) {
   const [isConnected, setIsConnected] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const vapiRef = useRef<VapiClient | null>(null);
+  const vapiRef = useRef<Vapi | null>(null);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -108,7 +108,7 @@ export function VoiceAssistant({ inline = false }: { inline?: boolean }) {
     setTranscript('Connecting to Cedex...');
 
     try {
-      const vapi = new VapiClient(VAPI_PUBLIC_KEY);
+      const vapi = new Vapi(VAPI_PUBLIC_KEY);
       vapiRef.current = vapi;
 
       // Event handlers
@@ -135,7 +135,7 @@ export function VoiceAssistant({ inline = false }: { inline?: boolean }) {
         }
       });
 
-      vapi.on('function-call', (functionCall) => {
+      (vapi as any).on('function-call', (functionCall: any) => {
         handleFunctionCall(functionCall);
       });
 
@@ -150,7 +150,7 @@ export function VoiceAssistant({ inline = false }: { inline?: boolean }) {
       });
 
       // Start the call
-      await vapi.start(ASSISTANT_CONFIG);
+      await vapi.start(ASSISTANT_CONFIG as any);
 
     } catch (err) {
       console.error('Start call failed:', err);

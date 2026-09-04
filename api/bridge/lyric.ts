@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { alertCritical } from './critical-alert';
-import { readMembers, writeMembers } from './github-db';
+import { alertCritical } from '../critical-alert';
+import { readMembers, writeMembers } from '../github-db';
 
 /**
  * POST /api/bridge/lyric

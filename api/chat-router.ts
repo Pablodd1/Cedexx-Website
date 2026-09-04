@@ -1,5 +1,5 @@
 import express from 'express';
-import { CEDEXX_KNOWLEDGE } from '../data/cedexx-knowledge';
+import { CEDEXX_KNOWLEDGE } from '../src/data/cedexx-knowledge';
 
 const router = express.Router();
 

@@ -57,8 +57,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     // DEBUG: Show which Stripe account this key belongs to
-    const account = await stripe.accounts.retrieve();
-    console.log('[PROMO DEBUG] Stripe account:', account.id, account.email);
+    let account: any = null;
+    try {
+      account = await (stripe.accounts as any).retrieve();
+      console.log('[PROMO DEBUG] Stripe account:', account?.id, account?.email);
+    } catch (_) {}
 
     let coupon: Stripe.Coupon | null = null;
     let promoCodeId: string | null = null;
@@ -73,7 +76,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     console.log('[PROMO DEBUG] PromotionCodes.search for', normalizedCode, 'found', promoList.data.length);
 
     if (promoList.data.length > 0) {
-      const promo = promoList.data[0];
+      const promo: any = promoList.data[0];
       coupon = promo.coupon;
       promoCodeId = promo.id;
       console.log('[PROMO DEBUG] Found via PromotionCode:', promo.id, '→ coupon:', coupon?.id);
@@ -82,9 +85,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // ─── Strategy 2: Look up as a Coupon (direct coupon ID) ───
     if (!coupon) {
       try {
-        const couponResult = await stripe.coupons.retrieve(normalizedCode.toLowerCase());
+        const couponResult: any = await stripe.coupons.retrieve(normalizedCode.toLowerCase());
         if (couponResult && !couponResult.deleted) {
-          coupon = couponResult;
+          coupon = couponResult as Stripe.Coupon;
           console.log('[PROMO DEBUG] Found via Coupon ID:', coupon.id);
         }
       } catch (err) {
@@ -96,7 +99,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({
         success: false,
         error: 'Invalid or expired promo code',
-        debug: `Checked account ${account.id}. No promotion code or coupon found for "${normalizedCode}".`,
+        debug: `Checked account ${account?.id || 'unknown'}. No promotion code or coupon found for "${normalizedCode}".`,
       });
     }
 

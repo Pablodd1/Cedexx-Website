@@ -174,8 +174,8 @@ function useVoiceInput(onResult: (text: string) => void) {
 }
 
 /* ─── Voice Input Field ─── */
-function VoiceField({ label, value, onChange, placeholder, required, type = 'text', lang, helpText }: {
-  label: string; value: string; onChange: (v: string) => void; placeholder?: string;
+function VoiceField({ label, value, onChange, onBlur, placeholder, required, type = 'text', lang, helpText }: {
+  label: string; value: string; onChange: (v: string) => void; onBlur?: () => void; placeholder?: string;
   required?: boolean; type?: string; lang: Lang; helpText?: string;
 }) {
   const { isListening, toggle } = useVoiceInput(onChange);
@@ -189,7 +189,7 @@ function VoiceField({ label, value, onChange, placeholder, required, type = 'tex
       {helpText && <p className="text-[10px] text-slate-400 font-medium">{helpText}</p>}
       <div className="relative">
         <input
-          type={type} value={value} onChange={(e) => onChange(e.target.value)}
+          type={type} value={value} onChange={(e) => onChange(e.target.value)} onBlur={onBlur}
           placeholder={placeholder} required={required}
           className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-[#050249] font-medium
                      placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#23d9b0] focus:border-transparent transition-all pr-10"
@@ -288,10 +288,56 @@ export default function MemberRegistration() {
     URL.revokeObjectURL(url);
   };
 
-  const handleSubmit = () => {
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleEmailBlur = async () => {
+    if (form.email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+      try {
+        await fetch('/api/track-form-start', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: form.email.trim(),
+            form_field: 'patient_registration',
+            page_url: window.location.pathname,
+          }),
+        });
+      } catch (_) {}
+    }
+  };
+
+  const handleSubmit = async () => {
     if (!isValid()) return;
-    console.log('[MEMBER REGISTRATION]', form);
-    setSubmitted(true);
+    setSubmitting(true);
+    try {
+      await fetch('/api/register-member', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          first_name: form.firstName.trim(),
+          last_name: form.lastName.trim(),
+          email: form.email.trim(),
+          phone: form.primaryPhone.trim(),
+          dob: form.dob,
+          address: form.address.trim(),
+          city: form.city.trim(),
+          state: form.state.trim(),
+          zipcode: form.zipcode.trim(),
+          gender: form.gender,
+          plan: form.plan || 'carenow',
+          status: 'registered',
+          consent_tos: consent,
+          consent_analytics: true,
+          consent_version: '2.0',
+          consent_timestamp: new Date().toISOString(),
+        }),
+      });
+    } catch (err) {
+      console.warn('[REGISTRATION PERSISTENCE WARN]', err);
+    } finally {
+      setSubmitting(false);
+      setSubmitted(true);
+    }
   };
 
   if (submitted) {
@@ -456,7 +502,7 @@ export default function MemberRegistration() {
               <VoiceField label={t.secondaryPhone} value={form.secondaryPhone} onChange={v => update('secondaryPhone', v)} lang={lang} type="tel" />
             </div>
             <div className="mt-4">
-              <VoiceField label={t.email} value={form.email} onChange={v => update('email', v)} required lang={lang} type="email" />
+              <VoiceField label={t.email} value={form.email} onChange={v => update('email', v)} onBlur={handleEmailBlur} required lang={lang} type="email" />
             </div>
           </section>
 

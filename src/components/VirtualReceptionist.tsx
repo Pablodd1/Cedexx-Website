@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Mic, MicOff, Volume2, Phone, Sparkles, X, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { VapiClient } from '@vapi-ai/web';
+import Vapi from '@vapi-ai/web';
 import { buildSystemPrompt } from '../data/cedexx-knowledge';
 
 const VAPI_PUBLIC_KEY = import.meta.env.VITE_VAPI_PUBLIC_KEY || '5acddf90-ccad-4b4b-aac8-9adcea8d51bb';
@@ -73,7 +73,7 @@ export function VirtualReceptionist() {
   const [status, setStatus] = useState<"idle" | "connecting" | "speaking" | "listening">("idle");
   const [transcript, setTranscript] = useState("");
   const [latestUserMessage, setLatestUserMessage] = useState("");
-  const vapiRef = useRef<VapiClient | null>(null);
+  const vapiRef = useRef<Vapi | null>(null);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -112,7 +112,7 @@ export function VirtualReceptionist() {
     setStatus("connecting");
 
     try {
-      const vapi = new VapiClient(VAPI_PUBLIC_KEY);
+      const vapi = new Vapi(VAPI_PUBLIC_KEY);
       vapiRef.current = vapi;
 
       // Event handlers
@@ -137,7 +137,7 @@ export function VirtualReceptionist() {
         }
       });
 
-      vapi.on('function-call', (functionCall) => {
+      (vapi as any).on('function-call', (functionCall: any) => {
         handleFunctionCall(functionCall);
       });
 
@@ -153,7 +153,7 @@ export function VirtualReceptionist() {
       });
 
       // Start the call
-      await vapi.start(ASSISTANT_CONFIG);
+      await vapi.start(ASSISTANT_CONFIG as any);
 
     } catch (error) {
       console.error('Start call failed:', error);
