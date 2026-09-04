@@ -1,36 +1,11 @@
 {
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "functions": {
-    "api/**": {
-      "includeFiles": "api/**"
-    }
-  },
   "redirects": [
     { "source": "/", "has": [{ "type": "host", "value": "cedexx.net" }], "destination": "https://www.cedexx.net/", "permanent": true }
   ],
   "rewrites": [
-    { "source": "/api/stripe/validate-promo", "destination": "/api/stripe/validate-promo.ts" },
-    { "source": "/api/stripe/create-checkout", "destination": "/api/stripe/create-checkout.ts" },
-    { "source": "/api/register-member", "destination": "/api/register-member.ts" },
-    { "source": "/api/webhook/stripe", "destination": "/api/webhook/stripe.ts" },
-    { "source": "/api/dashboard/members", "destination": "/api/dashboard/members.ts" },
-    { "source": "/api/dashboard/calls", "destination": "/api/dashboard/calls.ts" },
-    { "source": "/api/dashboard/analytics", "destination": "/api/dashboard/analytics.ts" },
-    { "source": "/api/track-visit", "destination": "/api/track-visit.ts" },
-    { "source": "/api/chat", "destination": "/api/chat.js" },
-    { "source": "/api/send", "destination": "/api/send.js" },
-    { "source": "/api/guide-subscribe", "destination": "/api/guide-subscribe.js" },
-    { "source": "/api/book-voice", "destination": "/api/voice-booking.ts" },
-    { "source": "/api/voice/incoming", "destination": "/api/voice/incoming.ts" },
-    { "source": "/api/voice/ai-desk", "destination": "/api/voice/ai-desk.ts" },
-    { "source": "/api/voice/menu-choice", "destination": "/api/voice/menu-choice.ts" },
-    { "source": "/api/voice/voicemail", "destination": "/api/voice/voicemail.ts" },
-    { "source": "/api/voice/call-log", "destination": "/api/voice/call-log.ts" },
-    { "source": "/api/track-form-start", "destination": "/api/track-form-start.ts" },
-    { "source": "/api/bridge/lyric", "destination": "/api/bridge/lyric.ts" },
-    { "source": "/api/sms/reply", "destination": "/api/sms/reply.ts" },
     { "source": "/admin", "destination": "/admin.html" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }
