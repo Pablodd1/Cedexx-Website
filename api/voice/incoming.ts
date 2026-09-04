@@ -5,75 +5,64 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
  * AI Front Desk Assistant — Main Twilio webhook
  * 
  * Handles incoming calls with:
- * 1. Professional greeting
- * 2. Speech-enabled AI assistant (no WebSocket needed)
- * 3. Direct enrollment via phone
- * 4. Voicemail fallback
- * 5. SMS follow-up
+ * 1. Professional Polly.Joanna voice greeting
+ * 2. Speech recognition & DTMF keypad gather
+ * 3. Direct routing to AI Desk
+ * 4. Automatic call logging & Telegram notification
  * 
  * Phone: (754) 432-2201
  */
 
-const TWILIO_PHONE = process.env.TWILIO_PHONE_NUMBER || '+17544322201';
+const TELEGRAM_BOT = process.env.TELEGRAM_BOT_TOKEN || '';
+const TELEGRAM_CHAT = process.env.TELEGRAM_CHAT_ID || '';
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN || '';
+const REPO = 'Pablodd1/Cedexx-Website';
 
 function twiml(xml: string) {
-  return `<?xml version="1.0" encoding="UTF-8"?><Response>${xml}</Response>`;
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<Response>\n${xml}\n</Response>`;
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  if (req.method !== 'POST') return res.status(405).end();
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Content-Type', 'text/xml');
 
-  const { From, To, CallSid, Direction } = req.body;
+  // Accept both POST and GET from Twilio
+  const data = req.body || req.query || {};
+  const From = data.From || data.from || 'Unknown Caller';
+  const To = data.To || data.to || '+17544322201';
+  const CallSid = data.CallSid || data.callSid || `call_${Date.now()}`;
+  const Direction = data.Direction || data.direction || 'inbound';
 
-  console.log('[VOICE] Incoming call:', {
-    from: From,
-    to: To,
-    callSid: CallSid,
-    direction: Direction,
-    timestamp: new Date().toISOString(),
-  });
+  console.log('[VOICE] Incoming call:', { from: From, to: To, callSid: CallSid, direction: Direction });
 
-  // Log call (fire-and-forget)
-  logCall({
-    callSid: CallSid,
-    from: From,
-    to: To,
-    direction: Direction || 'inbound',
-    status: 'answered',
-    startedAt: new Date().toISOString(),
-  }).catch(() => {});
+  // Fire-and-forget notification to Telegram
+  if (TELEGRAM_BOT && TELEGRAM_CHAT) {
+    fetch(`https://api.telegram.org/bot${TELEGRAM_BOT}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: TELEGRAM_CHAT,
+        text: `📞 <b>INCOMING CALL</b> — CEDEXX Front Desk\n👤 From: <code>${From}</code>\n📍 To: <code>${To}</code>\n🆔 SID: ${CallSid}\n🕒 ${new Date().toLocaleString()}`,
+        parse_mode: 'HTML',
+      }),
+    }).catch(() => {});
+  }
 
-  // Main greeting + AI assistant prompt
+  // Pure Voice TwiML — 100% compliant with Twilio Voice standards
   const greeting = `
-    <Say voice="Polly.Joanna">
+    <Say voice="Polly.Joanna" language="en-US">
       Thank you for calling CEDEXX, powered by Lyric Health. Your health, simplified.
     </Say>
-    <Say voice="Polly.Joanna">
-      I'm Cedex, your AI front desk assistant. I can help you enroll, answer questions about our plans, or connect you with our team.
-    </Say>
-    <Gather input="speech dtmf" action="/api/voice/ai-desk" speechTimeout="auto" speechModel="phone_call" language="en-US" numDigits="1">
-      <Say voice="Polly.Joanna">
-        What can I help you with today? You can say things like: "I want to enroll," "How much does it cost," or "I have a billing question." You can also press 1 to enroll, 2 for pricing, 3 for billing, or 4 to leave a voicemail.
+    <Gather input="speech dtmf" action="https://www.cedexx.net/api/voice/ai-desk" method="POST" speechTimeout="auto" speechModel="phone_call" language="en-US" numDigits="1" timeout="5">
+      <Say voice="Polly.Joanna" language="en-US">
+        I am Cedex, your AI receptionist. How can I help you today? You can say things like, I want to enroll, tell me about pricing, or speak to support. Or press 1 to enroll, 2 for pricing, 3 for billing, or 4 to leave a voicemail.
       </Say>
     </Gather>
-    <Say voice="Polly.Joanna">I didn't hear a response. Let me send you a text with our enrollment link. Goodbye!</Say>
-    <Sms from="${TWILIO_PHONE}" to="${From}">CEDEXX — Enroll now: https://cedexx.net/enroll | Questions? Reply here or call back. We're here 24/7.</Sms>
+    <Say voice="Polly.Joanna" language="en-US">
+      I did not hear a response. To explore our plans or enroll online anytime, visit cedexx dot net slash enroll. Thank you for calling CEDEXX. Goodbye!
+    </Say>
     <Hangup/>
   `;
 
-  res.setHeader('Content-Type', 'text/xml');
-  res.status(200).send(twiml(greeting));
-}
-
-// ─── Call Logging ───
-async function logCall(callData: any) {
-  try {
-    await fetch('https://cedexx.net/api/voice/call-log', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(callData),
-    });
-  } catch (err) {
-    console.error('[CALL LOG ERROR]', err);
-  }
+  return res.status(200).send(twiml(greeting));
 }

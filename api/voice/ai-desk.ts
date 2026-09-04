@@ -114,11 +114,18 @@ function buildQuickResponse(intent: string): string | null {
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  if (req.method !== 'POST') return res.status(405).end();
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Content-Type', 'text/xml');
 
-  const { SpeechResult, Digits, Confidence, CallSid, From } = req.body;
-  const speech = SpeechResult || '';
-  const digit = Digits || '';
+  const data = req.body || req.query || {};
+  const SpeechResult = data.SpeechResult || data.speech || '';
+  const Digits = data.Digits || data.digit || '';
+  const Confidence = data.Confidence || '1.0';
+  const CallSid = data.CallSid || data.callSid || `call_${Date.now()}`;
+  const From = data.From || data.from || 'Unknown Caller';
+
+  const speech = (SpeechResult || '').trim();
+  const digit = (Digits || '').toString().trim();
 
   console.log('[AI DESK] Input:', {
     callSid: CallSid,
@@ -130,58 +137,64 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   // Handle DTMF (keypad) input
   if (digit) {
-    return handleDigitInput(digit, From, res);
+    return handleDigitInput(digit, From, CallSid, res);
   }
 
   // No speech detected
   if (!speech) {
-    res.setHeader('Content-Type', 'text/xml');
-    res.status(200).send(twiml(`
-      <Say voice="Polly.Joanna">I didn't catch that. Could you please repeat?</Say>
-      <Gather input="speech dtmf" action="/api/voice/ai-desk" speechTimeout="auto" speechModel="phone_call" language="en-US" numDigits="1">
-        <Say voice="Polly.Joanna">What can I help you with today?</Say>
+    return res.status(200).send(twiml(`
+      <Say voice="Polly.Joanna" language="en-US">I did not catch that. Could you please repeat?</Say>
+      <Gather input="speech dtmf" action="https://www.cedexx.net/api/voice/ai-desk" method="POST" speechTimeout="auto" speechModel="phone_call" language="en-US" numDigits="1" timeout="5">
+        <Say voice="Polly.Joanna" language="en-US">What can I help you with today? You can speak, or press 1 to enroll, 2 for pricing, 3 for billing, or 4 for voicemail.</Say>
       </Gather>
-      <Say voice="Polly.Joanna">Let me send you a text with our information. Goodbye!</Say>
-      <Sms from="${SMS_FROM}" to="${From}">CEDEXX — Enroll: https://cedexx.net/enroll | Support: support@cedexx.net | Call: (754) 432-2201</Sms>
+      <Say voice="Polly.Joanna" language="en-US">Thank you for calling CEDEXX, powered by Lyric Health. Goodbye!</Say>
       <Hangup/>
     `));
-    return;
   }
 
   // Detect intent
   const intent = detectIntent(speech);
-  console.log('[AI DESK] Detected intent:', intent);
+  console.log('[AI DESK] Detected intent:', intent, 'from speech:', speech);
+
+  // Notify on Telegram
+  const TELEGRAM_BOT = process.env.TELEGRAM_BOT_TOKEN || '';
+  const TELEGRAM_CHAT = process.env.TELEGRAM_CHAT_ID || '';
+  if (TELEGRAM_BOT && TELEGRAM_CHAT) {
+    fetch(`https://api.telegram.org/bot${TELEGRAM_BOT}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: TELEGRAM_CHAT,
+        text: `🗣️ <b>VOICE INPUT</b> — CEDEXX Front Desk\n👤 Caller: <code>${From}</code>\n💬 Said: "<i>${speech}</i>"\n🏷️ Intent: <b>${intent}</b>\n🕒 ${new Date().toLocaleString()}`,
+        parse_mode: 'HTML',
+      }),
+    }).catch(() => {});
+  }
 
   // Handle emergency immediately
   if (intent === 'emergency') {
-    res.setHeader('Content-Type', 'text/xml');
-    res.status(200).send(twiml(`
-      <Say voice="Polly.Joanna">This is an emergency. Please hang up and call 9 1 1 immediately. Do not wait. Call 9 1 1 now.</Say>
+    return res.status(200).send(twiml(`
+      <Say voice="Polly.Joanna" language="en-US">This is an emergency. Please hang up and call 9 1 1 immediately. Do not wait. Call 9 1 1 now.</Say>
       <Hangup/>
     `));
-    return;
   }
 
   // Handle voicemail intent
   if (intent === 'voicemail') {
-    res.setHeader('Content-Type', 'text/xml');
-    res.status(200).send(twiml(`
-      <Say voice="Polly.Joanna">I'll transfer you to voicemail. Please leave your name, phone number, and how we can help after the tone. Our team will respond within 2 hours.</Say>
-      <Record action="/api/voice/voicemail" maxLength="300" transcribe="true" transcribeCallback="/api/voice/voicemail" finishOnKey="#" playBeep="true" />
-      <Say voice="Polly.Joanna">We didn't receive a message. Please call back or text us. Goodbye.</Say>
+    return res.status(200).send(twiml(`
+      <Say voice="Polly.Joanna" language="en-US">I will transfer you to voicemail. Please leave your name, phone number, and message after the tone. Our team will return your call within 2 hours.</Say>
+      <Record action="https://www.cedexx.net/api/voice/voicemail" method="POST" maxLength="180" finishOnKey="#" playBeep="true" />
+      <Say voice="Polly.Joanna" language="en-US">Thank you for your message. Goodbye.</Say>
       <Hangup/>
     `));
-    return;
   }
 
   // Handle goodbye
   if (intent === 'goodbye') {
-    res.setHeader('Content-Type', 'text/xml');
-    res.status(200).send(twiml(`
-      <Say voice="Polly.Joanna">Thank you for calling CEDEXX, powered by Lyric Health. Have a healthy day! Goodbye.</Say>
+    return res.status(200).send(twiml(`
+      <Say voice="Polly.Joanna" language="en-US">Thank you for calling CEDEXX, powered by Lyric Health. Have a wonderful day! Goodbye.</Say>
       <Hangup/>
     `));
-    return;
   }
 
   // Try quick response first, fall back to AI
@@ -192,70 +205,74 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       responseText = await getAIResponse(speech, intent);
     } catch (err) {
       console.error('[AI DESK] Gemini failed:', err);
-      responseText = "I'm sorry, I'm having trouble right now. Please visit cedexx dot net or call back later.";
+      responseText = "CEDEXX offers 24/7 virtual urgent care and primary care powered by Lyric Health. Plans start at 18 dollars and 99 cents per month.";
     }
   }
 
   if (!responseText) {
-    responseText = "I can help you enroll, answer questions about pricing, or connect you with our team. What would you like to do?";
+    responseText = "I can help you enroll in CEDEXX, answer questions about our plans, or take a message for our support team.";
   }
 
-  // Build Twilio response with follow-up gather
-  const isEnrollIntent = intent === 'enroll';
-  
   const twilioResponse = `
-    <Say voice="Polly.Joanna">${escapeXml(responseText)}</Say>
-    ${isEnrollIntent ? `<Sms from="${SMS_FROM}" to="${From}">CEDEXX Enrollment: https://cedexx.net/enroll | Plans from $18.99/mo | Questions? Reply here.</Sms>` : ''}
-    <Gather input="speech dtmf" action="/api/voice/ai-desk" speechTimeout="auto" speechModel="phone_call" language="en-US" numDigits="1">
-      <Say voice="Polly.Joanna">Is there anything else I can help you with? Or press 4 to leave a voicemail.</Say>
+    <Say voice="Polly.Joanna" language="en-US">${escapeXml(responseText)}</Say>
+    <Gather input="speech dtmf" action="https://www.cedexx.net/api/voice/ai-desk" method="POST" speechTimeout="auto" speechModel="phone_call" language="en-US" numDigits="1" timeout="5">
+      <Say voice="Polly.Joanna" language="en-US">Is there anything else I can assist you with? Or press 4 to leave a voicemail.</Say>
     </Gather>
-    <Say voice="Polly.Joanna">Thank you for calling CEDEXX powered by Lyric Health. Have a healthy day!</Say>
+    <Say voice="Polly.Joanna" language="en-US">Thank you for calling CEDEXX, powered by Lyric Health. Have a healthy day!</Say>
     <Hangup/>
   `;
 
-  res.setHeader('Content-Type', 'text/xml');
-  res.status(200).send(twiml(twilioResponse));
+  return res.status(200).send(twiml(twilioResponse));
 }
 
 // ─── Handle DTMF Input ───
-function handleDigitInput(digit: string, from: string, res: VercelResponse) {
+function handleDigitInput(digit: string, from: string, callSid: string, res: VercelResponse) {
   let response = '';
 
   switch (digit) {
     case '1':
       response = `
-        <Say voice="Polly.Joanna">Perfect! You can enroll right now at cedexx dot net slash enroll. I'll send you a text with the link.</Say>
-        <Sms from="${SMS_FROM}" to="${from}">CEDEXX Enrollment: https://cedexx.net/enroll | Plans: CareNow™ $18.99/mo | CareComplete™ $34.99/mo | No insurance needed!</Sms>
-        <Gather input="speech dtmf" action="/api/voice/ai-desk" speechTimeout="auto" speechModel="phone_call" language="en-US" numDigits="1">
-          <Say voice="Polly.Joanna">Is there anything else I can help you with?</Say>
+        <Say voice="Polly.Joanna" language="en-US">
+          Wonderful! You can enroll online in just two minutes at cedexx dot net slash enroll. Our popular CareNow plan is only 18 dollars and 99 cents per month, with no insurance required and up to 7 household members included.
+        </Say>
+        <Gather input="speech dtmf" action="https://www.cedexx.net/api/voice/ai-desk" method="POST" speechTimeout="auto" speechModel="phone_call" language="en-US" numDigits="1" timeout="5">
+          <Say voice="Polly.Joanna" language="en-US">Would you like to hear about our other plans, or leave a voicemail for enrollment support?</Say>
         </Gather>
+        <Say voice="Polly.Joanna" language="en-US">Thank you for calling CEDEXX. Goodbye!</Say>
         <Hangup/>
       `;
       break;
     case '2':
       response = `
-        <Say voice="Polly.Joanna">Our plans are: Care Now for 18 dollars and 99 cents per month, Care Now plus Mental Wellness for 26 dollars and 99 cents, Mental Wellness alone for 18 dollars and 99 cents, Care Complete for 34 dollars and 99 cents, and Care Complete Family for 52 dollars and 99 cents. All plans include up to 7 dependents.</Say>
-        <Gather input="speech dtmf" action="/api/voice/ai-desk" speechTimeout="auto" speechModel="phone_call" language="en-US" numDigits="1">
-          <Say voice="Polly.Joanna">Would you like to enroll? Just say yes, or press 1.</Say>
+        <Say voice="Polly.Joanna" language="en-US">
+          Our plans include: CareNow for 18 dollars and 99 cents per month for 24/7 urgent care; CareNow plus Mental Wellness for 26 dollars and 99 cents; Mental Wellness alone for 18 dollars and 99 cents; and CareComplete with a dedicated virtual primary care physician for 34 dollars and 99 cents per month. All plans cover up to 7 dependents.
+        </Say>
+        <Gather input="speech dtmf" action="https://www.cedexx.net/api/voice/ai-desk" method="POST" speechTimeout="auto" speechModel="phone_call" language="en-US" numDigits="1" timeout="5">
+          <Say voice="Polly.Joanna" language="en-US">Press 1 if you would like to enroll, or press 4 to leave a voicemail.</Say>
         </Gather>
+        <Say voice="Polly.Joanna" language="en-US">Thank you for calling CEDEXX. Goodbye!</Say>
         <Hangup/>
       `;
       break;
     case '3':
       response = `
-        <Say voice="Polly.Joanna">For billing questions, please email support at cedexx dot net, or visit your account at cedexx dot net. I'll send you our support email via text.</Say>
-        <Sms from="${SMS_FROM}" to="${from}">CEDEXX Billing Support: support@cedexx.net | Account: https://cedexx.net | Reply here for help.</Sms>
-        <Gather input="speech dtmf" action="/api/voice/ai-desk" speechTimeout="auto" speechModel="phone_call" language="en-US" numDigits="1">
-          <Say voice="Polly.Joanna">Is there anything else I can help you with?</Say>
+        <Say voice="Polly.Joanna" language="en-US">
+          For billing support, you can email us at support at cedexx dot net, or manage your membership online at cedexx dot net.
+        </Say>
+        <Gather input="speech dtmf" action="https://www.cedexx.net/api/voice/ai-desk" method="POST" speechTimeout="auto" speechModel="phone_call" language="en-US" numDigits="1" timeout="5">
+          <Say voice="Polly.Joanna" language="en-US">Press 4 if you would like to leave a voicemail for our billing team.</Say>
         </Gather>
+        <Say voice="Polly.Joanna" language="en-US">Thank you for calling CEDEXX. Goodbye!</Say>
         <Hangup/>
       `;
       break;
     case '4':
       response = `
-        <Say voice="Polly.Joanna">I'll transfer you to voicemail. Please leave your name, phone number, and how we can help after the tone. Our team will respond within 2 hours.</Say>
-        <Record action="/api/voice/voicemail" maxLength="300" transcribe="true" transcribeCallback="/api/voice/voicemail" finishOnKey="#" playBeep="true" />
-        <Say voice="Polly.Joanna">We didn't receive a message. Please call back or text us. Goodbye.</Say>
+        <Say voice="Polly.Joanna" language="en-US">
+          Please leave your name, phone number, and a brief message after the tone. Our support team will return your call within 2 hours.
+        </Say>
+        <Record action="https://www.cedexx.net/api/voice/voicemail" method="POST" maxLength="180" finishOnKey="#" playBeep="true" />
+        <Say voice="Polly.Joanna" language="en-US">Thank you for your message. Goodbye.</Say>
         <Hangup/>
       `;
       break;
@@ -263,13 +280,12 @@ function handleDigitInput(digit: string, from: string, res: VercelResponse) {
     case '0':
     default:
       response = `
-        <Redirect>/api/voice/incoming</Redirect>
+        <Redirect method="POST">https://www.cedexx.net/api/voice/incoming</Redirect>
       `;
       break;
   }
 
-  res.setHeader('Content-Type', 'text/xml');
-  res.status(200).send(twiml(response));
+  return res.status(200).send(twiml(response));
 }
 
 // ─── Call Gemini AI ───
