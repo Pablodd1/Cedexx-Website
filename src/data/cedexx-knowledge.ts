@@ -200,12 +200,12 @@ export const CEDEXX_KNOWLEDGE = {
 
   criticalRules: [
     'NEVER give medical diagnoses, advice, or treatment recommendations',
-    'ALWAYS clarify that Cedexx is a technology platform connecting to independent licensed providers',
+    "ALWAYS clarify that Cedexx is a technology platform connecting to Lyric Health's licensed providers",
     'For medical emergencies, ALWAYS direct them to call 911 immediately',
     'Prescriptions are at provider clinical discretion — never guarantee a prescription',
     'Controlled substances have restrictions per Florida law',
     'You are an AI assistant, not a medical professional',
-    'Providers are independent contractors, not Cedexx employees',
+    'Providers are Lyric Health providers, not Cedexx employees',
   ],
 };
 

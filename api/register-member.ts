@@ -1,8 +1,13 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import fs from 'fs';
 import { notifyAdmin } from './notify';
+import { createClient } from '@supabase/supabase-js';
 
 const DATA_FILE = '/tmp/cedexx-members.json';
+
+const supabaseUrl = process.env.SUPABASE_URL || '';
+const supabaseKey = process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+const supabase = (supabaseUrl && supabaseKey) ? createClient(supabaseUrl, supabaseKey) : null;
 
 function loadMembers(): any[] {
   try {
@@ -66,6 +71,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   };
 
   const members = loadMembers();
+  let finalId = member.id;
 
   // Upsert: update existing by email if already registered
   const existingIdx = members.findIndex((m) => m.email === member.email);
@@ -76,12 +82,56 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       id: members[existingIdx].id, // keep original id
       registered_at: members[existingIdx].registered_at, // keep original reg date
     };
+    finalId = members[existingIdx].id;
   } else {
     members.push(member);
   }
 
   saveMembers(members);
+
+  if (supabase) {
+    try {
+      const dbStatus = status === 'paid' ? 'active' : 'pending_payment';
+      const { data: existingRecords } = await supabase
+        .from('enrollments')
+        .select('id')
+        .eq('email', member.email)
+        .single();
+      
+      if (existingRecords) {
+        await supabase.from('enrollments').update({
+          first_name: member.first_name,
+          last_name: member.last_name,
+          phone: member.phone,
+          date_of_birth: member.dob ? member.dob : null,
+          plan: member.plan || 'individual',
+          role: 'individual',
+          status: dbStatus,
+          payment_reference: member.stripe_session_id || null,
+        }).eq('email', member.email);
+        finalId = existingRecords.id;
+      } else {
+        const { data } = await supabase.from('enrollments').insert([{
+          first_name: member.first_name,
+          last_name: member.last_name,
+          email: member.email,
+          phone: member.phone,
+          date_of_birth: member.dob ? member.dob : null,
+          plan: member.plan || 'individual',
+          role: 'individual',
+          status: dbStatus,
+          payment_reference: member.stripe_session_id || null,
+        }]).select();
+        if (data && data[0]) {
+          finalId = data[0].id;
+        }
+      }
+    } catch (error) {
+      console.error('[SUPABASE UPSERT ERROR]', error);
+    }
+  }
+
   await sendNotifications(member);
 
-  return res.status(200).json({ success: true, id: member.id });
+  return res.status(200).json({ success: true, id: finalId });
 }

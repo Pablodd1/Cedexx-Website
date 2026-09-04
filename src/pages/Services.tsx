@@ -33,12 +33,14 @@ export function Services() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
-              { icon: Stethoscope, title: 'Urgent Care', desc: 'Providers can evaluate and treat common illnesses like flu, allergies, infections, and more. Available 24/7.' },
-              { icon: Brain, title: 'Mental Wellness', desc: 'Secure consultations and support for anxiety, depression, and stress management.' },
-              { icon: HeartPulse, title: 'Prescription Access', desc: 'Evaluation and digital prescriptions and refills sent to your local pharmacy when medically appropriate.' },
-              { icon: Activity, title: 'Pediatric Care', desc: 'Immediate access to board-certified pediatric specialists for your children when your regular doctor is unavailable.' },
-              { icon: ShieldCheck, title: 'Work & School Notes', desc: 'Clinical documentation for employers and schools provided digitally after consults at provider discretion.' },
-              { icon: Users, title: 'Family Wellness', desc: 'Holistic support including wellness coaching and preventative counseling for your household.' }
+              { icon: Stethoscope, title: '24/7 Urgent Care', desc: 'Providers can evaluate and treat common illnesses like flu, allergies, infections, and more. Available around the clock.' },
+              { icon: HeartPulse, title: 'Primary Care', desc: 'Comprehensive everyday health management, preventative care, and ongoing condition monitoring.' },
+              { icon: Brain, title: 'Mental Health', desc: 'Secure consultations and support for anxiety, depression, and stress management.' },
+              { icon: ShieldCheck, title: 'Dermatology', desc: 'Expert evaluation and treatment plans for skin conditions, rashes, and other dermatological needs.' },
+              { icon: Activity, title: 'Virtual MSK', desc: 'Musculoskeletal care and physical therapy guidance for joint, muscle, and bone issues.' },
+              { icon: Users, title: 'Care Navigation', desc: 'Personalized assistance navigating the healthcare system and coordinating your care journey.' },
+              { icon: CheckCircle2, title: 'Labs', desc: 'Convenient ordering and review of diagnostic laboratory tests.' },
+              { icon: TrendingUp, title: 'GLP-1 Weight Loss', desc: 'Medical weight management program including GLP-1 prescriptions when clinically appropriate.' }
             ].map((service, i) => (
               <Card key={i} className="p-10 hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 border-blue-50 bg-[#EBF3FB] rounded-[2.5rem] group">
                 <div className="h-16 w-16 rounded-2xl bg-white flex items-center justify-center mb-8 text-[#050249] group-hover:bg-[#050249] group-hover:text-white transition-all duration-300 shadow-sm">

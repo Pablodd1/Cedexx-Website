@@ -81,11 +81,11 @@ export function Terms() {
               </ul>
             </section>
 
-            {/* SECTION 4: Providers Are Independent */}
+            {/* SECTION 4: providers are part of Lyric Health's network */}
             <section>
               <h2 className="text-2xl font-bold text-emerald-900 mb-4 flex items-center gap-2">
                 <Stethoscope className="h-6 w-6 text-emerald-500" />
-                4. Providers Are Independent Contractors
+                4. Providers Are Lyric Health providers
               </h2>
               <p>
                 All healthcare providers accessible through our platform are part of Lyric Health, 

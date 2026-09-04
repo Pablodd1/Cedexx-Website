@@ -75,12 +75,49 @@ async function sendEmailNotification(data: NotifyData) {
   `;
 
   try {
+    // 1. Email to Admin
     await resend.emails.send({
       from: 'CEDEXX Notifications <onboarding@resend.dev>',
       to: [adminEmail],
       subject,
       html,
     });
+
+    // 2. Email to User
+    if (data.email) {
+      const userSubject = isPayment 
+        ? `Payment Confirmation - CEDEXX` 
+        : isDeletion 
+          ? `Data Deletion Request Received - CEDEXX` 
+          : `Welcome to CEDEXX - Registration Complete`;
+      
+      const userHtml = `
+        <div style="font-family:Arial,sans-serif;max-width:600px;margin:20px auto;border:1px solid #e0e0e0;border-radius:16px;overflow:hidden">
+          <div style="background:#050249;color:#fff;padding:20px">
+            <h2 style="margin:0;font-size:18px">
+              ${isPayment ? 'Payment Successful' : isDeletion ? 'Request Received' : 'Registration Successful'}
+            </h2>
+          </div>
+          <div style="padding: 20px; font-size:14px; color:#333;">
+            <p>Hi ${data.first_name},</p>
+            <p>${isPayment 
+                ? 'Thank you for your payment. Your CEDEXX membership is now active.' 
+                : isDeletion 
+                  ? 'We have received your data deletion request and are processing it.' 
+                  : 'Thank you for registering with CEDEXX. Please proceed to payment to activate your membership.'}</p>
+            <p>If you have any questions, feel free to reply to this email.</p>
+            <p>Best regards,<br>The CEDEXX Team</p>
+          </div>
+        </div>
+      `;
+
+      await resend.emails.send({
+        from: 'CEDEXX <onboarding@resend.dev>',
+        to: [data.email],
+        subject: userSubject,
+        html: userHtml,
+      });
+    }
   } catch (err) {
     console.error('[EMAIL NOTIFY ERROR]', err);
   }

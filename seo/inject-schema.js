@@ -126,6 +126,27 @@ const SCHEMA_CONFIG = {
 // SCHEMA BUILDERS
 // ──────────────────────────────────────────────
 
+
+function buildLyricHealthOrganization() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'MedicalOrganization',
+    name: 'Lyric Health',
+    description: 'Integrated Virtual Primary Care and Telehealth Services',
+    url: 'https://www.getlyric.com',
+    sameAs: ['https://www.getlyric.com']
+  };
+}
+
+function buildPhysician() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Physician',
+    name: 'Lyric Health Provider Network',
+    description: 'Nationwide network of licensed physicians, pediatricians, dermatologists, psychiatrists, and therapists.'
+  };
+}
+
 function buildMedicalBusiness() {
   return {
     '@context': 'https://schema.org',
@@ -199,7 +220,8 @@ function buildMedicalBusiness() {
       '@type': 'PropertyValue',
       name: 'Florida Office of Supplier Development Certification',
       value: SCHEMA_CONFIG.certificationId
-    }
+    },
+    partner: buildLyricHealthOrganization()
   };
 }
 
@@ -234,6 +256,7 @@ function buildLocalBusiness() {
       { '@type': 'State', name: 'Florida' }
     ],
     hasMap: 'https://www.google.com/maps?q=Miami,FL',
+      partner: buildLyricHealthOrganization(),
     // Aggregate rating placeholder (updated by review aggregation)
     aggregateRating: {
       '@type': 'AggregateRating',

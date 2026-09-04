@@ -1,9 +1,14 @@
 import Stripe from 'stripe';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import fs from 'fs';
-import { notifyAdmin } from './notify';
+import { notifyAdmin } from '../notify';
+import { createClient } from '@supabase/supabase-js';
 
 const DATA_FILE = '/tmp/cedexx-members.json';
+
+const supabaseUrl = process.env.SUPABASE_URL || '';
+const supabaseKey = process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+const supabase = (supabaseUrl && supabaseKey) ? createClient(supabaseUrl, supabaseKey) : null;
 
 function loadMembers(): any[] {
   try {
@@ -85,6 +90,37 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     }
     saveMembers(members);
+    
+    // Upsert to Supabase
+    if (supabase) {
+      try {
+        const { data: existingRecords } = await supabase
+          .from('enrollments')
+          .select('id')
+          .eq('email', memberData.email)
+          .single();
+        
+        if (existingRecords) {
+          await supabase.from('enrollments').update({
+            status: 'active',
+            payment_reference: memberData.stripe_session_id
+          }).eq('email', memberData.email);
+        } else {
+          await supabase.from('enrollments').insert([{
+            first_name: memberData.first_name,
+            last_name: memberData.last_name,
+            email: memberData.email,
+            plan: memberData.plan || 'individual',
+            role: 'individual',
+            status: 'active',
+            payment_reference: memberData.stripe_session_id
+          }]);
+        }
+      } catch (error) {
+        console.error('[SUPABASE WEBHOOK UPSERT ERROR]', error);
+      }
+    }
+    
     await sendNotifications(memberData);
   }
 

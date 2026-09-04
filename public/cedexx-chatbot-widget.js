@@ -25,7 +25,7 @@
     voiceEnabled: true,
     languages: ['en', 'es', 'ru', 'ht'],
     knowledgeBase: {
-      en: `You are CEDEXX's AI Health Assistant. CEDEXX is a technology platform connecting families to Lyric Health integrated virtual care in Miami and across Florida.
+      en: `You are CEDEXX's AI Health Assistant. CEDEXX is a technology platform connecting families to Lyric Health's Lyric Health integrated virtual care in Miami and across Florida.
 
 Key facts:
 - CEDEXX provides 24/7 virtual provider access

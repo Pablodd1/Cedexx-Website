@@ -1,6 +1,6 @@
 {
   "name": "CEDEXX",
-  "description": "Healthcare technology platform connecting families with independent telemedicine providers via Lyric Health. 24/7 virtual care, no insurance required.",
+  "description": "Healthcare technology platform connecting families with Lyric Health providers via Lyric Health. 24/7 virtual care, no insurance required.",
   "requestFramePermissions": [
     "camera",
     "microphone",
