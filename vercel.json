@@ -1,6 +1,11 @@
 {
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
+  "functions": {
+    "api/**": {
+      "includeFiles": "api/**"
+    }
+  },
   "redirects": [
     { "source": "/", "has": [{ "type": "host", "value": "cedexx.net" }], "destination": "https://www.cedexx.net/", "permanent": true }
   ],
