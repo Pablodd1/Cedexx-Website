@@ -182,13 +182,14 @@
       "plan": "",
       "status": "form_started",
       "registered_at": "2026-09-04T15:40:26.362Z",
-      "form_started_at": "2026-09-04T15:40:26.362Z",
+      "form_started_at": "2026-09-04T15:41:32.476Z",
       "form_field": "first_name",
       "page_url": "",
       "consent_tos": false,
       "consent_analytics": false,
       "consent_version": "1.0",
-      "consent_timestamp": "2026-09-04T15:40:26.362Z"
+      "consent_timestamp": "2026-09-04T15:40:26.362Z",
+      "updated_at": "2026-09-04T15:41:32.476Z"
     },
     {
       "id": "mem_1788536435582_idiexs",
