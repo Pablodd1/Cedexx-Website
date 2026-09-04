@@ -538,5 +538,17 @@
     "lang": "en-US",
     "timestamp": "2026-09-04T01:43:14.348Z",
     "sessionId": "sess_1788486194354"
+  },
+  {
+    "id": "v_1788486218854_jtr1kw",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 26_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/23G71 Safari/604.1 [FBAN/FBIOS;FBAV/575.0.0.30.70;FBBV/1043180474;FBDV/iPhone18,1;FBMD/iPhone;FBSN/iOS;FBSV/26.6;FBSS/3;FBID/phone;FBLC/en_US;FBOP/5;FBRV/1051424522;IABMV/1]",
+    "screen": "",
+    "lang": "en-US",
+    "timestamp": "2026-09-04T01:43:38.854Z",
+    "sessionId": "sess_1788486218854"
   }
 ]
