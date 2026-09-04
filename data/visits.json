@@ -802,5 +802,17 @@
     "lang": "en-US",
     "timestamp": "2026-09-04T14:23:42.239Z",
     "sessionId": "sess_1788531822241"
+  },
+  {
+    "id": "v_1788535682618_scyu87",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "screen": "",
+    "lang": "en-US",
+    "timestamp": "2026-09-04T15:28:02.618Z",
+    "sessionId": "sess_1788535682621"
   }
 ]
