@@ -5,17 +5,17 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
  * AI Front Desk Receptionist — Core Conversation & Routing Handler
  * 
  * Features:
- * 1. Warm, conversational front desk assistant (Cedex)
- * 2. Strict grounding in CEDEXX & Lyric Health website knowledge
- * 3. Autonomous front desk buffer so staff doesn't take routine calls
- * 4. Transfer ("trumpet") to Daisy (+1 954-624-6744) on explicit request or '0'/'9'
- * 5. Instant fallback to voicemail if Daisy is away
- * 6. Live Telegram alerts for visibility
+ * 1. Warm, coherent front desk assistant (Ceedex)
+ * 2. Company name pronounced "Ceedex" (See-dex)
+ * 3. Strict grounding in website knowledge (pricing, telehealth, enrollment)
+ * 4. Transfer to staff (+1 954-624-6744) without mentioning personal names
+ * 5. Loop prevention for staff calling in from their own line
+ * 6. bargeIn="false" on prompts to prevent line noise and crossed speech
  */
 
 const GEMINI_KEY = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY || '';
 const TWILIO_PHONE = process.env.TWILIO_PHONE_NUMBER || '+17544322201';
-const DAISY_PHONE = process.env.DAISY_PHONE || '+19546246744';
+const STAFF_PHONE = process.env.STAFF_PHONE || process.env.DAISY_PHONE || '+19546246744';
 const TELEGRAM_BOT = process.env.TELEGRAM_BOT_TOKEN || '';
 const TELEGRAM_CHAT = process.env.TELEGRAM_CHAT_ID || '';
 
@@ -23,22 +23,22 @@ function twiml(xml: string) {
   return `<?xml version="1.0" encoding="UTF-8"?>\n<Response>\n${xml}\n</Response>`;
 }
 
-// ─── CEDEXX Knowledge Base ───
+// ─── Ceedex Knowledge Base ───
 const CEDEXX_KNOWLEDGE = `
-You are Cedex, the warm, friendly, and professional virtual front desk receptionist for CEDEXX Healthcare, powered by Lyric Health.
+You are Ceedex, the warm, friendly, and professional virtual front desk receptionist for Ceedex Healthcare, powered by Lyric Health.
 You are on a live phone call with a patient or prospective member.
 
-CRITICAL ROLE & RULES:
-1. Act as a helpful front desk buffer: answer caller questions quickly, accurately, and naturally based ONLY on the website information below.
-2. If the caller asks to speak to Daisy, a person, a human, an agent, or a representative, politely tell them you will connect them with Daisy immediately.
-3. Keep answers concise: 2 to 3 spoken sentences maximum. This is a voice phone conversation.
-4. Speak warmly, naturally, and conversationally. Avoid robotic menu lists or technical jargon.
+CRITICAL PRONUNCIATION & RULES:
+1. Company Name: Always pronounce and spell as "Ceedex" (sounds like "See-dex").
+2. Staff Referrals: NEVER mention individual employee names like Daisy to the caller. Always say "our staff", "a team member", or "our office team".
+3. Receptionist Buffer: Answer caller questions quickly, accurately, and naturally based ONLY on the website facts below so staff only takes calls when human assistance is specifically requested.
+4. Keep answers concise: 2 spoken sentences maximum. This is a voice phone conversation.
 5. NEVER provide medical advice, diagnosis, or write prescriptions. For medical emergencies, advise dialing 911 immediately.
-6. Always conclude with a natural, friendly follow-up, such as "Would you like to enroll online at cedexx dot net slash enroll, or can I connect you with Daisy?"
+6. Follow-up: Ask "Would you like to enroll online at ceedex dot net slash enroll, or can I connect you with our staff?"
 
-CEDEXX FACTS:
-- Partnership: CEDEXX is powered by Lyric Health, delivering 24/7 integrated virtual primary care, urgent care, and mental health therapy.
-- Contact: Front desk phone is (754) 432-2201. Daisy Gonzalez is Founder / Office Lead at (954) 624-6744, email Daisy@Cedexx.net. Support email is support@cedexx.net. Website is cedexx.net.
+CEEDEX FACTS:
+- Partnership: Ceedex is powered by Lyric Health, delivering 24/7 integrated virtual primary care, urgent care, and mental health therapy.
+- Contact: Front desk line is (754) 432-2201. Support email is support@cedexx.net. Website is ceedex.net.
 - Plans & Pricing:
   * CareNow™: $18.99/mo (24/7 virtual urgent care, up to 7 household members included, no co-pays)
   * CareNow™ + Mental Wellness: $26.99/mo (Urgent care + therapy & behavioral health)
@@ -47,12 +47,12 @@ CEDEXX FACTS:
   * CareComplete™ Family: $52.99/mo (Primary care for large families, up to 7 members)
 - Key Benefits: No insurance needed, no co-pays, no deductibles, no waiting periods. Family coverage covers up to 7 household members at no extra cost.
 - Prescriptions: Lyric doctors can send prescriptions directly to any local pharmacy.
-- How to enroll: Visit cedexx.net/enroll, pick a plan, and get instant access in under 2 minutes.
+- How to enroll: Visit ceedex.net/enroll, pick a plan, and get instant access in under 2 minutes.
 `;
 
 // ─── Intent Detection ───
 function detectIntent(speech: string, digit: string): string {
-  if (digit === '0' || digit === '9' || digit === '3') return 'transfer_daisy';
+  if (digit === '0' || digit === '9' || digit === '3') return 'transfer_staff';
   if (digit === '1') return 'enroll';
   if (digit === '2') return 'pricing';
   if (digit === '4') return 'voicemail';
@@ -64,9 +64,9 @@ function detectIntent(speech: string, digit: string): string {
     return 'emergency';
   }
 
-  // Transfer to Daisy or human
-  if (/daisy|transfer|speak to (a )?(human|person|agent|representative|someone|daisy)|talk to (a )?(human|person|agent|representative|someone|daisy)|connect me|operator|real person|front desk|office/i.test(lower)) {
-    return 'transfer_daisy';
+  // Transfer to staff or human (understands 'daisy' in caller speech, but routes to staff)
+  if (/daisy|staff|team|transfer|speak to (a )?(human|person|agent|representative|someone|staff)|talk to (a )?(human|person|agent|representative|someone|staff)|connect me|operator|real person|front desk|office/i.test(lower)) {
+    return 'transfer_staff';
   }
 
   // Goodbye / Done
@@ -115,16 +115,16 @@ function getQuickResponse(intent: string): string | null {
       return "Our plans are very affordable. CareNow is 18 dollars and 99 cents a month for 24/7 virtual urgent care. CareNow plus Mental Wellness is 26 dollars and 99 cents. And CareComplete, with your own dedicated primary care doctor, is 34 dollars and 99 cents a month. All plans cover up to 7 family members with zero insurance needed.";
     
     case 'insurance_coverage':
-      return "You do not need health insurance at all! There are no co-pays, no deductibles, and no surprise charges. Best of all, our plans cover up to 7 household members under one subscription at no extra cost.";
+      return "You do not need health insurance at all. There are no co-pays, no deductibles, and no surprise charges. Best of all, our plans cover up to 7 household members under one subscription at no extra cost.";
     
     case 'how_it_works':
-      return "CEDEXX is powered by Lyric Health to connect you directly with licensed doctors and therapists 24/7 from your phone. You can have a virtual visit in minutes, and any necessary prescriptions are sent straight to your local pharmacy.";
+      return "Ceedex is powered by Lyric Health to connect you directly with licensed doctors and therapists 24/7 from your phone. You can have a virtual visit in minutes, and any necessary prescriptions are sent straight to your local pharmacy.";
 
     case 'enroll':
-      return "Enrolling is quick and simple! You can sign up online in under two minutes at cedexx dot net slash enroll. Your membership activates right away with no waiting period.";
+      return "Enrolling is quick and simple! You can sign up online in under two minutes at ceedex dot net slash enroll. Your membership activates right away with no waiting period.";
 
     case 'billing':
-      return "You can manage your account and billing anytime at cedexx dot net, or email us at support at cedexx dot net. I can also connect you with Daisy if you need direct billing assistance.";
+      return "You can manage your account and billing anytime at ceedex dot net, or email us at support at cedexx dot net. I can also connect you with our staff if you need direct billing assistance.";
 
     default:
       return null;
@@ -159,13 +159,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       <Say voice="Polly.Joanna" language="en-US">
         I didn't quite catch that. How can I help you today?
       </Say>
-      <Gather input="speech dtmf" action="https://www.cedexx.net/api/voice/ai-desk" method="POST" speechTimeout="auto" speechModel="phone_call" language="en-US" numDigits="1" timeout="5">
+      <Gather input="speech dtmf" action="https://www.cedexx.net/api/voice/ai-desk" method="POST" speechTimeout="auto" speechModel="phone_call" language="en-US" numDigits="1" timeout="5" bargeIn="false">
         <Say voice="Polly.Joanna" language="en-US">
-          You can ask about our pricing, how our Lyric doctors work, or ask to speak with Daisy.
+          You can ask about our pricing, how our Lyric doctors work, or ask to speak with our staff.
         </Say>
       </Gather>
       <Say voice="Polly.Joanna" language="en-US">
-        Thank you for calling CEDEXX, powered by Lyric Health. Have a wonderful day!
+        Thank you for calling Ceedex, powered by Lyric Health. Have a wonderful day!
       </Say>
       <Hangup/>
     `));
@@ -198,9 +198,29 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     `));
   }
 
-  // 2. TRANSFER TO DAISY
-  if (intent === 'transfer_daisy') {
-    console.log('[AI DESK] Transferring caller to Daisy at', DAISY_PHONE);
+  // 2. TRANSFER TO STAFF
+  if (intent === 'transfer_staff') {
+    // Loop prevention: check if caller IS the staff line calling in
+    const cleanFrom = From.replace(/\D/g, '');
+    const cleanStaff = STAFF_PHONE.replace(/\D/g, '');
+    const isFromStaff = cleanFrom.length >= 10 && cleanStaff.length >= 10 && cleanFrom.endsWith(cleanStaff.slice(-10));
+
+    if (isFromStaff) {
+      console.log('[AI DESK] Staff line called in. Preventing self-dial loop.');
+      return res.status(200).send(twiml(`
+        <Say voice="Polly.Joanna" language="en-US">
+          You are currently calling from the office staff line. How can I assist you with Ceedex services today?
+        </Say>
+        <Gather input="speech dtmf" action="https://www.cedexx.net/api/voice/ai-desk" method="POST" speechTimeout="auto" speechModel="phone_call" language="en-US" numDigits="1" timeout="5" bargeIn="false">
+        </Gather>
+        <Say voice="Polly.Joanna" language="en-US">
+          Thank you for calling Ceedex. Goodbye!
+        </Say>
+        <Hangup/>
+      `));
+    }
+
+    console.log('[AI DESK] Transferring caller to staff at', STAFF_PHONE);
     
     if (TELEGRAM_BOT && TELEGRAM_CHAT) {
       fetch(`https://api.telegram.org/bot${TELEGRAM_BOT}/sendMessage`, {
@@ -208,7 +228,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           chat_id: TELEGRAM_CHAT,
-          text: `📲 <b>TRANSFERRING CALL TO DAISY</b>\n👤 Caller: <code>${From}</code>\n📞 Dialing: <code>${DAISY_PHONE}</code>\n🕒 ${new Date().toLocaleString()}`,
+          text: `📲 <b>TRANSFERRING CALL TO STAFF</b>\n👤 Caller: <code>${From}</code>\n📞 Dialing: <code>${STAFF_PHONE}</code>\n🕒 ${new Date().toLocaleString()}`,
           parse_mode: 'HTML',
         }),
       }).catch(() => {});
@@ -216,10 +236,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     return res.status(200).send(twiml(`
       <Say voice="Polly.Joanna" language="en-US">
-        Certainly! Let me transfer you directly to Daisy. Please hold for just a moment while I connect your call.
+        Certainly! Let me transfer you directly to our staff. Please hold for just a moment while I connect your call.
       </Say>
       <Dial action="https://www.cedexx.net/api/voice/dial-status" timeout="20" callerId="${TWILIO_PHONE}">
-        ${DAISY_PHONE}
+        ${STAFF_PHONE}
       </Dial>
     `));
   }
@@ -228,11 +248,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (intent === 'voicemail') {
     return res.status(200).send(twiml(`
       <Say voice="Polly.Joanna" language="en-US">
-        Certainly. Please leave your name, phone number, and a brief message after the beep, and Daisy or our front desk team will call you right back!
+        Certainly. Please leave your name, phone number, and a brief message after the beep, and a staff member will call you right back!
       </Say>
       <Record action="https://www.cedexx.net/api/voice/voicemail" method="POST" maxLength="180" finishOnKey="#" playBeep="true" />
       <Say voice="Polly.Joanna" language="en-US">
-        Thank you for your message. We have forwarded it to Daisy. Have a wonderful day!
+        Thank you for your message. We have alerted our staff. Have a wonderful day!
       </Say>
       <Hangup/>
     `));
@@ -242,7 +262,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (intent === 'goodbye') {
     return res.status(200).send(twiml(`
       <Say voice="Polly.Joanna" language="en-US">
-        You're very welcome! Thank you for calling CEDEXX, powered by Lyric Health. Have a wonderful and healthy day! Goodbye.
+        You're very welcome! Thank you for calling Ceedex, powered by Lyric Health. Have a wonderful and healthy day! Goodbye.
       </Say>
       <Hangup/>
     `));
@@ -260,21 +280,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   if (!spokenText) {
-    spokenText = "CEDEXX offers 24/7 virtual urgent care and primary care powered by Lyric Health, starting at 18 dollars and 99 cents a month with no insurance needed.";
+    spokenText = "Ceedex offers 24/7 virtual urgent care and primary care powered by Lyric Health, starting at 18 dollars and 99 cents a month with no insurance needed.";
   }
 
-  // Smooth conversational response + gather next question
+  // Coherent delivery: play answer in full, then prompt with bargeIn="false" to prevent line cutoffs
   const followUpResponse = `
     <Say voice="Polly.Joanna" language="en-US">
       ${escapeXml(spokenText)}
     </Say>
-    <Gather input="speech dtmf" action="https://www.cedexx.net/api/voice/ai-desk" method="POST" speechTimeout="auto" speechModel="phone_call" language="en-US" numDigits="1" timeout="5">
+    <Gather input="speech dtmf" action="https://www.cedexx.net/api/voice/ai-desk" method="POST" speechTimeout="auto" speechModel="phone_call" language="en-US" numDigits="1" timeout="5" bargeIn="false">
       <Say voice="Polly.Joanna" language="en-US">
-        Can I help you with anything else today, or would you like me to connect you with Daisy?
+        Can I help you with anything else today, or would you like to speak with our staff?
       </Say>
     </Gather>
     <Say voice="Polly.Joanna" language="en-US">
-      Thank you for calling CEDEXX, powered by Lyric Health. Have a wonderful day!
+      Thank you for calling Ceedex, powered by Lyric Health. Have a wonderful day!
     </Say>
     <Hangup/>
   `;
@@ -293,7 +313,7 @@ async function getAIResponse(userSpeech: string): Promise<string> {
         contents: [{
           role: 'user',
           parts: [{
-            text: `${CEDEXX_KNOWLEDGE}\n\nCaller said: "${userSpeech}"\n\nRespond as Cedex, the front desk receptionist. Keep it to 2-3 friendly, spoken sentences. Offer to help enroll or connect with Daisy if relevant.`
+            text: `${CEDEXX_KNOWLEDGE}\n\nCaller said: "${userSpeech}"\n\nRespond as Ceedex, the front desk receptionist. Keep it to 2 friendly, spoken sentences. Never mention employee names like Daisy; refer to "our staff". Offer to help enroll or connect with staff if relevant.`
           }]
         }],
         generationConfig: { temperature: 0.3, maxOutputTokens: 120 },
@@ -305,7 +325,7 @@ async function getAIResponse(userSpeech: string): Promise<string> {
   const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
   if (text) return text;
   
-  return "I'd be happy to help with that. You can enroll online at cedexx dot net slash enroll, or I can connect you directly with Daisy.";
+  return "I'd be happy to help with that. You can enroll online at ceedex dot net slash enroll, or I can connect you directly with our staff.";
 }
 
 // ─── Escape XML ───

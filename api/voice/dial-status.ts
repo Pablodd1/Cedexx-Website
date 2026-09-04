@@ -32,27 +32,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(200).send(twiml('<Hangup/>'));
   }
 
-  // Daisy did not answer (busy, no-answer, failed, canceled)
+  // Staff did not answer (busy, no-answer, failed, canceled)
   if (TELEGRAM_BOT && TELEGRAM_CHAT) {
     fetch(`https://api.telegram.org/bot${TELEGRAM_BOT}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         chat_id: TELEGRAM_CHAT,
-        text: `⚠️ <b>DAISY UNAVAILABLE (${DialCallStatus.toUpperCase()})</b>\n👤 Caller: <code>${From}</code>\n📍 Routing to voicemail...\n🕒 ${new Date().toLocaleString()}`,
+        text: `⚠️ <b>STAFF UNAVAILABLE (${DialCallStatus.toUpperCase()})</b>\n👤 Caller: <code>${From}</code>\n📍 Routing to voicemail...\n🕒 ${new Date().toLocaleString()}`,
         parse_mode: 'HTML',
       }),
     }).catch(() => {});
   }
 
-  // Gracefully transition to voicemail
+  // Gracefully transition to voicemail — no employee names spoken
   const fallback = `
     <Say voice="Polly.Joanna" language="en-US">
-      It looks like Daisy is away from her desk or assisting another patient right now. Please leave your name, phone number, and a brief message after the beep, and she will call you right back!
+      Our staff is currently assisting other patients or away from the desk. Please leave your name, phone number, and a brief message after the beep, and a team member will call you right back!
     </Say>
     <Record action="https://www.cedexx.net/api/voice/voicemail" method="POST" maxLength="180" finishOnKey="#" playBeep="true" />
     <Say voice="Polly.Joanna" language="en-US">
-      Thank you for your message. We have alerted Daisy, and she will follow up with you promptly. Have a wonderful day!
+      Thank you for your message. We have alerted our staff, and a team member will follow up with you promptly. Have a wonderful day!
     </Say>
     <Hangup/>
   `;

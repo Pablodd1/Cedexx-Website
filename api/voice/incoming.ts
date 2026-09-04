@@ -48,20 +48,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }).catch(() => {});
   }
 
-  // Pure Voice TwiML — Friendly, natural front desk receptionist
+  // Pure Voice TwiML — Friendly, coherent front desk receptionist
+  // Pronounced as "Ceedex". bargeIn="false" ensures the greeting plays completely without line-static cutoffs.
   const greeting = `
-    <Gather input="speech dtmf" action="https://www.cedexx.net/api/voice/ai-desk" method="POST" speechTimeout="auto" speechModel="phone_call" language="en-US" numDigits="1" timeout="5">
+    <Gather input="speech dtmf" action="https://www.cedexx.net/api/voice/ai-desk" method="POST" speechTimeout="auto" speechModel="phone_call" language="en-US" numDigits="1" timeout="5" bargeIn="false">
       <Say voice="Polly.Joanna" language="en-US">
-        Hi! Thank you for calling CEDEXX, powered by Lyric Health. My name is Cedex, your virtual front desk receptionist. How can I help you today?
+        Hi! Thank you for calling Ceedex, powered by Lyric Health. My name is Ceedex, your virtual front desk receptionist. How can I help you today?
       </Say>
     </Gather>
-    <Gather input="speech dtmf" action="https://www.cedexx.net/api/voice/ai-desk" method="POST" speechTimeout="auto" speechModel="phone_call" language="en-US" numDigits="1" timeout="6">
+    <Gather input="speech dtmf" action="https://www.cedexx.net/api/voice/ai-desk" method="POST" speechTimeout="auto" speechModel="phone_call" language="en-US" numDigits="1" timeout="6" bargeIn="false">
       <Say voice="Polly.Joanna" language="en-US">
-        I'm still here! I can answer questions about our plans, pricing, virtual doctor visits, or connect you directly with Daisy. What can I do for you?
+        I'm still here! I can answer questions about our plans, pricing, virtual doctor visits, or connect you with our staff. What can I do for you?
       </Say>
     </Gather>
     <Say voice="Polly.Joanna" language="en-US">
-      I didn't catch a response. You can visit us online anytime at cedexx dot net slash enroll, or call back whenever you're ready. Thank you for calling CEDEXX. Have a wonderful day!
+      I didn't catch a response. You can visit us online anytime at ceedex dot net slash enroll, or call back whenever you're ready. Thank you for calling Ceedex. Have a wonderful day!
     </Say>
     <Hangup/>
   `;
