@@ -9,7 +9,7 @@ const VAPI_PUBLIC_KEY = import.meta.env.VITE_VAPI_PUBLIC_KEY || '5acddf90-ccad-4
 // Vapi.ai assistant configuration for CEDEXX Virtual Receptionist
 // Uses REAL website content from cedexx-knowledge.ts
 const ASSISTANT_CONFIG = {
-  name: 'Cedex',
+  name: 'JasDex',
   model: {
     provider: 'google',
     model: 'gemini-1.5-flash',
@@ -21,7 +21,7 @@ const ASSISTANT_CONFIG = {
     voiceId: 'flux-hannah-en',
     speed: 1,
   },
-  firstMessage: "Hello! I'm Hannah, your Cedexx virtual front desk. I'm here to help you with telemedicine access, pricing, or booking a consultation. How can I assist you today?",
+  firstMessage: "Hello! I'm JasDex, your Cedexx virtual front desk. I'm here to help you with telemedicine access, pricing, or booking a consultation. How can I assist you today?",
   endCallFunctionEnabled: true,
   recordingEnabled: false,
   functions: [
@@ -208,12 +208,12 @@ export function VirtualReceptionist() {
           </div>
 
           <h3 className="text-3xl md:text-5xl font-black text-white mb-6 uppercase italic tracking-tighter">
-            {isActive ? "Connected to Cedex" : "Talk to our Front Desk"}
+            {isActive ? "Connected to JasDex" : "Talk to our Front Desk"}
           </h3>
           
           <p className="text-blue-200/60 font-medium mb-12 max-w-sm leading-relaxed italic">
             {isActive 
-              ? (transcript || "I'm your Cedexx virtual assistant. How can I help you today?")
+              ? (transcript || "I'm JasDex, your Cedexx virtual assistant. How can I help you today?")
               : "Experience instant voice support. Click below to start a secure conversation with our AI receptionist."}
           </p>
 

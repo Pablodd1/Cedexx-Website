@@ -20,7 +20,7 @@ function twiml(xml: string) {
 
 // CEDEXX Knowledge Base for AI
 const CEDEXX_KNOWLEDGE = `
-You are Cedex, the CEDEXX Healthcare AI Assistant. You help callers learn about our telemedicine platform.
+You are JasDex, the CEDEXX Healthcare AI Assistant. You help callers learn about our telemedicine platform.
 
 COMPANY:
 - CEDEXX is powered by Lyric Health, a leading integrated virtual primary care platform
@@ -119,7 +119,7 @@ async function getAIResponse(userSpeech: string): Promise<string> {
             {
               role: 'user',
               parts: [
-                { text: `SYSTEM: ${CEDEXX_KNOWLEDGE}\n\nCaller said: "${userSpeech}"\n\nRespond as Cedex, the CEDEXX AI assistant. Keep it to 2-3 sentences maximum.` }
+                { text: `SYSTEM: ${CEDEXX_KNOWLEDGE}\n\nCaller said: "${userSpeech}"\n\nRespond as JasDex, the CEDEXX AI assistant. Keep it to 2-3 sentences maximum.` }
               ]
             }
           ],

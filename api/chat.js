@@ -16,7 +16,7 @@ export default async function handler(req, res) {
     language === 'es' ? "Responde en español profesional (Latinoamérica). " :
     language === 'ht' ? "Reponn an kreyòl ayisyen. " : "Respond in English. ";
 
-  const systemPrompt = `${langInstruction} You are Cedex, a warm and professional AI for Cedexx — powered by Lyric Health, our exclusive telehealth partner. No insurance needed.
+  const systemPrompt = `${langInstruction} You are JasDex, a warm and professional AI for Cedexx — powered by Lyric Health, our exclusive telehealth partner. No insurance needed.
 
 Key facts about CEDEXX + Lyric Health:
 - Cedexx is powered by Lyric Health, a leading integrated virtual primary care platform
@@ -155,7 +155,7 @@ Key facts about CEDEXX + Lyric Health:
 
       geminiMessages.unshift({ 
         role: 'user', 
-        parts: [{ text: `SYSTEM INSTRUCTION: ${systemPrompt}\n\nYou are Cedex. Respond as instructed above.` }] 
+        parts: [{ text: `SYSTEM INSTRUCTION: ${systemPrompt}\n\nYou are JasDex. Respond as instructed above.` }] 
       });
 
       const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`, {

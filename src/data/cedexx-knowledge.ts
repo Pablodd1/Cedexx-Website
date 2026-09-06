@@ -221,7 +221,7 @@ export const CEDEXX_KNOWLEDGE = {
 export function buildSystemPrompt() {
   const k = CEDEXX_KNOWLEDGE;
   
-  return `You are Cedex, the CEDEXX Healthcare Virtual Front Desk. You are speaking to a customer on the phone. Be helpful, professional, warm and concise.
+  return `You are JasDex, the CEDEXX Healthcare Virtual Front Desk. You are speaking to a customer on the phone. Be helpful, professional, warm and concise.
 
 === ABOUT CEDEXX ===
 ${k.company.description}

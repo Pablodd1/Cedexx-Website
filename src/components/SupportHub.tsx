@@ -18,7 +18,7 @@ export function SupportHub() {
     },
     { 
       id: 'chat', 
-      label: 'Text / Chat', 
+      label: 'Chat with JasDex', 
       icon: MessageSquare, 
       desc: 'Instant AI Support',
       onClick: () => setActiveMode('chat')
@@ -27,7 +27,7 @@ export function SupportHub() {
       id: 'voice', 
       label: 'Voice call', 
       icon: Mic, 
-      desc: 'AI Voice Assistant',
+      desc: 'JasDex Voice Desk',
       onClick: () => setActiveMode('voice')
     },
     { 
@@ -63,7 +63,7 @@ export function SupportHub() {
                 <div className="flex items-center justify-between mb-8">
                    <div>
                      <h4 className="text-[#050249] font-black text-2xl tracking-tighter uppercase italic">Cedexx <span className="text-blue-500">Hub</span></h4>
-                     <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest mt-1">24/7 Digital Assistant</p>
+                     <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest mt-1">JasDex — 24/7 Digital Assistant</p>
                    </div>
                    <div className="h-12 w-12 bg-blue-50 rounded-2xl flex items-center justify-center">
                      <Bot className="h-6 w-6 text-blue-600" />
@@ -115,8 +115,8 @@ export function SupportHub() {
                   <div className="h-20 w-20 bg-blue-500/20 rounded-full flex items-center justify-center ring-8 ring-blue-500/10 animate-pulse">
                     <Mic className="h-10 w-10 text-blue-400" />
                   </div>
-                  <h5 className="font-black italic text-xl">Cedexx Voice Support</h5>
-                  <p className="text-blue-200/60 text-xs font-medium">Connecting you to our AI Clinical Assistant...</p>
+                  <h5 className="font-black italic text-xl">JasDex Voice Support</h5>
+                  <p className="text-blue-200/60 text-xs font-medium">Connecting you to JasDex, our AI Front Desk...</p>
                   <VoiceAssistant inline />
                 </div>
               </div>

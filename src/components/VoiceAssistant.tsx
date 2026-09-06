@@ -9,7 +9,7 @@ const VAPI_PUBLIC_KEY = import.meta.env.VITE_VAPI_PUBLIC_KEY || '5acddf90-ccad-4
 // Vapi.ai assistant configuration for CEDEXX
 // Uses REAL website content from cedexx-knowledge.ts (updated for Lyric Health partnership)
 const ASSISTANT_CONFIG = {
-  name: 'Cedex',
+  name: 'JasDex',
   model: {
     provider: 'google',
     model: 'gemini-1.5-flash',
@@ -21,7 +21,7 @@ const ASSISTANT_CONFIG = {
     voiceId: 'flux-hannah-en',
     speed: 1,
   },
-  firstMessage: "Hello! I'm Hannah, your Cedexx virtual front desk receptionist. I'm here to help you with Lyric Health virtual care access, pricing questions, or booking a consultation. How can I assist you today?",
+  firstMessage: "Hello! I'm JasDex, your Cedexx virtual front desk receptionist. I'm here to help you with Lyric Health virtual care access, pricing questions, or booking a consultation. How can I assist you today?",
   endCallFunctionEnabled: true,
   recordingEnabled: false,
   functions: [
@@ -203,7 +203,7 @@ export function VoiceAssistant({ inline = false }: { inline?: boolean }) {
           <div className="flex items-center gap-2">
             <PhoneCall className="h-5 w-5" />
             <div>
-              <p className="font-bold text-sm leading-tight">Cedex — AI Receptionist</p>
+              <p className="font-bold text-sm leading-tight">JasDex — AI Receptionist</p>
               <p className="text-blue-200 text-xs">CEDEXX</p>
             </div>
           </div>
@@ -252,7 +252,7 @@ export function VoiceAssistant({ inline = false }: { inline?: boolean }) {
           {isSpeaking && <Volume2 className="h-4 w-4 text-[#050249] mr-2 flex-shrink-0 animate-pulse" />}
           {isConnecting && <Loader2 className="h-4 w-4 text-[#050249] mr-2 animate-spin" />}
           <p className="text-center text-sm text-slate-600 leading-snug">
-            {transcript || (isConnecting ? 'Connecting to Cedex...' : 'Click "Start Call" to speak with Cedex, our AI receptionist.')}
+            {transcript || (isConnecting ? 'Connecting to JasDex...' : 'Click "Start Call" to speak with JasDex, our AI receptionist.')}
           </p>
         </div>
 
@@ -289,11 +289,11 @@ export function VoiceAssistant({ inline = false }: { inline?: boolean }) {
             'fixed bottom-24 right-6 h-14 w-14 rounded-full bg-[#050249] text-white shadow-xl flex items-center justify-center hover:bg-[#03013b] transition-all z-50 group',
             isOpen && 'hidden'
           )}
-          title="Talk to Cedex — AI Receptionist"
+          title="Talk to JasDex — AI Receptionist"
         >
           <PhoneCall className="h-6 w-6" />
           <span className="absolute right-full mr-3 bg-white text-slate-800 px-2 py-1 rounded text-xs font-bold shadow-sm opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap border border-slate-100">
-            Talk to Cedex
+            Talk to JasDex
           </span>
         </button>
       )}

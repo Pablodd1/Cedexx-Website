@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { MessageSquare, X, Send, Bot, User, Minimize2, Mic, Volume2, VolumeX } from 'lucide-react';
 import { cn } from './ui';
 
-const FAMILY_SYSTEM_INSTRUCTION = `You are Cedex, a warm, professional, and highly knowledgeable AI Virtual Receptionist for Cedexx — powered by Lyric Health, our exclusive telehealth partner. No insurance needed.
+const FAMILY_SYSTEM_INSTRUCTION = `You are JasDex, a warm, professional, and highly knowledgeable AI Virtual Receptionist for Cedexx — powered by Lyric Health, our exclusive telehealth partner. No insurance needed.
 
 COMPANY KNOWLEDGE:
 - Cedexx is powered by Lyric Health, a leading integrated virtual primary care platform
@@ -44,7 +44,7 @@ const FALLBACK_RESPONSES: Record<string, string> = {
   'representative': "You can reach a live representative by calling (754) 432-2201 or emailing support@cedexx.net.",
   'emergency': "⚠️ If you are experiencing a medical emergency, please call 911 immediately. Cedexx and Lyric Health provide non-emergency virtual care.",
   'insurance': "No insurance needed! Cedexx powered by Lyric Health works on a simple monthly membership. Just pay your plan fee and get access to Lyric's nationwide provider network.",
-  'who are you': "I'm Cedex, your AI assistant for Cedexx — powered by Lyric Health. I can answer questions about our virtual care services, pricing, and help you get started!",
+  'who are you': "I'm JasDex, your AI assistant for Cedexx — powered by Lyric Health. I can answer questions about our virtual care services, pricing, and help you get started!",
   'what is cedexx': "Cedexx is a healthcare technology platform powered by Lyric Health. We connect families to Lyric Health's integrated virtual care services including 24/7 urgent care, primary care, mental health, and more. No insurance required, affordable monthly plans.",
   'cancel': "To cancel, email support@cedexx.net with 'Cancellation' in the subject. Include your Full Name, DOB, Email, and Full Address. No penalties or fees.",
   'cancellation': "To cancel, email support@cedexx.net with 'Cancellation' in the subject. Include your Full Name, DOB, Email, and Full Address. No penalties or fees.",
@@ -74,7 +74,7 @@ export function Chatbot({ inline = false }: { inline?: boolean }) {
   const [isVoiceEnabled, setIsVoiceEnabled] = useState(true);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'model', text: "Hi there! I'm Cedex, your Cedexx AI Assistant. 👋 I can help you learn about our affordable physician access for families, enrollment options, or connect you with our team. How can I help you today?" }
+    { role: 'model', text: "Hi there! I'm JasDex, your Cedexx AI Assistant. 👋 I can help you learn about our affordable physician access for families, enrollment options, or connect you with our team. How can I help you today?" }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -134,7 +134,7 @@ useEffect(() => {
   useEffect(() => {
     if (isOpen && messages.length === 1) {
       const timer = setTimeout(() => {
-        const greeting = "Hi there! I'm Cedex, your Cedexx AI Assistant. 👋 I can help you learn about our affordable physician access for families, enrollment options, or connect you with our team. How can I help you today?";
+        const greeting = "Hi there! I'm JasDex, your Cedexx AI Assistant. 👋 I can help you learn about our affordable physician access for families, enrollment options, or connect you with our team. How can I help you today?";
         setMessages(prev => [...prev, { role: 'model', text: greeting }]);
         speak(greeting);
       }, 5000);
@@ -358,7 +358,7 @@ useEffect(() => {
       
       // Try fallback response
       const fallback = getFallbackResponse(text);
-      const reply = fallback || "We're experiencing connectivity issues connecting to Cedexx AI. Please try again in a moment, or email us at support@cedexx.net for assistance.";
+      const reply = fallback || "We're experiencing connectivity issues connecting to JasDex. Please try again in a moment, or email us at support@cedexx.net for assistance.";
       
       setMessages(prev => [...prev, { role: 'model', text: reply }]);
       speak(reply);
@@ -386,7 +386,7 @@ useEffect(() => {
               <Bot className={cn("h-4 w-4", isSpeaking ? "text-[#050249]" : "text-white")} />
             </div>
             <div>
-              <p className="font-bold text-sm leading-tight">Cedex — AI Receptionist</p>
+              <p className="font-bold text-sm leading-tight">JasDex — AI Receptionist</p>
               <div className="flex items-center gap-1">
                 <span className={cn("h-1.5 w-1.5 rounded-full transition-all", isSpeaking ? "bg-emerald-400 animate-pulse" : "bg-emerald-400")} />
                 <span className={cn("text-[10px] transition-all", isSpeaking ? "text-emerald-300 font-semibold" : "text-blue-200")}>
@@ -510,7 +510,7 @@ useEffect(() => {
             'fixed bottom-6 right-6 h-14 w-14 rounded-full bg-[#050249] text-white shadow-xl flex items-center justify-center hover:bg-[#03013b] transition-all z-50 group',
             isOpen && !isMinimized && 'hidden'
           )}
-          title="Chat with Cedex"
+          title="Chat with JasDex"
         >
           <MessageSquare className="h-6 w-6" />
           {!isOpen && (

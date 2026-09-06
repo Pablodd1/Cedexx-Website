@@ -31,7 +31,7 @@ router.post('/chat', async (req, res) => {
 
   const systemPrompt = `${langInstruction}
 
-You are Cedex, the CEDEXX Healthcare AI Assistant. You help customers learn about our telemedicine platform.
+You are JasDex, the CEDEXX Healthcare AI Assistant. You help customers learn about our telemedicine platform.
 
 COMPANY: ${k.company.description}
 Website: ${k.company.website} | Email: ${k.company.email} | Phone: ${k.company.phone}
@@ -118,7 +118,7 @@ VOICE GUIDELINES:
       // Add system prompt as first user message (Gemini doesn't have system role)
       geminiMessages.unshift({ 
         role: 'user', 
-        parts: [{ text: `SYSTEM INSTRUCTION: ${systemPrompt}\n\nYou are Cedex. Respond as instructed above.` }] 
+        parts: [{ text: `SYSTEM INSTRUCTION: ${systemPrompt}\n\nYou are JasDex. Respond as instructed above.` }] 
       });
 
       const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`, {

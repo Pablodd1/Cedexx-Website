@@ -434,7 +434,7 @@
             <div class="agentic-chat-header-info">
               <div class="agentic-chat-avatar">🤖</div>
               <div class="agentic-chat-header-text">
-                <h3>${this.config.siteName} AI Assistant</h3>
+                <h3>JasDex — ${this.config.siteName} AI Assistant</h3>
                 <p>Online now — Ask me anything</p>
               </div>
             </div>
@@ -502,7 +502,7 @@
     getWelcomeMessage() {
       const lang = this.config.defaultLanguage;
       const defaults = {
-        en: `Hi there! 👋 I'm the ${this.config.siteName} AI Assistant.
+        en: `Hi there! 👋 I'm JasDex, the ${this.config.siteName} AI Assistant.
 
 I can help you with:
 • Answering questions about our services
@@ -512,13 +512,13 @@ I can help you with:
 • Generating helpful content on the fly
 
 What can I help you with today?`,
-        es: `¡Hola! 👋 Soy el Asistente de IA de ${this.config.siteName}.
+        es: `¡Hola! 👋 Soy JasDex, el Asistente de IA de ${this.config.siteName}.
 
 ¿En qué puedo ayudarte hoy?`,
-        ru: `Привет! 👋 Я AI-ассистент ${this.config.siteName}.
+        ru: `Привет! 👋 Я JasDex, AI-ассистент ${this.config.siteName}.
 
 Чем могу помочь?`,
-        ht: `Bonjou! 👋 Mwen se asistan AI ${this.config.siteName}.
+        ht: `Bonjou! 👋 Mwen se JasDex, asistan AI ${this.config.siteName}.
 
 Kouman mwen ka ede w?`
       };
@@ -615,7 +615,7 @@ Kouman mwen ka ede w?`
         return `${name}: ${tool.description}\nParameters: ${JSON.stringify(tool.parameters)}`;
       }).join('\n\n');
 
-      const systemPrompt = `You are the AI assistant for ${this.config.siteName}. 
+      const systemPrompt = `You are JasDex, the AI assistant for ${this.config.siteName}. 
 
 ${this.config.knowledgeBase}
 
