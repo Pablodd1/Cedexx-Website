@@ -17,12 +17,11 @@ const ASSISTANT_CONFIG = {
     systemPrompt: buildSystemPrompt(),
   },
   voice: {
-    provider: '11labs',
-    voiceId: 'bella', // Warm, professional female voice
-    stability: 0.5,
-    similarityBoost: 0.75,
+    provider: 'deepgram',
+    voiceId: 'flux-hannah-en',
+    speed: 1,
   },
-  firstMessage: "Hello! I'm Cedex, your Cedexx virtual front desk. I'm here to help you with telemedicine access, pricing, or booking a consultation. How can I assist you today?",
+  firstMessage: "Hello! I'm Hannah, your Cedexx virtual front desk. I'm here to help you with telemedicine access, pricing, or booking a consultation. How can I assist you today?",
   endCallFunctionEnabled: true,
   recordingEnabled: false,
   functions: [

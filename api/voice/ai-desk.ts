@@ -23,9 +23,15 @@ function twiml(xml: string) {
   return `<?xml version="1.0" encoding="UTF-8"?>\n<Response>\n${xml}\n</Response>`;
 }
 
+// Speaks via Deepgram Flux Hannah (American Feminine, 1x speed, 1 expressivity)
+function hannah(text: string): string {
+  const url = `https://www.cedexx.net/api/voice/speak?text=${encodeURIComponent(text.trim())}`;
+  return `<Play>${url}</Play>`;
+}
+
 // ─── Ceedex Knowledge Base ───
 const CEDEXX_KNOWLEDGE = `
-You are Ceedex, the warm, friendly, and professional virtual front desk receptionist for Ceedex Healthcare, powered by Lyric Health.
+You are Hannah, the warm, friendly, and enthusiastic virtual front desk receptionist for Ceedex Healthcare, powered by Lyric Health.
 You are on a live phone call with a patient or prospective member.
 
 CRITICAL PRONUNCIATION & RULES:
@@ -156,17 +162,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // No speech and no keypad digit
   if (!speech && !digit) {
     return res.status(200).send(twiml(`
-      <Say voice="Polly.Joanna" language="en-US">
-        I didn't quite catch that. How can I help you today?
-      </Say>
+      ${hannah("I didn't quite catch that. How can I help you today?")}
       <Gather input="speech dtmf" action="https://www.cedexx.net/api/voice/ai-desk" method="POST" speechTimeout="auto" speechModel="phone_call" language="en-US" numDigits="1" timeout="5" bargeIn="false">
-        <Say voice="Polly.Joanna" language="en-US">
-          You can ask about our pricing, how our Lyric doctors work, or ask to speak with our staff.
-        </Say>
+        ${hannah("You can ask about our pricing, how our Lyric doctors work, or ask to speak with our staff.")}
       </Gather>
-      <Say voice="Polly.Joanna" language="en-US">
-        Thank you for calling Ceedex, powered by Lyric Health. Have a wonderful day!
-      </Say>
+      ${hannah("Thank you for calling Ceedex, powered by Lyric Health. Have a wonderful day!")}
       <Hangup/>
     `));
   }
@@ -191,9 +191,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // 1. EMERGENCY
   if (intent === 'emergency') {
     return res.status(200).send(twiml(`
-      <Say voice="Polly.Joanna" language="en-US">
-        If you are experiencing a medical emergency, please hang up and call 9 1 1 immediately. Do not wait. Please dial 9 1 1 now.
-      </Say>
+      ${hannah("If you are experiencing a medical emergency, please hang up and call 9 1 1 immediately. Do not wait. Please dial 9 1 1 now.")}
       <Hangup/>
     `));
   }
@@ -208,14 +206,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (isFromStaff) {
       console.log('[AI DESK] Staff line called in. Preventing self-dial loop.');
       return res.status(200).send(twiml(`
-        <Say voice="Polly.Joanna" language="en-US">
-          You are currently calling from the office staff line. How can I assist you with Ceedex services today?
-        </Say>
+        ${hannah("You are currently calling from the office staff line. How can I assist you with Ceedex services today?")}
         <Gather input="speech dtmf" action="https://www.cedexx.net/api/voice/ai-desk" method="POST" speechTimeout="auto" speechModel="phone_call" language="en-US" numDigits="1" timeout="5" bargeIn="false">
         </Gather>
-        <Say voice="Polly.Joanna" language="en-US">
-          Thank you for calling Ceedex. Goodbye!
-        </Say>
+        ${hannah("Thank you for calling Ceedex. Goodbye!")}
         <Hangup/>
       `));
     }
@@ -235,9 +229,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     return res.status(200).send(twiml(`
-      <Say voice="Polly.Joanna" language="en-US">
-        Certainly! Let me transfer you directly to our staff. Please hold for just a moment while I connect your call.
-      </Say>
+      ${hannah("Certainly! Let me transfer you directly to our staff. Please hold for just a moment while I connect your call.")}
       <Dial action="https://www.cedexx.net/api/voice/dial-status" timeout="20" callerId="${TWILIO_PHONE}">
         ${STAFF_PHONE}
       </Dial>
@@ -247,13 +239,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // 3. DIRECT VOICEMAIL
   if (intent === 'voicemail') {
     return res.status(200).send(twiml(`
-      <Say voice="Polly.Joanna" language="en-US">
-        Certainly. Please leave your name, phone number, and a brief message after the beep, and a staff member will call you right back!
-      </Say>
+      ${hannah("Certainly. Please leave your name, phone number, and a brief message after the beep, and a staff member will call you right back!")}
       <Record action="https://www.cedexx.net/api/voice/voicemail" method="POST" maxLength="180" finishOnKey="#" playBeep="true" />
-      <Say voice="Polly.Joanna" language="en-US">
-        Thank you for your message. We have alerted our staff. Have a wonderful day!
-      </Say>
+      ${hannah("Thank you for your message. We have alerted our staff. Have a wonderful day!")}
       <Hangup/>
     `));
   }
@@ -261,9 +249,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // 4. GOODBYE
   if (intent === 'goodbye') {
     return res.status(200).send(twiml(`
-      <Say voice="Polly.Joanna" language="en-US">
-        You're very welcome! Thank you for calling Ceedex, powered by Lyric Health. Have a wonderful and healthy day! Goodbye.
-      </Say>
+      ${hannah("You're very welcome! Thank you for calling Ceedex, powered by Lyric Health. Have a wonderful and healthy day! Goodbye.")}
       <Hangup/>
     `));
   }
@@ -285,17 +271,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   // Coherent delivery: play answer in full, then prompt with bargeIn="false" to prevent line cutoffs
   const followUpResponse = `
-    <Say voice="Polly.Joanna" language="en-US">
-      ${escapeXml(spokenText)}
-    </Say>
+    ${hannah(spokenText)}
     <Gather input="speech dtmf" action="https://www.cedexx.net/api/voice/ai-desk" method="POST" speechTimeout="auto" speechModel="phone_call" language="en-US" numDigits="1" timeout="5" bargeIn="false">
-      <Say voice="Polly.Joanna" language="en-US">
-        Can I help you with anything else today, or would you like to speak with our staff?
-      </Say>
+      ${hannah("Can I help you with anything else today, or would you like to speak with our staff?")}
     </Gather>
-    <Say voice="Polly.Joanna" language="en-US">
-      Thank you for calling Ceedex, powered by Lyric Health. Have a wonderful day!
-    </Say>
+    ${hannah("Thank you for calling Ceedex, powered by Lyric Health. Have a wonderful day!")}
     <Hangup/>
   `;
 
