@@ -2218,5 +2218,17 @@
     "lang": "en-US",
     "timestamp": "2026-09-06T16:39:53.014Z",
     "sessionId": "sess_1788712793016"
+  },
+  {
+    "id": "v_1788712815689_akygl0",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 26_6_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/152.0.7977.64 Mobile/15E148 Safari/604.1",
+    "screen": "",
+    "lang": "en-US",
+    "timestamp": "2026-09-06T16:40:15.689Z",
+    "sessionId": "sess_1788712815689"
   }
 ]
