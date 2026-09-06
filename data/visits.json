@@ -2710,5 +2710,17 @@
     "lang": "en-US",
     "timestamp": "2026-09-06T21:33:03.897Z",
     "sessionId": "sess_1788730383899"
+  },
+  {
+    "id": "v_1788730491329_ycmxah",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1 (compatible; meta-externalads/1.1 (+https://developers.facebook.com/docs/sharing/webmasters/crawler))",
+    "screen": "",
+    "lang": "en-US",
+    "timestamp": "2026-09-06T21:34:51.329Z",
+    "sessionId": "sess_1788730491331"
   }
 ]
