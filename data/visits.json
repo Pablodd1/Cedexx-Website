@@ -2290,5 +2290,17 @@
     "lang": "en-US",
     "timestamp": "2026-09-06T16:51:45.159Z",
     "sessionId": "sess_1788713505161"
+  },
+  {
+    "id": "v_1788713623909_g7qgbv",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Mozilla/5.0 (Linux; Android 13; SM-A326U Build/TP1A.220624.014) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/151.0.7922.134 Mobile Safari/537.36 [FB_IAB/FB4A;FBAV/574.0.0.40.71;IABMV/1;] FBNV/500",
+    "screen": "",
+    "lang": "en-US",
+    "timestamp": "2026-09-06T16:53:43.909Z",
+    "sessionId": "sess_1788713623911"
   }
 ]
