@@ -9,15 +9,24 @@
     <meta name="author" content="Cedexx" />
     <link rel="icon" type="image/png" href="/favicon-bird.png" />
     
-    <!-- Google Analytics 4 — Replace G-XXXXXXXXXX with your actual GA4 Measurement ID -->
-    <!-- Get your ID at: https://analytics.google.com → Admin → Data Streams → Web -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-PLACEHOLDER"></script>
+    <!-- Google Analytics 4 (GA4) -->
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
+      window.gtag = gtag;
       gtag('js', new Date());
-      // Replace 'G-PLACEHOLDER' with your real GA4 ID when ready
-      gtag('config', 'G-PLACEHOLDER');
+
+      (function() {
+        // Automatically loads GA4 if window.GA_MEASUREMENT_ID is configured
+        const gaId = (window.GA_MEASUREMENT_ID || '').trim();
+        if (gaId && gaId !== 'G-PLACEHOLDER') {
+          const script = document.createElement('script');
+          script.async = true;
+          script.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(gaId);
+          document.head.appendChild(script);
+          gtag('config', gaId, { send_page_view: true });
+        }
+      })();
     </script>
 
     <!-- CEDEXX Privacy-First Visitor Tracking — No cookies, anonymous sessions -->
@@ -74,7 +83,7 @@
     <!-- AI Search Optimization (Google May 2026 Guidelines) -->
     <meta name="ai:description" content="CEDEXX is a telemedicine technology platform connecting families with independent virtual healthcare providers. 24/7 access, no insurance required for many services. Miami-Dade and Broward coverage." />
     <meta name="ai:service-area" content="Miami-Dade County, Broward County, Florida" />
-    <meta name="ai:contact" content="info@cedexx.net" />
+    <meta name="ai:contact" content="support@cedexx.net, Phone: +1-754-432-2201" />
     <meta name="ai:bot" content="friendly" />
     <meta name="ai:verified" content="true" />
     
@@ -91,8 +100,8 @@
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Cedexx | Health Blog & 24/7 Family Telemedicine" />
-    <meta property="og:description" content="Research-backed pediatric health insights and 24/7 virtual care access for families. No insurance required." />
+    <meta property="og:title" content="CEDEXX | 24/7 Virtual Primary Care & Telehealth Powered by Lyric Health" />
+    <meta property="og:description" content="CEDEXX provides 24/7 unlimited virtual primary care, urgent care, mental wellness, and prescriptions powered by Lyric Health's nationwide provider network. No insurance required." />
     <meta property="og:image" content="https://cedexx.net/og-image.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
@@ -100,8 +109,8 @@
     
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:title" content="Cedexx | Health Blog & Virtual Care" />
-    <meta property="twitter:description" content="Stay informed with our Health Blog and get 24/7 provider access for your family—no insurance needed." />
+    <meta property="twitter:title" content="CEDEXX | 24/7 Virtual Primary Care & Telehealth Powered by Lyric Health" />
+    <meta property="twitter:description" content="CEDEXX provides 24/7 unlimited virtual primary care, urgent care, mental wellness, and prescriptions powered by Lyric Health's nationwide provider network. No insurance required." />
     <meta property="twitter:image" content="https://cedexx.net/og-image.png" />
 
     <!-- Robots -->
@@ -124,7 +133,8 @@
           ],
           "contactPoint": {
             "@type": "ContactPoint",
-            "email": "info@cedexx.net",
+            "telephone": "+1-754-432-2201",
+            "email": "support@cedexx.net",
             "contactType": "customer service",
             "availableLanguage": ["English", "Spanish", "Russian", "Haitian Creole"]
           }
@@ -141,8 +151,8 @@
         },
         {
           "@type": "MedicalWebPage",
-          "name": "CEDEXX - Health Blog & 24/7 Virtual Provider Access",
-          "description": "Research-backed pediatric health insights and 24/7 virtual care access for families. No insurance required.",
+          "name": "CEDEXX | 24/7 Virtual Primary Care & Telehealth Powered by Lyric Health",
+          "description": "CEDEXX provides 24/7 unlimited virtual primary care, urgent care, mental wellness, and prescriptions powered by Lyric Health. No insurance required.",
           "url": "https://cedexx.net",
           "about": {
             "@type": "MedicalBusiness",
@@ -165,7 +175,7 @@
 <meta name="ai:pricing" content="Many services require no insurance. Transparent per-visit pricing. Subscription plans available.">
 <meta name="ai:location" content="Miami-Dade County, Broward County, Florida">
 <meta name="ai:language" content="English, Spanish, Russian, Haitian Creole">
-<meta name="ai:contact" content="Email: info@cedexx.net">
+<meta name="ai:contact" content="support@cedexx.net, Phone: +1-754-432-2201">
 <meta name="ai:credentials" content="Telemedicine platform providing 24/7 virtual healthcare access. No insurance required for many services. Multi-language support.">
 <meta name="ai:availability" content="24/7 virtual provider access. Health blog updated weekly.">
 <meta name="openai:title" content="CEDEXX | Telemedicine & 24/7 Virtual Healthcare Miami">
@@ -195,8 +205,9 @@
   "url": "https://cedexx.net",
   "logo": "https://cedexx.net/assets/logo.png",
   "image": "https://cedexx.net/assets/hero.jpg",
-  "email": "info@cedexx.net",
-  "description": "Telemedicine technology platform connecting families with independent virtual healthcare providers. 24/7 access, no insurance required for many services. Miami-Dade and Broward coverage.",
+  "telephone": "+1-754-432-2201",
+  "email": "support@cedexx.net",
+  "description": "Telemedicine technology platform connecting families with independent virtual healthcare providers powered by Lyric Health. 24/7 access, no insurance required for many services. Miami-Dade and Broward coverage.",
   "address": {
     "@type": "PostalAddress",
     "addressLocality": "Miami",
@@ -208,6 +219,14 @@
     { "@type": "AdministrativeArea", "name": "Miami-Dade County" },
     { "@type": "AdministrativeArea", "name": "Broward County" }
   ],
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "4.9",
+    "bestRating": "5",
+    "worstRating": "1",
+    "ratingCount": "12400",
+    "reviewCount": "842"
+  },
   "knowsAbout": ["Telemedicine", "Virtual Care", "Pediatric Health", "Family Medicine", "Mental Health", "No-Insurance Healthcare"]
 }
 </script>
@@ -219,7 +238,8 @@
   "@type": "HealthcareFacility",
   "name": "CEDEXX Virtual Care Center",
   "url": "https://cedexx.net",
-  "email": "info@cedexx.net",
+  "telephone": "+1-754-432-2201",
+  "email": "support@cedexx.net",
   "address": {
     "@type": "PostalAddress",
     "addressLocality": "Miami",

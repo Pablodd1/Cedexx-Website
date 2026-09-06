@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Mail, MessageSquare, Globe, X, Bot, Mic } from 'lucide-react';
+import { Mail, MessageSquare, Globe, X, Bot, Mic, Phone } from 'lucide-react';
 import { Chatbot } from './Chatbot';
 import { VoiceAssistant } from './VoiceAssistant';
 
@@ -9,6 +9,13 @@ export function SupportHub() {
   const [activeMode, setActiveMode] = useState<'menu' | 'chat' | 'voice'>('menu');
 
   const contactOptions = [
+    { 
+      id: 'phone', 
+      label: 'Call 24/7 Support', 
+      icon: Phone, 
+      desc: '(754) 432-2201',
+      onClick: () => window.location.href = 'tel:+17544322201'
+    },
     { 
       id: 'chat', 
       label: 'Text / Chat', 

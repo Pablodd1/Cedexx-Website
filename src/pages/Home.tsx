@@ -3,14 +3,14 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   ChevronRight, CheckCircle2, Shield, Clock, Activity,
-  FileText, Users, TrendingDown, Zap, Video, Star, Heart, Smartphone, Building2
+  FileText, Users, TrendingDown, Zap, Video, Star, Heart, Smartphone, Building2,
+  ShieldCheck, Lock, Award, Phone, Mail, ArrowRight
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import heroVideo from '../assets/hero-video.mp4';
 import { PartnerForm } from '../components/PartnerForm';
 import { Logo } from '../components/Logo';
 import { Button } from '../components/ui';
-import { ArrowRight } from 'lucide-react';
 import { GuideCapture } from '../components/GuideCapture';
 import { PricingSection } from '../components/PricingSection';
 
@@ -87,6 +87,22 @@ export function Home() {
               className="flex flex-col items-end"
             >
 
+              {/* Prominent Social Proof Pill */}
+              <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 mb-6 shadow-xl">
+                <div className="flex items-center text-amber-400">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                  ))}
+                </div>
+                <span className="text-white text-xs font-black tracking-wide">
+                  {t('social.rating')}
+                </span>
+                <span className="flex h-2 w-2 relative">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#23d9b0] opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[#23d9b0]"></span>
+                </span>
+              </div>
+
               <h1 className="text-4xl md:text-7xl font-black leading-[0.9] mb-6 tracking-tighter uppercase italic">
                 Better Care. Here. <span className="text-[#23d9b0]">Now.</span>
               </h1>
@@ -104,7 +120,7 @@ export function Home() {
                 </p>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-4 py-6">
+              <div className="flex flex-col sm:flex-row gap-4 py-4">
                 <Link
                   to="/enroll"
                   className="bg-white text-[#050249] hover:bg-blue-50 font-black px-10 py-5 rounded-2xl transition-all text-base text-center shadow-2xl hover:-translate-y-1 active:translate-y-0 uppercase tracking-tighter"
@@ -119,10 +135,128 @@ export function Home() {
                 </a>
               </div>
 
-              <p className="text-[15px] text-white [text-shadow:2px_2px_4px_rgba(0,0,0,0.8)] mt-8 max-w-4xl font-black leading-tight uppercase">
+              {/* Visible Direct Contact Strip */}
+              <div className="flex flex-wrap items-center justify-end gap-3 pt-2 pb-4">
+                <span className="text-blue-200/70 uppercase tracking-widest text-[10px] font-black mr-1">
+                  24/7 Direct Patient Care:
+                </span>
+                <a
+                  href="tel:+17544322201"
+                  className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-[#23d9b0] hover:text-[#050249] text-white border border-white/20 transition-all font-black text-xs tracking-wide shadow-sm"
+                  title="Call 24/7 Patient Support"
+                >
+                  <Phone className="w-3.5 h-3.5 text-[#23d9b0]" />
+                  <span>(754) 432-2201</span>
+                </a>
+                <a
+                  href="mailto:support@cedexx.net"
+                  className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white hover:text-[#050249] text-white border border-white/20 transition-all font-black text-xs tracking-wide shadow-sm"
+                  title="Email Support"
+                >
+                  <Mail className="w-3.5 h-3.5 text-blue-300" />
+                  <span>support@cedexx.net</span>
+                </a>
+              </div>
+
+              <p className="text-[15px] text-white [text-shadow:2px_2px_4px_rgba(0,0,0,0.8)] mt-4 max-w-4xl font-black leading-tight uppercase">
                 {t('disclaimer.text')}
               </p>
             </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── VISUAL TRUST & COMPLIANCE BADGES STRIP ── */}
+      <section className="bg-gradient-to-b from-[#050249] via-[#08055c] to-slate-900 text-white py-12 relative z-30 border-t border-white/10 shadow-2xl">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-8">
+            <span className="text-[11px] font-black uppercase tracking-[0.3em] text-[#23d9b0]">
+              Verified Healthcare Standards & Certifications
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 max-w-6xl mx-auto">
+            {/* HIPAA Badge */}
+            <div className="flex items-center gap-3.5 p-4 md:p-5 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 hover:border-[#23d9b0]/50 transition-all group">
+              <div className="h-12 w-12 rounded-xl bg-[#23d9b0]/20 flex items-center justify-center shrink-0 border border-[#23d9b0]/30 group-hover:scale-105 transition-transform">
+                <ShieldCheck className="h-6 w-6 text-[#23d9b0]" />
+              </div>
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-sm font-black uppercase tracking-tight text-white">HIPAA Compliant</span>
+                  <CheckCircle2 className="h-3.5 w-3.5 text-[#23d9b0]" />
+                </div>
+                <p className="text-[11px] text-blue-200/70 font-medium">Protected Health Information (PHI) Secure</p>
+              </div>
+            </div>
+
+            {/* 256-Bit SSL Badge */}
+            <div className="flex items-center gap-3.5 p-4 md:p-5 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 hover:border-blue-400/50 transition-all group">
+              <div className="h-12 w-12 rounded-xl bg-blue-500/20 flex items-center justify-center shrink-0 border border-blue-400/30 group-hover:scale-105 transition-transform">
+                <Lock className="h-6 w-6 text-blue-400" />
+              </div>
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-sm font-black uppercase tracking-tight text-white">256-Bit SSL Encrypted</span>
+                  <CheckCircle2 className="h-3.5 w-3.5 text-blue-400" />
+                </div>
+                <p className="text-[11px] text-blue-200/70 font-medium">Bank-Grade Privacy & Security Protocol</p>
+              </div>
+            </div>
+
+            {/* Lyric Health Partner Badge */}
+            <div className="flex items-center gap-3.5 p-4 md:p-5 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 hover:border-emerald-400/50 transition-all group">
+              <div className="h-12 w-12 rounded-xl bg-emerald-500/20 flex items-center justify-center shrink-0 border border-emerald-400/30 group-hover:scale-105 transition-transform">
+                <Activity className="h-6 w-6 text-emerald-400" />
+              </div>
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-sm font-black uppercase tracking-tight text-white">Lyric Health Partner</span>
+                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+                </div>
+                <p className="text-[11px] text-blue-200/70 font-medium">Nationwide Board-Certified Physicians</p>
+              </div>
+            </div>
+
+            {/* Social Proof Rating Badge */}
+            <div className="flex items-center gap-3.5 p-4 md:p-5 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 hover:border-amber-400/50 transition-all group">
+              <div className="h-12 w-12 rounded-xl bg-amber-500/20 flex items-center justify-center shrink-0 border border-amber-400/30 group-hover:scale-105 transition-transform">
+                <Award className="h-6 w-6 text-amber-400" />
+              </div>
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-sm font-black uppercase tracking-tight text-white">Rated 4.9 / 5</span>
+                  <div className="flex text-amber-400">
+                    <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+                  </div>
+                </div>
+                <p className="text-[11px] text-blue-200/70 font-medium">Over 12,400+ Families Enrolled</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Support Concierge Bar */}
+          <div className="mt-8 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left max-w-6xl mx-auto">
+            <div className="flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-[#23d9b0] animate-pulse"></span>
+              <span className="text-xs font-bold text-blue-100">Need immediate care assistance? Speak with our concierge desk:</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <a
+                href="tel:+17544322201"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#23d9b0] text-[#050249] font-black text-xs hover:bg-emerald-300 transition-all shadow-md"
+              >
+                <Phone className="h-3.5 w-3.5" />
+                <span>Call (754) 432-2201</span>
+              </a>
+              <a
+                href="mailto:support@cedexx.net"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 text-white font-black text-xs hover:bg-white/20 border border-white/20 transition-all"
+              >
+                <Mail className="h-3.5 w-3.5" />
+                <span>support@cedexx.net</span>
+              </a>
+            </div>
           </div>
         </div>
       </section>
@@ -432,11 +566,11 @@ export function Home() {
               { q: 'Are prescriptions covered at no cost?', a: 'Yes. Your membership includes covered medications at no additional cost when prescribed by our platform provider. CareNow includes 37 acute medications for common conditions at no additional cost. CareComplete includes 37 acute medications plus 200 medications for chronic care conditions at no additional cost.' },
               { q: 'How do I receive my medications?', a: 'Your provider will electronically send your prescription to the pharmacy you select. Present your RX discount card at the pharmacy to access your covered medication. Your digital card, including your BIN #, PCN #, and Member ID #, is available in your member portal to print or screenshot.' },
               { q: 'Is my medical data secure?', a: 'Cedexx is a fully HIPAA-compliant platform. We use enterprise-level encryption to ensure your family\'s privacy is protected at all times.' },
-              { q: 'Who do I contact if I need help accessing my CEDEXX account?', a: 'For assistance accessing your CEDEXX membership account, please contact our support team at support@cedexx.net. We\'re happy to help you locate your account and resolve any account-related questions.' },
+              { q: 'Who do I contact if I need help accessing my CEDEXX account?', a: 'For assistance accessing your CEDEXX membership account, please contact our support team at support@cedexx.net or call our 24/7 care desk directly at (754) 432-2201. We\'re happy to help you locate your account and resolve any account-related questions.' },
               { q: 'How do I cancel my membership?', a: 'Membership cancellations are handled by email. Please send your cancellation request to support@cedexx.net with "Cancellation" in the subject line. To help us quickly locate and deactivate your membership, please include your Full Name, Date of Birth, Email Address on File, and Full Address. There are no cancellation penalties or fees. Please note that previously billed monthly membership fees or services are non-refundable.' },
               { q: 'I already have the Lyric Health app and my CEDEXX membership is active. Who do I contact for support?', a: 'If your CEDEXX membership is already active and you have successfully downloaded and activated the Lyric Health app, please contact Lyric Health Member Services for assistance accessing your available services at 1-866-223-8831.' },
               { q: 'I want to add another membership or change my plan. Who do I contact?', a: 'For assistance adding a membership, changing your plan, or reviewing available membership options, please contact support@cedexx.net.' },
-              { q: "I just purchased my membership, but I don't have access yet. What should I do?", a: "Don't panic! It can take 24-48 hours for your membership information to be uploaded and activated within the Lyric Health platform. Once at least 48 hours have passed: 1) Download the Lyric Health app, 2) Open the app and select the link at the bottom right next to 'First Time User?', 3) Verify your account with your Last Name, Date of Birth, and ZIP Code, 4) Check your email for instructions from noreply@getlyric.com (check spam/junk folder). If you've waited 48 hours and still can't access your membership, contact support@cedexx.net." },
+              { q: "I just purchased my membership, but I don't have access yet. What should I do?", a: "Don't panic! It can take 24-48 hours for your membership information to be uploaded and activated within the Lyric Health platform. Once at least 48 hours have passed: 1) Download the Lyric Health app, 2) Open the app and select the link at the bottom right next to 'First Time User?', 3) Verify your account with your Last Name, Date of Birth, and ZIP Code, 4) Check your email for instructions from noreply@getlyric.com (check spam/junk folder). If you've waited 48 hours and still can't access your membership, contact support@cedexx.net or call (754) 432-2201." },
             ].map((faq, idx) => (
               <motion.div
                 key={idx}
@@ -470,6 +604,18 @@ export function Home() {
             <div className="flex flex-col sm:flex-row gap-6 justify-center">
                <Link to="/enroll" className="bg-white text-[#050249] px-12 py-6 rounded-2xl font-black text-lg hover:scale-105 transition-all shadow-[0_30px_100px_rgba(255,255,255,0.1)] uppercase tracking-tighter">Start Membership</Link>
                <a href="#partner" className="bg-blue-600/30 backdrop-blur-md border border-white/20 px-12 py-6 rounded-2xl font-black text-lg hover:bg-blue-600/40 transition-all shadow-2xl uppercase tracking-tighter">Partner With Us</a>
+            </div>
+
+            <div className="mt-10 flex flex-wrap items-center justify-center gap-6 text-sm font-bold text-blue-200">
+              <a href="tel:+17544322201" className="inline-flex items-center gap-2 hover:text-[#23d9b0] transition-colors">
+                <Phone className="h-4 w-4 text-[#23d9b0]" />
+                <span>Call 24/7 Support: (754) 432-2201</span>
+              </a>
+              <span className="hidden sm:inline text-white/30">•</span>
+              <a href="mailto:support@cedexx.net" className="inline-flex items-center gap-2 hover:text-white transition-colors">
+                <Mail className="h-4 w-4 text-blue-300" />
+                <span>support@cedexx.net</span>
+              </a>
             </div>
           </motion.div>
         </div>

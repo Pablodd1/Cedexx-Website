@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { Menu, X, Mail, Globe, Shield, Check, LayoutDashboard } from 'lucide-react';
+import { Menu, X, Mail, Globe, Shield, Check, LayoutDashboard, Phone } from 'lucide-react';
 import { SupportHub } from './SupportHub';
 import { motion, AnimatePresence } from 'motion/react';
 import { Logo } from './Logo';
@@ -122,6 +122,19 @@ export function Layout() {
           </nav>
 
           <div className="hidden lg:flex items-center gap-6">
+            <a 
+              href="tel:+17544322201" 
+              className={`hidden xl:flex items-center gap-2 px-3.5 py-2 rounded-xl border text-[11px] font-black uppercase tracking-wider transition-all shadow-sm ${
+                scrolled || location.pathname !== '/' 
+                  ? 'bg-slate-50 border-slate-200 text-[#050249] hover:bg-slate-100 hover:border-[#23d9b0]' 
+                  : 'bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-md'
+              }`}
+              title="Call 24/7 Support: (754) 432-2201"
+            >
+              <Phone className="h-3.5 w-3.5 text-[#23d9b0]" />
+              <span>(754) 432-2201</span>
+            </a>
+
             <div className={`flex items-center rounded-xl p-1 gap-1 border transition-all duration-500 ${
               scrolled || location.pathname !== '/' ? 'bg-slate-50 border-slate-100' : 'bg-white/10 border-white/20 backdrop-blur-md'
             }`}>
@@ -182,6 +195,14 @@ export function Layout() {
                   {item.key.startsWith('nav.') ? t(item.key as any) : item.key}
                 </Link>
               ))}
+
+              <a 
+                href="tel:+17544322201" 
+                className="flex items-center justify-center gap-2.5 py-3.5 px-4 rounded-xl bg-slate-50 border border-slate-200 text-[#050249] font-black text-sm hover:bg-slate-100 transition-colors"
+              >
+                <Phone className="h-4 w-4 text-[#23d9b0]" />
+                <span>Call 24/7: (754) 432-2201</span>
+              </a>
 
               <div className="flex items-center bg-slate-50 rounded-2xl p-1 gap-1">
                 {LANG_OPTIONS.map(opt => (
@@ -253,15 +274,21 @@ export function Layout() {
           <div>
             <h4 className="font-black text-xs uppercase tracking-[0.2em] mb-8 text-blue-400">{t('footer.contact')}</h4>
             <ul className="space-y-6 text-sm font-medium">
-              <li className="flex items-center gap-4">
-                <div className="h-10 w-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 italic">
-                  <Mail className="h-4 w-4 text-blue-400" />
+              <li className="flex items-center gap-4 group">
+                <div className="h-10 w-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:bg-[#23d9b0]/20 transition-all duration-500">
+                  <Phone className="h-4 w-4 text-blue-400 group-hover:text-[#23d9b0]" />
+                </div>
+                <a href="tel:+17544322201" className="hover:text-white transition-all text-blue-100 font-bold">(754) 432-2201</a>
+              </li>
+              <li className="flex items-center gap-4 group">
+                <div className="h-10 w-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:bg-[#23d9b0]/20 transition-all duration-500">
+                  <Mail className="h-4 w-4 text-blue-400 group-hover:text-[#23d9b0]" />
                 </div>
                 <a href="mailto:support@cedexx.net" className="hover:text-white transition-all text-blue-100">support@cedexx.net</a>
               </li>
               <li className="flex items-center gap-4 group">
                 <div className="h-10 w-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:bg-[#23d9b0]/20 transition-all duration-500">
-                  <Globe className="h-4 w-4 text-blue-400" />
+                  <Globe className="h-4 w-4 text-blue-400 group-hover:text-[#23d9b0]" />
                 </div>
                 <a href="https://cedexx.net" className="hover:text-white transition-all text-blue-100 font-bold">cedexx.net</a>
               </li>
