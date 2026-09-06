@@ -2014,5 +2014,17 @@
     "lang": "en-US",
     "timestamp": "2026-09-06T14:11:42.306Z",
     "sessionId": "sess_1788703902306"
+  },
+  {
+    "id": "v_1788703972402_j0nyir",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/22H352 Safari/604.1 [FBAN/FBIOS;FBAV/577.1.0.69.74;FBBV/1058113930;FBDV/iPhone13,2;FBMD/iPhone;FBSN/iOS;FBSV/18.7.8;FBSS/3;FBID/phone;FBLC/en_US;FBOP/5;FBRV/1060708235;IABMV/1]",
+    "screen": "",
+    "lang": "en-US",
+    "timestamp": "2026-09-06T14:12:52.402Z",
+    "sessionId": "sess_1788703972404"
   }
 ]
