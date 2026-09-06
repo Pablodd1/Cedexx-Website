@@ -1882,5 +1882,17 @@
     "lang": "en-US",
     "timestamp": "2026-09-06T10:13:27.091Z",
     "sessionId": "sess_1788689607093"
+  },
+  {
+    "id": "v_1788689702491_l4vgho",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Mozilla/5.0 (Linux; Android 14; moto g play - 2024 Build/U1TFS34.100-35-14-1-18) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/152.0.7977.61 Mobile Safari/537.36 [FB_IAB/FB4A;FBAV/576.0.0.42.73;IABMV/1;] FBNV/500",
+    "screen": "",
+    "lang": "en-US",
+    "timestamp": "2026-09-06T10:15:02.491Z",
+    "sessionId": "sess_1788689702494"
   }
 ]
