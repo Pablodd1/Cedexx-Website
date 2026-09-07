@@ -243,6 +243,23 @@
       "consent_analytics": false,
       "consent_version": "1.0",
       "consent_timestamp": "2026-09-07T09:46:43.627Z"
+    },
+    {
+      "id": "mem_1788813211211_ccjb24",
+      "first_name": "David",
+      "last_name": "Gonzalez",
+      "email": "david.gonz128@gmail.com",
+      "phone": "7862698171",
+      "dob": "1990-04-02",
+      "plan": "carenow-mental",
+      "status": "registered",
+      "registered_at": "2026-09-07T20:33:31.002Z",
+      "checkout_started_at": null,
+      "stripe_session_id": null,
+      "consent_tos": true,
+      "consent_analytics": true,
+      "consent_version": "2.0",
+      "consent_timestamp": "2026-09-07T20:33:31.040Z"
     }
   ],
   "created_at": "2026-09-01T23:00:00Z",
