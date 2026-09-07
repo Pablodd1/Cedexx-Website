@@ -3334,5 +3334,17 @@
     "lang": "en-US",
     "timestamp": "2026-09-07T14:24:36.443Z",
     "sessionId": "sess_1788791076443"
+  },
+  {
+    "id": "v_1788791078994_fuoyzi",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+    "screen": "",
+    "lang": "en-US",
+    "timestamp": "2026-09-07T14:24:38.994Z",
+    "sessionId": "sess_1788791078994"
   }
 ]
