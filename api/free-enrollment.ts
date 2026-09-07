@@ -144,39 +144,61 @@ async function sendEmail(to: string, subject: string, html: string, text: string
 async function sendWelcomeEmail(member: any) {
   const planName = PLAN_MAP[member.plan] || member.plan;
   const html = `
-    <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
-      <div style="background:#050249;padding:40px 20px;text-align:center;border-radius:12px 12px 0 0;">
-        <h1 style="color:#fff;margin:0;font-size:28px;">Welcome to CEDEXX</h1>
-        <p style="color:#23d9b0;margin:10px 0 0;font-size:16px;">Complimentary Enrollment — Resident Housing Partner</p>
+    <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:600px;margin:0 auto;color:#1e293b;">
+      <div style="background:#050249;padding:36px 24px;text-align:center;border-radius:16px 16px 0 0;">
+        <h1 style="color:#fff;margin:0;font-size:26px;font-weight:900;text-transform:uppercase;font-style:italic;">Welcome to CEDEXX</h1>
+        <p style="color:#23d9b0;margin:8px 0 0;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1px;">Complimentary Enrollment — Active</p>
       </div>
-      <div style="padding:30px;background:#fff;border:1px solid #e5e7eb;">
-        <p style="font-size:18px;margin-bottom:20px;">Hi <strong>${member.first_name}</strong>,</p>
-        <p>Welcome to CEDEXX! Your complimentary membership through our Resident Housing Partnership is now active.</p>
+      <div style="padding:32px 24px;background:#fff;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 16px 16px;">
+        <p style="font-size:18px;margin:0 0 16px;font-weight:700;color:#050249;">Hi <strong>${member.first_name}</strong>,</p>
+        <p style="margin:0 0 20px;font-size:15px;line-height:1.6;color:#475569;">Welcome to CEDEXX! Your complimentary membership through our Resident Housing Partnership is confirmed and active.</p>
         
-        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:20px;margin:20px 0;">
-          <h3 style="margin:0 0 12px 0;color:#166534;font-size:14px;font-weight:700;">✓ Your Complimentary Plan</h3>
-          <p style="margin:5px 0;"><strong>Plan:</strong> ${planName}</p>
-          <p style="margin:5px 0;"><strong>Cost:</strong> $0.00 — Covered by your housing partnership</p>
-          <p style="margin:5px 0;"><strong>Status:</strong> Active</p>
+        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:16px;padding:20px;margin:20px 0;">
+          <h3 style="margin:0 0 10px;color:#166534;font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;">✓ Your Plan Details</h3>
+          <p style="margin:4px 0;font-size:14px;"><strong>Plan:</strong> ${planName}</p>
+          <p style="margin:4px 0;font-size:14px;"><strong>Cost:</strong> $0.00 (Covered by Housing Partnership)</p>
+          <p style="margin:4px 0;font-size:14px;color:#166534;font-weight:700;"><strong>Status:</strong> Active</p>
         </div>
 
-        <h3 style="margin:0 0 12px 0;color:#111827;font-size:16px;font-weight:700;">How to Access Care</h3>
-        <ol style="margin:0 0 24px 0;padding-left:20px;color:#374151;font-size:14px;line-height:1.8;">
-          <li>Download the <strong>Lyric Health</strong> app (App Store or Google Play)</li>
-          <li>Open the app and tap "First Time User?" at the bottom right</li>
-          <li>Enter your Last Name, Date of Birth, and ZIP Code</li>
-          <li>Your membership will be located and activated</li>
-        </ol>
+        <!-- WHAT HAPPENS NEXT -->
+        <div style="border-top:2px solid #f1f5f9;padding-top:24px;margin:24px 0 28px;">
+          <h3 style="margin:0 0 8px;font-size:18px;font-weight:900;color:#050249;text-transform:uppercase;font-style:italic;">
+            What Happens Next?
+          </h3>
+          <p style="margin:0 0 20px;font-size:14px;color:#64748b;">
+            Follow these 4 simple steps to access your benefits:
+          </p>
 
-        <div style="background:#fef3c7;border:1px solid #fcd34d;border-radius:8px;padding:16px;margin:20px 0;">
-          <p style="margin:0;color:#92400e;font-size:14px;"><strong>Note:</strong> Please allow 24-48 hours for activation. Check spam for emails from noreply@getlyric.com.</p>
+          <div style="margin-bottom:16px;padding:16px;background:#f8fafc;border-radius:12px;border:1px solid #e2e8f0;">
+            <div style="font-weight:800;font-size:14px;color:#050249;margin-bottom:4px;">1. Allow 24–48 Hours for Activation</div>
+            <div style="font-size:13px;color:#475569;line-height:1.5;">Lyric Health requires 24 to 48 hours to complete credentialing and establish your member record in the clinical system.</div>
+          </div>
+
+          <div style="margin-bottom:16px;padding:16px;background:#f8fafc;border-radius:12px;border:1px solid #e2e8f0;">
+            <div style="font-weight:800;font-size:14px;color:#050249;margin-bottom:4px;">2. Download the Lyric Health App</div>
+            <div style="font-size:13px;color:#475569;line-height:1.5;">Download the <strong>Lyric Health</strong> app from the Apple App Store or Google Play Store.</div>
+          </div>
+
+          <div style="margin-bottom:16px;padding:16px;background:#f0fdf4;border-radius:12px;border:1px solid #bbf7d0;">
+            <div style="font-weight:800;font-size:14px;color:#166534;margin-bottom:4px;">3. Verify Your Account with ZIP Code</div>
+            <div style="font-size:13px;color:#334155;line-height:1.5;">Open the app and tap <strong>"First Time User?"</strong> at the bottom right. Enter your:<br>• <strong>Last Name</strong><br>• <strong>Date of Birth</strong><br>• <strong>ZIP Code</strong> (as registered on CEDEXX)</div>
+          </div>
+
+          <div style="margin-bottom:16px;padding:16px;background:#f8fafc;border-radius:12px;border:1px solid #e2e8f0;">
+            <div style="font-weight:800;font-size:14px;color:#050249;margin-bottom:4px;">4. Watch for Your Welcome Email</div>
+            <div style="font-size:13px;color:#475569;line-height:1.5;">Lyric will send setup instructions from <strong>noreply@getlyric.com</strong>. Please check your Inbox and Spam folder.</div>
+          </div>
         </div>
 
-        <p style="margin-top:30px;color:#6b7280;font-size:14px;">Questions? Contact us at <a href="mailto:support@cedexx.net">support@cedexx.net</a></p>
+        <div style="background:#f8fafc;border-radius:16px;padding:20px;border:1px solid #e2e8f0;font-size:13px;color:#475569;line-height:1.6;">
+          <p style="margin:0 0 8px;font-weight:700;color:#050249;">Need Assistance?</p>
+          <p style="margin:0 0 6px;">• <strong>Lyric Health Member Services:</strong> <a href="tel:18662238831" style="color:#050249;font-weight:700;text-decoration:none;">1-866-223-8831</a> (24/7 care & app help)</p>
+          <p style="margin:0;">• <strong>CEDEXX Support:</strong> <a href="mailto:support@cedexx.net" style="color:#050249;font-weight:700;text-decoration:none;">support@cedexx.net</a> • (754) 432-2201</p>
+        </div>
       </div>
     </div>
   `;
-  await sendEmail(member.email, `Welcome to CEDEXX — ${planName} (Complimentary)`, html, `Welcome to CEDEXX, ${member.first_name}! Your complimentary membership is active.`);
+  await sendEmail(member.email, `✓ Welcome to CEDEXX — ${planName} (Active)`, html, `Welcome to CEDEXX, ${member.first_name}! Your complimentary membership is active.`);
 }
 
 async function sendAdminNotification(member: any) {
@@ -241,6 +263,10 @@ async function sendToLyric(member: any) {
           email: member.email,
           phone: member.phone || '',
           dob: member.dob || '',
+          address: member.address || '',
+          city: member.city || '',
+          state: member.state || '',
+          zipcode: member.zipcode || '',
           plan: member.plan,
           paid_at: member.activated_at,
           stripe_customer_id: null,
@@ -271,7 +297,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { email, promo_code, plan_id, first_name, last_name, phone, dob } = req.body;
+  const { email, promo_code, plan_id, first_name, last_name, phone, dob, address, city, state, zipcode } = req.body;
 
   // Validate
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -306,6 +332,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         last_name: last_name || existing.last_name,
         phone: phone || existing.phone,
         dob: dob || existing.dob,
+        address: address || existing.address || '',
+        city: city || existing.city || '',
+        state: state ? state.toUpperCase() : (existing.state || ''),
+        zipcode: zipcode || existing.zipcode || '',
         plan: plan_id,
         status: 'active',
         promo_code: normalizedCode,
@@ -341,6 +371,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       email: normalizedEmail,
       phone: phone || '',
       dob: dob || '',
+      address: address || '',
+      city: city || '',
+      state: state ? state.toUpperCase() : '',
+      zipcode: zipcode || '',
       plan: plan_id,
       status: 'active',
       promo_code: normalizedCode,

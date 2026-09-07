@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { CheckCircle2, Shield, Lock, CreditCard, Heart, Users, Smartphone, Building2, Brain, Stethoscope, Loader2, AlertCircle } from 'lucide-react';
+import { CheckCircle2, Shield, Lock, CreditCard, Heart, Users, Smartphone, Building2, Brain, Stethoscope, Loader2, AlertCircle, MapPin } from 'lucide-react';
 
 const fadeIn = {
   initial: { opacity: 0, y: 24 },
@@ -19,8 +19,8 @@ interface PlanOption {
 }
 
 const PLANS: PlanOption[] = [
-  { id: 'carenow', name: 'CareNow™', price: '$18.99', desc: 'Virtual Urgent Care for you and your household — up to 7 dependents included.', icon: Heart },
-  { id: 'carenow-mental', name: 'CareNow™ + Mental Wellness', price: '$26.99', desc: 'Everything in CareNow™, plus behavioral health and therapy support.', icon: Brain, highlight: true },
+  { id: 'carenow', name: 'CareNow™', price: '$18.99', desc: 'Virtual Urgent Care for you and your household — up to 7 dependents included.', icon: Heart, highlight: true },
+  { id: 'carenow-mental', name: 'CareNow™ + Mental Wellness', price: '$26.99', desc: 'Everything in CareNow™, plus behavioral health and therapy support.', icon: Brain },
   { id: 'mental-wellness', name: 'Mental Wellness', price: '$18.99', desc: 'Standalone behavioral health, therapy, and counseling support.', icon: Brain },
   { id: 'carecomplete', name: 'CareComplete™', price: '$34.99', desc: 'Complete Virtual Primary Care — Individual Membership.', icon: Stethoscope },
   { id: 'carecomplete-family', name: 'CareComplete™ Family', price: '$52.99', desc: 'Complete Family Virtual Care for up to 7 household members.', icon: Users },
@@ -29,12 +29,16 @@ const PLANS: PlanOption[] = [
 export function Enroll() {
   const [step, setStep] = React.useState(0);
   const [role, setRole] = React.useState('individual');
-  const [plan, setPlan] = React.useState('carenow-mental');
+  const [plan, setPlan] = React.useState('carenow');
   const [firstName, setFirstName] = React.useState('');
   const [lastName, setLastName] = React.useState('');
   const [email, setEmail] = React.useState('');
   const [phone, setPhone] = React.useState('');
   const [dob, setDob] = React.useState('');
+  const [address, setAddress] = React.useState('');
+  const [city, setCity] = React.useState('');
+  const [state, setState] = React.useState('');
+  const [zipcode, setZipcode] = React.useState('');
   const [promoCode, setPromoCode] = React.useState('');
   const [promoError, setPromoError] = React.useState<string | null>(null);
   const [promoApplied, setPromoApplied] = React.useState(false);
@@ -45,6 +49,17 @@ export function Enroll() {
   const [consentTOS, setConsentTOS] = React.useState(false);
   const [consentError, setConsentError] = React.useState<string | null>(null);
   const [isFreeEnrollment, setIsFreeEnrollment] = React.useState(false);
+
+  // Read URL query parameter for plan preselection (e.g. /enroll?plan=carenow)
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const qPlan = params.get('plan');
+      if (qPlan && PLANS.some(p => p.id === qPlan)) {
+        setPlan(qPlan);
+      }
+    }
+  }, []);
 
   // Track form start — fire once when user first interacts with any field
   const formStartedRef = React.useRef(false);
@@ -95,6 +110,10 @@ export function Enroll() {
       setConsentError('Please complete all required fields: First Name, Last Name, Email, and Date of Birth.');
       return;
     }
+    if (!address.trim() || !city.trim() || !state.trim() || !zipcode.trim()) {
+      setConsentError('Please complete your Street Address, City, State, and ZIP Code. The ZIP code is required for Lyric Health account setup and in-app activation.');
+      return;
+    }
     // Fire-and-forget: log the lead when they move from personal info to plan selection
     try {
       await fetch('/api/register-member', {
@@ -106,6 +125,10 @@ export function Enroll() {
           email: email.trim(),
           phone: phone.trim(),
           dob: dob,
+          address: address.trim(),
+          city: city.trim(),
+          state: state.trim(),
+          zipcode: zipcode.trim(),
           plan: plan,
           status: 'registered',
           consent_analytics: consentAnalytics,
@@ -120,9 +143,31 @@ export function Enroll() {
     setStep(2);
   };
 
+  const selectPlanAndSync = (newPlan: string) => {
+    setPlan(newPlan);
+    if (email.trim()) {
+      fetch('/api/register-member', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: email.trim(),
+          plan: newPlan,
+          first_name: firstName.trim(),
+          last_name: lastName.trim(),
+          phone: phone.trim(),
+          dob: dob,
+          address: address.trim(),
+          city: city.trim(),
+          state: state.trim(),
+          zipcode: zipcode.trim(),
+        }),
+      }).catch(() => {});
+    }
+  };
+
   const handleCheckout = async () => {
-    if (!firstName.trim() || !lastName.trim() || !email.trim()) {
-      setError('Please complete your personal information in step 2.');
+    if (!firstName.trim() || !lastName.trim() || !email.trim() || !address.trim() || !zipcode.trim()) {
+      setError('Please ensure your personal details, Street Address, and ZIP Code are complete.');
       return;
     }
     setLoading(true);
@@ -140,6 +185,10 @@ export function Enroll() {
             email: email.trim(),
             phone: phone.trim(),
             dob: dob,
+            address: address.trim(),
+            city: city.trim(),
+            state: state.trim(),
+            zipcode: zipcode.trim(),
             plan_id: plan,
             promo_code: promoCode.trim().toUpperCase(),
           }),
@@ -172,6 +221,10 @@ export function Enroll() {
           email: email.trim(),
           phone: phone.trim(),
           dob: dob,
+          address: address.trim(),
+          city: city.trim(),
+          state: state.trim(),
+          zipcode: zipcode.trim(),
           plan: plan,
           is_checkout: true,
           consent_tos: consentTOS,
@@ -192,6 +245,12 @@ export function Enroll() {
           email: email.trim(),
           first_name: firstName.trim(),
           last_name: lastName.trim(),
+          phone: phone.trim(),
+          dob: dob,
+          address: address.trim(),
+          city: city.trim(),
+          state: state.trim(),
+          zipcode: zipcode.trim(),
           promo_code: promoApplied ? promoCode.trim().toUpperCase() : undefined,
         }),
       });
@@ -302,6 +361,64 @@ export function Enroll() {
                       <label htmlFor="dob" className="text-xs font-black text-[#050249] uppercase tracking-widest">Date of Birth</label>
                       <input id="dob" type="date" value={dob} onChange={e => setDob(e.target.value)} className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-blue-50 focus:ring-2 focus:ring-[#050249] outline-none transition-all font-medium text-sm" />
                     </div>
+
+                    {/* Residential Address (Required for Lyric Health) */}
+                    <div className="space-y-3 sm:col-span-2">
+                      <div className="flex items-center justify-between">
+                        <label className="text-xs font-black text-[#050249] uppercase tracking-widest flex items-center gap-1.5">
+                          <MapPin className="h-3.5 w-3.5 text-[#23d9b0]" />
+                          Street Address
+                        </label>
+                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Required for Lyric Health</span>
+                      </div>
+                      <input 
+                        type="text" 
+                        value={address} 
+                        onChange={e => setAddress(e.target.value)} 
+                        className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-blue-50 focus:ring-2 focus:ring-[#050249] outline-none transition-all font-medium text-sm" 
+                        placeholder="123 Main St, Apt 4B" 
+                      />
+                    </div>
+                    <div className="space-y-3">
+                      <label className="text-xs font-black text-[#050249] uppercase tracking-widest">City</label>
+                      <input 
+                        type="text" 
+                        value={city} 
+                        onChange={e => setCity(e.target.value)} 
+                        className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-blue-50 focus:ring-2 focus:ring-[#050249] outline-none transition-all font-medium text-sm" 
+                        placeholder="Fort Lauderdale" 
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-3">
+                        <label className="text-xs font-black text-[#050249] uppercase tracking-widest">State</label>
+                        <input 
+                          type="text" 
+                          value={state} 
+                          onChange={e => setState(e.target.value.toUpperCase())} 
+                          maxLength={2} 
+                          className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-blue-50 focus:ring-2 focus:ring-[#050249] outline-none transition-all font-medium text-sm uppercase text-center" 
+                          placeholder="FL" 
+                        />
+                      </div>
+                      <div className="space-y-3">
+                        <label className="text-xs font-black text-[#050249] uppercase tracking-widest">ZIP Code</label>
+                        <input 
+                          type="text" 
+                          value={zipcode} 
+                          onChange={e => setZipcode(e.target.value)} 
+                          maxLength={10} 
+                          className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-blue-50 focus:ring-2 focus:ring-[#050249] outline-none transition-all font-medium text-sm text-center" 
+                          placeholder="33301" 
+                        />
+                      </div>
+                    </div>
+                    <div className="sm:col-span-2 p-4 bg-emerald-50/70 rounded-2xl border border-emerald-100 flex items-start gap-3 text-xs text-[#050249]">
+                      <span className="text-base leading-none mt-0.5">🔒</span>
+                      <div>
+                        <strong>Lyric Health App Activation Notice:</strong> Your <strong>ZIP Code</strong>, <strong>Last Name</strong>, and <strong>Date of Birth</strong> are verified in the Lyric Health app under <em>"First Time User?"</em> to connect and activate your account.
+                      </div>
+                    </div>
                   </div>
                   {/* Consent Section */}
                   <div className="mt-8 space-y-4 border-t border-slate-100 pt-6">
@@ -350,7 +467,7 @@ export function Enroll() {
                     {PLANS.map((p) => (
                       <div
                         key={p.id}
-                        onClick={() => setPlan(p.id)}
+                        onClick={() => selectPlanAndSync(p.id)}
                         className={`p-6 rounded-[2.5rem] border-2 transition-all cursor-pointer flex items-center justify-between group ${
                           plan === p.id ? 'border-[#050249] bg-[#EBF3FB] shadow-xl' : 'border-slate-100 bg-white hover:border-blue-200'
                         }`}
@@ -373,7 +490,7 @@ export function Enroll() {
                   </div>
                   <div className="flex flex-col sm:flex-row gap-4 mt-8">
                     <button className="flex-1 py-4 rounded-2xl font-black border-2 border-slate-100 text-slate-400 hover:bg-slate-50 transition-all text-sm italic" onClick={() => setStep(1)}>Back</button>
-                    <button className="flex-[2] py-4 rounded-2xl font-black bg-[#050249] text-white hover:bg-[#03013b] transition-all shadow-xl text-sm italic" onClick={() => setStep(3)}>Continue to Payment</button>
+                    <button className="flex-[2] py-4 rounded-2xl font-black bg-[#050249] text-white hover:bg-[#03013b] transition-all shadow-xl text-sm italic" onClick={() => { selectPlanAndSync(plan); setStep(3); }}>Continue to Payment</button>
                   </div>
                 </motion.div>
               )}

@@ -72,7 +72,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(503).json({ success: false, error: 'Stripe is not configured.' });
   }
 
-  const { plan_id, plan, email, first_name, last_name, promo_code } = req.body;
+  const { 
+    plan_id, plan, email, first_name, last_name, 
+    phone, dob, address, city, state, zipcode, 
+    promo_code 
+  } = req.body;
 
   // Accept plan_id or plan (frontend sends plan_id)
   const selectedPlan = plan_id || plan;
@@ -110,6 +114,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         first_name: sanitizeText(first_name),
         last_name: sanitizeText(last_name),
         email: email.toLowerCase().trim(),
+        phone: phone ? sanitizeText(phone) : '',
+        dob: dob || '',
+        address: address ? sanitizeText(address) : '',
+        city: city ? sanitizeText(city) : '',
+        state: state ? sanitizeText(state).toUpperCase() : '',
+        zipcode: zipcode ? sanitizeText(zipcode) : '',
         promo_code: promo_code ? sanitizeText(promo_code) : '',
       },
       subscription_data: {
@@ -117,6 +127,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           plan: selectedPlan,
           first_name: sanitizeText(first_name),
           last_name: sanitizeText(last_name),
+          email: email.toLowerCase().trim(),
+          zipcode: zipcode ? sanitizeText(zipcode) : '',
         },
       },
     };

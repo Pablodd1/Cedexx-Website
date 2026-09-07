@@ -264,7 +264,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const { 
-    first_name, last_name, email, phone, dob, plan, 
+    first_name, last_name, email, phone, dob, plan,
+    address, city, state, zipcode,
     status = 'registered',
     consent_analytics, consent_tos, consent_version, consent_timestamp,
     stripe_session_id, is_checkout 
@@ -284,16 +285,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (existing) {
       const updates: any = { updated_at: now };
       
+      // Always update member contact & plan details
+      if (plan) updates.plan = sanitize(plan);
+      if (first_name) updates.first_name = sanitize(first_name);
+      if (last_name) updates.last_name = sanitize(last_name);
+      if (phone) updates.phone = sanitize(phone);
+      if (dob) updates.dob = dob;
+      if (address) updates.address = sanitize(address);
+      if (city) updates.city = sanitize(city);
+      if (state) updates.state = sanitize(state).toUpperCase();
+      if (zipcode) updates.zipcode = sanitize(zipcode);
+
       if (is_checkout) {
         updates.status = 'checkout_started';
         updates.checkout_started_at = now;
         updates.stripe_session_id = stripe_session_id || existing.stripe_session_id;
       } else {
-        if (first_name) updates.first_name = sanitize(first_name);
-        if (last_name) updates.last_name = sanitize(last_name);
-        if (phone) updates.phone = sanitize(phone);
-        if (dob) updates.dob = dob;
-        if (plan) updates.plan = plan;
         if (status) updates.status = status;
         if (consent_tos !== undefined) updates.consent_tos = consent_tos;
         if (consent_analytics !== undefined) updates.consent_analytics = consent_analytics;
@@ -329,7 +336,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       email: normalizedEmail,
       phone: phone ? sanitize(phone) : '',
       dob: dob || '',
-      plan: plan || '',
+      address: address ? sanitize(address) : '',
+      city: city ? sanitize(city) : '',
+      state: state ? sanitize(state).toUpperCase() : '',
+      zipcode: zipcode ? sanitize(zipcode) : '',
+      plan: plan || 'carenow',
       status: is_checkout ? 'checkout_started' : (status || 'registered'),
       registered_at: now,
       checkout_started_at: is_checkout ? now : null,

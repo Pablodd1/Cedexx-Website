@@ -324,10 +324,12 @@ async function sendLyricEnrollmentEmail(patient: PatientData) {
               <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:700;">Email</td><td style="padding:8px;border-bottom:1px solid #eee;">${patient.email}</td></tr>
               <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:700;">Phone</td><td style="padding:8px;border-bottom:1px solid #eee;">${patient.phone}</td></tr>
               <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:700;">DOB</td><td style="padding:8px;border-bottom:1px solid #eee;">${patient.dob}</td></tr>
-              <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:700;">Plan</td><td style="padding:8px;border-bottom:1px solid #eee;">${patient.plan}</td></tr>
+              <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:700;">Street Address</td><td style="padding:8px;border-bottom:1px solid #eee;">${patient.address || 'Not provided'}</td></tr>
+              <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:700;">City, State ZIP</td><td style="padding:8px;border-bottom:1px solid #eee;">${patient.city || ''}, ${patient.state || ''} <strong>${patient.zipcode || ''}</strong></td></tr>
+              <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:700;">Plan</td><td style="padding:8px;border-bottom:1px solid #eee;">${planMap[patient.plan] || patient.plan}</td></tr>
               <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:700;">Stripe Customer</td><td style="padding:8px;border-bottom:1px solid #eee;">${patient.stripe_customer_id || 'N/A'}</td></tr>
             </table>
-            <p style="margin-top:20px;color:#666;font-size:13px;">Please activate within 24-48 hours.</p>
+            <p style="margin-top:20px;color:#666;font-size:13px;">Please activate within 24-48 hours. Member activates app using ZIP: <strong>${patient.zipcode || 'N/A'}</strong>.</p>
           </div>
         `,
       }),

@@ -10,6 +10,22 @@ const JASMEL_EMAIL = process.env.JASMEL_EMAIL || 'jasmelacosta@gmail.com';
 const TELEGRAM_BOT = process.env.TELEGRAM_BOT_TOKEN || '8834617573:AAGANwBh_xp-MIZpqukctS2OAuJ2zxJOnrU';
 const TELEGRAM_CHAT = process.env.TELEGRAM_CHAT_ID || '7838956683';
 
+const REVERSE_PRICE_MAP: Record<string, string> = {
+  'price_1U6wRRRPzCKs3jKTR9VQCVeS': 'carenow',
+  'price_1U6wRSRPzCKs3jKTq0wKVKZU': 'carenow-mental',
+  'price_1U6wRSRPzCKs3jKT5P4ibSrd': 'mental-wellness',
+  'price_1TrKOuRPzCKs3jKTNjuqOOsF': 'carecomplete',
+  'price_1TrKOuRPzCKs3jKTU8UdSLC2': 'carecomplete-family',
+};
+
+const PLAN_DISPLAY_NAMES: Record<string, string> = {
+  'carenow': 'CareNow™',
+  'carenow-mental': 'CareNow™ + Mental Wellness',
+  'mental-wellness': 'Mental Wellness',
+  'carecomplete': 'CareComplete™',
+  'carecomplete-family': 'CareComplete™ Family',
+};
+
 async function readMembers() {
   if (!GITHUB_TOKEN) return [];
   try {
@@ -113,24 +129,132 @@ async function alertCritical(error: any, context: any) {
 
 async function sendPaymentConfirmation(data: any) {
   if (!RESEND_KEY) return;
+  const planKey = data.plan || 'carenow';
+  const planName = PLAN_DISPLAY_NAMES[planKey] || planKey;
   const amountStr = data.amount ? `$${(data.amount / 100).toFixed(2)}` : '$18.99/mo';
+  
   const html = `
-    <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1a1a2e;">
-      <div style="background:linear-gradient(135deg,#00D4FF,#7B2FF7);padding:40px 20px;text-align:center;border-radius:12px 12px 0 0;">
-        <h1 style="color:#fff;margin:0;font-size:26px;">Payment Confirmed</h1>
-        <p style="color:rgba(255,255,255,0.9);margin:8px 0 0;font-size:15px;">Your CEDEXX membership is now active!</p>
-      </div>
-      <div style="padding:30px;background:#fff;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 12px 12px;">
-        <p style="font-size:16px;">Hi <strong>${data.first_name}</strong>,</p>
-        <p>Thank you for your payment of <strong>${amountStr}</strong> for the <strong>${data.plan}</strong> plan.</p>
-        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:16px;margin:20px 0;">
-          <p style="margin:0;font-size:16px;font-weight:600;color:#166534;">✓ Membership Active</p>
-          <p style="margin:6px 0 0;color:#374151;font-size:14px;">Download the Lyric Health app from the App Store or Google Play and tap "First Time User?" to connect your account.</p>
-        </div>
-        <p style="color:#6b7280;font-size:14px;">Questions? Contact us anytime at <a href="mailto:support@cedexx.net">support@cedexx.net</a> or call (754) 432-2201.</p>
-      </div>
-    </div>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+    <body style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background-color:#F8FAFC;color:#1e293b;">
+      <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#F8FAFC;padding:32px 16px;">
+        <tr>
+          <td align="center">
+            <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:24px;border:1px solid #e2e8f0;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.06);">
+              
+              <!-- Header -->
+              <tr>
+                <td style="background:#050249;padding:36px 32px;text-align:center;">
+                  <h1 style="margin:0;color:#ffffff;font-size:24px;font-weight:900;letter-spacing:-0.5px;text-transform:uppercase;font-style:italic;">CEDEXX</h1>
+                  <p style="margin:8px 0 0;color:#23d9b0;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1px;">Membership Confirmed & Active</p>
+                </td>
+              </tr>
+
+              <!-- Body -->
+              <tr>
+                <td style="padding:36px 32px;">
+                  <h2 style="margin:0 0 16px;font-size:20px;font-weight:800;color:#050249;">Welcome, ${data.first_name}!</h2>
+                  <p style="margin:0 0 20px;font-size:15px;line-height:1.6;color:#475569;">
+                    Thank you for enrolling with CEDEXX. Your payment of <strong>${amountStr}</strong> for <strong>${planName}</strong> has been processed successfully.
+                  </p>
+
+                  <!-- Payment Summary Box -->
+                  <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:16px;padding:20px;margin-bottom:28px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                      <span style="font-size:13px;font-weight:700;color:#166534;text-transform:uppercase;letter-spacing:0.5px;">✓ Membership Status</span>
+                      <span style="background:#166534;color:#ffffff;font-size:11px;font-weight:800;padding:3px 10px;border-radius:999px;text-transform:uppercase;">Active</span>
+                    </div>
+                    <p style="margin:4px 0 0;font-size:14px;color:#15803d;">
+                      Plan: <strong>${planName}</strong> • Rate: <strong>${amountStr}</strong>
+                    </p>
+                    ${data.stripe_session_id ? `<p style="margin:4px 0 0;font-size:12px;color:#64748b;">Ref: ${data.stripe_session_id.slice(0, 24)}...</p>` : ''}
+                  </div>
+
+                  <!-- WHAT HAPPENS NEXT SECTION -->
+                  <div style="border-top:2px solid #f1f5f9;padding-top:24px;margin-bottom:28px;">
+                    <h3 style="margin:0 0 8px;font-size:18px;font-weight:900;color:#050249;text-transform:uppercase;letter-spacing:-0.5px;font-style:italic;">
+                      What Happens Next?
+                    </h3>
+                    <p style="margin:0 0 20px;font-size:14px;color:#64748b;">
+                      Follow these 4 simple steps to access your 24/7 care benefits:
+                    </p>
+
+                    <!-- Step 1 -->
+                    <div style="margin-bottom:18px;padding:16px;background:#f8fafc;border-radius:12px;border:1px solid #e2e8f0;">
+                      <div style="font-weight:800;font-size:14px;color:#050249;margin-bottom:4px;">
+                        1. Allow 24–48 Hours for Activation
+                      </div>
+                      <div style="font-size:13px;color:#475569;line-height:1.5;">
+                        Lyric Health requires 24 to 48 hours to complete credentialing and establish your member record in the clinical system.
+                      </div>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div style="margin-bottom:18px;padding:16px;background:#f8fafc;border-radius:12px;border:1px solid #e2e8f0;">
+                      <div style="font-weight:800;font-size:14px;color:#050249;margin-bottom:4px;">
+                        2. Download the Lyric Health App
+                      </div>
+                      <div style="font-size:13px;color:#475569;line-height:1.5;">
+                        Download the <strong>Lyric Health</strong> app from the Apple App Store or Google Play Store.
+                      </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div style="margin-bottom:18px;padding:16px;background:#f0fdf4;border-radius:12px;border:1px solid #bbf7d0;">
+                      <div style="font-weight:800;font-size:14px;color:#166534;margin-bottom:4px;">
+                        3. Verify Your Account with ZIP Code
+                      </div>
+                      <div style="font-size:13px;color:#334155;line-height:1.5;">
+                        Open the app and tap <strong>"First Time User?"</strong> at the bottom right. Enter your:<br>
+                        • <strong>Last Name</strong><br>
+                        • <strong>Date of Birth</strong><br>
+                        • <strong>ZIP Code</strong> (as entered on your CEDEXX registration)
+                      </div>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div style="margin-bottom:18px;padding:16px;background:#f8fafc;border-radius:12px;border:1px solid #e2e8f0;">
+                      <div style="font-weight:800;font-size:14px;color:#050249;margin-bottom:4px;">
+                        4. Watch for Your Welcome Email
+                      </div>
+                      <div style="font-size:13px;color:#475569;line-height:1.5;">
+                        Lyric will send a setup confirmation from <strong>noreply@getlyric.com</strong>. Please check your Inbox and Spam/Junk folder.
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Member Services & Support -->
+                  <div style="background:#f8fafc;border-radius:16px;padding:20px;border:1px solid #e2e8f0;font-size:13px;color:#475569;line-height:1.6;">
+                    <p style="margin:0 0 8px;font-weight:700;color:#050249;">Need Assistance?</p>
+                    <p style="margin:0 0 6px;">
+                      • <strong>Lyric Health Member Services:</strong> <a href="tel:18662238831" style="color:#050249;font-weight:700;text-decoration:none;">1-866-223-8831</a> (24/7 care & app help)
+                    </p>
+                    <p style="margin:0;">
+                      • <strong>CEDEXX Support:</strong> <a href="mailto:support@cedexx.net" style="color:#050249;font-weight:700;text-decoration:none;">support@cedexx.net</a> • (754) 432-2201
+                    </p>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Footer -->
+              <tr>
+                <td style="background:#f8fafc;padding:20px 32px;text-align:center;border-top:1px solid #e2e8f0;">
+                  <p style="margin:0;font-size:12px;color:#94a3b8;">
+                    © ${new Date().getFullYear()} CEDEXX. Telehealth technology platform powered by Lyric Health.<br>
+                    CEDEXX is not an insurance provider.
+                  </p>
+                </td>
+              </tr>
+
+            </table>
+          </td>
+        </tr>
+      </table>
+    </body>
+    </html>
   `;
+
   fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
@@ -140,7 +264,7 @@ async function sendPaymentConfirmation(data: any) {
     body: JSON.stringify({
       from: 'CEDEXX Support <support@cedexx.net>',
       to: [data.email],
-      subject: `✓ Payment Confirmed — Your ${data.plan} Membership is Active`,
+      subject: `✓ Payment Confirmed — Your ${planName} Membership is Active`,
       html,
     }),
   }).catch(() => {});
@@ -198,7 +322,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object;
-        const email = session.customer_email || session.customer_details?.email;
+        const rawEmail = session.customer_email || session.customer_details?.email;
+        const email = rawEmail ? rawEmail.toLowerCase().trim() : '';
         const metadata = session.metadata || {};
         
         if (!email) {
@@ -206,28 +331,54 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           break;
         }
 
-        const member = members.find((m: any) => m.email === email);
+        let member = members.find((m: any) => m.email && m.email.toLowerCase() === email);
         if (!member) {
-          console.error('[STRIPE WEBHOOK] Member not found for email:', email);
-          // Alert but don't fail — member might register after payment
-          await alertCritical(
-            new Error(`Payment received but member not found: ${email}`),
-            {
-              endpoint: '/api/webhook/stripe',
-              patientEmail: email,
-              stripeSessionId: session.id,
-            }
-          );
-          break;
+          console.log('[STRIPE WEBHOOK] Creating new member from checkout:', email);
+          member = {
+            id: `mem_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`,
+            email,
+            first_name: metadata.first_name || '',
+            last_name: metadata.last_name || '',
+            phone: metadata.phone || '',
+            dob: metadata.dob || '',
+            address: metadata.address || '',
+            city: metadata.city || '',
+            state: metadata.state || '',
+            zipcode: metadata.zipcode || '',
+            registered_at: new Date().toISOString(),
+          };
+          members.push(member);
         }
 
-        // Update member status
+        // Determine EXACT purchased plan:
+        // Priority 1: session.metadata.plan (set at checkout creation from user's selection)
+        // Priority 2: line item price ID lookup from REVERSE_PRICE_MAP
+        // Priority 3: member.plan fallback
+        let exactPlan = metadata.plan;
+        if (!exactPlan && session.line_items?.data?.[0]?.price?.id) {
+          exactPlan = REVERSE_PRICE_MAP[session.line_items.data[0].price.id];
+        }
+        if (!exactPlan) {
+          exactPlan = member.plan || 'carenow';
+        }
+
+        member.plan = exactPlan;
         member.status = 'paid';
         member.paid_at = new Date().toISOString();
         member.stripe_session_id = session.id;
         member.stripe_customer_id = session.customer;
         member.stripe_subscription_id = session.subscription;
-        member.plan = member.plan || metadata.plan || '';
+
+        // Persist address fields from session metadata
+        if (metadata.address) member.address = metadata.address;
+        if (metadata.city) member.city = metadata.city;
+        if (metadata.state) member.state = metadata.state;
+        if (metadata.zipcode) member.zipcode = metadata.zipcode;
+        if (metadata.first_name && !member.first_name) member.first_name = metadata.first_name;
+        if (metadata.last_name && !member.last_name) member.last_name = metadata.last_name;
+        if (metadata.phone && !member.phone) member.phone = metadata.phone;
+        if (metadata.dob && !member.dob) member.dob = metadata.dob;
+
         updated = true;
 
         console.log('[STRIPE WEBHOOK] Member paid:', {
@@ -382,6 +533,10 @@ async function sendToLyric(member: any, session: any) {
           email: member.email,
           phone: member.phone || '',
           dob: member.dob || '',
+          address: member.address || '',
+          city: member.city || '',
+          state: member.state || '',
+          zipcode: member.zipcode || '',
           plan: member.plan,
           paid_at: member.paid_at,
           stripe_customer_id: session.customer,
