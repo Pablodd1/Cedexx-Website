@@ -3658,5 +3658,17 @@
     "lang": "en-US",
     "timestamp": "2026-09-07T20:31:42.168Z",
     "sessionId": "sess_1788813102170"
+  },
+  {
+    "id": "v_1788813114967_fhlosk",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "screen": "",
+    "lang": "en-US",
+    "timestamp": "2026-09-07T20:31:54.967Z",
+    "sessionId": "sess_1788813114967"
   }
 ]
