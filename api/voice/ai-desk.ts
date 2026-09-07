@@ -51,9 +51,11 @@ CEEDEX FACTS:
   * Mental Wellness: $18.99/mo (Therapy, counseling, mental health sessions)
   * CareComplete™: $34.99/mo (Full virtual primary care physician + urgent care)
   * CareComplete™ Family: $52.99/mo (Primary care for large families, up to 7 members)
-- Key Benefits: No insurance needed, no co-pays, no deductibles, no waiting periods. Family coverage covers up to 7 household members at no extra cost.
+- Key Benefits: No insurance needed, no co-pays, no deductibles. Family coverage covers up to 7 household members at no extra cost.
 - Prescriptions: Lyric doctors can send prescriptions directly to any local pharmacy.
-- How to enroll: Visit ceedex.net/enroll, pick a plan, and get instant access in under 2 minutes.
+- How to enroll: Visit ceedex.net/enroll to choose your plan.
+- CRITICAL ACTIVATION RULE: Lyric Health communication and account activation is NOT immediate; it takes 24 to 48 hours. Lyric Health sends welcome and activation instructions from noreply@getlyric.com within 24 to 48 hours.
+- Health Blogs: We publish clinical insights on pediatric AI diagnostics, healthcare economics, heat hydration, and chronic care management at ceedex.net/blog.
 `;
 
 // ─── Intent Detection ───
@@ -96,6 +98,11 @@ function detectIntent(speech: string, digit: string): string {
     return 'insurance_coverage';
   }
 
+  // Blog / Articles
+  if (/blog|article|pediatric ai|research|hydration|heat exhaustion/i.test(lower)) {
+    return 'blog';
+  }
+
   // How it works / Lyric Health / Doctors
   if (/how does it work|lyric|doctor|appointment|telehealth|telemedicine|prescription|pharmacy|urgent care/i.test(lower)) {
     return 'how_it_works';
@@ -124,10 +131,13 @@ function getQuickResponse(intent: string): string | null {
       return "You do not need health insurance at all. There are no co-pays, no deductibles, and no surprise charges. Best of all, our plans cover up to 7 household members under one subscription at no extra cost.";
     
     case 'how_it_works':
-      return "Ceedex is powered by Lyric Health to connect you directly with licensed doctors and therapists 24/7 from your phone. You can have a virtual visit in minutes, and any necessary prescriptions are sent straight to your local pharmacy.";
+      return "Ceedex is powered by Lyric Health. You enroll online at ceedex dot net slash enroll. Please note that Lyric Health communication and account activation takes 24 to 48 hours. Once active, you can consult with licensed doctors and therapists 24/7.";
 
     case 'enroll':
-      return "Enrolling is quick and simple! You can sign up online in under two minutes at ceedex dot net slash enroll. Your membership activates right away with no waiting period.";
+      return "Enrolling is quick and simple online at ceedex dot net slash enroll. Please keep in mind that Lyric Health communication and account activation takes 24 to 48 hours before you can log in, so welcome communication is not immediate.";
+
+    case 'blog':
+      return "Our health blog covers pediatric AI respiratory analysis, healthcare savings that eliminate urgent care co-pays, and summer heat hydration tips. You can read all articles at ceedex dot net slash blog.";
 
     case 'billing':
       return "You can manage your account and billing anytime at ceedex dot net, or email us at support at cedexx dot net. I can also connect you with our staff if you need direct billing assistance.";
