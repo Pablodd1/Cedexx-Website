@@ -281,6 +281,26 @@
   </div>
 
   <div class="container">
+    <!-- Telegram Bot Status Banner -->
+    <div style="display:flex;align-items:center;justify-content:space-between;background:var(--white);border:1px solid var(--slate-100);border-radius:1.5rem;padding:16px 24px;margin-bottom:24px;box-shadow:0 1px 3px rgba(0,0,0,0.05);flex-wrap:wrap;gap:12px;">
+      <div style="display:flex;align-items:center;gap:14px;">
+        <div style="width:40px;height:40px;border-radius:0.75rem;background:#0088cc;display:flex;align-items:center;justify-content:center;color:white;font-size:20px;">
+          ✈️
+        </div>
+        <div>
+          <div style="font-size:0.875rem;font-weight:900;color:var(--primary);display:flex;align-items:center;gap:8px;">
+            Telegram Alerts: <span style="color:#059669;font-weight:800;">● Active (@Cedexxbot)</span>
+          </div>
+          <div style="font-size:0.75rem;color:var(--slate-500);font-weight:500;">
+            Delivering instant alerts for payments, Lyric sync, patient enrollments, and critical errors to Jasmel (@JassCTO).
+          </div>
+        </div>
+      </div>
+      <button id="tgTestBtn" onclick="sendTestTelegram()" style="padding:10px 18px;border-radius:0.75rem;border:1px solid #0088cc;background:rgba(0,136,204,0.08);color:#0088cc;font-weight:800;font-size:0.75rem;cursor:pointer;transition:all 0.2s;text-transform:uppercase;letter-spacing:0.04em;">
+        Send Test Alert
+      </button>
+    </div>
+
     <!-- Stats Cards -->
     <div id="statsSection" class="stats-grid"></div>
 
@@ -679,6 +699,39 @@ function exportCSV() {
   a.download = `cedexx-members-${new Date().toISOString().slice(0,10)}.csv`;
   a.click();
   URL.revokeObjectURL(url);
+}
+
+/* ===================== TELEGRAM TEST ===================== */
+async function sendTestTelegram() {
+  const btn = document.getElementById('tgTestBtn');
+  const origText = btn ? btn.textContent : '';
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Sending...';
+  }
+  try {
+    const targetUrl = `${apiBase || ''}/api/telegram-test`;
+    const res = await fetch(targetUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        text: '🔔 <b>CEDEXX Admin Ping</b>\n\nManual test notification triggered directly from CEDEXX Admin Dashboard.'
+      })
+    });
+    const data = await res.json();
+    if (data.success && data.test_message_sent) {
+      alert('✅ Test alert delivered successfully to your Telegram via @Cedexxbot!');
+    } else {
+      alert('Telegram test response: ' + (data.error || JSON.stringify(data)));
+    }
+  } catch (err) {
+    alert('Failed to send test alert: ' + err.message);
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = origText;
+    }
+  }
 }
 
 /* ===================== INIT ===================== */

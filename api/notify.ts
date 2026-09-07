@@ -45,8 +45,8 @@ export async function notifyAdmin(data: NotifyData) {
 
 // ─── Telegram ───
 async function sendTelegramNotification(data: NotifyData) {
-  const token = process.env.TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.TELEGRAM_CHAT_ID;
+  const token = process.env.TELEGRAM_BOT_TOKEN || '8834617573:AAGANwBh_xp-MIZpqukctS2OAuJ2zxJOnrU';
+  const chatId = process.env.TELEGRAM_CHAT_ID || '7838956683';
   if (!token || !chatId) return;
 
   const isPayment = data.type === 'payment';

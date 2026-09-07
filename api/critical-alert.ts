@@ -5,8 +5,8 @@
  */
 
 const RESEND_KEY = process.env.RESEND_API_KEY || '';
-const TELEGRAM_BOT = process.env.TELEGRAM_BOT_TOKEN || '';
-const TELEGRAM_CHAT = process.env.TELEGRAM_CHAT_ID || '';
+const TELEGRAM_BOT = process.env.TELEGRAM_BOT_TOKEN || '8834617573:AAGANwBh_xp-MIZpqukctS2OAuJ2zxJOnrU';
+const TELEGRAM_CHAT = process.env.TELEGRAM_CHAT_ID || '7838956683';
 const JASMEL_EMAIL = process.env.JASMEL_EMAIL || 'jasmelacosta@gmail.com';
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'support@cedexx.net';
 

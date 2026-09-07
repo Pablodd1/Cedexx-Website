@@ -38,7 +38,7 @@ router.post('/book-voice', async (req, res) => {
 
     // Send Telegram notification to Jasmel
     try {
-      const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+      const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '8834617573:AAGANwBh_xp-MIZpqukctS2OAuJ2zxJOnrU';
       const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID || '7838956683';
       
       if (TELEGRAM_BOT_TOKEN) {
