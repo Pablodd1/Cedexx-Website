@@ -4450,5 +4450,17 @@
     "lang": "en-US",
     "timestamp": "2026-09-08T08:58:14.563Z",
     "sessionId": "sess_1788857894563"
+  },
+  {
+    "id": "v_1788859416939_8bedb8",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 (compatible; meta-externalads/1.1 (+https://developers.facebook.com/docs/sharing/webmasters/crawler))",
+    "screen": "",
+    "lang": "en-US",
+    "timestamp": "2026-09-08T09:23:36.939Z",
+    "sessionId": "sess_1788859416943"
   }
 ]
