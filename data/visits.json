@@ -4642,5 +4642,17 @@
     "lang": "en-US",
     "timestamp": "2026-09-08T16:47:48.663Z",
     "sessionId": "sess_1788886068677"
+  },
+  {
+    "id": "v_1788890843911_deh5ak",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Dalvik/2.1.0 (Linux; U; Android 12; BRAVIA 4K VH2 Build/STT2.230505.001.S136) [FBAN/FB4FireTV;FBAV/389.0.0.42.111;FBPN/com.facebook.katana;FBLC/fr_FR;FBBV/317817212;FBCR/null;FBMF/Sony;FBBD/Sony;FBDV/BRAVIA 4K VH2;FBSV/12;FBCA/armeabi-v7a:armeabi;FBDM/{density=2.0,width=1920,height=1080};FB_FW/1;]",
+    "screen": "",
+    "lang": "en-US",
+    "timestamp": "2026-09-08T18:07:23.911Z",
+    "sessionId": "sess_1788890843915"
   }
 ]
