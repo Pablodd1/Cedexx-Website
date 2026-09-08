@@ -56,7 +56,7 @@ Key facts about CEDEXX + Lyric Health:
 
   if (!selectedProvider) {
     console.error('[CHAT] No AI provider keys configured');
-    const fallbackText = 'We are currently unavailable. Please try again in a moment or contact support at 954-624-6744 for immediate assistance.';
+    const fallbackText = 'We are currently unavailable. Please try again in a moment or contact support at (754) 432-2201 for immediate assistance.';
     return res.status(200).json({ choices: [{ message: { content: fallbackText } }] });
   }
 
@@ -224,10 +224,10 @@ Key facts about CEDEXX + Lyric Health:
     console.error('[CHAT] Fatal error:', error.message);
     // Return a graceful fallback instead of 500
     const fallbackText = language === 'es' 
-      ? 'Lo siento, estoy teniendo problemas técnicos. Por favor contacta a soporte al 954-624-6744.'
+      ? 'Lo siento, estoy teniendo problemas técnicos. Por favor contacta a soporte al (754) 432-2201.'
       : language === 'ht'
-      ? 'Mwen regrèt, mwen gen pwoblèm teknik. Tanpri kontakte sipò nan 954-624-6744.'
-      : 'I apologize, I\'m experiencing technical difficulties. Please contact support at 954-624-6744.';
+      ? 'Mwen regrèt, mwen gen pwoblèm teknik. Tanpri kontakte sipò nan (754) 432-2201.'
+      : 'I apologize, I\'m experiencing technical difficulties. Please contact support at (754) 432-2201.';
     return res.status(200).json({ choices: [{ message: { content: fallbackText } }] });
   }
 }

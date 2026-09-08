@@ -458,10 +458,10 @@ Toujou montre konpasyon ak pwofesyonalis, ankouraje itilizatè pou yo konsilte a
     }).catch(err => {
       showTyping(false);
       const errorMsgs = {
-        en: "I'm having trouble connecting right now. Please try again or contact us at info@cedexx.net",
-        es: "Estoy teniendo problemas de conexión. Por favor intenta de nuevo o contáctanos en info@cedexx.net",
-        ru: "У меня сейчас проблемы с подключением. Пожалуйста, попробуйте еще раз или свяжитесь с нами по адресу info@cedexx.net",
-        ht: "Mwen gen pwoblèm koneksyon kounye a. Tanpri eseye ankò oswa kontakte nou nan info@cedexx.net"
+        en: "I'm having trouble connecting right now. Please try again, call us at (754) 432-2201, or contact support@cedexx.net",
+        es: "Estoy teniendo problemas de conexión. Por favor intenta de nuevo, llámanos al (754) 432-2201, o contáctanos en support@cedexx.net",
+        ru: "У меня сейчас проблемы с подключением. Пожалуйста, попробуйте еще раз, позвоните нам по телефону (754) 432-2201 или свяжитесь с нами по адресу support@cedexx.net",
+        ht: "Mwen gen pwoblèm koneksyon kounye a. Tanpri eseye ankò, rele nou nan (754) 432-2201, oswa kontakte nou nan support@cedexx.net"
       };
       addMessage('bot', errorMsgs[currentLang] || errorMsgs.en);
       console.error('Chatbot error:', err);
@@ -560,26 +560,26 @@ Toujou montre konpasyon ak pwofesyonalis, ankouraje itilizatè pou yo konsilte a
         telemedicine: "CEDEXX offers 24/7 virtual provider access for families. No insurance required for many consultations. We cover general medicine, pediatrics, wellness, and mental health support across Miami-Dade and Broward counties.",
         pediatric: "Our pediatric telemedicine specialists are available 24/7 for common childhood illnesses, wellness checks, and developmental questions. Book a consultation at cedexx.net/consultation",
         blog: "Our Health Blog features research-backed insights on pediatric care, wellness tips, and affordable healthcare options. Visit cedexx.net/blog to explore.",
-        price: "Many CEDEXX consultations don't require insurance. Pricing varies by service type. Book a free initial consultation to discuss options.",
-        insurance: "No insurance? No problem. CEDEXX offers affordable virtual care options that don't require traditional insurance. Contact us at info@cedexx.net for details.",
-        booking: "You can book a virtual consultation at cedexx.net/consultation. Same-day appointments often available.",
-        contact: "Reach us at info@cedexx.net or through our consultation booking page. We're here to help Miami families access quality virtual care.",
-        hours: "CEDEXX virtual providers are available 24/7. Book anytime at cedexx.net/consultation.",
-        location: "CEDEXX serves families across Miami-Dade, Broward, and throughout Florida. All consultations are virtual — no office visit needed.",
-        default: "That's a great question. For detailed information about our telemedicine services, please visit cedexx.net or book a consultation. You can also email us at info@cedexx.net."
+        price: "Many CEDEXX consultations don't require insurance. Pricing starts at $18.99/mo for CareNow™ urgent care (covering up to 7 family members) with zero co-pays. Call us at (754) 432-2201 or visit cedexx.net/enroll.",
+        insurance: "No insurance? No problem. CEDEXX offers affordable virtual care plans with zero co-pays starting at $18.99/mo. Call (754) 432-2201 or email support@cedexx.net.",
+        booking: "You can enroll in a virtual care plan at cedexx.net/enroll, or call our care desk at (754) 432-2201.",
+        contact: "Reach us by phone at (754) 432-2201, email support@cedexx.net, or visit cedexx.net/enroll. We're here to help families access quality 24/7 care.",
+        hours: "CEDEXX virtual providers are available 24/7 once active. Enroll anytime at cedexx.net/enroll or call (754) 432-2201.",
+        location: "CEDEXX serves families across Miami-Dade, Broward, and throughout Florida. All consultations are virtual — no office visit needed. Call (754) 432-2201.",
+        default: "That's a great question. For detailed information about our telemedicine services, please visit cedexx.net/enroll, call us at (754) 432-2201, or email support@cedexx.net."
       },
       es: {
         greeting: "¡Hola! Bienvenido a CEDEXX. Puedo ayudarte a conocer nuestros servicios de telemedicina, blog de salud, o conectarte con un proveedor virtual. ¿Qué te gustaría saber?",
         telemedicine: "CEDEXX ofrece acceso 24/7 a proveedores virtuales para familias. No se requiere seguro para muchas consultas. Cubrimos medicina general, pediatría, bienestar y apoyo de salud mental en Miami-Dade y Broward.",
-        pediatric: "Nuestros especialistas en telemedicina pediátrica están disponibles 24/7 para enfermedades comunes infantiles, chequeos de bienestar y preguntas de desarrollo. Reserva en cedexx.net/consultation",
+        pediatric: "Nuestros especialistas en telemedicina pediátrica están disponibles 24/7 para enfermedades comunes infantiles, chequeos de bienestar y preguntas de desarrollo. Inscríbete en cedexx.net/enroll o llámanos al (754) 432-2201.",
         blog: "Nuestro Blog de Salud presenta información basada en investigación sobre cuidado pediátrico, consejos de bienestar y opciones de salud asequibles. Visita cedexx.net/blog.",
-        price: "Muchas consultas de CEDEXX no requieren seguro. Los precios varían según el tipo de servicio. Reserva una consulta inicial gratuita para discutir opciones.",
-        insurance: "¿Sin seguro? No hay problema. CEDEXX ofrece opciones de atención virtual asequibles que no requieren seguro tradicional. Contáctanos en info@cedexx.net.",
-        booking: "Puedes reservar una consulta virtual en cedexx.net/consultation. Citas el mismo día a menudo disponibles.",
-        contact: "Escríbenos a info@cedexx.net o a través de nuestra página de reservas. Estamos aquí para ayudar a las familias de Miami a acceder a atención virtual de calidad.",
-        hours: "Los proveedores virtuales de CEDEXX están disponibles 24/7. Reserva en cualquier momento en cedexx.net/consultation.",
-        location: "CEDEXX sirve a familias en Miami-Dade, Broward y todo Florida. Todas las consultas son virtuales — no se necesita visita presencial.",
-        default: "Esa es una excelente pregunta. Para información detallada sobre nuestros servicios de telemedicina, visita cedexx.net o reserva una consulta. También puedes escribirnos a info@cedexx.net."
+        price: "Nuestros planes comienzan en $18.99/mes para CareNow™ (cubre hasta 7 miembros de la familia) sin copagos ni deducibles. Llámanos al (754) 432-2201 o visita cedexx.net/enroll.",
+        insurance: "¿Sin seguro? No hay problema. CEDEXX ofrece planes de atención virtual asequibles desde $18.99/mes sin seguro tradicional. Llámanos al (754) 432-2201 o escríbenos a support@cedexx.net.",
+        booking: "Puedes inscribirte en línea en cedexx.net/enroll o llamarnos al (754) 432-2201.",
+        contact: "Comunícate con nosotros por teléfono al (754) 432-2201, por correo a support@cedexx.net, o visita cedexx.net/enroll. Estamos aquí para ayudarte las 24 horas, los 7 días de la semana.",
+        hours: "Los proveedores de CEDEXX están disponibles 24/7 una vez activo. Inscríbete en cedexx.net/enroll o llama al (754) 432-2201.",
+        location: "CEDEXX sirve a familias en Miami-Dade, Broward y todo Florida. Todas las consultas son virtuales — no se necesita visita presencial. Llama al (754) 432-2201.",
+        default: "Esa es una excelente pregunta. Para información detallada sobre nuestros servicios de telemedicina, visita cedexx.net/enroll, llámanos al (754) 432-2201 o escríbenos a support@cedexx.net."
       }
     };
 

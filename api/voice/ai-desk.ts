@@ -8,14 +8,14 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
  * 1. Warm, coherent front desk assistant (Ceedex)
  * 2. Company name pronounced "Ceedex" (See-dex)
  * 3. Strict grounding in website knowledge (pricing, telehealth, enrollment)
- * 4. Transfer to staff (+1 954-624-6744) without mentioning personal names
+ * 4. Transfer to staff when requested without mentioning personal names
  * 5. Loop prevention for staff calling in from their own line
  * 6. bargeIn="false" on prompts to prevent line noise and crossed speech
  */
 
 const GEMINI_KEY = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY || '';
 const TWILIO_PHONE = process.env.TWILIO_PHONE_NUMBER || '+17544322201';
-const STAFF_PHONE = process.env.STAFF_PHONE || process.env.DAISY_PHONE || '+19546246744';
+const STAFF_PHONE = process.env.STAFF_PHONE || process.env.DAISY_PHONE || '';
 const TELEGRAM_BOT = process.env.TELEGRAM_BOT_TOKEN || '8834617573:AAGANwBh_xp-MIZpqukctS2OAuJ2zxJOnrU';
 const TELEGRAM_CHAT = process.env.TELEGRAM_CHAT_ID || '7838956683';
 
@@ -44,7 +44,7 @@ CRITICAL PRONUNCIATION & RULES:
 
 CEEDEX FACTS:
 - Partnership: Ceedex is powered by Lyric Health, delivering 24/7 integrated virtual primary care, urgent care, and mental health therapy.
-- Contact: Front desk line is (754) 432-2201. Support email is support@cedexx.net. Website is ceedex.net.
+- Contact: Front desk line is (754) 432-2201. Support email is support@cedexx.net. Website is ceedex.net. All CEDEXX phone references are (754) 432-2201.
 - Plans & Pricing:
   * CareNow™: $18.99/mo (24/7 virtual urgent care, up to 7 household members included, no co-pays)
   * CareNow™ + Mental Wellness: $26.99/mo (Urgent care + therapy & behavioral health)
@@ -118,6 +118,11 @@ function detectIntent(speech: string, digit: string): string {
     return 'billing';
   }
 
+  // Contact phone
+  if (/phone|telephone|number|call (you|cedex|ceedex|support|desk)|reach (you|cedex|ceedex)|contact (you|cedex|ceedex|number|phone)/i.test(lower)) {
+    return 'contact_phone';
+  }
+
   return 'ai_fallback';
 }
 
@@ -141,6 +146,9 @@ function getQuickResponse(intent: string): string | null {
 
     case 'billing':
       return "You can manage your account and billing anytime at ceedex dot net, or email us at support at cedexx dot net. I can also connect you with our staff if you need direct billing assistance.";
+
+    case 'contact_phone':
+      return "You can reach Ceedex by phone anytime at 7 5 4, 4 3 2, 2 2 0 1, or by email at support at cedexx dot net.";
 
     default:
       return null;
@@ -208,6 +216,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   // 2. TRANSFER TO STAFF
   if (intent === 'transfer_staff') {
+    if (!STAFF_PHONE || STAFF_PHONE === TWILIO_PHONE) {
+      console.log('[AI DESK] No separate staff forwarding line configured. Routing to voicemail.');
+      return res.status(200).send(twiml(`
+        ${hannah("Our office staff is currently assisting other members. Please leave your name, phone number, and a brief message after the beep, and a team member will call you right back! You can also reach our main desk at 7 5 4, 4 3 2, 2 2 0 1.")}
+        <Record action="https://www.cedexx.net/api/voice/voicemail" method="POST" maxLength="180" finishOnKey="#" playBeep="true" />
+        ${hannah("Thank you for your message. We have alerted our staff. Have a wonderful day!")}
+        <Hangup/>
+      `));
+    }
+
     // Loop prevention: check if caller IS the staff line calling in
     const cleanFrom = From.replace(/\D/g, '');
     const cleanStaff = STAFF_PHONE.replace(/\D/g, '');
@@ -249,7 +267,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // 3. DIRECT VOICEMAIL
   if (intent === 'voicemail') {
     return res.status(200).send(twiml(`
-      ${hannah("Certainly. Please leave your name, phone number, and a brief message after the beep, and a staff member will call you right back!")}
+      ${hannah("Certainly. Please leave your name, phone number, and a brief message after the beep, and our team will call you right back! You can also reach our main desk at 7 5 4, 4 3 2, 2 2 0 1.")}
       <Record action="https://www.cedexx.net/api/voice/voicemail" method="POST" maxLength="180" finishOnKey="#" playBeep="true" />
       ${hannah("Thank you for your message. We have alerted our staff. Have a wonderful day!")}
       <Hangup/>

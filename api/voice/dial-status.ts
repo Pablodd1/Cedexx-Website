@@ -48,7 +48,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Gracefully transition to voicemail — no employee names spoken
   const fallback = `
     <Say voice="Polly.Joanna" language="en-US">
-      Our staff is currently assisting other patients or away from the desk. Please leave your name, phone number, and a brief message after the beep, and a team member will call you right back!
+      Our staff is currently assisting other patients or away from the desk. Please leave your name, phone number, and a brief message after the beep, and a team member will call you right back! You can also reach our main desk directly at 7 5 4, 4 3 2, 2 2 0 1, or visit ceedex dot net.
     </Say>
     <Record action="https://www.cedexx.net/api/voice/voicemail" method="POST" maxLength="180" finishOnKey="#" playBeep="true" />
     <Say voice="Polly.Joanna" language="en-US">

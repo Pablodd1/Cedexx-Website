@@ -184,8 +184,8 @@ CREATE TABLE IF NOT EXISTS site_settings (
 INSERT INTO site_settings (key, value, type, description) VALUES
 ('site_name', 'CEDEXX', 'string', 'Brand name'),
 ('site_tagline', 'Better Care. Here. Now.', 'string', 'Primary tagline'),
-('contact_email', 'info@cedexx.net', 'string', 'Primary contact email'),
-('support_phone', '954-624-6744', 'string', 'Support phone number'),
+('contact_email', 'support@cedexx.net', 'string', 'Primary contact email'),
+('support_phone', '754-432-2201', 'string', 'Support phone number'),
 ('family_plan_price', '$27.99', 'string', 'Family plan monthly price'),
 ('individual_plan_price', '$14.99', 'string', 'Individual plan monthly price'),
 ('location_city', 'Miami', 'string', 'Primary location'),

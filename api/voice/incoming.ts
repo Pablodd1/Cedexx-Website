@@ -8,11 +8,10 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
  * 1. Warm, natural receptionist greeting (Polly.Joanna)
  * 2. Speech recognition & DTMF keypad gather
  * 3. Answers questions quickly & acts as front-desk buffer
- * 4. Transfers to Daisy (+1 954-624-6744) when requested
+ * 4. Transfers to staff when requested
  * 5. Instant Telegram alert on incoming call
  * 
  * Front Desk Line: (754) 432-2201
- * Daisy's Line: (954) 624-6744
  */
 
 const TELEGRAM_BOT = process.env.TELEGRAM_BOT_TOKEN || '8834617573:AAGANwBh_xp-MIZpqukctS2OAuJ2zxJOnrU';

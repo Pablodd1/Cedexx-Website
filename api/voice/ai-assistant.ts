@@ -104,7 +104,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.setHeader('Content-Type', 'text/xml');
     res.status(200).send(twiml(`
       <Say voice="Polly.Joanna">
-        I'm sorry, I'm having trouble understanding. Please visit ceedex dot net or text us for assistance. Thank you for calling!
+        I'm sorry, I'm having trouble understanding. Please visit ceedex dot net or call us at 754-432-2201 for assistance. Thank you for calling!
       </Say>
       <Hangup/>
     `));
@@ -114,7 +114,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 // ─── Call Gemini API ───
 async function getAIResponse(userSpeech: string): Promise<string> {
   if (!GEMINI_KEY) {
-    return "Thank you for calling Ceedex. For enrollment, visit ceedex dot net slash enroll. For support, email support at cedexx dot net.";
+    return "Thank you for calling Ceedex. For enrollment, visit ceedex dot net slash enroll. For support, call 754-432-2201 or email support at cedexx dot net.";
   }
 
   try {

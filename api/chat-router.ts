@@ -119,7 +119,7 @@ GUIDELINES:
   }
 
   if (!selectedProvider?.key) {
-    const fallbackText = 'We are currently unavailable. Please try again in a moment or contact support at 954-624-6744 for immediate assistance.';
+    const fallbackText = 'We are currently unavailable. Please try again in a moment or contact support at (754) 432-2201 for immediate assistance.';
     return res.status(200).json({ choices: [{ message: { content: fallbackText } }] });
   }
 

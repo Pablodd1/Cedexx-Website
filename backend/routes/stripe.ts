@@ -138,7 +138,7 @@ function buildPatientWelcomeEmail(data: {
         
         <p style="font-size:13px;color:#64748b;text-align:center;margin-top:24px">
           Need help? / ¿Necesita ayuda?<br>
-          Contact us at <a href="mailto:info@cedexx.net" style="color:#050249">info@cedexx.net</a> or call / llame al <strong>954-624-6744</strong>
+          Contact us at <a href="mailto:support@cedexx.net" style="color:#050249">support@cedexx.net</a> or call / llame al <strong>(754) 432-2201</strong>
         </p>
       </div>
       <div style="background:#f8fafc;padding:20px 24px;text-align:center;font-size:11px;color:#94a3b8;border-top:1px solid #e2e8f0">
@@ -147,7 +147,7 @@ function buildPatientWelcomeEmail(data: {
           Thanks / Gracias,<br><br>
           <strong>Daisy Gonzalez</strong><br>
           Founder & CEO / Fundadora y CEO<br>
-          Direct: 954-624-6744<br>
+          Direct: (754) 432-2201<br>
           Website: www.cedexx.net
         </p>
       </div>

@@ -3,7 +3,7 @@
 **Submitted to:** Twilio Toll-Free Verification Team  
 **Date:** September 3, 2026  
 **Business Name:** CEDEXX, Inc.  
-**Toll-Free Number:** +1 (855) 503-3371  
+**Active Phone Number:** +1 (754) 432-2201  
 **Website:** https://cedexx.net  
 **Support Email:** support@cedexx.net  
 
@@ -14,14 +14,14 @@
 CEDEXX obtains explicit consent before sending any text messages. We use **two opt-in methods**:
 
 ### Method A: Verbal Consent (Primary — Phone Call)
-When a user calls our AI front desk at **(855) 503-3371**, the AI assistant asks:
+When a user calls our AI front desk at **(754) 432-2201**, the AI assistant asks:
 
 > **"Would you like me to text you the enrollment link?"**
 
 The user must provide an **affirmative verbal response** ("yes," "sure," "please," etc.) before any SMS is sent. This is recorded in our call logs with intent classification.
 
 **Call Flow:**
-1. User dials (855) 503-3371
+1. User dials (754) 432-2201
 2. AI greets user and answers questions
 3. AI asks: *"Would you like me to text you the enrollment link?"*
 4. If user says "yes" → SMS is sent immediately
@@ -72,7 +72,7 @@ Users can stop receiving SMS at any time:
 
 - **Reply STOP** to any text message → immediate unsubscribe + confirmation text
 - **Reply HELP** to any text message → support instructions
-- **Contact support:** support@cedexx.net or call (855) 503-3371
+- **Contact support:** support@cedexx.net or call (754) 432-2201
 - **Online:** Users can manage communication preferences in their CEDEXX account dashboard
 
 Once opted out, the user's phone number is flagged in our system and no further SMS will be sent.
@@ -83,7 +83,7 @@ Once opted out, the user's phone number is flagged in our system and no further 
 
 Below is a representative example of the only SMS sent after verbal opt-in:
 
-> **From:** +1 (855) 503-3371  
+> **From:** +1 (754) 432-2201  
 > **To:** [User's phone number]  
 > **Body:** CEDEXX Enrollment: https://cedexx.net/enroll | Plans: CareNow™ $18.99/mo | CareComplete™ $34.99/mo | No insurance needed!  
 
@@ -102,7 +102,7 @@ This message includes:
 | **Business Name** | CEDEXX, Inc. |
 | **Website** | https://cedexx.net |
 | **Support Email** | support@cedexx.net |
-| **Phone** | (855) 503-3371 |
+| **Phone** | (754) 432-2201 |
 | **Privacy Officer** | Daisy@Cedexx.net |
 | **Physical Address** | Miami, FL (virtual-first platform) |
 
@@ -111,7 +111,7 @@ This message includes:
 ## 7. Supporting Evidence
 
 ### A. Call Log System
-All calls to (855) 503-3371 are logged with:
+All calls to (754) 432-2201 are logged with:
 - Caller phone number (masked in storage for privacy)
 - Call timestamp
 - Call duration
