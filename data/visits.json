@@ -4498,5 +4498,17 @@
     "lang": "en-US",
     "timestamp": "2026-09-08T09:33:35.015Z",
     "sessionId": "sess_1788860015018"
+  },
+  {
+    "id": "v_1788868061923_hvenlm",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Mobile Safari/537.36",
+    "screen": "",
+    "lang": "en-US",
+    "timestamp": "2026-09-08T11:47:41.923Z",
+    "sessionId": "sess_1788868061933"
   }
 ]
