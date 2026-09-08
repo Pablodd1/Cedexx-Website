@@ -4390,5 +4390,17 @@
     "lang": "en-US",
     "timestamp": "2026-09-08T04:13:53.633Z",
     "sessionId": "sess_1788840833635"
+  },
+  {
+    "id": "v_1788841329714_nt5gsn",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm) Chrome/136.0.0.0 Safari/537.36 AppleWebKit/537.36 (KHTML, like Gecko; compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm) Chrome/116.0.1938.76 Safari/537.36",
+    "screen": "",
+    "lang": "",
+    "timestamp": "2026-09-08T04:22:09.714Z",
+    "sessionId": "sess_1788841329716"
   }
 ]
