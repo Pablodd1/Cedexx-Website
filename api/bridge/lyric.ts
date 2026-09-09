@@ -11,6 +11,25 @@ const LYRIC_EMAIL = process.env.LYRIC_ENROLLMENT_EMAIL || 'enrollment@getlyric.c
 const TELEGRAM_BOT = process.env.TELEGRAM_BOT_TOKEN || '8834617573:AAGANwBh_xp-MIZpqukctS2OAuJ2zxJOnrU';
 const TELEGRAM_CHAT = process.env.TELEGRAM_CHAT_ID || '7838956683';
 
+export const LYRIC_PLAN_CONFIG: Record<string, { planId: string; planDetailsId: string; name: string }> = {
+  'carenow': { planId: '2662', planDetailsId: '1', name: 'CareNow™' },
+  'carenow-mental': { planId: '2664', planDetailsId: '1', name: 'CareNow™ + Mental Wellness' },
+  'mental-wellness': { planId: '2665', planDetailsId: '1', name: 'Mental Wellness' },
+  'carecomplete': { planId: '2666', planDetailsId: '1', name: 'CareComplete™' },
+  'carecomplete-family': { planId: '2667', planDetailsId: '3', name: 'CareComplete™ Family' },
+};
+
+export const LYRIC_STATE_IDS: Record<string, string> = {
+  'AL': '1', 'AK': '2', 'AZ': '3', 'AR': '4', 'CA': '5', 'CO': '6', 'CT': '7', 'DE': '8',
+  'DC': '9', 'FL': '10', 'GA': '11', 'HI': '12', 'ID': '13', 'IL': '14', 'IN': '15', 'IA': '16',
+  'KS': '17', 'KY': '18', 'LA': '19', 'ME': '20', 'MD': '21', 'MA': '22', 'MI': '23', 'MN': '24',
+  'MS': '25', 'MO': '26', 'MT': '27', 'NE': '28', 'NV': '29', 'NH': '30', 'NJ': '31', 'NM': '32',
+  'NY': '33', 'NC': '34', 'ND': '35', 'OH': '36', 'OK': '37', 'OR': '38', 'PA': '39', 'RI': '40',
+  'SC': '41', 'SD': '42', 'TN': '43', 'TX': '44', 'UT': '45', 'VT': '46', 'VA': '47', 'WA': '48',
+  'WV': '49', 'WI': '50', 'WY': '51', 'PR': '52', 'AS': '53', 'FM': '54', 'GU': '55', 'MH': '56',
+  'MP': '57', 'PW': '58', 'VI': '59',
+};
+
 const planMap: Record<string, string> = {
   'carenow': 'CareNow™',
   'carenow-mental': 'CareNow™ + Mental Wellness',
@@ -18,6 +37,26 @@ const planMap: Record<string, string> = {
   'carecomplete': 'CareComplete™',
   'carecomplete-family': 'CareComplete™ Family',
 };
+
+function getLyricPlanInfo(plan: string) {
+  const normalized = (plan || '').toLowerCase().replace(/[^a-z-]/g, '');
+  for (const [key, cfg] of Object.entries(LYRIC_PLAN_CONFIG)) {
+    if (normalized.includes(key) || key.includes(normalized)) {
+      return cfg;
+    }
+  }
+  return LYRIC_PLAN_CONFIG['carenow'] || { planId: '2662', planDetailsId: '1', name: plan || 'CareNow™' };
+}
+
+function formatLyricDob(dob: string): string {
+  if (!dob) return '';
+  const parts = dob.trim().split('-');
+  if (parts.length === 3 && parts[0].length === 4) {
+    const [year, month, day] = parts;
+    return `${month.padStart(2, '0')}/${day.padStart(2, '0')}/${year}`;
+  }
+  return dob;
+}
 
 async function readMembers() {
   if (!GITHUB_TOKEN) return [];
@@ -275,24 +314,29 @@ function getMemberId(patient: PatientData): string {
 // ─── Build Lyric Enrollment Email ───
 function buildLyricEmail(patient: PatientData): string {
   const memberId = getMemberId(patient);
+  const planInfo = getLyricPlanInfo(patient.plan);
 
   return `
 NEW CEDEXX ENROLLMENT — ACTION REQUIRED
 
 Patient Information:
 -------------------
-Member ID: ${memberId}
+Member ID / External ID: ${memberId}
 Name: ${patient.first_name} ${patient.last_name}
 Email: ${patient.email}
 Phone: ${patient.phone}
-Date of Birth: ${patient.dob}
+Date of Birth: ${formatLyricDob(patient.dob)}
 Gender: ${patient.gender || 'Not provided'}
 
 Address:
 ${patient.address || 'Not provided'}
 ${patient.city || ''}, ${patient.state || ''} ${patient.zipcode || ''}
 
-Plan: ${planMap[patient.plan] || patient.plan}
+Lyric Plan Mapping:
+-------------------
+Plan Name: ${planInfo.name}
+Lyric Plan ID: ${planInfo.planId}
+Lyric Plan Details ID: ${planInfo.planDetailsId} (${planInfo.planDetailsId === '3' ? 'Family Tier' : 'Individual Tier'})
 Enrollment Date: ${new Date(patient.paid_at).toLocaleString()}
 
 Stripe Information:
@@ -314,6 +358,7 @@ async function sendLyricEnrollmentEmail(patient: PatientData) {
   }
 
   const memberId = getMemberId(patient);
+  const planInfo = getLyricPlanInfo(patient.plan);
 
   try {
     const res = await fetch('https://api.resend.com/emails', {
@@ -325,23 +370,25 @@ async function sendLyricEnrollmentEmail(patient: PatientData) {
       body: JSON.stringify({
         from: 'CEDEXX Enrollments <enrollments@cedexx.net>',
         to: [LYRIC_EMAIL, ADMIN_EMAIL],
-        subject: `NEW ENROLLMENT: ${patient.first_name} ${patient.last_name} (Member ID: ${memberId}) — ${patient.plan}`,
+        subject: `NEW ENROLLMENT: ${patient.first_name} ${patient.last_name} (Member ID: ${memberId}) — ${planInfo.name} [Plan ID: ${planInfo.planId}]`,
         text: buildLyricEmail(patient),
         html: `
           <div style="font-family:Arial,sans-serif;max-width:600px;margin:20px auto;">
             <h2 style="color:#050249;">New CEDEXX Enrollment</h2>
             <table style="width:100%;border-collapse:collapse;font-size:14px;">
-              <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:700;">Member ID</td><td style="padding:8px;border-bottom:1px solid #eee;"><strong style="font-size:15px;color:#050249;">${memberId}</strong></td></tr>
+              <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:700;">Member ID / External ID</td><td style="padding:8px;border-bottom:1px solid #eee;"><strong style="font-size:15px;color:#050249;">${memberId}</strong></td></tr>
               <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:700;">Name</td><td style="padding:8px;border-bottom:1px solid #eee;">${patient.first_name} ${patient.last_name}</td></tr>
               <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:700;">Email</td><td style="padding:8px;border-bottom:1px solid #eee;">${patient.email}</td></tr>
               <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:700;">Phone</td><td style="padding:8px;border-bottom:1px solid #eee;">${patient.phone}</td></tr>
-              <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:700;">DOB</td><td style="padding:8px;border-bottom:1px solid #eee;">${patient.dob}</td></tr>
+              <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:700;">DOB</td><td style="padding:8px;border-bottom:1px solid #eee;">${formatLyricDob(patient.dob)}</td></tr>
               <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:700;">Street Address</td><td style="padding:8px;border-bottom:1px solid #eee;">${patient.address || 'Not provided'}</td></tr>
               <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:700;">City, State ZIP</td><td style="padding:8px;border-bottom:1px solid #eee;">${patient.city || ''}, ${patient.state || ''} <strong>${patient.zipcode || ''}</strong></td></tr>
-              <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:700;">Plan</td><td style="padding:8px;border-bottom:1px solid #eee;">${planMap[patient.plan] || patient.plan}</td></tr>
+              <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:700;">Plan</td><td style="padding:8px;border-bottom:1px solid #eee;"><strong>${planInfo.name}</strong></td></tr>
+              <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:700;">Lyric Plan ID</td><td style="padding:8px;border-bottom:1px solid #eee;"><code style="background:#eef;padding:2px 6px;border-radius:4px;color:#050249;">${planInfo.planId}</code></td></tr>
+              <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:700;">Plan Details ID</td><td style="padding:8px;border-bottom:1px solid #eee;"><code style="background:#eef;padding:2px 6px;border-radius:4px;color:#050249;">${planInfo.planDetailsId}</code> (${planInfo.planDetailsId === '3' ? 'Family' : 'Single'})</td></tr>
               <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:700;">Stripe Customer</td><td style="padding:8px;border-bottom:1px solid #eee;">${patient.stripe_customer_id || 'N/A'}</td></tr>
             </table>
-            <p style="margin-top:20px;color:#666;font-size:13px;">Please activate within 24-48 hours. Member activates app using ZIP: <strong>${patient.zipcode || 'N/A'}</strong>.</p>
+            <p style="margin-top:20px;color:#666;font-size:13px;">Please activate within 24-48 hours. Member activates app using ZIP: <strong>${patient.zipcode || 'N/A'}</strong> and Member ID: <strong>${memberId}</strong>.</p>
           </div>
         `,
       }),
@@ -359,35 +406,45 @@ async function sendLyricEnrollmentEmail(patient: PatientData) {
   }
 }
 
-// ─── Build API Payload (for when Lyric has an API) ───
+// ─── Build API Payload (POST https://staging.getlyric.com/go/api/census/createMember) ───
 function buildApiPayload(patient: PatientData) {
   const memberId = getMemberId(patient);
+  const planInfo = getLyricPlanInfo(patient.plan);
+  const stateUpper = (patient.state || '').trim().toUpperCase();
+  const stateId = LYRIC_STATE_IDS[stateUpper] || '';
+
   return {
-    source: 'cedexx',
-    enrollment_type: 'direct',
-    patient: {
-      id: memberId,
-      member_id: memberId,
-      first_name: patient.first_name,
-      last_name: patient.last_name,
-      email: patient.email,
-      phone: patient.phone,
-      date_of_birth: patient.dob,
-      gender: patient.gender,
-      address: {
-        street: patient.address,
-        city: patient.city,
-        state: patient.state,
-        zip: patient.zipcode,
-      },
+    endpoint: 'https://staging.getlyric.com/go/api/census/createMember',
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Authorization': 'Bearer <LYRIC_API_TOKEN>',
     },
-    plan: {
-      name: patient.plan,
-      stripe_customer_id: patient.stripe_customer_id,
-      stripe_subscription_id: patient.stripe_subscription_id,
-      activated_at: patient.paid_at,
+    body: {
+      primaryExternalId: memberId,
+      groupCode: process.env.LYRIC_GROUP_CODE || 'CEDEXX',
+      planId: planInfo.planId,
+      planDetailsId: planInfo.planDetailsId,
+      firstName: patient.first_name,
+      lastName: patient.last_name,
+      dob: formatLyricDob(patient.dob),
+      email: patient.email,
+      primaryPhone: memberId,
+      gender: (patient.gender || 'u').toLowerCase().charAt(0) || 'u',
+      address: patient.address || '',
+      city: patient.city || '',
+      stateId: stateId,
+      zipCode: patient.zipcode || '',
+      sendRegistrationNotification: '1',
+      numAllowedDependents: planInfo.planDetailsId === '3' ? '7' : '0',
     },
     metadata: {
+      source: 'cedexx',
+      member_id: memberId,
+      plan_name: planInfo.name,
+      stripe_customer_id: patient.stripe_customer_id || null,
+      stripe_subscription_id: patient.stripe_subscription_id || null,
+      paid_at: patient.paid_at,
       sent_at: new Date().toISOString(),
       source_url: 'https://cedexx.net',
     },
