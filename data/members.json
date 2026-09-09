@@ -274,15 +274,15 @@
       "state": "FL",
       "zipcode": "33126",
       "plan": "carenow",
-      "status": "registered",
+      "status": "checkout_started",
       "registered_at": "2026-09-09T13:19:01.961Z",
-      "checkout_started_at": null,
+      "checkout_started_at": "2026-09-09T13:21:25.445Z",
       "stripe_session_id": null,
       "consent_tos": true,
       "consent_analytics": true,
       "consent_version": "2.0",
       "consent_timestamp": "2026-09-09T13:19:02.712Z",
-      "updated_at": "2026-09-09T13:19:37.572Z"
+      "updated_at": "2026-09-09T13:21:25.445Z"
     }
   ],
   "created_at": "2026-09-01T23:00:00Z",
