@@ -11,6 +11,14 @@ const LYRIC_EMAIL = process.env.LYRIC_ENROLLMENT_EMAIL || 'enrollment@getlyric.c
 const TELEGRAM_BOT = process.env.TELEGRAM_BOT_TOKEN || '8834617573:AAGANwBh_xp-MIZpqukctS2OAuJ2zxJOnrU';
 const TELEGRAM_CHAT = process.env.TELEGRAM_CHAT_ID || '7838956683';
 
+const planMap: Record<string, string> = {
+  'carenow': 'CareNow™',
+  'carenow-mental': 'CareNow™ + Mental Wellness',
+  'mental-wellness': 'Mental Wellness',
+  'carecomplete': 'CareComplete™',
+  'carecomplete-family': 'CareComplete™ Family',
+};
+
 async function readMembers() {
   if (!GITHUB_TOKEN) return [];
   try {
@@ -260,13 +268,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
 // ─── Build Lyric Enrollment Email ───
 function buildLyricEmail(patient: PatientData): string {
-  const planMap: Record<string, string> = {
-    'carenow': 'CareNow™',
-    'carenow-mental': 'CareNow™ + Mental Wellness',
-    'mental-wellness': 'Mental Wellness',
-    'carecomplete': 'CareComplete™',
-    'carecomplete-family': 'CareComplete™ Family',
-  };
 
   return `
 NEW CEDEXX ENROLLMENT — ACTION REQUIRED
