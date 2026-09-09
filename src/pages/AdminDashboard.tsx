@@ -519,7 +519,7 @@ function MembersTab({ members, stats, loading, search, setSearch, filterStatus, 
                 <tr key={m.id} className={`border-t border-slate-50 hover:bg-blue-50/30 transition-colors ${i % 2 === 0 ? 'bg-white' : 'bg-slate-50/30'}`}>
                   <td className="px-4 py-3 whitespace-nowrap">
                     <div className="font-black text-[#050249] text-sm">{m.first_name} {m.last_name}</div>
-                    <div className="text-[10px] text-slate-400 font-mono">{m.id}</div>
+                    <div className="text-[10px] text-[#050249] font-bold font-mono">ID: {m.id}</div>
                   </td>
                   <td className="px-4 py-3">
                     <a href={`mailto:${m.email}`} className="flex items-center gap-1.5 text-[#050249] font-medium hover:text-[#23d9b0]">

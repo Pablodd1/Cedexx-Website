@@ -327,6 +327,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (existing) {
       // Update existing member to active
+      const cleanPhone = phone ? phone.replace(/\D/g, '').slice(-10) : (existing.phone ? existing.phone.replace(/\D/g, '').slice(-10) : '');
+      if (cleanPhone.length === 10) existing.id = cleanPhone;
+
       Object.assign(existing, {
         first_name: first_name || existing.first_name,
         last_name: last_name || existing.last_name,
@@ -363,9 +366,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     }
 
-    // Create new member
+    // Create new member with phone-based Member ID
+    const cleanPhone = phone ? phone.replace(/\D/g, '').slice(-10) : '';
+    const memberId = (cleanPhone.length === 10)
+      ? cleanPhone
+      : `mem_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+
     const newMember = {
-      id: `mem_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`,
+      id: memberId,
       first_name: first_name || '',
       last_name: last_name || '',
       email: normalizedEmail,

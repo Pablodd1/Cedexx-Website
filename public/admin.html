@@ -590,7 +590,7 @@ function applyFilters(shouldFetch = true) {
     if (status && m.status !== status) return false;
     if (plan && m.plan !== plan) return false;
     if (search) {
-      const hay = `${m.first_name} ${m.last_name} ${m.email} ${m.phone} ${m.address || ''} ${m.city || ''} ${m.zipcode || ''} ${m.plan}`.toLowerCase();
+      const hay = `${m.id || ''} ${m.first_name} ${m.last_name} ${m.email} ${m.phone} ${m.address || ''} ${m.city || ''} ${m.zipcode || ''} ${m.plan}`.toLowerCase();
       if (!hay.includes(search)) return false;
     }
     return true;
@@ -649,7 +649,7 @@ function renderTable() {
       <tr>
         <td>
           <div class="td-name">${esc(m.first_name)} ${esc(m.last_name)}</div>
-          <div class="td-id">${esc(m.id)}</div>
+          <div class="td-id" style="color:#050249;font-weight:700;font-size:11px;">ID: ${esc(m.id)}</div>
         </td>
         <td>
           <span class="td-email">
@@ -688,7 +688,7 @@ function renderTable() {
 function exportCSV() {
   const data = filteredMembers.length ? filteredMembers : members;
   if (!data.length) { alert('No members to export'); return; }
-  const headers = ['ID','First Name','Last Name','Email','Phone','DOB','Age','Street Address','City','State','ZIP Code','Plan','Price','Status','Registered At','Paid At','Stripe Session','Consent TOS','Consent Analytics','Consent Version','Consent Timestamp'];
+  const headers = ['Member ID','First Name','Last Name','Email','Phone','DOB','Age','Street Address','City','State','ZIP Code','Plan','Price','Status','Registered At','Paid At','Stripe Session','Consent TOS','Consent Analytics','Consent Version','Consent Timestamp'];
   const rows = data.map(m => [
     m.id, m.first_name, m.last_name, m.email, m.phone, m.dob,
     calcAge(m.dob) ?? '', m.address || '', m.city || '', m.state || '', m.zipcode || '',

@@ -289,7 +289,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (plan) updates.plan = sanitize(plan);
       if (first_name) updates.first_name = sanitize(first_name);
       if (last_name) updates.last_name = sanitize(last_name);
-      if (phone) updates.phone = sanitize(phone);
+      if (phone) {
+        updates.phone = sanitize(phone);
+        const cleanPhone = phone.replace(/\D/g, '').slice(-10);
+        if (cleanPhone.length === 10) existing.id = cleanPhone;
+      }
       if (dob) updates.dob = dob;
       if (address) updates.address = sanitize(address);
       if (city) updates.city = sanitize(city);
@@ -328,9 +332,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     }
 
-    // Create new member
+    // Create new member with phone-based Member ID
+    const cleanPhone = phone ? phone.replace(/\D/g, '').slice(-10) : '';
+    const memberId = (cleanPhone.length === 10)
+      ? cleanPhone
+      : `mem_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+
     const newMember = {
-      id: `mem_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`,
+      id: memberId,
       first_name: first_name ? sanitize(first_name) : '',
       last_name: last_name ? sanitize(last_name) : '',
       email: normalizedEmail,

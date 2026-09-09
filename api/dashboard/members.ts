@@ -76,7 +76,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (search && typeof search === 'string') {
       const q = search.toLowerCase();
       filtered = filtered.filter((m: any) =>
-        `${m.first_name} ${m.last_name} ${m.email} ${m.phone} ${m.address || ''} ${m.city || ''} ${m.zipcode || ''} ${m.plan || ''}`.toLowerCase().includes(q)
+        `${m.id || ''} ${m.first_name} ${m.last_name} ${m.email} ${m.phone} ${m.address || ''} ${m.city || ''} ${m.zipcode || ''} ${m.plan || ''}`.toLowerCase().includes(q)
       );
     }
 

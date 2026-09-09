@@ -266,14 +266,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 }
 
+function getMemberId(patient: PatientData): string {
+  const cleanPhone = (patient.phone || '').replace(/\D/g, '').slice(-10);
+  if (cleanPhone.length === 10) return cleanPhone;
+  return patient.id || cleanPhone || 'N/A';
+}
+
 // ─── Build Lyric Enrollment Email ───
 function buildLyricEmail(patient: PatientData): string {
+  const memberId = getMemberId(patient);
 
   return `
 NEW CEDEXX ENROLLMENT — ACTION REQUIRED
 
 Patient Information:
 -------------------
+Member ID: ${memberId}
 Name: ${patient.first_name} ${patient.last_name}
 Email: ${patient.email}
 Phone: ${patient.phone}
@@ -305,6 +313,8 @@ async function sendLyricEnrollmentEmail(patient: PatientData) {
     return { sent: false, error: 'No Resend API key' };
   }
 
+  const memberId = getMemberId(patient);
+
   try {
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -315,12 +325,13 @@ async function sendLyricEnrollmentEmail(patient: PatientData) {
       body: JSON.stringify({
         from: 'CEDEXX Enrollments <enrollments@cedexx.net>',
         to: [LYRIC_EMAIL, ADMIN_EMAIL],
-        subject: `NEW ENROLLMENT: ${patient.first_name} ${patient.last_name} — ${patient.plan}`,
+        subject: `NEW ENROLLMENT: ${patient.first_name} ${patient.last_name} (Member ID: ${memberId}) — ${patient.plan}`,
         text: buildLyricEmail(patient),
         html: `
           <div style="font-family:Arial,sans-serif;max-width:600px;margin:20px auto;">
             <h2 style="color:#050249;">New CEDEXX Enrollment</h2>
             <table style="width:100%;border-collapse:collapse;font-size:14px;">
+              <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:700;">Member ID</td><td style="padding:8px;border-bottom:1px solid #eee;"><strong style="font-size:15px;color:#050249;">${memberId}</strong></td></tr>
               <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:700;">Name</td><td style="padding:8px;border-bottom:1px solid #eee;">${patient.first_name} ${patient.last_name}</td></tr>
               <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:700;">Email</td><td style="padding:8px;border-bottom:1px solid #eee;">${patient.email}</td></tr>
               <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:700;">Phone</td><td style="padding:8px;border-bottom:1px solid #eee;">${patient.phone}</td></tr>
@@ -350,10 +361,13 @@ async function sendLyricEnrollmentEmail(patient: PatientData) {
 
 // ─── Build API Payload (for when Lyric has an API) ───
 function buildApiPayload(patient: PatientData) {
+  const memberId = getMemberId(patient);
   return {
     source: 'cedexx',
     enrollment_type: 'direct',
     patient: {
+      id: memberId,
+      member_id: memberId,
       first_name: patient.first_name,
       last_name: patient.last_name,
       email: patient.email,

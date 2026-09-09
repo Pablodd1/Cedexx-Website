@@ -334,8 +334,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         let member = members.find((m: any) => m.email && m.email.toLowerCase() === email);
         if (!member) {
           console.log('[STRIPE WEBHOOK] Creating new member from checkout:', email);
+          const rawPhone = metadata.phone || '';
+          const phoneDigits = rawPhone.replace(/\D/g, '').slice(-10);
+          const memberId = (phoneDigits.length === 10)
+            ? phoneDigits
+            : `mem_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+
           member = {
-            id: `mem_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`,
+            id: memberId,
             email,
             first_name: metadata.first_name || '',
             last_name: metadata.last_name || '',
@@ -376,7 +382,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         if (metadata.zipcode) member.zipcode = metadata.zipcode;
         if (metadata.first_name && !member.first_name) member.first_name = metadata.first_name;
         if (metadata.last_name && !member.last_name) member.last_name = metadata.last_name;
-        if (metadata.phone && !member.phone) member.phone = metadata.phone;
+        if (metadata.phone) {
+          member.phone = metadata.phone;
+          const phoneDigits = metadata.phone.replace(/\D/g, '').slice(-10);
+          if (phoneDigits.length === 10) member.id = phoneDigits;
+        } else if (member.phone) {
+          const phoneDigits = member.phone.replace(/\D/g, '').slice(-10);
+          if (phoneDigits.length === 10) member.id = phoneDigits;
+        }
         if (metadata.dob && !member.dob) member.dob = metadata.dob;
 
         updated = true;
