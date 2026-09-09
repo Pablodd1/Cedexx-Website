@@ -559,6 +559,7 @@ export function Home() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
             {[
+              { q: 'What is my Member ID number?', a: 'The head of household Member ID number is the 10-digit phone number entered at registration. When contacting Member Services, pharmacy support, or verifying your account, simply provide this phone number.' },
               { q: 'Can my children be seen immediately?', a: 'Yes. Most consultations begin in under 15 minutes with a board-certified provider, making it the fastest way to connect for pediatric care.' },
               { q: 'Do I need insurance to use Cedexx?', a: 'No. Cedexx connects you with providers offering high-quality care without the need for insurance premiums, co-pays, or complex billing.' },
               { q: 'Can I get a doctor\'s note for travel insurance?', a: 'Yes. Providers on our platform can issue clinical documentation and notes for travel-related illnesses and non-controlled medical requirements instantly.' },

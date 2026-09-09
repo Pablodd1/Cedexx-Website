@@ -21,6 +21,7 @@ export default function VideoLibrary() {
   ];
 
   const faqs = [
+    { q: 'What is my Member ID number?', a: 'The head of household Member ID number is the 10-digit phone number entered at registration. When contacting Member Services, pharmacy support, or verifying your account, simply provide this phone number.' },
     { q: 'How quickly can I connect with a Lyric Health provider?', a: 'In most cases, a Lyric Health provider joins the consultation within 15 minutes of your request — 24 hours a day, 7 days a week, including holidays.' },
     { q: 'Is the platform HIPAA compliant?', a: 'Absolutely. Cedexx is fully HIPAA compliant with military-grade encryption and strict security protocols protecting all patient data and communications.' },
     { q: 'Can I use this for my entire family?', a: 'Yes. Our Family Plan is designed for your whole household, providing 24/7 access for up to 7 members at one low monthly rate.' },

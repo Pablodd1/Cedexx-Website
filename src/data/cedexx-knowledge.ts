@@ -199,6 +199,7 @@ export const CEDEXX_KNOWLEDGE = {
   ],
 
   membershipSupport: {
+    memberId: 'The head of household Member ID number is the 10-digit phone number entered at registration. When contacting Member Services, pharmacy support, or verifying your account, simply provide this phone number.',
     accountAccess: 'For assistance accessing your CEDEXX membership account, contact support@cedexx.net or call (754) 432-2201.',
     cancellation: 'Send cancellation request to support@cedexx.net with "Cancellation" in subject line. Include: Full Name, Date of Birth, Email Address on File, Full Address. No penalties or fees. Previously billed fees are non-refundable.',
     lyricAppSupport: 'For active members using the Lyric Health mobile app, call Lyric Health Member Services directly at 1-866-223-8831.',
@@ -332,6 +333,7 @@ ${k.keyBenefits.map(b => `- ${b}`).join('\n')}
 ${k.websitePages.map(p => `- ${p.name} (${p.path}): ${p.description}`).join('\n')}
 
 === MEMBERSHIP SUPPORT FAQ ===
+- Member ID Number: ${k.membershipSupport.memberId}
 - Account Access: ${k.membershipSupport.accountAccess}
 - Cancellation: ${k.membershipSupport.cancellation}
 - Lyric App Support: ${k.membershipSupport.lyricAppSupport}
