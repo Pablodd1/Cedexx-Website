@@ -4774,5 +4774,17 @@
     "lang": "en-US",
     "timestamp": "2026-09-09T00:12:04.425Z",
     "sessionId": "sess_1788912724427"
+  },
+  {
+    "id": "v_1788914606252_eturnh",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Mozilla/5.0 (Linux; Android 16; motorola razr 2023 Build/W1TVS36H.28-60-15-1) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/152.0.7977.61 Mobile Safari/537.36 [FB_IAB/FB4A;FBAV/576.0.0.42.73;IABMV/1;]",
+    "screen": "",
+    "lang": "en-US",
+    "timestamp": "2026-09-09T00:43:26.252Z",
+    "sessionId": "sess_1788914606256"
   }
 ]
