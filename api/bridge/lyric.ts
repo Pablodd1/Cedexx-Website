@@ -467,15 +467,19 @@ async function updateMemberSyncStatus(memberId: string, syncData: any) {
 
 // ─── Notify Admin ───
 async function notifyAdminOfLyricSync(patient: PatientData, results: any) {
-  // 1. Telegram
+  // 1. Telegram (HIPAA-Sanitized / De-identified alert for non-BAA channel)
   if (TELEGRAM_BOT && TELEGRAM_CHAT) {
     try {
+      const maskedName = `${(patient.first_name || '').charAt(0)}. ${(patient.last_name || '').charAt(0)}.`;
+      const phoneDigits = (patient.phone || '').replace(/\D/g, '');
+      const maskedPhone = phoneDigits.length >= 4 ? `***-***-${phoneDigits.slice(-4)}` : '***';
       const text = [
-        '🏥 <b>LYRIC SYNC</b> — CEDEXX',
-        `👤 ${patient.first_name} ${patient.last_name}`,
-        `📧 ${patient.email}`,
+        '🏥 <b>LYRIC HEALTH SYNC</b> — CEDEXX',
+        `👤 Member: <code>${maskedName}</code>`,
+        `📱 ID/Phone: <code>${maskedPhone}</code>`,
         `📦 Plan: ${patient.plan}`,
-        `✉️ Email: ${results.email?.sent ? '✅ Sent' : '❌ Failed'}`,
+        `✉️ Lyric Dispatch: ${results.email?.sent ? '✅ Sent' : '❌ Failed'}`,
+        `🔒 Details protected in secure Admin Dashboard`,
         `🕒 ${new Date().toLocaleString()}`,
       ].join('\n');
 

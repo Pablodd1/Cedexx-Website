@@ -34,14 +34,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   console.log('[VOICE] Incoming front desk call:', { from: From, to: To, callSid: CallSid, direction: Direction });
 
-  // Instant notification to Telegram
+  // Instant notification to Telegram (HIPAA-compliant phone masking)
   if (TELEGRAM_BOT && TELEGRAM_CHAT) {
+    const rawFrom = String(From || '');
+    const maskedFrom = rawFrom.length >= 4 ? `***-***-${rawFrom.slice(-4)}` : 'Unknown Caller';
     fetch(`https://api.telegram.org/bot${TELEGRAM_BOT}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         chat_id: TELEGRAM_CHAT,
-        text: `📞 <b>INCOMING CALL — FRONT DESK</b>\n👤 Caller: <code>${From}</code>\n📍 Line: <code>${To}</code>\n🆔 SID: <code>${CallSid}</code>\n🕒 ${new Date().toLocaleString()}`,
+        text: `📞 <b>INCOMING CALL — FRONT DESK</b>\n👤 Caller: <code>${maskedFrom}</code>\n📍 Line: <code>${To}</code>\n🆔 SID: <code>${CallSid}</code>\n🕒 ${new Date().toLocaleString()}`,
         parse_mode: 'HTML',
       }),
     }).catch(() => {});

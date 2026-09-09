@@ -201,14 +201,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const intent = detectIntent(speech, digit);
   console.log('[AI DESK] Detected intent:', intent, 'speech:', speech, 'digit:', digit);
 
-  // Send Telegram event notification
+  // Send Telegram event notification (HIPAA-compliant phone masking)
   if (TELEGRAM_BOT && TELEGRAM_CHAT) {
+    const fromDigits = (From || '').replace(/\D/g, '');
+    const maskedFrom = fromDigits.length >= 4 ? `***-***-${fromDigits.slice(-4)}` : 'Unknown Caller';
     fetch(`https://api.telegram.org/bot${TELEGRAM_BOT}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         chat_id: TELEGRAM_CHAT,
-        text: `🗣️ <b>FRONT DESK INTERACTION</b>\n👤 Caller: <code>${From}</code>\n💬 Said: "<i>${speech || 'Keypad: ' + digit}</i>"\n🏷️ Intent: <b>${intent}</b>\n🕒 ${new Date().toLocaleString()}`,
+        text: `🗣️ <b>FRONT DESK INTERACTION</b>\n👤 Caller: <code>${maskedFrom}</code>\n💬 Said: "<i>${speech || 'Keypad: ' + digit}</i>"\n🏷️ Intent: <b>${intent}</b>\n🕒 ${new Date().toLocaleString()}`,
         parse_mode: 'HTML',
       }),
     }).catch(() => {});
@@ -253,12 +255,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     console.log('[AI DESK] Transferring caller to staff at', STAFF_PHONE);
     
     if (TELEGRAM_BOT && TELEGRAM_CHAT) {
+      const fromDigits = (From || '').replace(/\D/g, '');
+      const maskedFrom = fromDigits.length >= 4 ? `***-***-${fromDigits.slice(-4)}` : 'Unknown Caller';
       fetch(`https://api.telegram.org/bot${TELEGRAM_BOT}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           chat_id: TELEGRAM_CHAT,
-          text: `📲 <b>TRANSFERRING CALL TO STAFF</b>\n👤 Caller: <code>${From}</code>\n📞 Dialing: <code>${STAFF_PHONE}</code>\n🕒 ${new Date().toLocaleString()}`,
+          text: `📲 <b>TRANSFERRING CALL TO STAFF</b>\n👤 Caller: <code>${maskedFrom}</code>\n📞 Routing to staff\n🕒 ${new Date().toLocaleString()}`,
           parse_mode: 'HTML',
         }),
       }).catch(() => {});

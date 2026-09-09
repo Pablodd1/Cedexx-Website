@@ -200,6 +200,14 @@ export function Privacy() {
               <p className="mt-3 bg-slate-50 p-4 rounded-xl border border-slate-200 text-sm">
                 <strong>Categories of Personal Information Collected (CCPA):</strong> Identifiers (name, email, phone, DOB); Commercial Information (plan selected, purchase history); Internet Activity (IP, browser type); Geolocation Data (derived from IP).
               </p>
+
+              <h3 className="text-lg font-bold text-emerald-800 mt-6 mb-2">For Florida Residents (Florida Information Protection Act - FIPA § 501.171 & Florida Telehealth § 456.47):</h3>
+              <ul className="list-disc pl-6 space-y-2">
+                <li><strong>Medical & Health Data Safeguards:</strong> Under Florida Statute § 501.171, personal information explicitly includes medical information (any information regarding medical history, condition, or treatment) and health insurance policy or subscriber identification numbers. CEDEXX maintains administrative, physical, and technical safeguards to protect all electronic personal information of Florida residents.</li>
+                <li><strong>Florida 30-Day Breach Notification Standard:</strong> In accordance with Fla. Stat. § 501.171(4), in the event of a security breach affecting 500 or more Florida residents, CEDEXX will notify affected individuals and the Florida Department of Legal Affairs within thirty (30) days of determining that a breach has occurred.</li>
+                <li><strong>Florida Telehealth Delivery:</strong> All clinical telemedicine consultations for Florida residents are conducted by Florida-licensed or Florida-registered out-of-state healthcare providers in full accordance with Florida Statute § 456.47 and Florida Patient Records Confidentiality standards under Fla. Stat. § 456.057, managed exclusively through Lyric Health's secure platform.</li>
+                <li><strong>Secure Disposal:</strong> Pursuant to Fla. Stat. § 501.171(8), customer records containing personal information are disposed of by shredding, erasing, or otherwise modifying the data to render it unreadable and undecipherable.</li>
+              </ul>
             </section>
 
             {/* 9. Data Security Standards */}
@@ -213,7 +221,7 @@ export function Privacy() {
                 <li><strong>Access Control:</strong> Member data is accessible only through a password-protected admin dashboard. Passwords are hashed using bcrypt.</li>
                 <li><strong>Serverless Architecture:</strong> Our API runs on Vercel's serverless infrastructure with ephemeral compute. Member data is stored in isolated temporary files with no public access.</li>
                 <li><strong>Regular Review:</strong> We review access logs and security configurations quarterly.</li>
-                <li><strong>Breach Notification:</strong> In the event of a data breach affecting your personal information, we will notify you within 72 hours as required by applicable law.</li>
+                <li><strong>Breach Notification:</strong> In the event of a data breach affecting your personal information, we will notify affected individuals within 30 days as mandated by Florida FIPA § 501.171 and federal HIPAA standards.</li>
               </ul>
             </section>
 

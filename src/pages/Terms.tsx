@@ -252,9 +252,21 @@ export function Terms() {
               </p>
             </section>
 
-            {/* SECTION 16: Contact */}
+            {/* SECTION 17: Governing Law & Jurisdiction */}
+            <section>
+              <h2 className="text-2xl font-bold text-emerald-900 mb-4">17. Governing Law & Florida Jurisdiction</h2>
+              <p>
+                These Terms of Service and any dispute arising from your use of the CEDEXX platform shall be governed by and 
+                construed in accordance with the laws of the State of Florida, without regard to its conflict of law principles. 
+                Any legal proceeding arising out of or relating to these Terms shall be instituted exclusively in the state or federal courts 
+                located in Miami-Dade County, Florida. Telehealth consultations conducted for Florida residents are governed by 
+                Florida Statute § 456.47 and Florida Board of Medicine rules.
+              </p>
+            </section>
+
+            {/* SECTION 18: Contact */}
             <section className="border-t border-slate-100 pt-8 mt-8">
-              <h2 className="text-2xl font-bold text-emerald-900 mb-4">16. Contact Information</h2>
+              <h2 className="text-2xl font-bold text-emerald-900 mb-4">18. Contact Information</h2>
               <p>For questions regarding these Terms of Service, please contact us:</p>
               <div className="bg-slate-50 p-6 rounded-xl mt-4 border border-slate-200">
                 <p className="font-medium text-emerald-900">Cedexx Support</p>

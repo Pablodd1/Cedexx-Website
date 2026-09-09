@@ -287,7 +287,9 @@ async function notifyAdmin(data: any) {
     }).catch(() => {});
   }
   if (TELEGRAM_BOT && TELEGRAM_CHAT) {
-    const text = `💳 <b>NEW PAYMENT</b> — CEDEXX\n👤 ${data.first_name} ${data.last_name}\n📧 ${data.email}\n📦 Plan: ${data.plan}\n💰 Amount: $${((data.amount || 0) / 100).toFixed(2)}\n🕒 ${new Date().toLocaleString()}`;
+    const maskedName = `${(data.first_name || '').charAt(0)}. ${(data.last_name || '').charAt(0)}.`;
+    const maskedEmail = data.email ? `${data.email.charAt(0)}***@${data.email.split('@')[1] || '***'}` : '***';
+    const text = `💳 <b>NEW PAYMENT</b> — CEDEXX\n👤 Member: <code>${maskedName}</code>\n📧 Contact: <code>${maskedEmail}</code>\n📦 Plan: ${data.plan}\n💰 Amount: $${((data.amount || 0) / 100).toFixed(2)}\n🔒 Protected in Admin Dashboard\n🕒 ${new Date().toLocaleString()}`;
     fetch(`https://api.telegram.org/bot${TELEGRAM_BOT}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

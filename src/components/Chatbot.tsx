@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { MessageSquare, X, Send, Bot, User, Minimize2, Mic, Volume2, VolumeX } from 'lucide-react';
+import { MessageSquare, X, Send, Bot, User, Minimize2, Mic, Volume2, VolumeX, Shield } from 'lucide-react';
 import { cn } from './ui';
 
 const FAMILY_SYSTEM_INSTRUCTION = `You are JasDex, a warm, professional, and highly knowledgeable AI Virtual Receptionist for Cedexx — powered by Lyric Health, our exclusive telehealth partner. No insurance needed.
@@ -441,6 +441,12 @@ useEffect(() => {
 
       {(!isMinimized || inline) && (
         <>
+          <div className="bg-emerald-50/95 border-b border-emerald-100 px-3 py-1.5 text-[11px] text-emerald-900 flex items-center justify-between flex-shrink-0">
+            <span className="flex items-center gap-1.5">
+              <Shield className="h-3 w-3 text-emerald-600 flex-shrink-0" />
+              <span><strong>HIPAA Notice:</strong> Non-clinical AI. Do not submit personal medical records.</span>
+            </span>
+          </div>
           <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50">
             {messages.map((msg, i) => (
               <div key={i} className={cn('flex gap-2', msg.role === 'user' ? 'justify-end' : 'justify-start')}>

@@ -199,12 +199,17 @@ async function sendTelegramNotification(
 ) {
   if (!TELEGRAM_BOT || !TELEGRAM_CHAT) return;
 
+  const rawFrom = String(from || '');
+  const digits = rawFrom.replace(/\D/g, '');
+  const maskedFrom = digits.length >= 4 ? `***-***-${digits.slice(-4)}` : 'Unknown Caller';
+
   const text = [
     '🎙️ <b>NEW VOICEMAIL — CEDEXX Front Desk</b>',
-    `📞 From: ${from}`,
+    `📞 From: ${maskedFrom}`,
     `⏱️ Duration: ${duration || 'N/A'}s`,
     `🤖 Transcription: ${source}`,
     transcription ? `📝 "${transcription.substring(0, 800)}"` : '⏳ Processing...',
+    `🔒 Full audio and details in secure Admin Dashboard`,
     `🕒 ${new Date().toLocaleString()}`,
   ].filter(Boolean).join('\n\n');
 

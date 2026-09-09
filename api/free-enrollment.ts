@@ -225,15 +225,21 @@ async function sendAdminNotification(member: any) {
 // ─── Telegram ───
 async function sendTelegram(member: any) {
   if (!TELEGRAM_BOT || !TELEGRAM_CHAT) return;
+  const maskedName = `${(member.first_name || '').charAt(0)}. ${(member.last_name || '').charAt(0)}.`;
+  const maskedEmail = member.email ? `${member.email.charAt(0)}***@${member.email.split('@')[1] || '***'}` : '***';
+  const phoneDigits = (member.phone || '').replace(/\D/g, '');
+  const maskedPhone = phoneDigits.length >= 4 ? `***-***-${phoneDigits.slice(-4)}` : null;
+
   const text = [
     '🏠 <b>FREE ENROLLMENT — CEDEXX</b>',
-    `👤 ${member.first_name} ${member.last_name}`,
-    `📧 ${member.email}`,
-    member.phone ? `📞 ${member.phone}` : null,
+    `👤 Member: <code>${maskedName}</code>`,
+    `📧 Contact: <code>${maskedEmail}</code>`,
+    maskedPhone ? `📞 Phone: <code>${maskedPhone}</code>` : null,
     `📦 Plan: ${PLAN_MAP[member.plan] || member.plan}`,
     '🎟️ Promo: Welcome1',
     '💰 Amount: $0.00 (Complimentary)',
     '✅ Status: Active',
+    '🔒 Protected in Admin Dashboard',
     `🕒 ${new Date().toLocaleString()}`,
   ].filter(Boolean).join('\n');
 
