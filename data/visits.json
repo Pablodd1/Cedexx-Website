@@ -5278,5 +5278,17 @@
     "lang": "en-GB",
     "timestamp": "2026-09-09T13:37:14.353Z",
     "sessionId": "sess_1788961034355"
+  },
+  {
+    "id": "v_1788963864841_ydk2j7",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Mozilla/5.0 (X11; Linux aarch64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/120.0.6099.28 Safari/537.36",
+    "screen": "",
+    "lang": "",
+    "timestamp": "2026-09-09T14:24:24.841Z",
+    "sessionId": "sess_1788963864843"
   }
 ]
