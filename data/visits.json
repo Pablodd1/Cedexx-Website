@@ -4882,5 +4882,17 @@
     "lang": "en-US",
     "timestamp": "2026-09-09T01:42:06.309Z",
     "sessionId": "sess_1788918126309"
+  },
+  {
+    "id": "v_1788918128871_ylkird",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.0 Safari/537.36",
+    "screen": "",
+    "lang": "en-US",
+    "timestamp": "2026-09-09T01:42:08.871Z",
+    "sessionId": "sess_1788918128871"
   }
 ]
