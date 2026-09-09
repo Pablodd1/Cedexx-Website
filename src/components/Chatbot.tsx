@@ -21,8 +21,9 @@ COMPANY KNOWLEDGE:
 - How it works: 1) Enroll at cedexx.net/enroll → 2) Receive immediate receipt from support@cedexx.net → 3) Allow 24-48 hours for Lyric activation email from noreply@getlyric.com → 4) Log into Lyric Health app via "First Time User?" → 5) Connect 24/7 with providers
 
 EMAIL & COMMUNICATION WORKFLOWS:
-- Immediate Order Receipt: Sent from support@cedexx.net right after signup
+- Immediate Order Receipt: Instant confirmation receipt from support@cedexx.net right after signup
 - Lyric Activation Email: Sent from noreply@getlyric.com within 24 to 48 hours (not immediate)
+- Member ID: The head of household Member ID is the 10-digit phone number entered at registration. Use this phone number when verifying your account or contacting support.
 - Cancellation: Email support@cedexx.net with "Cancellation" in subject line + Name, DOB, Email, Address. No fees or penalties.
 - App Support: Active members in the Lyric app can call Lyric Member Services at 1-866-223-8831
 
@@ -42,6 +43,8 @@ IMPORTANT DISCLAIMERS:
 TONE: Friendly, professional, concise. Keep responses short (2-3 sentences). No markdown formatting.`;
 
 const FALLBACK_RESPONSES: Record<string, string> = {
+  'member id': "Your Member ID is the 10-digit phone number you entered at registration. When contacting Member Services, pharmacy support, or verifying your account, simply provide this phone number.",
+  'member number': "Your Member ID is the 10-digit phone number you entered at registration. When contacting Member Services, pharmacy support, or verifying your account, simply provide this phone number.",
   'hello': "Hi! Welcome to Cedexx powered by Lyric Health. I'm JasDex, your AI assistant. I can help you with virtual care plans, pricing, blog insights, or enrollment. What would you like to know?",
   'hi': "Hey there! Welcome to Cedexx powered by Lyric Health. How can I assist you today?",
   'pricing': "Our plans are straightforward: CareNow™ is $18.99/month for 24/7 urgent care for up to 7 family members, CareNow+Mental is $26.99/month, and CareComplete™ with primary care is $34.99/month. No insurance needed!",

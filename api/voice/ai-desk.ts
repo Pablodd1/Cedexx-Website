@@ -103,6 +103,11 @@ function detectIntent(speech: string, digit: string): string {
     return 'blog';
   }
 
+  // Member ID
+  if (/member id|member number|my id|identification number|external id/i.test(lower)) {
+    return 'member_id';
+  }
+
   // How it works / Lyric Health / Doctors
   if (/how does it work|lyric|doctor|appointment|telehealth|telemedicine|prescription|pharmacy|urgent care/i.test(lower)) {
     return 'how_it_works';
@@ -129,6 +134,9 @@ function detectIntent(speech: string, digit: string): string {
 // ─── Quick Natural Spoken Responses ───
 function getQuickResponse(intent: string): string | null {
   switch (intent) {
+    case 'member_id':
+      return "Your Member ID number is simply the 10-digit phone number you entered when you registered. Whenever you need to verify your account or speak with pharmacy support, just provide your registered phone number.";
+
     case 'pricing':
       return "Our plans are very affordable. CareNow is 18 dollars and 99 cents a month for 24/7 virtual urgent care. CareNow plus Mental Wellness is 26 dollars and 99 cents. And CareComplete, with your own dedicated primary care doctor, is 34 dollars and 99 cents a month. All plans cover up to 7 family members with zero insurance needed.";
     

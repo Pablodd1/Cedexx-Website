@@ -31,6 +31,7 @@ Key facts about CEDEXX + Lyric Health:
 - No insurance needed, no co-pays. Pricing: CareNow™ $18.99/mo (Urgent care, up to 7 members), Mental Wellness $18.99/mo, CareNow+Mental $26.99/mo, CareComplete™ $34.99/mo, CareComplete Family™ $52.99/mo
 - Contact: Phone desk (754) 432-2201 (Mon-Fri 9am-6pm EST), Email support@cedexx.net
 - Instant confirmation receipt sent from support@cedexx.net upon purchase. Lyric welcome email arrives within 24-48 hours.
+- MEMBER ID: The head of household Member ID is the 10-digit phone number entered at registration. When verifying account status, contacting pharmacy support, or speaking with Member Services, provide this 10-digit phone number.
 - Active members in Lyric app can call Lyric Member Services at 1-866-223-8831
 - Health Blog (cedexx.net/blog): Articles on pediatric AI respiratory diagnostics (94% accuracy via audio), telehealth economics eliminating co-pays, heat hydration tips, and chronic asthma care.
 - Cedexx is NOT a healthcare provider — we are the technology platform. Lyric Health delivers all medical care.
