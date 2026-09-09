@@ -251,7 +251,7 @@ async function sendTelegram(member: any) {
 // ─── Lyric Bridge ───
 async function sendToLyric(member: any) {
   try {
-    const res = await fetch('https://cedexx.net/api/bridge/lyric', {
+    const res = await fetch('https://www.cedexx.net/api/bridge/lyric', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
