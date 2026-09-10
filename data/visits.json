@@ -6022,5 +6022,17 @@
     "lang": "en-US",
     "timestamp": "2026-09-10T10:36:45.740Z",
     "sessionId": "sess_1789036605742"
+  },
+  {
+    "id": "v_1789036657395_v0cb57",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Mozilla/5.0 (Linux; Android 16; SM-A166U Build/BP4A.251205.006) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/152.0.7977.72 Mobile Safari/537.36 [FB_IAB/FB4A;FBAV/577.0.0.50.72;IABMV/1;] FBNV/500",
+    "screen": "",
+    "lang": "en-US",
+    "timestamp": "2026-09-10T10:37:37.395Z",
+    "sessionId": "sess_1789036657397"
   }
 ]
