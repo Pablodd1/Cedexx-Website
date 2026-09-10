@@ -5722,5 +5722,17 @@
     "lang": "en-US",
     "timestamp": "2026-09-10T01:04:22.653Z",
     "sessionId": "sess_1789002262655"
+  },
+  {
+    "id": "v_1789002809492_djatuy",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Mobile Safari/537.36",
+    "screen": "",
+    "lang": "en-US",
+    "timestamp": "2026-09-10T01:13:29.492Z",
+    "sessionId": "sess_1789002809495"
   }
 ]
