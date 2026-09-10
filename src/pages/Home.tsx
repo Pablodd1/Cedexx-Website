@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion } from 'motion/react';
 import {
   ChevronRight, CheckCircle2, Shield, Clock, Activity,
   FileText, Users, TrendingDown, Zap, Video, Star, Heart, Smartphone, Building2,
@@ -14,10 +14,8 @@ import { Button } from '../components/ui';
 import { GuideCapture } from '../components/GuideCapture';
 import { PricingSection } from '../components/PricingSection';
 
-// Persona Images
+// Platform Images
 import momImg from '../assets/mom_wfh.png';
-import travelerImg from '../assets/traveler.png';
-import ceoImg from '../assets/ceo.png';
 
 const fadeIn = {
   initial: { opacity: 0, y: 30 },
@@ -26,40 +24,8 @@ const fadeIn = {
   transition: { duration: 0.6, ease: "easeOut" },
 };
 
-const TESTIMONIALS = [
-  {
-    category: "For Families",
-    image: momImg,
-    quote: "I can finally get my kids treated without missing work or waiting for hours at urgent care.",
-    author: "Modern WFH Parent",
-    detail: "Caring for her child while staying connected to work."
-  },
-  {
-    category: "For Travelers",
-    image: travelerImg,
-    quote: "I didn't have to wait hours in the urgent care for a doctor's note for my travel insurance.",
-    author: "Relieved Traveler",
-    detail: "Immediate support when travel plans get interrupted."
-  },
-  {
-    category: "For Employers",
-    image: ceoImg,
-    quote: "I have increased productivity with Cedexx Telemedicine and my employees are really enjoying this added value.",
-    author: "Organization CEO",
-    detail: "Strengthening workforce stability and benefit reach."
-  }
-];
-
 export function Home() {
   const { t } = useLanguage();
-  const [activeTestimonial, setActiveTestimonial] = useState(0);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setActiveTestimonial((prev) => (prev + 1) % TESTIMONIALS.length);
-    }, 6000);
-    return () => clearInterval(timer);
-  }, []);
 
   return (
     <div className="flex flex-col selection:bg-[#050249] selection:text-white">
@@ -389,59 +355,49 @@ export function Home() {
               </div>
             </motion.div>
 
-            {/* Rotating Testimonials with Multi-Persona Support */}
+            {/* Healthcare Platform Visual & Quality Badge */}
             <motion.div
-              className="relative aspect-[4/5] md:aspect-square overflow-hidden rounded-[4rem] group"
+              className="relative aspect-[4/5] md:aspect-square overflow-hidden rounded-[4rem] group shadow-2xl"
               {...fadeIn}
             >
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={activeTestimonial}
-                  initial={{ opacity: 0, scale: 1.1 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 1, ease: "easeInOut" }}
-                  className="absolute inset-0"
-                >
-                  <img
-                    src={TESTIMONIALS[activeTestimonial].image}
-                    alt={TESTIMONIALS[activeTestimonial].category}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#050249] via-transparent to-transparent opacity-90" />
+              <img
+                src={momImg}
+                alt="Connected Healthcare with Cedexx"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#050249] via-[#050249]/40 to-transparent opacity-90" />
 
-                  <div className="absolute bottom-0 left-0 w-full p-6 md:p-12">
-                    <motion.div
-                      initial={{ y: 20, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      transition={{ delay: 0.5 }}
-                      className="bg-white/95 backdrop-blur-md p-6 md:p-10 rounded-[2.5rem] shadow-2xl border border-white/50"
-                    >
-                      <div className="text-[10px] font-black tracking-[0.3em] uppercase text-blue-500 mb-4">
-                        {TESTIMONIALS[activeTestimonial].category}
-                      </div>
-                      <p className="text-[#050249] font-black text-lg md:text-2xl leading-tight mb-6">
-                        "{TESTIMONIALS[activeTestimonial].quote}"
-                      </p>
-                      <div className="flex items-center justify-between border-t border-slate-100 pt-6">
-                        <div>
-                          <p className="text-[#050249] font-black text-sm uppercase tracking-widest leading-none mb-1">
-                            {TESTIMONIALS[activeTestimonial].author}
-                          </p>
-                          <p className="text-slate-400 text-[10px] font-medium uppercase tracking-wider">
-                            {TESTIMONIALS[activeTestimonial].detail}
-                          </p>
-                        </div>
-                        <div className="flex gap-1">
-                          {[0, 1, 2].map(i => (
-                            <div key={i} className={`h-1.5 w-1.5 rounded-full transition-all duration-500 ${activeTestimonial === i ? 'w-6 bg-[#050249]' : 'bg-slate-200'}`} />
-                          ))}
-                        </div>
-                      </div>
-                    </motion.div>
+              <div className="absolute bottom-0 left-0 w-full p-6 md:p-12">
+                <div className="bg-white/95 backdrop-blur-md p-6 md:p-10 rounded-[2.5rem] shadow-2xl border border-white/50">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="h-2 w-2 rounded-full bg-[#23d9b0] animate-pulse"></span>
+                    <span className="text-[10px] font-black tracking-[0.3em] uppercase text-blue-600">
+                      Lyric Health Partner Network
+                    </span>
                   </div>
-                </motion.div>
-              </AnimatePresence>
+                  <p className="text-[#050249] font-black text-xl md:text-2xl leading-tight mb-4 tracking-tight">
+                    On-demand, board-certified care built for the moments that cannot wait.
+                  </p>
+                  <div className="grid grid-cols-2 gap-3 border-t border-slate-100 pt-4 text-xs font-bold text-slate-700">
+                    <div className="flex items-center gap-1.5">
+                      <CheckCircle2 className="h-4 w-4 text-[#23d9b0] shrink-0" />
+                      <span>24/7 Access</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <CheckCircle2 className="h-4 w-4 text-[#23d9b0] shrink-0" />
+                      <span>HIPAA Compliant</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <CheckCircle2 className="h-4 w-4 text-[#23d9b0] shrink-0" />
+                      <span>No Insurance Needed</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <CheckCircle2 className="h-4 w-4 text-[#23d9b0] shrink-0" />
+                      <span>Direct Prescriptions</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </motion.div>
           </div>
         </div>

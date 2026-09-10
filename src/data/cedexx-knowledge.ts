@@ -164,26 +164,8 @@ export const CEDEXX_KNOWLEDGE = {
     'Family plans cover up to 7 members',
   ],
 
-  testimonials: [
-    {
-      category: 'For Families',
-      quote: 'I can finally get my kids treated without missing work or waiting for hours at urgent care.',
-      author: 'Modern WFH Parent',
-    },
-    {
-      category: 'For Travelers',
-      quote: "I didn't have to wait hours in the urgent care for a doctor's note for my travel insurance.",
-      author: 'Relieved Traveler',
-    },
-    {
-      category: 'For Employers',
-      quote: 'I have increased productivity with Cedexx Telemedicine and my employees are really enjoying this added value.',
-      author: 'Organization CEO',
-    },
-  ],
-
   websitePages: [
-    { name: 'Home', path: '/', description: 'Hero, features, testimonials, partner form' },
+    { name: 'Home', path: '/', description: 'Hero, features, partner form' },
     { name: 'About', path: '/about', description: 'Mission, founders, team, values' },
     { name: 'Services', path: '/services', description: 'All 6 core services, detailed breakdown, property scale' },
     { name: 'Enroll', path: '/enroll', description: 'Enrollment form for individuals, families, seniors, facilities, employers' },
