@@ -5736,15 +5736,15 @@
     "sessionId": "sess_1789002809495"
   },
   {
-    "id": "v_1789003112879_7a9viv",
+    "id": "v_1789003113506_o89p26",
     "page": "/",
     "referrer": "direct",
     "country": "",
     "city": "",
-    "ua": "Mozilla/5.0 (Linux; Android 13; motorola edge 5G UW (2021) Build/T1RM33.1-110-17-8-2) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/152.0.7977.61 Mobile Safari/537.36 [FB_IAB/FB4A;FBAV/576.0.0.42.73;IABMV/1;]",
+    "ua": "Mozilla/5.0 (Linux; Android 13; motorola edge 5G UW (2021) Build/T1RM33.1-110-17-8-2) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/152.0.7977.61 Mobile Safari/537.36 [FB_IAB/FB4A;FBAV/576.0.0.42.73;IABMV/1;] FBNV/500",
     "screen": "",
     "lang": "en-US",
-    "timestamp": "2026-09-10T01:18:32.879Z",
-    "sessionId": "sess_1789003112881"
+    "timestamp": "2026-09-10T01:18:33.506Z",
+    "sessionId": "sess_1789003113508"
   }
 ]
