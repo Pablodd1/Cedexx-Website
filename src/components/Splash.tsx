@@ -27,12 +27,14 @@ export function Splash({ onFinish }: { onFinish: () => void }) {
             <video
               autoPlay
               muted
+              defaultMuted
               playsInline
               onEnded={() => {
                 setIsVisible(false);
                 setTimeout(onFinish, 500);
               }}
               src={splashVideo}
+              type="video/mp4"
               className="w-full h-full object-cover"
             />
           </div>

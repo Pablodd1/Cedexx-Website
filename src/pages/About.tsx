@@ -54,9 +54,11 @@ export function About() {
           <video 
             autoPlay 
             muted 
+            defaultMuted
             loop 
             playsInline 
             src={splashVideo}
+            type="video/mp4"
             className="w-full h-full object-cover opacity-20 grayscale brightness-125"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-[#050249] via-[#050249]/60 to-[#050249]" />

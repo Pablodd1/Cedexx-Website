@@ -38,8 +38,10 @@ export function Home() {
             autoPlay
             loop
             muted
+            defaultMuted
             playsInline
             src={heroVideo}
+            type="video/mp4"
             className="w-full h-full object-cover"
           />
         </div>
