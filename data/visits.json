@@ -6826,5 +6826,17 @@
     "lang": "en-US",
     "timestamp": "2026-09-15T16:19:03.040Z",
     "sessionId": "sess_1789489143040"
+  },
+  {
+    "id": "v_1789489149221_euzelx",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+    "screen": "",
+    "lang": "en-US",
+    "timestamp": "2026-09-15T16:19:09.221Z",
+    "sessionId": "sess_1789489149221"
   }
 ]
