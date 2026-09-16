@@ -7006,5 +7006,17 @@
     "lang": "",
     "timestamp": "2026-09-16T09:47:26.687Z",
     "sessionId": "sess_1789552046687"
+  },
+  {
+    "id": "v_1789560628139_szspem",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Mobile Safari/537.36",
+    "screen": "",
+    "lang": "en-US",
+    "timestamp": "2026-09-16T12:10:28.139Z",
+    "sessionId": "sess_1789560628142"
   }
 ]
