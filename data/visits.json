@@ -7426,5 +7426,17 @@
     "lang": "en-US",
     "timestamp": "2026-09-17T19:23:52.262Z",
     "sessionId": "sess_1789673032264"
+  },
+  {
+    "id": "v_1789673062174_s7ssn2",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+    "screen": "",
+    "lang": "en-US",
+    "timestamp": "2026-09-17T19:24:22.174Z",
+    "sessionId": "sess_1789673062176"
   }
 ]
