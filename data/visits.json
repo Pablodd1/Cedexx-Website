@@ -7570,5 +7570,17 @@
     "lang": "en-US",
     "timestamp": "2026-09-18T16:04:38.219Z",
     "sessionId": "sess_1789747478221"
+  },
+  {
+    "id": "v_1789752304628_71nin3",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm) Chrome/136.0.0.0 Safari/537.36 AppleWebKit/537.36 (KHTML, like Gecko; compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm) Chrome/116.0.1938.76 Safari/537.36",
+    "screen": "",
+    "lang": "",
+    "timestamp": "2026-09-18T17:25:04.628Z",
+    "sessionId": "sess_1789752304632"
   }
 ]
