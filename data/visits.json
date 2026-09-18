@@ -7522,5 +7522,17 @@
     "lang": "en-US",
     "timestamp": "2026-09-18T13:46:28.304Z",
     "sessionId": "sess_1789739188314"
+  },
+  {
+    "id": "v_1789739198565_uwgpl8",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.7444.162 Safari/537.36",
+    "screen": "",
+    "lang": "en-US",
+    "timestamp": "2026-09-18T13:46:38.565Z",
+    "sessionId": "sess_1789739198565"
   }
 ]
