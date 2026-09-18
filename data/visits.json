@@ -7486,5 +7486,17 @@
     "lang": "en-US",
     "timestamp": "2026-09-18T05:00:02.861Z",
     "sessionId": "sess_1789707602876"
+  },
+  {
+    "id": "v_1789724834007_4qwqo3",
+    "page": "/daily-smoke-test",
+    "referrer": "smoke-test-cron",
+    "country": "",
+    "city": "",
+    "ua": "curl/8.5.0",
+    "screen": "",
+    "lang": "",
+    "timestamp": "2026-09-18T09:47:14.007Z",
+    "sessionId": "sess_1789724834010"
   }
 ]
