@@ -7606,5 +7606,17 @@
     "lang": "zh-CN",
     "timestamp": "2026-09-19T06:49:46.088Z",
     "sessionId": "sess_1789800586098"
+  },
+  {
+    "id": "v_1789811243648_csvt8t",
+    "page": "smoke-test",
+    "referrer": "cron",
+    "country": "",
+    "city": "",
+    "ua": "curl/8.5.0",
+    "screen": "",
+    "lang": "",
+    "timestamp": "2026-09-19T09:47:23.658Z",
+    "sessionId": "sess_1789811243665"
   }
 ]
