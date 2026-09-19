@@ -322,7 +322,7 @@
       "state": "CA",
       "zipcode": "95337",
       "plan": "mental-wellness",
-      "status": "registered",
+      "status": "active",
       "registered_at": "2026-09-19T21:40:24.999Z",
       "checkout_started_at": null,
       "stripe_session_id": null,
@@ -330,7 +330,10 @@
       "consent_analytics": true,
       "consent_version": "2.0",
       "consent_timestamp": "2026-09-19T21:40:24.756Z",
-      "updated_at": "2026-09-19T21:41:46.574Z"
+      "updated_at": "2026-09-19T21:43:11.832Z",
+      "promo_code": "WELCOME1",
+      "activated_at": "2026-09-19T21:43:11.832Z",
+      "payment_method": "complimentary"
     }
   ],
   "created_at": "2026-09-01T23:00:00Z",
