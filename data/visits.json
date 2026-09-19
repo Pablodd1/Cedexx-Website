@@ -7918,5 +7918,17 @@
     "lang": "en-US",
     "timestamp": "2026-09-19T23:11:57.345Z",
     "sessionId": "sess_1789859517345"
+  },
+  {
+    "id": "v_1789859630701_6gcibh",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
+    "screen": "",
+    "lang": "en-US",
+    "timestamp": "2026-09-19T23:13:50.701Z",
+    "sessionId": "sess_1789859630703"
   }
 ]
