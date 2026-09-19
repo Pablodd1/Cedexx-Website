@@ -1,4 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { sendCustomerEnrollmentEmails, getAdminEmails } from './client-email.js';
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN || '';
 const REPO = 'Pablodd1/Cedexx-Website';
@@ -125,8 +126,9 @@ const PLAN_MAP: Record<string, string> = {
 };
 
 // ─── Email Helper ───
-async function sendEmail(to: string, subject: string, html: string, text: string) {
+async function sendEmail(to: string | string[], subject: string, html: string, text: string) {
   if (!RESEND_KEY) return;
+  const toList = Array.isArray(to) ? to : [to];
   try {
     await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -134,7 +136,7 @@ async function sendEmail(to: string, subject: string, html: string, text: string
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${RESEND_KEY}`,
       },
-      body: JSON.stringify({ from: FROM_EMAIL, to: [to], subject, html, text }),
+      body: JSON.stringify({ from: FROM_EMAIL, to: toList, subject, html, text }),
     });
   } catch (err) {
     console.error('[EMAIL ERROR]', err);
@@ -219,7 +221,8 @@ async function sendAdminNotification(member: any) {
       <p style="margin-top:20px;"><a href="https://cedexx.net/admin.html" style="background:#050249;color:#fff;padding:12px 24px;text-decoration:none;border-radius:6px;">View Dashboard</a></p>
     </div>
   `;
-  await sendEmail(ADMIN_EMAIL, subject, html, `Free enrollment: ${member.first_name} ${member.last_name}`);
+  const adminEmails = getAdminEmails();
+  await sendEmail(adminEmails, subject, html, `Free enrollment: ${member.first_name} ${member.last_name}`);
 }
 
 // ─── Telegram ───
@@ -405,7 +408,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // Send all notifications
     Promise.allSettled([
-      sendWelcomeEmail(newMember),
+      sendCustomerEnrollmentEmails({
+        first_name: newMember.first_name,
+        last_name: newMember.last_name,
+        email: newMember.email,
+        plan: newMember.plan,
+        phone: newMember.phone,
+        member_id: newMember.id,
+        zipcode: newMember.zipcode,
+        dob: newMember.dob,
+      }),
       sendAdminNotification(newMember),
       sendTelegram(newMember),
       sendToLyric(newMember),

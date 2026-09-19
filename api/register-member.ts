@@ -1,4 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { sendCustomerEnrollmentEmails, getAdminEmails } from './client-email.js';
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN || '';
 const REPO = 'Pablodd1/Cedexx-Website';
@@ -121,11 +122,12 @@ async function alertCritical(error: any, context: any) {
 }
 
 // ─── EMAIL (Resend API) ───
-async function sendResendEmail(to: string, subject: string, html: string, text: string) {
+async function sendResendEmail(to: string | string[], subject: string, html: string, text: string) {
   if (!RESEND_KEY) {
     console.log('[EMAIL] No RESEND_API_KEY configured');
     return;
   }
+  const toList = Array.isArray(to) ? to : [to];
   try {
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -135,7 +137,7 @@ async function sendResendEmail(to: string, subject: string, html: string, text: 
       },
       body: JSON.stringify({
         from: FROM_EMAIL,
-        to: [to],
+        to: toList,
         subject,
         html,
         text,
@@ -145,37 +147,11 @@ async function sendResendEmail(to: string, subject: string, html: string, text: 
       const err = await res.json().catch(() => ({}));
       console.error('[RESEND ERROR]', res.status, err);
     } else {
-      console.log('[EMAIL] Sent to', to);
+      console.log('[EMAIL] Sent to', toList);
     }
   } catch (err) {
     console.error('[RESEND ERROR]', err);
   }
-}
-
-async function sendWelcomeEmail(member: any) {
-  const subject = 'Welcome to CEDEXX — Your Health, Simplified';
-  const html = `
-    <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1a1a2e;">
-      <div style="background:linear-gradient(135deg,#00D4FF,#7B2FF7);padding:40px 20px;text-align:center;border-radius:12px 12px 0 0;">
-        <h1 style="color:#fff;margin:0;font-size:28px;">Welcome to CEDEXX</h1>
-        <p style="color:rgba(255,255,255,0.9);margin:10px 0 0;font-size:16px;">Your Health, Simplified</p>
-      </div>
-      <div style="padding:30px;background:#fff;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 12px 12px;">
-        <p style="font-size:18px;margin-bottom:20px;">Hi <strong>${member.first_name}</strong>,</p>
-        <p>Welcome to CEDEXX! You've taken the first step toward better health.</p>
-        <div style="background:#f8fafc;padding:20px;border-radius:8px;margin:20px 0;">
-          <p style="margin:0 0 10px;font-weight:600;">Your Registration Details:</p>
-          <p style="margin:5px 0;"><strong>Name:</strong> ${member.first_name} ${member.last_name}</p>
-          <p style="margin:5px 0;"><strong>Email:</strong> ${member.email}</p>
-          <p style="margin:5px 0;"><strong>Plan:</strong> ${member.plan || 'CareNow™'}</p>
-        </div>
-        <p>You'll receive another email when your account is fully activated.</p>
-        <p style="margin-top:30px;color:#6b7280;font-size:14px;">Questions? Reply to this email or contact us at <a href="mailto:support@cedexx.net">support@cedexx.net</a></p>
-      </div>
-    </div>
-  `;
-  const text = `Welcome to CEDEXX, ${member.first_name}!\n\nYour registration is confirmed.\nName: ${member.first_name} ${member.last_name}\nEmail: ${member.email}\nPlan: ${member.plan || 'CareNow™'}\n\nYou'll receive another email when your account is fully activated.`;
-  await sendResendEmail(member.email, subject, html, text);
 }
 
 async function sendCheckoutStartedEmail(member: any) {
@@ -218,7 +194,8 @@ async function sendAdminNotification(member: any, type: 'registration' | 'checko
       <p style="margin-top:20px;"><a href="https://cedexx.net/admin.html" style="background:#7B2FF7;color:#fff;padding:12px 24px;text-decoration:none;border-radius:6px;">View Dashboard</a></p>
     </div>
   `;
-  await sendResendEmail(ADMIN_EMAIL, subject, html, `New ${type}: ${member.first_name} ${member.last_name}`);
+  const adminEmails = getAdminEmails();
+  await sendResendEmail(adminEmails, subject, html, `New ${type}: ${member.first_name} ${member.last_name}`);
 }
 
 // ─── TELEGRAM ───
@@ -372,7 +349,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Send notifications (fire-and-forget)
     const notificationType = is_checkout ? 'checkout' : 'registration';
     Promise.allSettled([
-      is_checkout ? sendCheckoutStartedEmail(newMember) : sendWelcomeEmail(newMember),
+      is_checkout
+        ? sendCheckoutStartedEmail(newMember)
+        : sendCustomerEnrollmentEmails({
+            first_name: newMember.first_name,
+            last_name: newMember.last_name,
+            email: newMember.email,
+            plan: newMember.plan,
+            phone: newMember.phone,
+            member_id: newMember.id,
+            zipcode: newMember.zipcode,
+            dob: newMember.dob,
+          }),
       sendAdminNotification(newMember, notificationType),
       sendTelegramNotification(newMember, notificationType),
     ]).catch(() => {});

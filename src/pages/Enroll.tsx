@@ -269,9 +269,9 @@ export function Enroll() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] py-24 font-sans">
-      <div className="container mx-auto px-4 max-w-6xl">
-        <div className="text-center mb-16">
+    <div className="min-h-screen bg-[#F8FAFC] py-12 md:py-24 font-sans overflow-x-hidden">
+      <div className="container mx-auto px-4 sm:px-6 max-w-6xl w-full">
+        <div className="text-center mb-10 md:mb-16">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -279,14 +279,14 @@ export function Enroll() {
           >
             Join the Network
           </motion.div>
-          <h1 className="text-4xl md:text-6xl font-black text-[#050249] mb-6 tracking-tight italic uppercase">Better Care. Here. <span className="text-[#23d9b0]">Now.</span></h1>
-          <p className="text-xl text-slate-500 font-medium max-w-2xl mx-auto italic">Complete your enrollment in under 5 minutes and get immediate 24/7 access to board-certified care.</p>
+          <h1 className="text-3xl sm:text-4xl md:text-6xl font-black text-[#050249] mb-4 md:mb-6 tracking-tight italic uppercase">Better Care. Here. <span className="text-[#23d9b0]">Now.</span></h1>
+          <p className="text-base sm:text-xl text-slate-500 font-medium max-w-2xl mx-auto italic">Complete your enrollment in under 5 minutes and get immediate 24/7 access to board-certified care.</p>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-12 items-start">
+        <div className="grid lg:grid-cols-3 gap-8 lg:gap-12 items-start">
           {/* Left Column: Form */}
-          <div className="lg:col-span-2 order-2 lg:order-1">
-            <div className="bg-white rounded-[3rem] shadow-2xl border border-blue-50 p-8 md:p-12 max-w-3xl mx-auto">
+          <div className="lg:col-span-2 order-1 lg:order-1 w-full min-w-0">
+            <div className="bg-white rounded-2xl sm:rounded-3xl md:rounded-[3rem] shadow-2xl border border-blue-50 p-5 sm:p-8 md:p-12 max-w-3xl mx-auto w-full">
               
               {/* Progress Bar */}
               <div className="flex items-center justify-between mb-16 max-w-md mx-auto">
@@ -662,11 +662,11 @@ export function Enroll() {
           </div>
 
           {/* Right Column: Summary */}
-          <div className="lg:order-2 space-y-8">
-            <div className="bg-[#050249] text-white rounded-[3rem] p-10 shadow-2xl relative overflow-hidden">
+          <div className="order-2 lg:order-2 space-y-6 sm:space-y-8 w-full min-w-0">
+            <div className="bg-[#050249] text-white rounded-2xl sm:rounded-3xl md:rounded-[3rem] p-6 sm:p-8 md:p-10 shadow-2xl relative overflow-hidden w-full">
               <div className="absolute -top-10 -right-10 h-32 w-32 bg-blue-500/20 rounded-full blur-2xl" />
-              <h3 className="text-2xl font-black mb-8 italic uppercase tracking-tighter">Member Benefits</h3>
-              <ul className="space-y-6">
+              <h3 className="text-xl sm:text-2xl font-black mb-6 sm:mb-8 italic uppercase tracking-tighter">Member Benefits</h3>
+              <ul className="space-y-4 sm:space-y-6">
                 {[
                   '24/7/365 Unlimited Consults',
                   '$0 Co-pays & Hidden Fees',
@@ -675,31 +675,32 @@ export function Enroll() {
                   'Enterprise-Level Data Encryption',
                   'Digital School & Work Notes'
                 ].map((item, i) => (
-                  <li key={i} className="flex items-start gap-4 text-sm font-bold text-blue-100 italic">
-                    <CheckCircle2 className="h-6 w-6 text-blue-400 shrink-0" />
+                  <li key={i} className="flex items-start gap-3 sm:gap-4 text-xs sm:text-sm font-bold text-blue-100 italic">
+                    <CheckCircle2 className="h-5 w-5 sm:h-6 sm:w-6 text-blue-400 shrink-0" />
                     <span>{item}</span>
                   </li>
-                ))}              </ul>
+                ))}
+              </ul>
             </div>
 
-            <div className="bg-white rounded-[3rem] p-10 border border-blue-50 shadow-xl">
-              <div className="h-16 w-16 bg-[#EBF3FB] rounded-2xl flex items-center justify-center mb-6 text-[#050249] shadow-sm">
-                <Shield className="h-8 w-8" />
+            <div className="bg-white rounded-2xl sm:rounded-3xl md:rounded-[3rem] p-6 sm:p-8 md:p-10 border border-blue-50 shadow-xl w-full">
+              <div className="h-12 w-12 sm:h-16 sm:w-16 bg-[#EBF3FB] rounded-2xl flex items-center justify-center mb-4 sm:mb-6 text-[#050249] shadow-sm">
+                <Shield className="h-6 w-6 sm:h-8 sm:w-8" />
               </div>
-              <h3 className="font-black text-[#050249] text-xl mb-3 italic uppercase tracking-tighter">100% Satisfaction</h3>
-              <p className="text-sm text-slate-500 font-medium leading-relaxed italic">
+              <h3 className="font-black text-[#050249] text-lg sm:text-xl mb-2 sm:mb-3 italic uppercase tracking-tighter">100% Satisfaction</h3>
+              <p className="text-xs sm:text-sm text-slate-500 font-medium leading-relaxed italic">
                 Cancel your membership at any time with zero penalties. We are committed to frictionless healthcare.
               </p>
             </div>
             
-            <div className="bg-[#EBF3FB] p-8 rounded-[2.5rem] border border-blue-50">
+            <div className="bg-[#EBF3FB] p-5 sm:p-8 rounded-2xl sm:rounded-3xl md:rounded-[2.5rem] border border-blue-50 w-full">
                <div className="flex gap-4 items-center">
-                  <div className="h-12 w-12 rounded-full bg-white flex items-center justify-center text-[#050249] shadow-sm">
-                    <Users className="h-6 w-6" />
+                  <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-white flex items-center justify-center text-[#050249] shadow-sm shrink-0">
+                    <Users className="h-5 w-5 sm:h-6 sm:w-6" />
                   </div>
                   <div>
-                    <h4 className="font-black text-xs text-[#050249] uppercase tracking-widest italic">Active Members</h4>
-                    <p className="text-slate-500 text-sm font-bold italic">12,400+ Families Enrolled</p>
+                    <h4 className="font-black text-[10px] sm:text-xs text-[#050249] uppercase tracking-widest italic">Active Members</h4>
+                    <p className="text-slate-500 text-xs sm:text-sm font-bold italic">12,400+ Families Enrolled</p>
                   </div>
                </div>
             </div>

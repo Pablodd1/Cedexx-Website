@@ -76,7 +76,7 @@ assert(fs.existsSync(trackFormStartFile), 'api/track-form-start.ts endpoint exis
 const registerMemberFile = path.join(ROOT, 'api', 'register-member.ts');
 assert(fs.existsSync(registerMemberFile), 'api/register-member.ts endpoint exists');
 const registerContent = fs.readFileSync(registerMemberFile, 'utf8');
-assert(registerContent.includes('sendWelcomeEmail'), 'Automated member welcome email triggered on registration');
+assert(registerContent.includes('sendCustomerEnrollmentEmails') || registerContent.includes('sendWelcomeEmail'), 'Automated member welcome email triggered on registration');
 assert(registerContent.includes('sendCheckoutStartedEmail'), 'Checkout started email notification trigger active');
 assert(registerContent.includes('TELEGRAM_BOT'), 'Telegram notification alert trigger configured');
 

@@ -1,4 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { sendCustomerEnrollmentEmails } from '../client-email.js';
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN || '';
 const REPO = 'Pablodd1/Cedexx-Website';
@@ -272,6 +273,7 @@ async function sendPaymentConfirmation(data: any) {
 
 async function notifyAdmin(data: any) {
   if (RESEND_KEY) {
+    const adminRecipients = ['support@cedexx.net', 'daisy@cedexx.net', 'jasmelacosta@gmail.com'];
     fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
@@ -280,7 +282,7 @@ async function notifyAdmin(data: any) {
       },
       body: JSON.stringify({
         from: 'CEDEXX Notifications <support@cedexx.net>',
-        to: [ADMIN_EMAIL],
+        to: adminRecipients,
         subject: `💳 Payment Received — ${data.first_name} ${data.last_name}`,
         html: `<h2>New Payment</h2><p><strong>Name:</strong> ${data.first_name} ${data.last_name}</p><p><strong>Email:</strong> ${data.email}</p><p><strong>Plan:</strong> ${data.plan}</p><p><strong>Amount:</strong> $${((data.amount || 0) / 100).toFixed(2)}</p>`,
       }),
@@ -416,7 +418,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
         // Run all notifications in parallel, catch errors
         Promise.allSettled([
-          // 1. Send payment confirmation to patient
+          // 1. Send payment confirmation receipt to patient
           sendPaymentConfirmation({
             first_name: member.first_name || metadata.first_name || '',
             last_name: member.last_name || metadata.last_name || '',
@@ -429,10 +431,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             stripe_session_id: session.id,
           }),
 
-          // 2. Notify admin (email + Telegram + SMS)
+          // 2. Send both customer enrollment emails (Welcome to CEDEXX + "What Happens Next?" guide)
+          sendCustomerEnrollmentEmails({
+            first_name: member.first_name || metadata.first_name || '',
+            last_name: member.last_name || metadata.last_name || '',
+            email: member.email,
+            phone: member.phone || metadata.phone || '',
+            zipcode: member.zipcode || metadata.zipcode || '',
+            member_id: member.id || '',
+            plan: member.plan,
+            dob: member.dob || metadata.dob || '',
+          }),
+
+          // 3. Notify admin (email + Telegram + SMS)
           notifyAdmin(notifyPayload),
 
-          // 3. Send to Lyric Health enrollment team
+          // 4. Send to Lyric Health enrollment team
           sendToLyric(member, session),
         ]).then((results) => {
           // Log any failures

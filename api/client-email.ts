@@ -52,12 +52,13 @@ const FROM_DAISY = 'Daisy @ CEDEXX <daisy@cedexx.net>';
 const FROM_NOTIFICATIONS = 'CEDEXX Notifications <support@cedexx.net>';
 
 // ─── Admin Recipients ───
-function getAdminEmails(): string[] {
+export function getAdminEmails(): string[] {
   const raw = process.env.ADMIN_EMAIL || process.env.ADMIN_NOTIFICATION_EMAIL || 'support@cedexx.net';
   const emails = raw.split(/[,;]/).map(e => e.trim()).filter(Boolean);
-  // Always include support and daisy
-  if (!emails.includes('support@cedexx.net')) emails.push('support@cedexx.net');
-  if (!emails.includes('daisy@cedexx.net')) emails.push('daisy@cedexx.net');
+  const defaults = ['support@cedexx.net', 'daisy@cedexx.net', 'jasmelacosta@gmail.com'];
+  for (const d of defaults) {
+    if (!emails.includes(d)) emails.push(d);
+  }
   return emails;
 }
 
@@ -234,7 +235,7 @@ function baseTemplate(content: string): string {
   `.trim();
 }
 
-// ─── 1. Welcome Email (After Registration & Direct Enrollment) ───
+// ─── 1. Welcome Email (Email 1: Welcome & Registration Details) ───
 export async function sendWelcomeEmail(data: ClientEmailData) {
   const planName = planDisplayName(data.plan);
   const cleanPhone = (data.phone || '').replace(/\D/g, '').slice(-10);
@@ -253,7 +254,8 @@ export async function sendWelcomeEmail(data: ClientEmailData) {
         <tr><td style="padding:6px 0;border-bottom:1px solid #f1f5f9;color:#64748b;">Member Name</td><td style="padding:6px 0;border-bottom:1px solid #f1f5f9;text-align:right;font-weight:600;color:#0f172a;">${data.first_name} ${data.last_name}</td></tr>
         <tr><td style="padding:6px 0;border-bottom:1px solid #f1f5f9;color:#64748b;">Member ID / Phone</td><td style="padding:6px 0;border-bottom:1px solid #f1f5f9;text-align:right;font-weight:600;color:#050249;">${memberId}</td></tr>
         <tr><td style="padding:6px 0;border-bottom:1px solid #f1f5f9;color:#64748b;">Email Address</td><td style="padding:6px 0;border-bottom:1px solid #f1f5f9;text-align:right;font-weight:600;color:#0f172a;">${data.email}</td></tr>
-        <tr><td style="padding:6px 0;color:#64748b;">Selected Plan</td><td style="padding:6px 0;text-align:right;font-weight:600;color:#0f172a;">${planName}</td></tr>
+        <tr><td style="padding:6px 0;border-bottom:1px solid #f1f5f9;color:#64748b;">Selected Plan</td><td style="padding:6px 0;border-bottom:1px solid #f1f5f9;text-align:right;font-weight:600;color:#0f172a;">${planName}</td></tr>
+        <tr><td style="padding:6px 0;color:#64748b;">Status</td><td style="padding:6px 0;text-align:right;font-weight:700;color:#166534;">✓ Active / Confirmed</td></tr>
       </table>
     </div>
 
@@ -273,18 +275,11 @@ export async function sendWelcomeEmail(data: ClientEmailData) {
       </div>
     </div>
 
-    <!-- What Happens Next -->
-    <div style="margin:0 0 24px 0;">
-      <h3 style="margin:0 0 12px 0;color:#050249;font-size:16px;font-weight:700;">What Happens Next?</h3>
-      <p style="margin:0 0 16px 0;color:#374151;font-size:14px;line-height:1.6;">
-        You can locate your membership within the Lyric Health app upon receipt of your welcome email from Lyric Health. Be sure to select the <strong>"First-Time User?"</strong> link on the bottom right of the app, and if you have any questions please refer to the "What Happens Next" steps below:
+    <!-- Membership Access Note -->
+    <div style="margin:0 0 24px 0;padding:18px;background:#f8fafc;border-radius:12px;border:1px solid #e2e8f0;">
+      <p style="margin:0 0 12px 0;color:#374151;font-size:14px;line-height:1.6;">
+        You can locate your membership within the Lyric Health app upon receipt of your welcome email from Lyric Health. Be sure to select <strong>"First-Time User?"</strong> on the bottom right of the app, and if you have any questions please revert to your separate <strong>"What Happens Next"</strong> email for complete instructions. Feel free to visit our website for additional support.
       </p>
-      <ol style="margin:0 0 16px 0;padding-left:20px;color:#374151;font-size:14px;line-height:1.8;">
-        <li><strong>Wait for Activation Email:</strong> You will receive setup instructions from <a href="mailto:noreply@getlyric.com" style="color:#050249;text-decoration:underline;">noreply@getlyric.com</a> within 24–48 hours. Please check your Inbox and spam/junk folder.</li>
-        <li><strong>Select First-Time User:</strong> Open the Lyric Health app and tap <em>"First Time User?"</em> at the bottom right.</li>
-        <li><strong>Verify Your Account:</strong> Enter your Last Name, Date of Birth, and ZIP Code ${data.zipcode ? `(<strong>${data.zipcode}</strong>)` : ''} to link your membership.</li>
-        <li><strong>Access 24/7 Care:</strong> Connect with board-certified doctors anytime via phone or secure video.</li>
-      </ol>
     </div>
 
     <!-- FAQ & Support -->
@@ -314,74 +309,80 @@ export async function sendWelcomeEmail(data: ClientEmailData) {
   });
 }
 
-// ─── 2. Payment Confirmation & "What Happens Next" Email (Immediate Upon Purchasing) ───
-export async function sendPaymentConfirmation(data: ClientEmailData & { amount?: number; stripe_session_id?: string }) {
+// ─── 2. "What Happens Next?" Email (Email 2: Dedicated Reference Guide) ───
+export async function sendWhatHappensNextEmail(data: ClientEmailData) {
   const planName = planDisplayName(data.plan);
-  const price = data.plan_price || planPrice(data.plan);
-  const amountText = data.amount ? `$${(data.amount / 100).toFixed(2)}` : price;
   const cleanPhone = (data.phone || '').replace(/\D/g, '').slice(-10);
   const memberId = data.member_id || (cleanPhone.length === 10 ? cleanPhone : data.phone || 'Your Phone Number');
 
   const html = baseTemplate(`
-    <h2 style="margin:0 0 16px 0;color:#050249;font-size:22px;font-weight:700;">Hi ${data.first_name},</h2>
+    <h2 style="margin:0 0 16px 0;color:#050249;font-size:22px;font-weight:700;">What Happens Next?</h2>
     <p style="margin:0 0 20px 0;color:#374151;font-size:15px;line-height:1.6;">
-      Welcome to <strong>CEDEXX</strong>! You've taken the first step towards better health. Please download the Lyric Health app from your app store.
+      Hi <strong>${data.first_name}</strong>, now that you're registered for <strong>${planName}</strong>, here is your quick reference guide on what to expect and how to access your 24/7 care through Lyric Health.
     </p>
 
-    <!-- Registration & Payment Details -->
-    <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:20px;margin:0 0 24px 0;">
-      <h3 style="margin:0 0 14px 0;color:#050249;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">Your Registration Details</h3>
-      <table style="width:100%;font-size:14px;color:#374151;border-collapse:collapse;">
-        <tr><td style="padding:6px 0;border-bottom:1px solid #f1f5f9;color:#64748b;">Member Name</td><td style="padding:6px 0;border-bottom:1px solid #f1f5f9;text-align:right;font-weight:600;color:#0f172a;">${data.first_name} ${data.last_name}</td></tr>
-        <tr><td style="padding:6px 0;border-bottom:1px solid #f1f5f9;color:#64748b;">Member ID / Phone</td><td style="padding:6px 0;border-bottom:1px solid #f1f5f9;text-align:right;font-weight:600;color:#050249;">${memberId}</td></tr>
-        <tr><td style="padding:6px 0;border-bottom:1px solid #f1f5f9;color:#64748b;">Email Address</td><td style="padding:6px 0;border-bottom:1px solid #f1f5f9;text-align:right;font-weight:600;color:#0f172a;">${data.email}</td></tr>
-        <tr><td style="padding:6px 0;border-bottom:1px solid #f1f5f9;color:#64748b;">Selected Plan</td><td style="padding:6px 0;border-bottom:1px solid #f1f5f9;text-align:right;font-weight:600;color:#0f172a;">${planName}</td></tr>
-        <tr><td style="padding:6px 0;border-bottom:1px solid #f1f5f9;color:#64748b;">Amount Paid</td><td style="padding:6px 0;border-bottom:1px solid #f1f5f9;text-align:right;font-weight:600;color:#166534;">${amountText}</td></tr>
-        <tr><td style="padding:6px 0;color:#64748b;">Status</td><td style="padding:6px 0;text-align:right;font-weight:700;color:#166534;">✓ Active / Paid</td></tr>
-      </table>
-    </div>
+    <!-- Step-by-Step Instructions -->
+    <div style="margin:0 0 24px 0;">
+      <div style="margin-bottom:16px;padding:16px;background:#f8fafc;border-radius:12px;border:1px solid #e2e8f0;">
+        <p style="margin:0 0 4px 0;color:#050249;font-size:15px;font-weight:700;">1. Allow 24–48 Hours for Account Provisioning</p>
+        <p style="margin:0;color:#4b5563;font-size:13px;line-height:1.6;">
+          Lyric Health requires 24 to 48 hours to credential and establish your member profile in their nationwide medical provider network. Watch for an email from <a href="mailto:noreply@getlyric.com" style="color:#050249;font-weight:600;text-decoration:underline;">noreply@getlyric.com</a> (be sure to check spam/junk).
+        </p>
+      </div>
 
-    <!-- Download App Links -->
-    <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:20px;margin:0 0 24px 0;text-align:center;">
-      <h3 style="margin:0 0 8px 0;color:#1e40af;font-size:15px;font-weight:700;">Download the Lyric Health App</h3>
-      <p style="margin:0 0 16px 0;color:#3b82f6;font-size:13px;line-height:1.5;">
-        Telehealth consultations and prescriptions are powered by Lyric Health.
-      </p>
-      <div style="margin:0 auto;">
-        <a href="https://play.google.com/store/apps/details?id=com.lyric.app" target="_blank" style="display:inline-block;background:#050249;color:#ffffff;text-decoration:none;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:600;margin:4px 6px;">
-          🤖 Google Play Store
-        </a>
-        <a href="https://apps.apple.com/us/app/lyric-health/id1607146169" target="_blank" style="display:inline-block;background:#050249;color:#ffffff;text-decoration:none;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:600;margin:4px 6px;">
-          🍏 Apple App Store
-        </a>
+      <div style="margin-bottom:16px;padding:16px;background:#f8fafc;border-radius:12px;border:1px solid #e2e8f0;">
+        <p style="margin:0 0 4px 0;color:#050249;font-size:15px;font-weight:700;">2. Download the Lyric Health App</p>
+        <p style="margin:0 0 10px 0;color:#4b5563;font-size:13px;line-height:1.6;">
+          Search "Lyric Health" in your mobile device's app store or use the direct buttons below:
+        </p>
+        <div style="margin:0;">
+          <a href="https://play.google.com/store/apps/details?id=com.lyric.app" target="_blank" style="display:inline-block;background:#050249;color:#ffffff;text-decoration:none;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:600;margin:2px 4px 2px 0;">
+            🤖 Google Play Store
+          </a>
+          <a href="https://apps.apple.com/us/app/lyric-health/id1607146169" target="_blank" style="display:inline-block;background:#050249;color:#ffffff;text-decoration:none;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:600;margin:2px 4px 2px 0;">
+            🍏 Apple App Store
+          </a>
+        </div>
+      </div>
+
+      <div style="margin-bottom:16px;padding:16px;background:#f0fdf4;border-radius:12px;border:1px solid #bbf7d0;">
+        <p style="margin:0 0 4px 0;color:#166534;font-size:15px;font-weight:700;">3. Tap "First Time User?"</p>
+        <p style="margin:0;color:#334155;font-size:13px;line-height:1.6;">
+          Open the app and select the link at the bottom right next to <strong>"First Time User?"</strong> to locate your membership.
+        </p>
+      </div>
+
+      <div style="margin-bottom:16px;padding:16px;background:#f8fafc;border-radius:12px;border:1px solid #e2e8f0;">
+        <p style="margin:0 0 4px 0;color:#050249;font-size:15px;font-weight:700;">4. Verify Your Account Details</p>
+        <p style="margin:0 0 6px 0;color:#4b5563;font-size:13px;line-height:1.6;">
+          Enter your information exactly as registered on CEDEXX:
+        </p>
+        <table style="width:100%;font-size:13px;color:#374151;border-collapse:collapse;">
+          <tr><td style="padding:4px 0;color:#64748b;">• Last Name:</td><td style="padding:4px 0;font-weight:600;">${data.last_name}</td></tr>
+          <tr><td style="padding:4px 0;color:#64748b;">• Date of Birth:</td><td style="padding:4px 0;font-weight:600;">${data.dob || 'As registered on CEDEXX'}</td></tr>
+          <tr><td style="padding:4px 0;color:#64748b;">• ZIP Code:</td><td style="padding:4px 0;font-weight:600;">${data.zipcode || 'As registered on CEDEXX'}</td></tr>
+          <tr><td style="padding:4px 0;color:#64748b;">• Member ID / Phone:</td><td style="padding:4px 0;font-weight:600;">${memberId}</td></tr>
+        </table>
+      </div>
+
+      <div style="margin-bottom:16px;padding:16px;background:#f8fafc;border-radius:12px;border:1px solid #e2e8f0;">
+        <p style="margin:0 0 4px 0;color:#050249;font-size:15px;font-weight:700;">5. Access 24/7 Care with Board-Certified Doctors</p>
+        <p style="margin:0;color:#4b5563;font-size:13px;line-height:1.6;">
+          Once verified, you're ready! Request urgent care consults, speak to a doctor via phone or video, get prescriptions sent directly to your local pharmacy, and connect with mental health specialists—all with $0 consult fees.
+        </p>
       </div>
     </div>
 
-    <!-- What Happens Next -->
-    <div style="margin:0 0 24px 0;">
-      <h3 style="margin:0 0 12px 0;color:#050249;font-size:16px;font-weight:700;">What Happens Next?</h3>
-      <p style="margin:0 0 16px 0;color:#374151;font-size:14px;line-height:1.6;">
-        You can locate your membership within the Lyric Health app upon receipt of your welcome email from Lyric Health. Be sure to select the <strong>"First-Time User?"</strong> link on the bottom right of the app, and if you have any questions please refer to your "What Happens Next" steps below:
-      </p>
-      <ol style="margin:0 0 16px 0;padding-left:20px;color:#374151;font-size:14px;line-height:1.8;">
-        <li><strong>Wait for Activation Email:</strong> Please allow 24–48 hours for Lyric Health to provision your membership. You'll receive an email from <a href="mailto:noreply@getlyric.com" style="color:#050249;text-decoration:underline;">noreply@getlyric.com</a> (be sure to check spam/junk).</li>
-        <li><strong>Open the Lyric Health App:</strong> Launch the app and select the link at the bottom right next to <em>"First Time User?"</em>.</li>
-        <li><strong>Verify Your Account:</strong> Enter your Last Name, Date of Birth, and ZIP Code ${data.zipcode ? `(<strong>${data.zipcode}</strong>)` : ''}.</li>
-        <li><strong>Enjoy 24/7 Access:</strong> Once verified, consult with board-certified physicians, request prescription refills, or access mental health services with $0 copay.</li>
-      </ol>
-    </div>
-
-    <!-- FAQ & Support -->
-    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:20px;margin:0 0 24px 0;text-align:center;">
-      <p style="margin:0 0 12px 0;color:#166534;font-size:14px;font-weight:600;">
-        Have questions? Check our FAQ or reach out anytime!
-      </p>
-      <a href="${CEDEXX_URL}/#faq" style="display:inline-block;background:#166534;color:#ffffff;text-decoration:none;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;">
-        View CEDEXX FAQs →
-      </a>
-      <p style="margin:12px 0 0 0;color:#4b5563;font-size:12px;">
-        Feel free to visit our website for additional support or email us at <a href="mailto:support@cedexx.net" style="color:#050249;text-decoration:underline;">support@cedexx.net</a>.
-      </p>
+    <!-- FAQ & Assistance -->
+    <div style="background:#f8fafc;border-radius:12px;padding:20px;margin:0 0 24px 0;border:1px solid #e2e8f0;font-size:13px;color:#475569;line-height:1.6;">
+      <p style="margin:0 0 8px;font-weight:700;color:#050249;">Need Live Support?</p>
+      <p style="margin:0 0 6px;">• <strong>Lyric Health Member Services:</strong> <a href="tel:18662238831" style="color:#050249;font-weight:700;text-decoration:none;">1-866-223-8831</a> (24/7 app and clinical care support)</p>
+      <p style="margin:0 0 10px;">• <strong>CEDEXX Support:</strong> <a href="mailto:support@cedexx.net" style="color:#050249;font-weight:700;text-decoration:none;">support@cedexx.net</a> • (754) 432-2201</p>
+      <div style="text-align:center;margin-top:14px;">
+        <a href="${CEDEXX_URL}/#faq" style="display:inline-block;background:#050249;color:#ffffff;text-decoration:none;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;">
+          Read Frequently Asked Questions (FAQ) →
+        </a>
+      </div>
     </div>
 
     <p style="margin:0;color:#050249;font-size:14px;line-height:1.6;font-weight:700;">
@@ -392,7 +393,65 @@ export async function sendPaymentConfirmation(data: ClientEmailData & { amount?:
   await sendViaResend({
     from: FROM_CLIENT,
     to: [data.email],
-    subject: `✓ Welcome to CEDEXX — What Happens Next & Your ${planName} Details`,
+    subject: `What Happens Next? — Step-by-Step Guide to Accessing Your CEDEXX Care`,
+    html,
+    replyTo: 'support@cedexx.net',
+  });
+}
+
+// ─── 3. Send Both Customer Enrollment Emails (Email 1 + Email 2) ───
+export async function sendCustomerEnrollmentEmails(data: ClientEmailData) {
+  return Promise.allSettled([
+    sendWelcomeEmail(data),
+    sendWhatHappensNextEmail(data),
+  ]);
+}
+
+// ─── 4. Payment Confirmation Email (Immediate Upon Purchasing) ───
+export async function sendPaymentConfirmation(data: ClientEmailData & { amount?: number; stripe_session_id?: string }) {
+  const planName = planDisplayName(data.plan);
+  const price = data.plan_price || planPrice(data.plan);
+  const amountText = data.amount ? `$${(data.amount / 100).toFixed(2)}` : price;
+  const cleanPhone = (data.phone || '').replace(/\D/g, '').slice(-10);
+  const memberId = data.member_id || (cleanPhone.length === 10 ? cleanPhone : data.phone || 'Your Phone Number');
+
+  const html = baseTemplate(`
+    <h2 style="margin:0 0 16px 0;color:#050249;font-size:22px;font-weight:700;">Payment Confirmed!</h2>
+    <p style="margin:0 0 20px 0;color:#374151;font-size:15px;line-height:1.6;">
+      Hi <strong>${data.first_name}</strong>, thank you for your purchase! Your payment has been processed successfully.
+    </p>
+
+    <!-- Payment Details -->
+    <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:20px;margin:0 0 24px 0;">
+      <h3 style="margin:0 0 14px 0;color:#050249;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">Payment Receipt</h3>
+      <table style="width:100%;font-size:14px;color:#374151;border-collapse:collapse;">
+        <tr><td style="padding:6px 0;border-bottom:1px solid #f1f5f9;color:#64748b;">Member Name</td><td style="padding:6px 0;border-bottom:1px solid #f1f5f9;text-align:right;font-weight:600;color:#0f172a;">${data.first_name} ${data.last_name}</td></tr>
+        <tr><td style="padding:6px 0;border-bottom:1px solid #f1f5f9;color:#64748b;">Member ID / Phone</td><td style="padding:6px 0;border-bottom:1px solid #f1f5f9;text-align:right;font-weight:600;color:#050249;">${memberId}</td></tr>
+        <tr><td style="padding:6px 0;border-bottom:1px solid #f1f5f9;color:#64748b;">Selected Plan</td><td style="padding:6px 0;border-bottom:1px solid #f1f5f9;text-align:right;font-weight:600;color:#0f172a;">${planName}</td></tr>
+        <tr><td style="padding:6px 0;border-bottom:1px solid #f1f5f9;color:#64748b;">Amount Paid</td><td style="padding:6px 0;border-bottom:1px solid #f1f5f9;text-align:right;font-weight:600;color:#166534;">${amountText}</td></tr>
+        <tr><td style="padding:6px 0;color:#64748b;">Status</td><td style="padding:6px 0;text-align:right;font-weight:700;color:#166534;">✓ Paid / Confirmed</td></tr>
+      </table>
+    </div>
+
+    <p style="margin:0 0 20px 0;color:#374151;font-size:14px;line-height:1.6;">
+      We have sent your official <strong>Welcome to CEDEXX</strong> email and your step-by-step <strong>"What Happens Next?"</strong> guide to your email address (<strong>${data.email}</strong>). Please check your Inbox and Spam/Junk folder.
+    </p>
+
+    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:20px;margin:0 0 24px 0;text-align:center;">
+      <a href="${CEDEXX_URL}/#faq" style="display:inline-block;background:#166534;color:#ffffff;text-decoration:none;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;">
+        View CEDEXX FAQs & Support →
+      </a>
+    </div>
+
+    <p style="margin:0;color:#050249;font-size:14px;line-height:1.6;font-weight:700;">
+      CEDEXX Healthcare Team — Better Care. Here. Now.
+    </p>
+  `);
+
+  await sendViaResend({
+    from: FROM_CLIENT,
+    to: [data.email],
+    subject: `✓ Payment Receipt — Your ${planName} is Confirmed`,
     html,
     replyTo: 'support@cedexx.net',
   });
