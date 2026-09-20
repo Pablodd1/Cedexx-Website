@@ -82,16 +82,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       console.log('[PROMO DEBUG] Found via PromotionCode:', promo.id, '→ coupon:', coupon?.id);
     }
 
-    // ─── Strategy 2: Look up as a Coupon (direct coupon ID) ───
+    // ─── Strategy 2: Look up as a Coupon (try exact case, then lowercase) ───
     if (!coupon) {
-      try {
-        const couponResult: any = await stripe.coupons.retrieve(normalizedCode.toLowerCase());
-        if (couponResult && !couponResult.deleted) {
-          coupon = couponResult as Stripe.Coupon;
-          console.log('[PROMO DEBUG] Found via Coupon ID:', coupon.id);
+      const idsToTry = [normalizedCode, normalizedCode.toLowerCase()];
+      for (const couponId of idsToTry) {
+        try {
+          const couponResult: any = await stripe.coupons.retrieve(couponId);
+          if (couponResult && !couponResult.deleted) {
+            coupon = couponResult as Stripe.Coupon;
+            console.log('[PROMO DEBUG] Found via Coupon ID:', coupon.id);
+            break;
+          }
+        } catch (err) {
+          console.log('[PROMO DEBUG] Coupon lookup failed for', couponId, ':', (err as Error).message);
         }
-      } catch (err) {
-        console.log('[PROMO DEBUG] Coupon lookup failed (expected if not a coupon):', (err as Error).message);
       }
     }
 
