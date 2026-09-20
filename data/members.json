@@ -376,11 +376,11 @@
       "state": "",
       "zipcode": "33101",
       "plan": "carenow",
-      "status": "active",
+      "status": "registered",
       "promo_code": "WELCOME1",
       "registered_at": "2026-09-20T09:54:06.412Z",
       "activated_at": "2026-09-20T09:54:06.412Z",
-      "updated_at": "2026-09-20T09:54:06.412Z",
+      "updated_at": "2026-09-20T09:54:39.327Z",
       "payment_method": "complimentary",
       "stripe_customer_id": null,
       "stripe_subscription_id": null
