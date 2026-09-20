@@ -126,26 +126,29 @@ const PLAN_MAP: Record<string, string> = {
 };
 
 // ─── Email Helper ───
-async function sendEmail(to: string | string[], subject: string, html: string, text: string) {
+async function sendEmail(to: string | string[], subject: string, html: string, text: string, cc?: string | string[]) {
   if (!RESEND_KEY) {
     console.error('[EMAIL ERROR] RESEND_API_KEY not configured');
     return;
   }
   const toList = Array.isArray(to) ? to : [to];
+  const ccList = cc ? (Array.isArray(cc) ? cc : [cc]) : undefined;
   try {
+    const body: any = { from: FROM_EMAIL, to: toList, subject, html, text };
+    if (ccList) body.cc = ccList;
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${RESEND_KEY}`,
       },
-      body: JSON.stringify({ from: FROM_EMAIL, to: toList, subject, html, text }),
+      body: JSON.stringify(body),
     });
     if (!res.ok) {
       const errBody = await res.text();
       console.error('[EMAIL ERROR] Resend returned', res.status, errBody);
     } else {
-      console.log('[EMAIL] Sent to', toList.join(', '));
+      console.log('[EMAIL] Sent to', toList.join(', '), ccList ? `CC: ${ccList.join(', ')}` : '');
     }
   } catch (err) {
     console.error('[EMAIL ERROR]', err);
@@ -230,8 +233,11 @@ async function sendAdminNotification(member: any) {
       <p style="margin-top:20px;"><a href="https://cedexx.net/admin.html" style="background:#050249;color:#fff;padding:12px 24px;text-decoration:none;border-radius:6px;">View Dashboard</a></p>
     </div>
   `;
+  // Send to primary admin as TO, CC secondary admins so reply-all includes everyone
   const adminEmails = getAdminEmails();
-  await sendEmail(adminEmails, subject, html, `Free enrollment: ${member.first_name} ${member.last_name}`);
+  const toAdmin = adminEmails[0] || ADMIN_EMAIL;
+  const ccAdmins = adminEmails.slice(1); // CC the rest
+  await sendEmail(toAdmin, subject, html, `Free enrollment: ${member.first_name} ${member.last_name}`, ccAdmins.length > 0 ? ccAdmins : undefined);
 }
 
 // ─── Telegram ───

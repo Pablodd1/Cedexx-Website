@@ -122,32 +122,35 @@ async function alertCritical(error: any, context: any) {
 }
 
 // ─── EMAIL (Resend API) ───
-async function sendResendEmail(to: string | string[], subject: string, html: string, text: string) {
+async function sendResendEmail(to: string | string[], subject: string, html: string, text: string, cc?: string | string[]) {
   if (!RESEND_KEY) {
     console.log('[EMAIL] No RESEND_API_KEY configured');
     return;
   }
   const toList = Array.isArray(to) ? to : [to];
+  const ccList = cc ? (Array.isArray(cc) ? cc : [cc]) : undefined;
   try {
+    const body: any = {
+      from: FROM_EMAIL,
+      to: toList,
+      subject,
+      html,
+      text,
+    };
+    if (ccList) body.cc = ccList;
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${RESEND_KEY}`,
       },
-      body: JSON.stringify({
-        from: FROM_EMAIL,
-        to: toList,
-        subject,
-        html,
-        text,
-      }),
+      body: JSON.stringify(body),
     });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
       console.error('[RESEND ERROR]', res.status, err);
     } else {
-      console.log('[EMAIL] Sent to', toList);
+      console.log('[EMAIL] Sent to', toList, ccList ? `CC: ${ccList}` : '');
     }
   } catch (err) {
     console.error('[RESEND ERROR]', err);
@@ -194,8 +197,11 @@ async function sendAdminNotification(member: any, type: 'registration' | 'checko
       <p style="margin-top:20px;"><a href="https://cedexx.net/admin.html" style="background:#7B2FF7;color:#fff;padding:12px 24px;text-decoration:none;border-radius:6px;">View Dashboard</a></p>
     </div>
   `;
+  // Send to primary admin as TO, CC secondary admins so reply-all includes everyone
   const adminEmails = getAdminEmails();
-  await sendResendEmail(adminEmails, subject, html, `New ${type}: ${member.first_name} ${member.last_name}`);
+  const toAdmin = adminEmails[0] || 'support@cedexx.net';
+  const ccAdmins = adminEmails.slice(1); // CC the rest
+  await sendResendEmail(toAdmin, subject, html, `New ${type}: ${member.first_name} ${member.last_name}`, ccAdmins.length > 0 ? ccAdmins : undefined);
 }
 
 // ─── TELEGRAM ───

@@ -6,37 +6,41 @@ async function sendViaResend({
   subject,
   html,
   replyTo,
+  cc,
 }: {
   from: string;
   to: string[];
   subject: string;
   html: string;
   replyTo?: string;
+  cc?: string[];
 }) {
   if (!RESEND_KEY) {
     console.log('[CLIENT EMAIL] No RESEND_API_KEY configured');
     return;
   }
   try {
+    const body: any = {
+      from,
+      to,
+      subject,
+      html,
+      ...(replyTo ? { reply_to: replyTo } : {}),
+      ...(cc ? { cc } : {}),
+    };
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${RESEND_KEY}`,
       },
-      body: JSON.stringify({
-        from,
-        to,
-        subject,
-        html,
-        ...(replyTo ? { reply_to: replyTo } : {}),
-      }),
+      body: JSON.stringify(body),
     });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
       console.error('[CLIENT EMAIL ERROR]', res.status, err);
     } else {
-      console.log('[CLIENT EMAIL] Sent to', to);
+      console.log('[CLIENT EMAIL] Sent to', to, cc ? `CC: ${cc}` : '');
     }
   } catch (err) {
     console.error('[CLIENT EMAIL FAILED]', err);
