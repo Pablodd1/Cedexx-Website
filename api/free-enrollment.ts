@@ -127,10 +127,13 @@ const PLAN_MAP: Record<string, string> = {
 
 // ─── Email Helper ───
 async function sendEmail(to: string | string[], subject: string, html: string, text: string) {
-  if (!RESEND_KEY) return;
+  if (!RESEND_KEY) {
+    console.error('[EMAIL ERROR] RESEND_API_KEY not configured');
+    return;
+  }
   const toList = Array.isArray(to) ? to : [to];
   try {
-    await fetch('https://api.resend.com/emails', {
+    const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -138,6 +141,12 @@ async function sendEmail(to: string | string[], subject: string, html: string, t
       },
       body: JSON.stringify({ from: FROM_EMAIL, to: toList, subject, html, text }),
     });
+    if (!res.ok) {
+      const errBody = await res.text();
+      console.error('[EMAIL ERROR] Resend returned', res.status, errBody);
+    } else {
+      console.log('[EMAIL] Sent to', toList.join(', '));
+    }
   } catch (err) {
     console.error('[EMAIL ERROR]', err);
   }
@@ -357,13 +366,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
       await writeMembers(members);
 
-      // Send notifications
-      Promise.allSettled([
+      // Send notifications (synchronous so errors surface)
+      const emailResults = await Promise.allSettled([
         sendWelcomeEmail(existing),
         sendAdminNotification(existing),
         sendTelegram(existing),
         sendToLyric(existing),
-      ]).catch(() => {});
+      ]);
+      
+      emailResults.forEach((r, i) => {
+        if (r.status === 'rejected') {
+          console.error(`[FREE ENROLLMENT] Notification ${i} failed:`, r.reason);
+        }
+      });
 
       return res.status(200).json({
         success: true,
@@ -406,22 +421,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     members.push(newMember);
     await writeMembers(members);
 
-    // Send all notifications
-    Promise.allSettled([
-      sendCustomerEnrollmentEmails({
-        first_name: newMember.first_name,
-        last_name: newMember.last_name,
-        email: newMember.email,
-        plan: newMember.plan,
-        phone: newMember.phone,
-        member_id: newMember.id,
-        zipcode: newMember.zipcode,
-        dob: newMember.dob,
-      }),
+    // Send all notifications (synchronous so errors surface)
+    const emailResults = await Promise.allSettled([
+      sendWelcomeEmail(newMember),
       sendAdminNotification(newMember),
       sendTelegram(newMember),
       sendToLyric(newMember),
-    ]).catch(() => {});
+    ]);
+    
+    // Log any email failures for debugging
+    emailResults.forEach((r, i) => {
+      if (r.status === 'rejected') {
+        console.error(`[FREE ENROLLMENT] Notification ${i} failed:`, r.reason);
+      }
+    });
 
     return res.status(200).json({
       success: true,
