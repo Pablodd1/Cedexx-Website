@@ -493,6 +493,27 @@
       "payment_method": "complimentary",
       "stripe_customer_id": null,
       "stripe_subscription_id": null
+    },
+    {
+      "id": "3055553333",
+      "first_name": "SyncTest",
+      "last_name": "EmailFlow",
+      "email": "sync-email-test@gmail.com",
+      "phone": "3055553333",
+      "dob": "",
+      "address": "",
+      "city": "",
+      "state": "",
+      "zipcode": "",
+      "plan": "carenow",
+      "status": "registered",
+      "registered_at": "2026-09-20T15:37:37.885Z",
+      "checkout_started_at": null,
+      "stripe_session_id": null,
+      "consent_tos": false,
+      "consent_analytics": false,
+      "consent_version": "1.0",
+      "consent_timestamp": "2026-09-20T15:37:37.885Z"
     }
   ],
   "created_at": "2026-09-01T23:00:00Z",
