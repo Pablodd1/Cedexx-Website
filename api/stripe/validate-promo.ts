@@ -99,6 +99,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
     }
 
+    // ─── Strategy 3: List all coupons and match by ID or name (case-insensitive) ───
+    if (!coupon) {
+      try {
+        const allCoupons = await stripe.coupons.list({ limit: 100 });
+        const search = normalizedCode.toLowerCase();
+        const match = allCoupons.data.find((c: Stripe.Coupon) =>
+          !c.deleted && (
+            (c.id && c.id.toLowerCase() === search) ||
+            (c.name && c.name.toLowerCase() === search)
+          )
+        );
+        if (match) {
+          coupon = match;
+          console.log('[PROMO DEBUG] Found via coupon list match:', match.id);
+        }
+      } catch (err) {
+        console.log('[PROMO DEBUG] Coupon list search failed:', (err as Error).message);
+      }
+    }
+
     if (!coupon) {
       return res.status(400).json({
         success: false,
