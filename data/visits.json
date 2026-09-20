@@ -8086,5 +8086,17 @@
     "lang": "en-US",
     "timestamp": "2026-09-20T00:50:21.943Z",
     "sessionId": "sess_1789865421943"
+  },
+  {
+    "id": "v_1789865430073_ppd4jw",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 26_6_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/154.0.8037.41 Mobile/15E148 Safari/604.1",
+    "screen": "",
+    "lang": "en-US",
+    "timestamp": "2026-09-20T00:50:30.073Z",
+    "sessionId": "sess_1789865430073"
   }
 ]
