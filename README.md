@@ -19,3 +19,4 @@ View your app in AI Studio: https://ai.studio/apps/887fac06-564b-42aa-8256-31d6b
 3. Run the app:
    `npm run dev`
 
+# Deploy trigger: activate RESEND_API_KEY env var 2026-09-20T15:15:45Z
