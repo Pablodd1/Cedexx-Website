@@ -8410,5 +8410,17 @@
     "lang": "en-US",
     "timestamp": "2026-09-21T06:03:33.947Z",
     "sessionId": "sess_1789970613949"
+  },
+  {
+    "id": "v_1789970615402_tzftwv",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; HubSpot Crawler; +https://www.hubspot.com) Chrome/131.0.0.0 Safari/537.36",
+    "screen": "",
+    "lang": "en-US",
+    "timestamp": "2026-09-21T06:03:35.402Z",
+    "sessionId": "sess_1789970615402"
   }
 ]
