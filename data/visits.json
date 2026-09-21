@@ -8626,5 +8626,17 @@
     "lang": "en-US",
     "timestamp": "2026-09-21T17:44:29.331Z",
     "sessionId": "sess_1790012669331"
+  },
+  {
+    "id": "v_1790012788181_m53b51",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Mozilla/5.0 (X11; CrOS x86_64 14541.0.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+    "screen": "",
+    "lang": "en-US",
+    "timestamp": "2026-09-21T17:46:28.181Z",
+    "sessionId": "sess_1790012788184"
   }
 ]
