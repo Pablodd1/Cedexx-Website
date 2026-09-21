@@ -8506,5 +8506,17 @@
     "lang": "en-US",
     "timestamp": "2026-09-21T13:17:34.592Z",
     "sessionId": "sess_1789996654596"
+  },
+  {
+    "id": "v_1789998932124_hfg9fs",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "curl/8.5.0",
+    "screen": "",
+    "lang": "",
+    "timestamp": "2026-09-21T13:55:32.124Z",
+    "sessionId": "sess_1789998932126"
   }
 ]
