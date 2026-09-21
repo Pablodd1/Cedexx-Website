@@ -8542,5 +8542,17 @@
     "lang": "en-US",
     "timestamp": "2026-09-21T13:59:15.101Z",
     "sessionId": "sess_1789999155101"
+  },
+  {
+    "id": "v_1789999158604_dhrpvl",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.7444.163 Safari/537.36",
+    "screen": "",
+    "lang": "en-US",
+    "timestamp": "2026-09-21T13:59:18.604Z",
+    "sessionId": "sess_1789999158604"
   }
 ]
