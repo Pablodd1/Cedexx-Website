@@ -8422,5 +8422,17 @@
     "lang": "en-US",
     "timestamp": "2026-09-21T06:03:35.402Z",
     "sessionId": "sess_1789970615402"
+  },
+  {
+    "id": "v_1789984001205_bf5kf4",
+    "page": "/smoke-test",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "curl/8.5.0",
+    "screen": "",
+    "lang": "",
+    "timestamp": "2026-09-21T09:46:41.205Z",
+    "sessionId": "sess_1789984001210"
   }
 ]
