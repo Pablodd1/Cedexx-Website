@@ -8818,5 +8818,17 @@
     "lang": "",
     "timestamp": "2026-09-22T09:01:05.353Z",
     "sessionId": "sess_1790067665356"
+  },
+  {
+    "id": "v_1790070432609_45hu1p",
+    "page": "/smoke-test",
+    "referrer": "daily-check",
+    "country": "",
+    "city": "",
+    "ua": "curl/8.5.0",
+    "screen": "",
+    "lang": "",
+    "timestamp": "2026-09-22T09:47:12.609Z",
+    "sessionId": "sess_1790070432612"
   }
 ]
