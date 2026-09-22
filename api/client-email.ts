@@ -289,13 +289,13 @@ export async function sendWelcomeEmail(data: ClientEmailData) {
     <!-- FAQ & Support -->
     <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:20px;margin:0 0 24px 0;text-align:center;">
       <p style="margin:0 0 12px 0;color:#166534;font-size:14px;font-weight:600;">
-        Have questions? We're here to help!
+        Have questions? Need step-by-step guidance on account setup?
       </p>
-      <a href="${CEDEXX_URL}/#faq" style="display:inline-block;background:#166534;color:#ffffff;text-decoration:none;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;">
-        View CEDEXX FAQs →
+      <a href="${CEDEXX_URL}/faq" style="display:inline-block;background:#166534;color:#ffffff;text-decoration:none;padding:12px 24px;border-radius:8px;font-size:13px;font-weight:700;">
+        View Frequently Asked Questions (FAQ) →
       </a>
       <p style="margin:12px 0 0 0;color:#4b5563;font-size:12px;">
-        Feel free to visit our website for additional support or email us at <a href="mailto:support@cedexx.net" style="color:#050249;text-decoration:underline;">support@cedexx.net</a>.
+        Feel free to visit the FAQ tab on our website for additional support or email us at <a href="mailto:support@cedexx.net" style="color:#050249;text-decoration:underline;">support@cedexx.net</a>.
       </p>
     </div>
 
@@ -383,7 +383,7 @@ export async function sendWhatHappensNextEmail(data: ClientEmailData) {
       <p style="margin:0 0 6px;">• <strong>Lyric Health Member Services:</strong> <a href="tel:18662238831" style="color:#050249;font-weight:700;text-decoration:none;">1-866-223-8831</a> (24/7 app and clinical care support)</p>
       <p style="margin:0 0 10px;">• <strong>CEDEXX Support:</strong> <a href="mailto:support@cedexx.net" style="color:#050249;font-weight:700;text-decoration:none;">support@cedexx.net</a> • (754) 432-2201</p>
       <div style="text-align:center;margin-top:14px;">
-        <a href="${CEDEXX_URL}/#faq" style="display:inline-block;background:#050249;color:#ffffff;text-decoration:none;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;">
+        <a href="${CEDEXX_URL}/faq" style="display:inline-block;background:#050249;color:#ffffff;text-decoration:none;padding:12px 24px;border-radius:8px;font-size:13px;font-weight:700;">
           Read Frequently Asked Questions (FAQ) →
         </a>
       </div>
@@ -442,8 +442,8 @@ export async function sendPaymentConfirmation(data: ClientEmailData & { amount?:
     </p>
 
     <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:20px;margin:0 0 24px 0;text-align:center;">
-      <a href="${CEDEXX_URL}/#faq" style="display:inline-block;background:#166534;color:#ffffff;text-decoration:none;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;">
-        View CEDEXX FAQs & Support →
+      <a href="${CEDEXX_URL}/faq" style="display:inline-block;background:#166534;color:#ffffff;text-decoration:none;padding:12px 24px;border-radius:8px;font-size:13px;font-weight:700;">
+        View Frequently Asked Questions (FAQ) & Support →
       </a>
     </div>
 

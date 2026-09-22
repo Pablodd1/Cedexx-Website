@@ -99,8 +99,8 @@ export function Layout() {
                 { to: '/about', label: t('nav.about') },
                 { to: '/services', label: t('nav.services') },
                 { to: '/pricing', label: 'Pricing' },
+                { to: '/faq', label: t('nav.faq') },
                 { to: '/blog', label: t('nav.blog') },
-                { to: '/press-release', label: t('nav.press') },
                 { to: '/partners', label: t('nav.partners') },
                 { to: '/contact', label: t('nav.contact') },
               ].map((link) => {
@@ -169,8 +169,8 @@ export function Layout() {
                 { key: 'nav.about', to: '/about' },
                 { key: 'nav.services', to: '/services' },
                 { key: 'Pricing', to: '/pricing' },
+                { key: 'nav.faq', to: '/faq' },
                 { key: 'nav.blog', to: '/blog' },
-                { key: 'nav.press', to: '/press-release' },
                 { key: 'nav.partners', to: '/partners' },
                 { key: 'nav.contact', to: '/contact' },
               ].map(item => (
@@ -243,6 +243,7 @@ export function Layout() {
               <li><Link to="/about" className="hover:text-white transition-colors">{t('nav.about')}</Link></li>
               <li><Link to="/services" className="hover:text-white transition-colors">{t('nav.services')}</Link></li>
               <li><Link to="/pricing" className="hover:text-white transition-colors">Pricing</Link></li>
+              <li><Link to="/faq" className="hover:text-white transition-colors">{t('nav.faq')}</Link></li>
               <li><Link to="/blog" className="hover:text-white transition-colors">{t('nav.blog')}</Link></li>
               <li><Link to="/press-release" className="hover:text-white transition-colors">{t('nav.press')}</Link></li>
               <li><Link to="/partners" className="hover:text-white transition-colors">{t('nav.partners')}</Link></li>

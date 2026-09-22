@@ -234,6 +234,11 @@ async function sendPaymentConfirmation(data: any) {
                     <p style="margin:0;">
                       • <strong>CEDEXX Support:</strong> <a href="mailto:support@cedexx.net" style="color:#050249;font-weight:700;text-decoration:none;">support@cedexx.net</a> • (754) 432-2201
                     </p>
+                    <div style="margin-top:16px;text-align:center;">
+                      <a href="https://www.cedexx.net/faq" style="display:inline-block;background:#050249;color:#ffffff;text-decoration:none;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:700;">
+                        View Frequently Asked Questions (FAQ) →
+                      </a>
+                    </div>
                   </div>
                 </td>
               </tr>

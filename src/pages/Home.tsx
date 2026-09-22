@@ -508,7 +508,7 @@ export function Home() {
       </section>
 
       {/* ── FAQ SECTION ── */}
-      <section className="py-40 bg-white relative overflow-hidden">
+      <section id="faq" className="py-40 bg-white relative overflow-hidden">
         <div className="container mx-auto px-6">
           <div className="text-center mb-24">
             <h2 className="text-3xl md:text-6xl font-black text-[#050249] mb-8 leading-none tracking-tighter uppercase italic">Frequently Asked Questions</h2>
@@ -545,6 +545,15 @@ export function Home() {
                 </p>
               </motion.div>
             ))}
+          </div>
+
+          <div className="text-center mt-16">
+            <Link
+              to="/faq"
+              className="inline-block bg-[#050249] hover:bg-[#03013b] text-white px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-widest transition-all shadow-xl hover:scale-105"
+            >
+              Explore Full FAQ & Patient Resource Guide →
+            </Link>
           </div>
         </div>
       </section>

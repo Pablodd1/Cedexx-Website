@@ -15,6 +15,7 @@ import { Partners } from './pages/Partners';
 import { PressRelease } from './pages/PressRelease';
 import { Contact } from './pages/Contact';
 import { Pricing } from './pages/Pricing';
+import { FAQ } from './pages/FAQ';
 import { ScheduleDemo } from './pages/ScheduleDemo';
 import VideoLibrary from './pages/VideoLibrary';
 import { InvestorPitch } from './pages/InvestorPitch';
@@ -58,6 +59,7 @@ export default function App() {
               <Route path="payment-cancel" element={<PaymentCancel />} />
               <Route path="partners" element={<Partners />} />
               <Route path="pricing" element={<Pricing />} />
+              <Route path="faq" element={<FAQ />} />
               <Route path="press-release" element={<PressRelease />} />
               <Route path="investor-pitch" element={<InvestorPitch />} />
               <Route path="contact" element={<Contact />} />
