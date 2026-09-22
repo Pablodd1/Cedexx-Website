@@ -8902,5 +8902,17 @@
     "lang": "en-US",
     "timestamp": "2026-09-22T12:29:14.532Z",
     "sessionId": "sess_1790080154533"
+  },
+  {
+    "id": "v_1790080266853_wwismg",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.7390.0 Safari/537.36",
+    "screen": "",
+    "lang": "en-US",
+    "timestamp": "2026-09-22T12:31:06.853Z",
+    "sessionId": "sess_1790080266855"
   }
 ]
