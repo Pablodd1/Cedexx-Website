@@ -9238,5 +9238,17 @@
     "lang": "en-US",
     "timestamp": "2026-09-22T17:44:57.364Z",
     "sessionId": "sess_1790099097367"
+  },
+  {
+    "id": "v_1790099107904_ldnyk0",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.7444.175 Safari/537.36",
+    "screen": "",
+    "lang": "en-US",
+    "timestamp": "2026-09-22T17:45:07.904Z",
+    "sessionId": "sess_1790099107904"
   }
 ]
