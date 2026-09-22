@@ -9046,5 +9046,17 @@
     "lang": "en-US",
     "timestamp": "2026-09-22T13:09:12.232Z",
     "sessionId": "sess_1790082552232"
+  },
+  {
+    "id": "v_1790082555450_3jasce",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
+    "screen": "",
+    "lang": "en-US",
+    "timestamp": "2026-09-22T13:09:15.450Z",
+    "sessionId": "sess_1790082555450"
   }
 ]
