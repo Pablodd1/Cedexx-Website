@@ -9706,5 +9706,17 @@
     "lang": "en-US",
     "timestamp": "2026-09-23T20:19:19.259Z",
     "sessionId": "sess_1790194759259"
+  },
+  {
+    "id": "v_1790196200429_kkato3",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+    "screen": "",
+    "lang": "",
+    "timestamp": "2026-09-23T20:43:20.429Z",
+    "sessionId": "sess_1790196200445"
   }
 ]
