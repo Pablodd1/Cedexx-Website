@@ -9286,5 +9286,17 @@
     "lang": "",
     "timestamp": "2026-09-22T20:11:58.942Z",
     "sessionId": "sess_1790107918952"
+  },
+  {
+    "id": "v_1790123233847_rfete7",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm) Chrome/136.0.0.0 Safari/537.36 AppleWebKit/537.36 (KHTML, like Gecko; compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm) Chrome/116.0.1938.76 Safari/537.36",
+    "screen": "",
+    "lang": "",
+    "timestamp": "2026-09-23T00:27:13.847Z",
+    "sessionId": "sess_1790123233850"
   }
 ]
