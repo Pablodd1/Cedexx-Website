@@ -9310,5 +9310,17 @@
     "lang": "en-US",
     "timestamp": "2026-09-23T04:18:36.695Z",
     "sessionId": "sess_1790137116698"
+  },
+  {
+    "id": "v_1790137701828_enyfaq",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.6.1 Safari/605.1.15",
+    "screen": "",
+    "lang": "en-us",
+    "timestamp": "2026-09-23T04:28:21.828Z",
+    "sessionId": "sess_1790137701831"
   }
 ]
