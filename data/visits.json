@@ -9322,5 +9322,17 @@
     "lang": "en-us",
     "timestamp": "2026-09-23T04:28:21.828Z",
     "sessionId": "sess_1790137701831"
+  },
+  {
+    "id": "v_1790137709044_njbiva",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.6.1 Safari/605.1.15",
+    "screen": "",
+    "lang": "en-us",
+    "timestamp": "2026-09-23T04:28:29.044Z",
+    "sessionId": "sess_1790137709044"
   }
 ]
