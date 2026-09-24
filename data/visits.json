@@ -9766,5 +9766,17 @@
     "lang": "en-US",
     "timestamp": "2026-09-23T20:44:07.175Z",
     "sessionId": "sess_1790196247177"
+  },
+  {
+    "id": "v_1790217309802_tc0y2a",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Mozilla/5.0 (compatible; AhrefsBot/7.0; +http://ahrefs.com/robot/)",
+    "screen": "",
+    "lang": "",
+    "timestamp": "2026-09-24T02:35:09.802Z",
+    "sessionId": "sess_1790217309805"
   }
 ]
