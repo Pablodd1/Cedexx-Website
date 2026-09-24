@@ -605,7 +605,11 @@
       "updated_at": "2026-09-24T13:07:34.696Z",
       "payment_method": "complimentary",
       "stripe_customer_id": null,
-      "stripe_subscription_id": null
+      "stripe_subscription_id": null,
+      "lyric_synced": true,
+      "lyric_synced_at": "2026-09-24T13:07:36.360Z",
+      "lyric_sync_method": "email",
+      "lyric_sync_attempts": 1
     }
   ],
   "created_at": "2026-09-01T23:00:00Z",
