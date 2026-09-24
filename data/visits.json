@@ -9862,5 +9862,17 @@
     "lang": "en-US",
     "timestamp": "2026-09-24T15:28:45.797Z",
     "sessionId": "sess_1790263725801"
+  },
+  {
+    "id": "v_1790263735410_oxt68z",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
+    "screen": "",
+    "lang": "en-US",
+    "timestamp": "2026-09-24T15:28:55.410Z",
+    "sessionId": "sess_1790263735410"
   }
 ]
