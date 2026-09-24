@@ -9910,5 +9910,17 @@
     "lang": "en-US",
     "timestamp": "2026-09-24T15:48:01.131Z",
     "sessionId": "sess_1790264881134"
+  },
+  {
+    "id": "v_1790264935719_grvoph",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36",
+    "screen": "",
+    "lang": "en-US",
+    "timestamp": "2026-09-24T15:48:55.719Z",
+    "sessionId": "sess_1790264935722"
   }
 ]
