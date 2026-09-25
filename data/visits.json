@@ -10366,5 +10366,17 @@
     "lang": "en-US",
     "timestamp": "2026-09-25T20:29:26.719Z",
     "sessionId": "sess_1790368166719"
+  },
+  {
+    "id": "v_1790368366598_uvutlx",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.7444.163 Safari/537.36",
+    "screen": "",
+    "lang": "en-US",
+    "timestamp": "2026-09-25T20:32:46.598Z",
+    "sessionId": "sess_1790368366600"
   }
 ]
