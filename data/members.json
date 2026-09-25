@@ -611,6 +611,27 @@
       "lyric_synced_at": "2026-09-24T13:07:36.360Z",
       "lyric_sync_method": "email",
       "lyric_sync_attempts": 1
+    },
+    {
+      "id": "2094959998",
+      "first_name": "Adriel",
+      "last_name": "Ruiz",
+      "email": "ruizadriel24@gmail.com",
+      "phone": "2094959998",
+      "dob": "2004-04-15",
+      "address": "1737 nighthawk way",
+      "city": "Modesto",
+      "state": "CA",
+      "zipcode": "95358",
+      "plan": "carenow",
+      "status": "registered",
+      "registered_at": "2026-09-25T22:12:56.743Z",
+      "checkout_started_at": null,
+      "stripe_session_id": null,
+      "consent_tos": true,
+      "consent_analytics": true,
+      "consent_version": "2.0",
+      "consent_timestamp": "2026-09-25T22:12:56.476Z"
     }
   ],
   "created_at": "2026-09-01T23:00:00Z",
