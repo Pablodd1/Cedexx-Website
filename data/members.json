@@ -624,15 +624,15 @@
       "state": "CA",
       "zipcode": "95358",
       "plan": "carenow",
-      "status": "registered",
+      "status": "checkout_started",
       "registered_at": "2026-09-25T22:12:56.743Z",
-      "checkout_started_at": null,
+      "checkout_started_at": "2026-09-25T22:13:30.752Z",
       "stripe_session_id": null,
       "consent_tos": true,
       "consent_analytics": true,
       "consent_version": "2.0",
       "consent_timestamp": "2026-09-25T22:12:56.476Z",
-      "updated_at": "2026-09-25T22:13:11.458Z"
+      "updated_at": "2026-09-25T22:13:30.752Z"
     }
   ],
   "created_at": "2026-09-01T23:00:00Z",
