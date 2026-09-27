@@ -10558,5 +10558,17 @@
     "lang": "zh-CN",
     "timestamp": "2026-09-27T13:26:27.060Z",
     "sessionId": "sess_1790515587063"
+  },
+  {
+    "id": "v_1790522066375_ddnpp2",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+    "screen": "",
+    "lang": "en-US",
+    "timestamp": "2026-09-27T15:14:26.375Z",
+    "sessionId": "sess_1790522066378"
   }
 ]
