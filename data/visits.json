@@ -10582,5 +10582,17 @@
     "lang": "en-US",
     "timestamp": "2026-09-27T20:00:38.832Z",
     "sessionId": "sess_1790539238836"
+  },
+  {
+    "id": "v_1790545529505_gody1r",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Mobile Safari/537.36",
+    "screen": "",
+    "lang": "en-US",
+    "timestamp": "2026-09-27T21:45:29.505Z",
+    "sessionId": "sess_1790545529514"
   }
 ]
