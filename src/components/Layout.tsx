@@ -244,6 +244,7 @@ export function Layout() {
               <li><Link to="/services" className="hover:text-white transition-colors">{t('nav.services')}</Link></li>
               <li><Link to="/pricing" className="hover:text-white transition-colors">Pricing</Link></li>
               <li><Link to="/faq" className="hover:text-white transition-colors">{t('nav.faq')}</Link></li>
+              <li><Link to="/video_library" className="hover:text-white transition-colors">Video Library</Link></li>
               <li><Link to="/blog" className="hover:text-white transition-colors">{t('nav.blog')}</Link></li>
               <li><Link to="/press-release" className="hover:text-white transition-colors">{t('nav.press')}</Link></li>
               <li><Link to="/partners" className="hover:text-white transition-colors">{t('nav.partners')}</Link></li>

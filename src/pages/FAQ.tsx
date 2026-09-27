@@ -15,7 +15,11 @@ import {
   CheckCircle2, 
   AlertTriangle,
   FileText,
-  Users
+  Users,
+  Play,
+  ExternalLink,
+  CreditCard,
+  Loader2
 } from 'lucide-react';
 
 interface FAQItem {
@@ -111,7 +115,7 @@ const FAQ_DATA: FAQItem[] = [
     id: 'cancellation-policy',
     category: 'billing',
     question: "How do I cancel or modify my membership?",
-    answer: "You may cancel your CEDEXX membership at any time with zero cancellation penalties or fees. To cancel, email support@cedexx.net with 'Cancellation' in the subject line. Please include your Full Name, Date of Birth, registered Email Address, and Phone Number so we can locate your record. Cancellations take effect at the end of your current billing cycle.",
+    answer: "You may manage, update payment methods, or cancel your CEDEXX membership at any time with zero cancellation penalties or fees. You can use our self-service Stripe Customer Portal below to manage your subscription directly, or email support@cedexx.net with 'Cancellation' in the subject line. Please include your Full Name and registered Email Address. Cancellations take effect at the end of your current billing cycle.",
   },
   {
     id: 'contact-lyric-vs-cedexx',
@@ -147,6 +151,44 @@ export function FAQ() {
     'post-purchase-steps': true,
     'first-time-user-setup': true,
   });
+
+  // Self-Service Customer Portal state
+  const [portalEmail, setPortalEmail] = useState<string>('');
+  const [portalLoading, setPortalLoading] = useState<boolean>(false);
+  const [portalMsg, setPortalMsg] = useState<{ type: 'error' | 'success'; text: string } | null>(null);
+
+  const handleOpenPortal = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!portalEmail || !portalEmail.includes('@')) {
+      setPortalMsg({ type: 'error', text: 'Please enter a valid email address.' });
+      return;
+    }
+    setPortalLoading(true);
+    setPortalMsg(null);
+    try {
+      const res = await fetch('/api/stripe/customer-portal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: portalEmail.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setPortalMsg({
+          type: 'error',
+          text: data.error || 'No active billing record found with this email. Please check your email or contact support@cedexx.net.',
+        });
+      } else if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch (err: any) {
+      setPortalMsg({
+        type: 'error',
+        text: 'Unable to connect to Stripe portal. Please try again or email support@cedexx.net.',
+      });
+    } finally {
+      setPortalLoading(false);
+    }
+  };
 
   const toggleItem = (id: string) => {
     setOpenItems(prev => ({ ...prev, [id]: !prev[id] }));
@@ -303,6 +345,75 @@ export function FAQ() {
         </div>
       </section>
 
+      {/* ── VIDEO WALKTHROUGH GUIDES ── */}
+      <section className="container mx-auto px-6 max-w-5xl mt-12">
+        <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 sm:p-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-xl bg-blue-50 text-[#050249] flex items-center justify-center">
+                <Play className="h-5 w-5 fill-current" />
+              </div>
+              <div>
+                <h3 className="text-lg font-black text-[#050249] uppercase tracking-tight">
+                  Video Guides & Demonstrations
+                </h3>
+                <p className="text-xs text-slate-500 font-medium">
+                  Watch quick step-by-step videos on how to activate your app and connect with a doctor.
+                </p>
+              </div>
+            </div>
+            <Link
+              to="/video_library"
+              className="text-xs font-bold text-blue-600 hover:text-blue-800 inline-flex items-center gap-1 self-start sm:self-auto"
+            >
+              Browse Full Video Library <span aria-hidden="true">&rarr;</span>
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-slate-50 rounded-2xl overflow-hidden border border-slate-100 shadow-sm">
+              <div className="aspect-video relative bg-slate-900">
+                <iframe
+                  className="w-full h-full"
+                  src="https://www.youtube.com/embed/Xp8BWVtL474?modestbranding=1&rel=0"
+                  title="How to Connect with a Lyric Health Provider"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-view; web-share"
+                  allowFullScreen
+                />
+              </div>
+              <div className="p-4">
+                <h4 className="font-black text-sm text-[#050249] mb-1">
+                  How to Connect with a Lyric Health Provider
+                </h4>
+                <p className="text-xs text-slate-500">
+                  Walkthrough of the consultation request process and speaking with a board-certified physician.
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-slate-50 rounded-2xl overflow-hidden border border-slate-100 shadow-sm">
+              <div className="aspect-video relative bg-slate-900">
+                <iframe
+                  className="w-full h-full"
+                  src="https://www.youtube.com/embed/8Ens9KdhOpo?modestbranding=1&rel=0"
+                  title="Lyric Health Virtual Care for Families"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-view; web-share"
+                  allowFullScreen
+                />
+              </div>
+              <div className="p-4">
+                <h4 className="font-black text-sm text-[#050249] mb-1">
+                  Virtual Care for Families & Dependents
+                </h4>
+                <p className="text-xs text-slate-500">
+                  How family members and minor dependents access pediatric visits and prescription refills.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ── CATEGORY FILTER TABS ── */}
       <section className="container mx-auto px-6 max-w-5xl mt-16">
         <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
@@ -412,8 +523,61 @@ export function FAQ() {
         )}
       </section>
 
+      {/* ── SELF-SERVICE BILLING & SUBSCRIPTION MANAGEMENT ── */}
+      <section className="container mx-auto px-6 max-w-5xl mt-16">
+        <div className="bg-gradient-to-r from-blue-900 via-[#050249] to-blue-950 text-white rounded-3xl p-8 sm:p-10 shadow-xl border border-blue-800/40 relative overflow-hidden">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="max-w-xl">
+              <span className="text-[10px] font-black uppercase tracking-widest text-[#23d9b0] bg-white/10 px-3 py-1 rounded-full border border-white/10">
+                Self-Service Member Portal
+              </span>
+              <h3 className="text-xl sm:text-2xl font-black mt-3 uppercase italic tracking-tight flex items-center gap-2">
+                <CreditCard className="h-6 w-6 text-[#23d9b0]" />
+                Manage Your Subscription & Billing
+              </h3>
+              <p className="text-xs sm:text-sm text-blue-100/80 font-medium leading-relaxed mt-2">
+                Need to update your payment method, view past invoices, or modify your subscription? Enter your registered email to open your secure Stripe Customer Portal.
+              </p>
+            </div>
+
+            <form onSubmit={handleOpenPortal} className="w-full md:w-auto flex-1 max-w-md">
+              <div className="flex flex-col sm:flex-row gap-3">
+                <input
+                  type="email"
+                  required
+                  placeholder="Enter your registered email..."
+                  value={portalEmail}
+                  onChange={(e) => setPortalEmail(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder:text-blue-200/50 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#23d9b0]"
+                />
+                <button
+                  type="submit"
+                  disabled={portalLoading}
+                  className="bg-[#23d9b0] hover:bg-[#1eb996] text-[#050249] text-xs font-black uppercase tracking-wider px-5 py-3 rounded-xl whitespace-nowrap transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  {portalLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <>
+                      <span>Open Portal</span>
+                      <ExternalLink className="h-3.5 w-3.5" />
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {portalMsg && (
+                <p className={`text-xs mt-2 font-medium ${portalMsg.type === 'error' ? 'text-amber-300' : 'text-emerald-300'}`}>
+                  {portalMsg.text}
+                </p>
+              )}
+            </form>
+          </div>
+        </div>
+      </section>
+
       {/* ── STILL NEED HELP? SUPPORT CARD ── */}
-      <section className="container mx-auto px-6 max-w-5xl mt-20">
+      <section className="container mx-auto px-6 max-w-5xl mt-12">
         <div className="bg-[#050249] text-white rounded-3xl p-8 sm:p-12 shadow-2xl relative overflow-hidden">
           <div className="absolute top-0 right-0 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl pointer-events-none" />
 

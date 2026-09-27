@@ -19,17 +19,25 @@ export function PartnerForm() {
     t('role.physician'),
     t('role.affiliate'),
     'Hospitality Partner',
-    'Housing / REIT Partner'
+    'Housing / REIT Partner',
+    'Broker / Agent'
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      await fetch('/api/partner-lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+    } catch (err) {
+      console.error('[PARTNER FORM SUBMISSION ERROR]', err);
+    } finally {
       setIsSubmitting(false);
       setIsSent(true);
-    }, 1500);
+    }
   };
 
   if (isSent) {
