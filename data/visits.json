@@ -10978,5 +10978,17 @@
     "lang": "",
     "timestamp": "2026-09-29T13:55:53.643Z",
     "sessionId": "sess_1790690153650"
+  },
+  {
+    "id": "v_1790706981855_nygtun",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/141.0.7390.0 Safari/537.36",
+    "screen": "",
+    "lang": "",
+    "timestamp": "2026-09-29T18:36:21.855Z",
+    "sessionId": "sess_1790706981860"
   }
 ]
