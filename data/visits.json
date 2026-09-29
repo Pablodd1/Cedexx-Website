@@ -10798,5 +10798,17 @@
     "lang": "en-US",
     "timestamp": "2026-09-29T04:13:12.618Z",
     "sessionId": "sess_1790655192622"
+  },
+  {
+    "id": "v_1790655225684_oca6q6",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Instagram 447.0.0.34.80 (iPhone12,1; iOS 17_7; en_US; en; scale=2.00; 828x1792; 1065993616) AppleWebKit/420+",
+    "screen": "",
+    "lang": "en-US",
+    "timestamp": "2026-09-29T04:13:45.684Z",
+    "sessionId": "sess_1790655225687"
   }
 ]
