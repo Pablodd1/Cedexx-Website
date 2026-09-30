@@ -11,13 +11,36 @@ const LYRIC_EMAIL = process.env.LYRIC_ENROLLMENT_EMAIL || 'enrollment@getlyric.c
 const TELEGRAM_BOT = process.env.TELEGRAM_BOT_TOKEN || '8834617573:AAGANwBh_xp-MIZpqukctS2OAuJ2zxJOnrU';
 const TELEGRAM_CHAT = process.env.TELEGRAM_CHAT_ID || '7838956683';
 
-export const LYRIC_PLAN_CONFIG: Record<string, { planId: string; planDetailsId: string; name: string }> = {
+// ─── Lyric Group & Auth Credentials ───
+export const LYRIC_PROD_GROUP_CODE = process.env.LYRIC_GROUP_CODE || 'MTMCOONR01';
+export const LYRIC_STAGING_GROUP_CODE = 'MTMSTGCEDEXXO1';
+
+export const LYRIC_AUTH_USER = process.env.LYRIC_API_USER || 'MTMCOONR01@mytelemedicine.com';
+export const LYRIC_AUTH_PASS = process.env.LYRIC_API_PASS || 'YCc25aLkB&Fj5xZL';
+
+export const LYRIC_LOGIN_URL = 'https://portal.getlyric.com/go/api/login';
+export const LYRIC_CENSUS_URL = 'https://portal.getlyric.com/go/api/census/createMember';
+
+// Production Plan IDs confirmed by Emma
+export const LYRIC_PROD_PLAN_CONFIG: Record<string, { planId: string; planDetailsId: string; name: string }> = {
+  'carenow': { planId: '6283', planDetailsId: '1', name: 'CareNow™' },
+  'carenow-mental': { planId: '6306', planDetailsId: '1', name: 'CareNow™ + Mental Wellness' },
+  'mental-wellness': { planId: '6307', planDetailsId: '1', name: 'Mental Wellness' },
+  'carecomplete': { planId: '6308', planDetailsId: '1', name: 'CareComplete™' },
+  'carecomplete-family': { planId: '6309', planDetailsId: '3', name: 'CareComplete™ Family' },
+};
+
+// Staging Plan IDs
+export const LYRIC_STAGING_PLAN_CONFIG: Record<string, { planId: string; planDetailsId: string; name: string }> = {
   'carenow': { planId: '2662', planDetailsId: '1', name: 'CareNow™' },
   'carenow-mental': { planId: '2664', planDetailsId: '1', name: 'CareNow™ + Mental Wellness' },
   'mental-wellness': { planId: '2665', planDetailsId: '1', name: 'Mental Wellness' },
   'carecomplete': { planId: '2666', planDetailsId: '1', name: 'CareComplete™' },
   'carecomplete-family': { planId: '2667', planDetailsId: '3', name: 'CareComplete™ Family' },
 };
+
+// Default export uses production mappings
+export const LYRIC_PLAN_CONFIG = LYRIC_PROD_PLAN_CONFIG;
 
 export const LYRIC_STATE_IDS: Record<string, string> = {
   'AL': '1', 'AK': '2', 'AZ': '3', 'AR': '4', 'CA': '5', 'CO': '6', 'CT': '7', 'DE': '8',
@@ -30,22 +53,15 @@ export const LYRIC_STATE_IDS: Record<string, string> = {
   'MP': '57', 'PW': '58', 'VI': '59',
 };
 
-const planMap: Record<string, string> = {
-  'carenow': 'CareNow™',
-  'carenow-mental': 'CareNow™ + Mental Wellness',
-  'mental-wellness': 'Mental Wellness',
-  'carecomplete': 'CareComplete™',
-  'carecomplete-family': 'CareComplete™ Family',
-};
-
-function getLyricPlanInfo(plan: string) {
+function getLyricPlanInfo(plan: string, isStaging: boolean = false) {
   const normalized = (plan || '').toLowerCase().replace(/[^a-z-]/g, '');
-  for (const [key, cfg] of Object.entries(LYRIC_PLAN_CONFIG)) {
+  const config = isStaging ? LYRIC_STAGING_PLAN_CONFIG : LYRIC_PROD_PLAN_CONFIG;
+  for (const [key, cfg] of Object.entries(config)) {
     if (normalized.includes(key) || key.includes(normalized)) {
       return cfg;
     }
   }
-  return LYRIC_PLAN_CONFIG['carenow'] || { planId: '2662', planDetailsId: '1', name: plan || 'CareNow™' };
+  return config['carenow'] || { planId: isStaging ? '2662' : '6283', planDetailsId: '1', name: plan || 'CareNow™' };
 }
 
 function formatLyricDob(dob: string): string {
@@ -56,6 +72,41 @@ function formatLyricDob(dob: string): string {
     return `${month.padStart(2, '0')}/${day.padStart(2, '0')}/${year}`;
   }
   return dob;
+}
+
+// Token cache for fast reuse across calls (tokens valid for 24h)
+let cachedBearerToken: string | null = null;
+let tokenExpiresAt: number = 0;
+
+export async function getLyricBearerToken(): Promise<string> {
+  const now = Date.now();
+  if (cachedBearerToken && now < tokenExpiresAt) {
+    return cachedBearerToken;
+  }
+
+  const res = await fetch(LYRIC_LOGIN_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      email: LYRIC_AUTH_USER,
+      password: LYRIC_AUTH_PASS,
+    }),
+  });
+
+  if (!res.ok) {
+    const errorText = await res.text().catch(() => '');
+    throw new Error(`Failed to authenticate with Lyric Health API (${res.status}): ${errorText}`);
+  }
+
+  const token = res.headers.get('authorization');
+  if (!token) {
+    throw new Error('Lyric Health API authenticated, but no Authorization header returned');
+  }
+
+  cachedBearerToken = token;
+  // Cache for 6 hours
+  tokenExpiresAt = now + 6 * 60 * 60 * 1000;
+  return token;
 }
 
 async function readMembers() {
@@ -159,7 +210,7 @@ async function alertCritical(error: any, context: any) {
   }
 }
 
-interface PatientData {
+export interface PatientData {
   id: string;
   first_name: string;
   last_name: string;
@@ -177,6 +228,67 @@ interface PatientData {
   paid_at: string;
 }
 
+export function getMemberId(patient: PatientData): string {
+  const cleanPhone = (patient.phone || '').replace(/\D/g, '').slice(-10);
+  if (cleanPhone.length === 10) return cleanPhone;
+  return patient.id || cleanPhone || 'N/A';
+}
+
+// ─── Call Lyric Census API ───
+export async function callLyricApi(patient: PatientData, isStaging: boolean = false) {
+  const token = await getLyricBearerToken();
+  const memberId = getMemberId(patient);
+  const planInfo = getLyricPlanInfo(patient.plan, isStaging);
+  const stateUpper = (patient.state || 'FL').trim().toUpperCase();
+  const stateId = LYRIC_STATE_IDS[stateUpper] || '10'; // default FL
+  const groupCode = isStaging ? LYRIC_STAGING_GROUP_CODE : LYRIC_PROD_GROUP_CODE;
+
+  const payload = new URLSearchParams({
+    primaryExternalId: memberId,
+    groupCode: groupCode,
+    planId: planInfo.planId,
+    planDetailsId: planInfo.planDetailsId,
+    firstName: patient.first_name,
+    lastName: patient.last_name,
+    dob: formatLyricDob(patient.dob),
+    email: patient.email,
+    primaryPhone: memberId,
+    gender: (patient.gender || 'u').toLowerCase().charAt(0) || 'u',
+    address: patient.address || 'Not provided',
+    address2: '',
+    city: patient.city || 'Miami',
+    stateId: stateId,
+    zipCode: patient.zipcode || '33101',
+    sendRegistrationNotification: '1',
+    numAllowedDependents: planInfo.planDetailsId === '3' ? '7' : '0',
+    heightFeet: '5',
+    heightInches: '9',
+    weight: '160',
+    timezoneId: '1', // Eastern Time
+  });
+
+  const res = await fetch(LYRIC_CENSUS_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Authorization': token,
+    },
+    body: payload,
+  });
+
+  const data = await res.json().catch(() => ({}));
+
+  if (!res.ok && !data.success) {
+    // If already exists, treat as non-fatal warning
+    if (data.message && data.message.includes('already exists')) {
+      return { success: true, alreadyExists: true, detail: data };
+    }
+    throw new Error(data.message || `Lyric API error HTTP ${res.status}`);
+  }
+
+  return { success: true, lyricUserId: data.userid, detail: data };
+}
+
 // ─── Main Handler ───
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -186,9 +298,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { patient_id, patient, dry_run } = req.body;
+  const { patient_id, patient, dry_run, use_staging } = req.body || {};
 
-  // Support both passing patient data directly or looking up by ID
   let patientData: PatientData | null = patient || null;
 
   if (!patientData && patient_id) {
@@ -227,49 +338,50 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ error: 'Patient data or patient_id required' });
   }
 
-  // Validate required fields
   const required = ['first_name', 'last_name', 'email', 'phone', 'dob', 'plan'];
   const missing = required.filter(f => !patientData![f as keyof PatientData]);
   if (missing.length > 0) {
     return res.status(400).json({ error: `Missing required fields: ${missing.join(', ')}` });
   }
 
-  // ─── DRY RUN: Just return what would be sent ───
+  // DRY RUN
   if (dry_run) {
     return res.status(200).json({
       success: true,
       dry_run: true,
       patient: patientData,
-      email_preview: buildLyricEmail(patientData),
-      api_payload: buildApiPayload(patientData),
+      email_preview: buildLyricEmail(patientData, !!use_staging),
+      api_payload: buildApiPayload(patientData, !!use_staging),
     });
   }
 
-  // ─── SYNC TO LYRIC ───
+  // LIVE SYNC TO LYRIC
   const results: any = { email: null, api: null, error: null };
 
   try {
-    // 1. Send enrollment email to Lyric
-    if (RESEND_KEY) {
-      results.email = await sendLyricEnrollmentEmail(patientData);
-    } else {
-      throw new Error('RESEND_API_KEY not configured — cannot send enrollment email');
+    // 1. Direct API call to Lyric Census
+    try {
+      results.api = await callLyricApi(patientData, !!use_staging);
+    } catch (apiErr: any) {
+      console.error('[LYRIC API CALL FAILED, FALLING BACK TO EMAIL]', apiErr);
+      results.api = { success: false, error: apiErr.message };
     }
 
-    // 2. Call Lyric API (when available)
-    // TODO: Uncomment when Lyric provides API endpoint
-    // const apiResult = await callLyricApi(patientData);
-    // results.api = apiResult;
+    // 2. Email notification dispatch to Lyric enrollment desk as backup/verification
+    if (RESEND_KEY) {
+      results.email = await sendLyricEnrollmentEmail(patientData, !!use_staging);
+    }
 
     // 3. Update member record with sync status
     await updateMemberSyncStatus(patientData.id, {
-      lyric_synced: true,
+      lyric_synced: results.api?.success || results.email?.sent || false,
       lyric_synced_at: new Date().toISOString(),
-      lyric_sync_method: 'email',
+      lyric_sync_method: results.api?.success ? 'api' : 'email',
+      lyric_user_id: results.api?.lyricUserId || null,
       lyric_sync_attempts: 1,
     });
 
-    // 4. Notify admin
+    // 4. Notify admin via Telegram & Email
     await notifyAdminOfLyricSync(patientData, results);
 
     res.status(200).json({
@@ -282,7 +394,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   } catch (err: any) {
     console.error('[LYRIC BRIDGE ERROR]', err);
 
-    // CRITICAL: Alert Jasmel immediately
     await alertCritical(err, {
       endpoint: '/api/bridge/lyric',
       patientEmail: patientData.email,
@@ -290,7 +401,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       plan: patientData.plan,
     });
 
-    // Update member with failed status
     await updateMemberSyncStatus(patientData.id, {
       lyric_synced: false,
       lyric_sync_error: err.message,
@@ -305,22 +415,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 }
 
-function getMemberId(patient: PatientData): string {
-  const cleanPhone = (patient.phone || '').replace(/\D/g, '').slice(-10);
-  if (cleanPhone.length === 10) return cleanPhone;
-  return patient.id || cleanPhone || 'N/A';
-}
-
 // ─── Build Lyric Enrollment Email ───
-function buildLyricEmail(patient: PatientData): string {
+function buildLyricEmail(patient: PatientData, isStaging: boolean = false): string {
   const memberId = getMemberId(patient);
-  const planInfo = getLyricPlanInfo(patient.plan);
+  const planInfo = getLyricPlanInfo(patient.plan, isStaging);
+  const groupCode = isStaging ? LYRIC_STAGING_GROUP_CODE : LYRIC_PROD_GROUP_CODE;
 
   return `
 NEW CEDEXX ENROLLMENT — ACTION REQUIRED
 
 Patient Information:
 -------------------
+Group Code: ${groupCode}
 Member ID / External ID: ${memberId}
 Name: ${patient.first_name} ${patient.last_name}
 Email: ${patient.email}
@@ -352,13 +458,14 @@ Sent automatically from CEDEXX Enrollment System
 }
 
 // ─── Send Email to Lyric ───
-async function sendLyricEnrollmentEmail(patient: PatientData) {
+async function sendLyricEnrollmentEmail(patient: PatientData, isStaging: boolean = false) {
   if (!RESEND_KEY) {
     return { sent: false, error: 'No Resend API key' };
   }
 
   const memberId = getMemberId(patient);
-  const planInfo = getLyricPlanInfo(patient.plan);
+  const planInfo = getLyricPlanInfo(patient.plan, isStaging);
+  const groupCode = isStaging ? LYRIC_STAGING_GROUP_CODE : LYRIC_PROD_GROUP_CODE;
 
   try {
     const res = await fetch('https://api.resend.com/emails', {
@@ -370,23 +477,22 @@ async function sendLyricEnrollmentEmail(patient: PatientData) {
       body: JSON.stringify({
         from: 'CEDEXX Enrollments <enrollments@cedexx.net>',
         to: [LYRIC_EMAIL, ADMIN_EMAIL],
-        subject: `NEW ENROLLMENT: ${patient.first_name} ${patient.last_name} (Member ID: ${memberId}) — ${planInfo.name} [Plan ID: ${planInfo.planId}]`,
-        text: buildLyricEmail(patient),
+        subject: `NEW ENROLLMENT [Group: ${groupCode}]: ${patient.first_name} ${patient.last_name} (Member ID: ${memberId}) — ${planInfo.name} [Plan ID: ${planInfo.planId}]`,
+        text: buildLyricEmail(patient, isStaging),
         html: `
           <div style="font-family:Arial,sans-serif;max-width:600px;margin:20px auto;">
             <h2 style="color:#050249;">New CEDEXX Enrollment</h2>
             <table style="width:100%;border-collapse:collapse;font-size:14px;">
+              <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:700;">Group Code</td><td style="padding:8px;border-bottom:1px solid #eee;"><strong style="color:#050249;">${groupCode}</strong></td></tr>
               <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:700;">Member ID / External ID</td><td style="padding:8px;border-bottom:1px solid #eee;"><strong style="font-size:15px;color:#050249;">${memberId}</strong></td></tr>
               <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:700;">Name</td><td style="padding:8px;border-bottom:1px solid #eee;">${patient.first_name} ${patient.last_name}</td></tr>
               <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:700;">Email</td><td style="padding:8px;border-bottom:1px solid #eee;">${patient.email}</td></tr>
               <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:700;">Phone</td><td style="padding:8px;border-bottom:1px solid #eee;">${patient.phone}</td></tr>
               <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:700;">DOB</td><td style="padding:8px;border-bottom:1px solid #eee;">${formatLyricDob(patient.dob)}</td></tr>
-              <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:700;">Street Address</td><td style="padding:8px;border-bottom:1px solid #eee;">${patient.address || 'Not provided'}</td></tr>
               <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:700;">City, State ZIP</td><td style="padding:8px;border-bottom:1px solid #eee;">${patient.city || ''}, ${patient.state || ''} <strong>${patient.zipcode || ''}</strong></td></tr>
               <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:700;">Plan</td><td style="padding:8px;border-bottom:1px solid #eee;"><strong>${planInfo.name}</strong></td></tr>
               <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:700;">Lyric Plan ID</td><td style="padding:8px;border-bottom:1px solid #eee;"><code style="background:#eef;padding:2px 6px;border-radius:4px;color:#050249;">${planInfo.planId}</code></td></tr>
               <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:700;">Plan Details ID</td><td style="padding:8px;border-bottom:1px solid #eee;"><code style="background:#eef;padding:2px 6px;border-radius:4px;color:#050249;">${planInfo.planDetailsId}</code> (${planInfo.planDetailsId === '3' ? 'Family' : 'Single'})</td></tr>
-              <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:700;">Stripe Customer</td><td style="padding:8px;border-bottom:1px solid #eee;">${patient.stripe_customer_id || 'N/A'}</td></tr>
             </table>
             <p style="margin-top:20px;color:#666;font-size:13px;">Please activate within 24-48 hours. Member activates app using ZIP: <strong>${patient.zipcode || 'N/A'}</strong> and Member ID: <strong>${memberId}</strong>.</p>
           </div>
@@ -406,23 +512,24 @@ async function sendLyricEnrollmentEmail(patient: PatientData) {
   }
 }
 
-// ─── Build API Payload (POST https://staging.getlyric.com/go/api/census/createMember) ───
-function buildApiPayload(patient: PatientData) {
+// ─── Build API Payload for Preview ───
+function buildApiPayload(patient: PatientData, isStaging: boolean = false) {
   const memberId = getMemberId(patient);
-  const planInfo = getLyricPlanInfo(patient.plan);
-  const stateUpper = (patient.state || '').trim().toUpperCase();
-  const stateId = LYRIC_STATE_IDS[stateUpper] || '';
+  const planInfo = getLyricPlanInfo(patient.plan, isStaging);
+  const stateUpper = (patient.state || 'FL').trim().toUpperCase();
+  const stateId = LYRIC_STATE_IDS[stateUpper] || '10';
+  const groupCode = isStaging ? LYRIC_STAGING_GROUP_CODE : LYRIC_PROD_GROUP_CODE;
 
   return {
-    endpoint: 'https://staging.getlyric.com/go/api/census/createMember',
+    endpoint: LYRIC_CENSUS_URL,
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
-      'Authorization': 'Bearer <LYRIC_API_TOKEN>',
+      'Authorization': 'Bearer <AUTOMATIC_JWT_TOKEN>',
     },
     body: {
       primaryExternalId: memberId,
-      groupCode: process.env.LYRIC_GROUP_CODE || 'CEDEXX',
+      groupCode: groupCode,
       planId: planInfo.planId,
       planDetailsId: planInfo.planDetailsId,
       firstName: patient.first_name,
@@ -437,10 +544,15 @@ function buildApiPayload(patient: PatientData) {
       zipCode: patient.zipcode || '',
       sendRegistrationNotification: '1',
       numAllowedDependents: planInfo.planDetailsId === '3' ? '7' : '0',
+      heightFeet: '5',
+      heightInches: '9',
+      weight: '160',
+      timezoneId: '1',
     },
     metadata: {
       source: 'cedexx',
       member_id: memberId,
+      group_code: groupCode,
       plan_name: planInfo.name,
       stripe_customer_id: patient.stripe_customer_id || null,
       stripe_subscription_id: patient.stripe_subscription_id || null,
@@ -467,7 +579,7 @@ async function updateMemberSyncStatus(memberId: string, syncData: any) {
 
 // ─── Notify Admin ───
 async function notifyAdminOfLyricSync(patient: PatientData, results: any) {
-  // 1. Telegram (HIPAA-Sanitized / De-identified alert for non-BAA channel)
+  // Telegram alert
   if (TELEGRAM_BOT && TELEGRAM_CHAT) {
     try {
       const maskedName = `${(patient.first_name || '').charAt(0)}. ${(patient.last_name || '').charAt(0)}.`;
@@ -478,8 +590,8 @@ async function notifyAdminOfLyricSync(patient: PatientData, results: any) {
         `👤 Member: <code>${maskedName}</code>`,
         `📱 ID/Phone: <code>${maskedPhone}</code>`,
         `📦 Plan: ${patient.plan}`,
-        `✉️ Lyric Dispatch: ${results.email?.sent ? '✅ Sent' : '❌ Failed'}`,
-        `🔒 Details protected in secure Admin Dashboard`,
+        `⚡ API Status: ${results.api?.success ? '✅ Registered (User #' + results.api.lyricUserId + ')' : '⚠️ ' + (results.api?.error || 'Skipped')}`,
+        `✉️ Email Dispatch: ${results.email?.sent ? '✅ Dispatched' : '❌ Failed'}`,
         `🕒 ${new Date().toLocaleString()}`,
       ].join('\n');
 
@@ -497,7 +609,7 @@ async function notifyAdminOfLyricSync(patient: PatientData, results: any) {
     }
   }
 
-  // 2. Email to admin
+  // Email to admin
   if (RESEND_KEY) {
     try {
       await fetch('https://api.resend.com/emails', {
@@ -509,16 +621,16 @@ async function notifyAdminOfLyricSync(patient: PatientData, results: any) {
         body: JSON.stringify({
           from: 'CEDEXX Alerts <alerts@cedexx.net>',
           to: [ADMIN_EMAIL],
-          subject: `Lyric Sync: ${patient.first_name} ${patient.last_name}`,
+          subject: `Lyric Sync: ${patient.first_name} ${patient.last_name} (${results.api?.success ? 'Success' : 'Email Only'})`,
           html: `
             <div style="font-family:Arial,sans-serif;max-width:600px;margin:20px auto;">
               <h2 style="color:#050249;">Lyric Health Sync Completed</h2>
-              <p>Patient enrollment data sent to Lyric Health.</p>
               <table style="width:100%;border-collapse:collapse;font-size:14px;">
                 <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:700;">Patient</td><td style="padding:8px;border-bottom:1px solid #eee;">${patient.first_name} ${patient.last_name}</td></tr>
                 <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:700;">Email</td><td style="padding:8px;border-bottom:1px solid #eee;">${patient.email}</td></tr>
                 <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:700;">Plan</td><td style="padding:8px;border-bottom:1px solid #eee;">${patient.plan}</td></tr>
-                <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:700;">Status</td><td style="padding:8px;border-bottom:1px solid #eee;">✅ Sent</td></tr>
+                <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:700;">API Registration</td><td style="padding:8px;border-bottom:1px solid #eee;">${results.api?.success ? '✅ Success (ID: ' + results.api.lyricUserId + ')' : '⚠️ ' + (results.api?.error || 'N/A')}</td></tr>
+                <tr><td style="padding:8px;border-bottom:1px solid #eee;font-weight:700;">Email Notification</td><td style="padding:8px;border-bottom:1px solid #eee;">${results.email?.sent ? '✅ Sent' : '❌ Failed'}</td></tr>
               </table>
             </div>
           `,
