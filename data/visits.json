@@ -11494,5 +11494,17 @@
     "lang": "en-US",
     "timestamp": "2026-09-30T15:42:43.611Z",
     "sessionId": "sess_1790782963611"
+  },
+  {
+    "id": "v_1790784939360_pmgotj",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.0 Safari/537.36",
+    "screen": "",
+    "lang": "en-US",
+    "timestamp": "2026-09-30T16:15:39.361Z",
+    "sessionId": "sess_1790784939375"
   }
 ]
