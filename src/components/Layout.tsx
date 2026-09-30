@@ -286,6 +286,16 @@ export function Layout() {
         </div>
 
         <div className="container mx-auto px-6 mt-20 pt-10 border-t border-white/5">
+          {/* Faith & Wholeness Slogan */}
+          <div className="max-w-2xl mx-auto mb-10 text-center px-4 py-6 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-sm">
+            <p className="text-sm md:text-base font-semibold italic text-[#23d9b0] mb-2 leading-relaxed">
+              3 John 1:2 — “I pray that you may prosper in all things and be in health, just as your soul prospers.”
+            </p>
+            <p className="text-xs text-blue-200/70 font-medium italic">
+              A beautiful reminder that God cares about both our inner life and our physical well-being.
+            </p>
+          </div>
+
           <p className="text-[15px] text-blue-500/60 leading-relaxed text-center max-w-3xl mx-auto mb-8 font-medium">
             {t('disclaimer.text')}
           </p>
