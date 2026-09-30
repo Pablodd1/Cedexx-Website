@@ -109,7 +109,6 @@ const SCHEMA_CONFIG = {
     '/': 'Home',
     '/about': 'About Us',
     '/services': 'Services',
-    '/video_library': 'Video Library',
     '/blog': 'Blog',
     '/corporate': 'Corporate',
     '/enroll': 'Enroll',

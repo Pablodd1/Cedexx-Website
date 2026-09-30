@@ -82,13 +82,6 @@
     <priority>0.7</priority>
   </url>
 
-  <!-- Educational Video Library & FAQs -->
-  <url>
-    <loc>https://cedexx.net/video_library</loc>
-    <lastmod>2026-09-04</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
 
   <!-- Blog & Insights -->
   <url>

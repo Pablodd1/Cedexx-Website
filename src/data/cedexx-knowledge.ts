@@ -175,7 +175,6 @@ export const CEDEXX_KNOWLEDGE = {
     { name: 'Partners', path: '/partners', description: 'Partner program information' },
     { name: 'Corporate', path: '/corporate', description: 'Employer and corporate benefits' },
     { name: 'Investor Pitch', path: '/investor-pitch', description: 'Investment opportunity information' },
-    { name: 'Video Library', path: '/video-library', description: 'Educational healthcare videos' },
     { name: 'Privacy Policy', path: '/privacy', description: 'HIPAA and privacy compliance' },
     { name: 'Terms of Service', path: '/terms', description: 'Service terms and conditions' },
   ],

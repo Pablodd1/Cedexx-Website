@@ -362,12 +362,6 @@ export function FAQ() {
                 </p>
               </div>
             </div>
-            <Link
-              to="/video_library"
-              className="text-xs font-bold text-blue-600 hover:text-blue-800 inline-flex items-center gap-1 self-start sm:self-auto"
-            >
-              Browse Full Video Library <span aria-hidden="true">&rarr;</span>
-            </Link>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -17,7 +17,6 @@ import { Contact } from './pages/Contact';
 import { Pricing } from './pages/Pricing';
 import { FAQ } from './pages/FAQ';
 import { ScheduleDemo } from './pages/ScheduleDemo';
-import VideoLibrary from './pages/VideoLibrary';
 import { InvestorPitch } from './pages/InvestorPitch';
 import { AdminDashboard } from './pages/AdminDashboard';
 import { DeleteMyData } from './pages/DeleteMyData';
@@ -49,7 +48,6 @@ export default function App() {
               <Route index element={<Home />} />
               <Route path="about" element={<About />} />
               <Route path="services" element={<Services />} />
-              <Route path="video_library" element={<VideoLibrary />} />
               <Route path="blog" element={<Blog />} />
               <Route path="privacy" element={<Privacy />} />
               <Route path="terms" element={<Terms />} />
