@@ -238,11 +238,9 @@ async function sendAdminNotification(member: any) {
       <p style="margin-top:20px;"><a href="https://cedexx.net/admin.html" style="background:#050249;color:#fff;padding:12px 24px;text-decoration:none;border-radius:6px;">View Dashboard</a></p>
     </div>
   `;
-  // Send to primary admin as TO, CC secondary admins so reply-all includes everyone
+  // Send to ALL admins as TO (not CC) so reply-all includes everyone
   const adminEmails = getAdminEmails();
-  const toAdmin = adminEmails[0] || ADMIN_EMAIL;
-  const ccAdmins = adminEmails.slice(1); // CC the rest
-  await sendEmail(toAdmin, subject, html, `Free enrollment: ${member.first_name} ${member.last_name}`, ccAdmins.length > 0 ? ccAdmins : undefined);
+  await sendEmail(adminEmails, subject, html, `Free enrollment: ${member.first_name} ${member.last_name}`);
 }
 
 // ─── Telegram ───

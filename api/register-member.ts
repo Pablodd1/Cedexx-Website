@@ -197,11 +197,9 @@ async function sendAdminNotification(member: any, type: 'registration' | 'checko
       <p style="margin-top:20px;"><a href="https://cedexx.net/admin.html" style="background:#7B2FF7;color:#fff;padding:12px 24px;text-decoration:none;border-radius:6px;">View Dashboard</a></p>
     </div>
   `;
-  // Send to primary admin as TO, CC secondary admins so reply-all includes everyone
+  // Send to ALL admins as TO (not CC) so reply-all includes everyone
   const adminEmails = getAdminEmails();
-  const toAdmin = adminEmails[0] || 'support@cedexx.net';
-  const ccAdmins = adminEmails.slice(1); // CC the rest
-  await sendResendEmail(toAdmin, subject, html, `New ${type}: ${member.first_name} ${member.last_name}`, ccAdmins.length > 0 ? ccAdmins : undefined);
+  await sendResendEmail(adminEmails, subject, html, `New ${type}: ${member.first_name} ${member.last_name}`);
 }
 
 // ─── TELEGRAM ───
