@@ -114,7 +114,7 @@ async function alertCritical(error: any, context: any) {
 }
 
 // ─── FREE ENROLLMENT CODES ───
-const FREE_CODES = ['WELCOME1'];
+const FREE_CODES = ['WELCOME1', 'ATLANTA'];
 
 // ─── Plan Info ───
 const PLAN_MAP: Record<string, string> = {
@@ -221,7 +221,8 @@ async function sendWelcomeEmail(member: any) {
 }
 
 async function sendAdminNotification(member: any) {
-  const subject = `🏠 Free Enrollment — ${member.first_name} ${member.last_name} (Welcome1)`;
+  const code = member.promo_code || 'WELCOME1';
+  const subject = `🏠 Free Enrollment — ${member.first_name} ${member.last_name} (${code})`;
   const html = `
     <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
       <h2 style="color:#166534;">🏠 Free Enrollment — Resident Housing Partner</h2>
@@ -231,7 +232,7 @@ async function sendAdminNotification(member: any) {
         <tr><td style="padding:8px;border:1px solid #e5e7eb;font-weight:600;">Phone</td><td style="padding:8px;border:1px solid #e5e7eb;">${member.phone || '—'}</td></tr>
         <tr><td style="padding:8px;border:1px solid #e5e7eb;font-weight:600;">DOB</td><td style="padding:8px;border:1px solid #e5e7eb;">${member.dob || '—'}</td></tr>
         <tr><td style="padding:8px;border:1px solid #e5e7eb;font-weight:600;">Plan</td><td style="padding:8px;border:1px solid #e5e7eb;">${PLAN_MAP[member.plan] || member.plan}</td></tr>
-        <tr><td style="padding:8px;border:1px solid #e5e7eb;font-weight:600;">Promo Code</td><td style="padding:8px;border:1px solid #e5e7eb;">Welcome1</td></tr>
+        <tr><td style="padding:8px;border:1px solid #e5e7eb;font-weight:600;">Promo Code</td><td style="padding:8px;border:1px solid #e5e7eb;">${code}</td></tr>
         <tr><td style="padding:8px;border:1px solid #e5e7eb;font-weight:600;">Amount</td><td style="padding:8px;border:1px solid #e5e7eb;color:#166534;font-weight:600;">$0.00 — Complimentary</td></tr>
         <tr><td style="padding:8px;border:1px solid #e5e7eb;font-weight:600;">Status</td><td style="padding:8px;border:1px solid #e5e7eb;">Active</td></tr>
       </table>
@@ -257,7 +258,7 @@ async function sendTelegram(member: any) {
     `📧 Contact: <code>${maskedEmail}</code>`,
     maskedPhone ? `📞 Phone: <code>${maskedPhone}</code>` : null,
     `📦 Plan: ${PLAN_MAP[member.plan] || member.plan}`,
-    '🎟️ Promo: Welcome1',
+    `🎟️ Promo: ${member.promo_code || 'WELCOME1'}`,
     '💰 Amount: $0.00 (Complimentary)',
     '✅ Status: Active',
     '🔒 Protected in Admin Dashboard',

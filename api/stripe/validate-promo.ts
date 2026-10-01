@@ -9,7 +9,7 @@ const stripe = process.env.STRIPE_SECRET_KEY
   : null;
 
 // ─── FREE ENROLLMENT CODES (skip Stripe entirely) ───
-const FREE_CODES = ['WELCOME1'];
+const FREE_CODES = ['WELCOME1', 'ATLANTA'];
 
 // Price map for calculating discounted amounts
 const PRICE_CENTS: Record<string, number> = {

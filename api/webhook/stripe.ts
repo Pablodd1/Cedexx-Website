@@ -422,7 +422,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         };
 
         // Run all notifications in parallel, catch errors
-        Promise.allSettled([
+        const notifResults = await Promise.allSettled([
           // 1. Send payment confirmation receipt to patient
           sendPaymentConfirmation({
             first_name: member.first_name || metadata.first_name || '',
@@ -453,14 +453,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
           // 4. Send to Lyric Health enrollment team
           sendToLyric(member, session),
-        ]).then((results) => {
-          // Log any failures
-          results.forEach((result, idx) => {
-            if (result.status === 'rejected') {
-              console.error(`[STRIPE WEBHOOK] Notification ${idx} failed:`, result.reason);
-            }
-          });
-        }).catch(() => {});
+        ]);
+
+        notifResults.forEach((result, idx) => {
+          if (result.status === 'rejected') {
+            console.error(`[STRIPE WEBHOOK] Notification ${idx} failed:`, result.reason);
+          }
+        });
 
         break;
       }

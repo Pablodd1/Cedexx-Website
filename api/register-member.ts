@@ -304,11 +304,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       // Send checkout notification if applicable
       if (is_checkout) {
-        Promise.allSettled([
+        await Promise.allSettled([
           sendCheckoutStartedEmail(existing),
           sendAdminNotification(existing, 'checkout'),
           sendTelegramNotification(existing, 'checkout'),
-        ]).catch(() => {});
+        ]);
       }
 
       return res.status(200).json({
@@ -350,9 +350,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     members.push(newMember);
     await writeMembers(members);
 
-    // Send notifications (fire-and-forget)
+    // Send notifications (await so serverless function doesn't terminate early)
     const notificationType = is_checkout ? 'checkout' : 'registration';
-    Promise.allSettled([
+    await Promise.allSettled([
       is_checkout
         ? sendCheckoutStartedEmail(newMember)
         : sendCustomerEnrollmentEmails({
@@ -367,7 +367,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           }),
       sendAdminNotification(newMember, notificationType),
       sendTelegramNotification(newMember, notificationType),
-    ]).catch(() => {});
+    ]);
 
     return res.status(200).json({
       success: true,

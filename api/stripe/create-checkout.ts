@@ -136,17 +136,40 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Apply promo code if provided
     if (promo_code) {
       try {
+        const normalized = promo_code.toUpperCase().trim();
         const promoList = await stripe.promotionCodes.list({
-          code: promo_code.toUpperCase().trim(),
+          code: normalized,
           active: true,
           limit: 1,
         });
 
-        if (promoList.data.length === 0) {
-          return res.status(400).json({ success: false, error: 'Invalid or expired promo code.' });
-        }
+        if (promoList.data.length > 0) {
+          sessionConfig.discounts = [{ promotion_code: promoList.data[0].id }];
+        } else {
+          // Check if it's a Coupon ID or Coupon Name
+          let couponId: string | null = null;
+          const couponAttempts = [normalized, normalized.toLowerCase()];
+          for (const cid of couponAttempts) {
+            try {
+              const c = await stripe.coupons.retrieve(cid);
+              if (c && !c.deleted) {
+                couponId = c.id;
+                break;
+              }
+            } catch (_) {}
+          }
+          if (!couponId) {
+            const allCoupons = await stripe.coupons.list({ limit: 100 });
+            const match = allCoupons.data.find(c => !c.deleted && (c.id.toLowerCase() === normalized.toLowerCase() || (c.name && c.name.toLowerCase() === normalized.toLowerCase())));
+            if (match) couponId = match.id;
+          }
 
-        sessionConfig.discounts = [{ promotion_code: promoList.data[0].id }];
+          if (couponId) {
+            sessionConfig.discounts = [{ coupon: couponId }];
+          } else {
+            return res.status(400).json({ success: false, error: 'Invalid or expired promo code.' });
+          }
+        }
       } catch (err: any) {
         console.error('[STRIPE PROMO ERROR]', err);
         await alertCritical(err, {
