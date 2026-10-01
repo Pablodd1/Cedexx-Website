@@ -11830,5 +11830,17 @@
     "lang": "",
     "timestamp": "2026-10-01T05:03:21.970Z",
     "sessionId": "sess_1790831001983"
+  },
+  {
+    "id": "v_1790841561302_8k1k1q",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36",
+    "screen": "",
+    "lang": "",
+    "timestamp": "2026-10-01T07:59:21.302Z",
+    "sessionId": "sess_1790841561307"
   }
 ]
