@@ -295,8 +295,8 @@
     },
     {
       "id": "mem_1789552045354_0hfuu6",
-      "first_name": "",
-      "last_name": "",
+      "first_name": "Test",
+      "last_name": "User",
       "email": "test@test.com",
       "phone": "",
       "dob": "",
@@ -313,7 +313,7 @@
       "consent_analytics": false,
       "consent_version": "1.0",
       "consent_timestamp": "2026-09-16T09:47:25.092Z",
-      "updated_at": "2026-09-29T13:55:57.054Z"
+      "updated_at": "2026-10-01T14:46:10.228Z"
     },
     {
       "id": "4087500964",
