@@ -633,6 +633,27 @@
       "consent_version": "2.0",
       "consent_timestamp": "2026-09-25T22:12:56.476Z",
       "updated_at": "2026-09-25T22:13:30.752Z"
+    },
+    {
+      "id": "3055550189",
+      "first_name": "Sophia",
+      "last_name": "Davis",
+      "email": "sophia.davis.test@cedexx.net",
+      "phone": "3055550189",
+      "dob": "1995-03-12",
+      "address": "789 Brickell Ave",
+      "city": "Miami",
+      "state": "FL",
+      "zipcode": "33131",
+      "plan": "carenow-mental",
+      "status": "registered",
+      "registered_at": "2026-10-01T22:43:57.042Z",
+      "checkout_started_at": null,
+      "stripe_session_id": null,
+      "consent_tos": true,
+      "consent_analytics": true,
+      "consent_version": "1.0",
+      "consent_timestamp": "2026-10-01T22:43:57.042Z"
     }
   ],
   "created_at": "2026-09-01T23:00:00Z",
