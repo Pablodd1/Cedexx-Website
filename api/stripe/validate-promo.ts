@@ -43,12 +43,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   // ─── Check for FREE enrollment codes first ───
   if (FREE_CODES.includes(normalizedCode)) {
+    const isAtlanta = normalizedCode === 'ATLANTA';
     return res.status(200).json({
       success: true,
       valid: true,
       code: normalizedCode,
       type: 'free',
-      description: 'Complimentary enrollment — Resident Housing Partnership',
+      description: isAtlanta
+        ? 'Complimentary enrollment — Affiliate Partner (Health Initiative)'
+        : 'Complimentary enrollment — Resident Housing Partnership',
       original_price: plan_id && PRICE_CENTS[plan_id] ? formatPrice(PRICE_CENTS[plan_id]) : null,
       discounted_price: '$0.00',
       amount: 0,

@@ -155,8 +155,42 @@ async function sendEmail(to: string | string[], subject: string, html: string, t
   }
 }
 
+// ─── PARTNER CONFIG ───
+interface PartnerInfo {
+  title: string;
+  subtitle: string;
+  sourceType: string;
+  icon: string;
+}
+
+const PARTNER_CONFIG: Record<string, PartnerInfo> = {
+  'WELCOME1': {
+    title: 'Resident Housing Partner',
+    subtitle: 'Resident Housing Partnership',
+    sourceType: 'Resident Housing Partner',
+    icon: '🏠',
+  },
+  'ATLANTA': {
+    title: 'Affiliate Partner — Health Initiative',
+    subtitle: 'Health Initiative Partnership',
+    sourceType: 'Affiliate Partner',
+    icon: '🏛️',
+  },
+};
+
+function getPartnerInfo(code?: string): PartnerInfo {
+  const norm = (code || '').toUpperCase().trim();
+  return PARTNER_CONFIG[norm] || {
+    title: 'Affiliate Partner',
+    subtitle: 'Partner Program',
+    sourceType: 'Affiliate Partner',
+    icon: '🎟️',
+  };
+}
+
 async function sendWelcomeEmail(member: any) {
   const planName = PLAN_MAP[member.plan] || member.plan;
+  const partner = getPartnerInfo(member.promo_code);
   const html = `
     <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:600px;margin:0 auto;color:#1e293b;">
       <div style="background:#050249;padding:36px 24px;text-align:center;border-radius:16px 16px 0 0;">
@@ -165,12 +199,12 @@ async function sendWelcomeEmail(member: any) {
       </div>
       <div style="padding:32px 24px;background:#fff;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 16px 16px;">
         <p style="font-size:18px;margin:0 0 16px;font-weight:700;color:#050249;">Hi <strong>${member.first_name}</strong>,</p>
-        <p style="margin:0 0 20px;font-size:15px;line-height:1.6;color:#475569;">Welcome to CEDEXX! Your complimentary membership through our Resident Housing Partnership is confirmed and active.</p>
+        <p style="margin:0 0 20px;font-size:15px;line-height:1.6;color:#475569;">Welcome to CEDEXX! Your complimentary membership through our ${partner.subtitle} is confirmed and active.</p>
         
         <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:16px;padding:20px;margin:20px 0;">
           <h3 style="margin:0 0 10px;color:#166534;font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;">✓ Your Plan Details</h3>
           <p style="margin:4px 0;font-size:14px;"><strong>Plan:</strong> ${planName}</p>
-          <p style="margin:4px 0;font-size:14px;"><strong>Cost:</strong> $0.00 (Covered by Housing Partnership)</p>
+          <p style="margin:4px 0;font-size:14px;"><strong>Cost:</strong> $0.00 (Covered by ${partner.subtitle})</p>
           <p style="margin:4px 0;font-size:14px;color:#166534;font-weight:700;"><strong>Status:</strong> Active</p>
         </div>
 
@@ -222,17 +256,18 @@ async function sendWelcomeEmail(member: any) {
 
 async function sendAdminNotification(member: any) {
   const code = member.promo_code || 'WELCOME1';
-  const subject = `🏠 Free Enrollment — ${member.first_name} ${member.last_name} (${code})`;
+  const partner = getPartnerInfo(code);
+  const subject = `${partner.icon} Free Enrollment — ${member.first_name} ${member.last_name} (${code})`;
   const html = `
     <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
-      <h2 style="color:#166534;">🏠 Free Enrollment — Resident Housing Partner</h2>
+      <h2 style="color:#166534;">${partner.icon} Free Enrollment — ${partner.title}</h2>
       <table style="width:100%;border-collapse:collapse;">
         <tr><td style="padding:8px;border:1px solid #e5e7eb;font-weight:600;">Name</td><td style="padding:8px;border:1px solid #e5e7eb;">${member.first_name} ${member.last_name}</td></tr>
         <tr><td style="padding:8px;border:1px solid #e5e7eb;font-weight:600;">Email</td><td style="padding:8px;border:1px solid #e5e7eb;">${member.email}</td></tr>
         <tr><td style="padding:8px;border:1px solid #e5e7eb;font-weight:600;">Phone</td><td style="padding:8px;border:1px solid #e5e7eb;">${member.phone || '—'}</td></tr>
         <tr><td style="padding:8px;border:1px solid #e5e7eb;font-weight:600;">DOB</td><td style="padding:8px;border:1px solid #e5e7eb;">${member.dob || '—'}</td></tr>
         <tr><td style="padding:8px;border:1px solid #e5e7eb;font-weight:600;">Plan</td><td style="padding:8px;border:1px solid #e5e7eb;">${PLAN_MAP[member.plan] || member.plan}</td></tr>
-        <tr><td style="padding:8px;border:1px solid #e5e7eb;font-weight:600;">Promo Code</td><td style="padding:8px;border:1px solid #e5e7eb;">${code}</td></tr>
+        <tr><td style="padding:8px;border:1px solid #e5e7eb;font-weight:600;">Promo Code</td><td style="padding:8px;border:1px solid #e5e7eb;">${code} (${partner.title})</td></tr>
         <tr><td style="padding:8px;border:1px solid #e5e7eb;font-weight:600;">Amount</td><td style="padding:8px;border:1px solid #e5e7eb;color:#166534;font-weight:600;">$0.00 — Complimentary</td></tr>
         <tr><td style="padding:8px;border:1px solid #e5e7eb;font-weight:600;">Status</td><td style="padding:8px;border:1px solid #e5e7eb;">Active</td></tr>
       </table>
@@ -247,13 +282,14 @@ async function sendAdminNotification(member: any) {
 // ─── Telegram ───
 async function sendTelegram(member: any) {
   if (!TELEGRAM_BOT || !TELEGRAM_CHAT) return;
+  const partner = getPartnerInfo(member.promo_code);
   const maskedName = `${(member.first_name || '').charAt(0)}. ${(member.last_name || '').charAt(0)}.`;
   const maskedEmail = member.email ? `${member.email.charAt(0)}***@${member.email.split('@')[1] || '***'}` : '***';
   const phoneDigits = (member.phone || '').replace(/\D/g, '');
   const maskedPhone = phoneDigits.length >= 4 ? `***-***-${phoneDigits.slice(-4)}` : null;
 
   const text = [
-    '🏠 <b>FREE ENROLLMENT — CEDEXX</b>',
+    `${partner.icon} <b>FREE ENROLLMENT — ${partner.title.toUpperCase()}</b>`,
     `👤 Member: <code>${maskedName}</code>`,
     `📧 Contact: <code>${maskedEmail}</code>`,
     maskedPhone ? `📞 Phone: <code>${maskedPhone}</code>` : null,
