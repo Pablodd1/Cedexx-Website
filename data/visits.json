@@ -12154,5 +12154,17 @@
     "lang": "en-US",
     "timestamp": "2026-10-02T13:09:12.275Z",
     "sessionId": "sess_1790946552275"
+  },
+  {
+    "id": "v_1790951139648_qfxnkc",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.7.5 Mobile/15E148 Safari/604.1",
+    "screen": "",
+    "lang": "en-US",
+    "timestamp": "2026-10-02T14:25:39.648Z",
+    "sessionId": "sess_1790951139654"
   }
 ]
