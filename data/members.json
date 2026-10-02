@@ -683,7 +683,12 @@
       "updated_at": "2026-10-02T13:08:16.582Z",
       "promo_code": "ATLANTA",
       "activated_at": "2026-10-02T13:08:16.582Z",
-      "payment_method": "complimentary"
+      "payment_method": "complimentary",
+      "lyric_synced": true,
+      "lyric_synced_at": "2026-10-02T13:08:18.671Z",
+      "lyric_sync_method": "api",
+      "lyric_user_id": 10383233,
+      "lyric_sync_attempts": 1
     }
   ],
   "created_at": "2026-09-01T23:00:00Z",
