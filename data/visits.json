@@ -12010,5 +12010,17 @@
     "lang": "",
     "timestamp": "2026-10-01T23:53:19.177Z",
     "sessionId": "sess_1790898799180"
+  },
+  {
+    "id": "v_1790904503550_wlcflz",
+    "page": "/",
+    "referrer": "direct",
+    "country": "",
+    "city": "",
+    "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36",
+    "screen": "",
+    "lang": "zh-CN",
+    "timestamp": "2026-10-02T01:28:23.550Z",
+    "sessionId": "sess_1790904503561"
   }
 ]
