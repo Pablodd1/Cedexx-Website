@@ -672,7 +672,7 @@
       "state": "FL",
       "zipcode": "32908-1339",
       "plan": "carenow",
-      "status": "registered",
+      "status": "active",
       "registered_at": "2026-10-02T13:07:35.530Z",
       "checkout_started_at": null,
       "stripe_session_id": null,
@@ -680,7 +680,10 @@
       "consent_analytics": true,
       "consent_version": "2.0",
       "consent_timestamp": "2026-10-02T13:07:35.405Z",
-      "updated_at": "2026-10-02T13:07:44.347Z"
+      "updated_at": "2026-10-02T13:08:16.582Z",
+      "promo_code": "ATLANTA",
+      "activated_at": "2026-10-02T13:08:16.582Z",
+      "payment_method": "complimentary"
     }
   ],
   "created_at": "2026-09-01T23:00:00Z",
