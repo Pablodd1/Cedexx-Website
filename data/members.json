@@ -659,6 +659,27 @@
       "lyric_sync_method": "api",
       "lyric_user_id": 10377025,
       "lyric_sync_attempts": 1
+    },
+    {
+      "id": "9546246744",
+      "first_name": "Daisy",
+      "last_name": "Gonzalez",
+      "email": "daisy@cedexx.net",
+      "phone": "19546246744",
+      "dob": "1985-07-13",
+      "address": "215 Olin Rd SW",
+      "city": "Palm Bay",
+      "state": "FL",
+      "zipcode": "32908-1339",
+      "plan": "carenow",
+      "status": "registered",
+      "registered_at": "2026-10-02T13:07:35.530Z",
+      "checkout_started_at": null,
+      "stripe_session_id": null,
+      "consent_tos": true,
+      "consent_analytics": true,
+      "consent_version": "2.0",
+      "consent_timestamp": "2026-10-02T13:07:35.405Z"
     }
   ],
   "created_at": "2026-09-01T23:00:00Z",
