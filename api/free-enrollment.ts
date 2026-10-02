@@ -114,7 +114,7 @@ async function alertCritical(error: any, context: any) {
 }
 
 // ─── FREE ENROLLMENT CODES ───
-const FREE_CODES = ['WELCOME1', 'ATLANTA'];
+const FREE_CODES = ['WELCOME1'];
 
 // ─── Plan Info ───
 const PLAN_MAP: Record<string, string> = {
