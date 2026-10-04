@@ -38,54 +38,76 @@ async function readMembers() {
 
 async function writeMembers(members: any[]) {
   if (!GITHUB_TOKEN) return;
-  try {
-    const getRes = await fetch(
-      `https://api.github.com/repos/${REPO}/contents/${FILE_PATH}?ref=main`,
-      {
-        headers: {
-          Authorization: `token ${GITHUB_TOKEN}`,
-          Accept: 'application/vnd.github.v3+json',
-        },
+  let attempts = 0;
+  const maxAttempts = 3;
+  let delayMs = 300;
+
+  while (attempts < maxAttempts) {
+    attempts++;
+    try {
+      const getRes = await fetch(
+        `https://api.github.com/repos/${REPO}/contents/${FILE_PATH}?ref=main`,
+        {
+          headers: {
+            Authorization: `token ${GITHUB_TOKEN}`,
+            Accept: 'application/vnd.github.v3+json',
+          },
+        }
+      );
+      let sha: string | undefined;
+      let created_at = new Date().toISOString();
+      if (getRes.ok) {
+        const fileData = await getRes.json();
+        sha = fileData.sha;
+        if (fileData.content) {
+          try {
+            const parsed = JSON.parse(Buffer.from(fileData.content, 'base64').toString('utf8'));
+            if (parsed.created_at) created_at = parsed.created_at;
+          } catch (_) {}
+        }
       }
-    );
-    let sha: string | undefined;
-    let created_at = new Date().toISOString();
-    if (getRes.ok) {
-      const fileData = await getRes.json();
-      sha = fileData.sha;
-      if (fileData.content) {
-        try {
-          const parsed = JSON.parse(Buffer.from(fileData.content, 'base64').toString('utf8'));
-          if (parsed.created_at) created_at = parsed.created_at;
-        } catch (_) {}
+
+      const payload = {
+        members,
+        created_at,
+        version: '1.0',
+      };
+
+      const putRes = await fetch(
+        `https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`,
+        {
+          method: 'PUT',
+          headers: {
+            Authorization: `token ${GITHUB_TOKEN}`,
+            Accept: 'application/vnd.github.v3+json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            message: `Update members DB (${members.length} members)`,
+            content: Buffer.from(JSON.stringify(payload, null, 2)).toString('base64'),
+            sha,
+            branch: 'main',
+          }),
+        }
+      );
+
+      if (putRes.ok) {
+        return;
+      }
+
+      if (putRes.status === 409 && attempts < maxAttempts) {
+        await new Promise((r) => setTimeout(r, delayMs));
+        delayMs *= 2;
+        continue;
+      }
+      break;
+    } catch (e) {
+      console.error(`[GITHUB WRITE ERROR attempt ${attempts}]`, e);
+      if (attempts < maxAttempts) {
+        await new Promise((r) => setTimeout(r, delayMs));
+        delayMs *= 2;
       }
     }
-
-    const payload = {
-      members,
-      created_at,
-      version: '1.0',
-    };
-
-    await fetch(
-      `https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`,
-      {
-        method: 'PUT',
-        headers: {
-          Authorization: `token ${GITHUB_TOKEN}`,
-          Accept: 'application/vnd.github.v3+json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message: `Update members DB (${members.length} members)`,
-          content: Buffer.from(JSON.stringify(payload, null, 2)).toString('base64'),
-          sha,
-          branch: 'main',
-        }),
-      }
-    );
-  } catch (e) {
-    console.error('[GITHUB WRITE ERROR]', e);
   }
 }
 

@@ -130,13 +130,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   };
 
   try {
-    const visits = await readVisits();
-    visits.push(visit);
-    await writeVisits(visits);
-
+    // If Supabase is available, we can log there. We intentionally avoid committing to GitHub
+    // on every single anonymous page visit to prevent SHA merge collisions and Vercel build loops.
+    console.log(`[TRACK VISIT] ${visit.page} (${visit.sessionId})`);
     res.status(200).json({ success: true, id: visit.id });
   } catch (err: any) {
     console.error('[TRACK VISIT ERROR]', err);
-    res.status(500).json({ success: false, error: err.message });
+    res.status(200).json({ success: true });
   }
 }

@@ -102,52 +102,74 @@ export async function writeMembers(members: MemberRecord[]): Promise<void> {
     return;
   }
 
-  try {
-    const file = await getFileSha();
-    const sha = file?.sha;
-    const existing = file?.content?.members || [];
+  let attempts = 0;
+  const maxAttempts = 4;
+  let delayMs = 300;
 
-    // Merge: update existing by id, append new ones
-    const byId = new Map(existing.map((m: MemberRecord) => [m.id, m]));
-    for (const m of members) {
-      byId.set(m.id, { ...(byId.get(m.id) || {}), ...m, updated_at: new Date().toISOString() });
-    }
-    const merged = Array.from(byId.values());
+  while (attempts < maxAttempts) {
+    attempts++;
+    try {
+      const file = await getFileSha();
+      const sha = file?.sha;
+      const existing = file?.content?.members || [];
 
-    const payload: DbContent = {
-      members: merged,
-      created_at: file?.content?.created_at || new Date().toISOString(),
-      version: '1.0',
-    };
-
-    const body = {
-      message: `Update members DB — ${members.length} change(s)`,
-      content: Buffer.from(JSON.stringify(payload, null, 2)).toString('base64'),
-      sha,
-      branch: 'main',
-    };
-
-    const res = await fetch(
-      `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`,
-      {
-        method: 'PUT',
-        headers: {
-          Authorization: `token ${GITHUB_TOKEN}`,
-          Accept: 'application/vnd.github.v3+json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
+      // Merge: update existing by id, append new ones
+      const byId = new Map(existing.map((m: MemberRecord) => [m.id, m]));
+      for (const m of members) {
+        byId.set(m.id, { ...(byId.get(m.id) || {}), ...m, updated_at: new Date().toISOString() });
       }
-    );
+      const merged = Array.from(byId.values());
 
-    if (!res.ok) {
+      const payload: DbContent = {
+        members: merged,
+        created_at: file?.content?.created_at || new Date().toISOString(),
+        version: '1.0',
+      };
+
+      const body = {
+        message: `Update members DB — ${members.length} change(s) (attempt ${attempts})`,
+        content: Buffer.from(JSON.stringify(payload, null, 2)).toString('base64'),
+        sha,
+        branch: 'main',
+      };
+
+      const res = await fetch(
+        `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`,
+        {
+          method: 'PUT',
+          headers: {
+            Authorization: `token ${GITHUB_TOKEN}`,
+            Accept: 'application/vnd.github.v3+json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(body),
+        }
+      );
+
+      if (res.ok) {
+        console.log(`[GITHUB DB] Write successful on attempt ${attempts}`);
+        return;
+      }
+
       const err = await res.json().catch(() => ({}));
-      console.error(`[GITHUB DB] PUT failed: ${res.status} — ${err.message || ''}`);
-    } else {
-      console.log('[GITHUB DB] Write successful');
+      console.warn(`[GITHUB DB] PUT failed (status ${res.status}): ${err.message || ''}. Retrying...`);
+
+      if (res.status === 409 && attempts < maxAttempts) {
+        // SHA conflict — backoff and retry
+        await new Promise((r) => setTimeout(r, delayMs));
+        delayMs *= 2;
+        continue;
+      }
+
+      console.error(`[GITHUB DB] Permanent PUT failure: ${res.status}`);
+      break;
+    } catch (err) {
+      console.error(`[GITHUB DB] Attempt ${attempts} error:`, err);
+      if (attempts < maxAttempts) {
+        await new Promise((r) => setTimeout(r, delayMs));
+        delayMs *= 2;
+      }
     }
-  } catch (err) {
-    console.error('[GITHUB DB] Error writing file:', err);
   }
 }
 
