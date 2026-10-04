@@ -702,7 +702,7 @@
       "state": "FL",
       "zipcode": "32908",
       "plan": "mental-wellness",
-      "status": "checkout_started",
+      "status": "active",
       "registered_at": "2026-10-02T21:14:55.557Z",
       "checkout_started_at": "2026-10-03T21:35:59.850Z",
       "stripe_session_id": null,
@@ -710,7 +710,13 @@
       "consent_analytics": true,
       "consent_version": "2.0",
       "consent_timestamp": "2026-10-03T21:35:31.541Z",
-      "updated_at": "2026-10-03T21:35:59.850Z"
+      "updated_at": "2026-10-03T21:35:59.850Z",
+      "paid_at": "2026-10-04T19:27:05.293Z",
+      "lyric_synced": true,
+      "lyric_synced_at": "2026-10-04T19:27:05.295Z",
+      "lyric_sync_method": "api",
+      "lyric_user_id": 10413898,
+      "lyric_sync_attempts": 1
     },
     {
       "id": "5104935737",
