@@ -761,6 +761,27 @@
       "consent_version": "2.0",
       "consent_timestamp": "2026-10-06T18:40:07.405Z",
       "updated_at": "2026-10-06T18:41:45.555Z"
+    },
+    {
+      "id": "3465747296",
+      "first_name": "Dexter",
+      "last_name": "Comeaux",
+      "email": "dextercomeaux2@gmail.com",
+      "phone": "3465747296",
+      "dob": "1991-10-17",
+      "address": "15626 Sunset Rock Dr",
+      "city": "Houston",
+      "state": "TX",
+      "zipcode": "77084",
+      "plan": "carenow",
+      "status": "registered",
+      "registered_at": "2026-10-06T18:46:24.676Z",
+      "checkout_started_at": null,
+      "stripe_session_id": null,
+      "consent_tos": true,
+      "consent_analytics": true,
+      "consent_version": "2.0",
+      "consent_timestamp": "2026-10-06T18:46:24.550Z"
     }
   ],
   "created_at": "2026-09-01T23:00:00Z",
