@@ -4,6 +4,7 @@ import { Menu, X, Mail, Globe, Shield, Check, LayoutDashboard, Phone } from 'luc
 import { SupportHub } from './SupportHub';
 import { motion, AnimatePresence } from 'motion/react';
 import { Logo } from './Logo';
+import { EcosystemSection } from './EcosystemSection';
 import { useLanguage, type Lang } from '../context/LanguageContext';
 
 const LANG_OPTIONS: { code: Lang; label: string }[] = [
@@ -284,7 +285,12 @@ export function Layout() {
           </div>
         </div>
 
-        <div className="container mx-auto px-6 mt-20 pt-10 border-t border-white/5">
+        {/* Connected Innovation Ecosystem Cross-Marketing Network */}
+        <div className="container mx-auto px-6">
+          <EcosystemSection />
+        </div>
+
+        <div className="container mx-auto px-6 mt-16 pt-10 border-t border-white/5">
           {/* Faith & Wholeness Slogan */}
           <div className="max-w-2xl mx-auto mb-10 text-center px-4 py-6 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-sm">
             <p className="text-sm md:text-base font-semibold italic text-[#23d9b0] mb-2 leading-relaxed">
