@@ -33,7 +33,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(503).json({ success: false, error: 'Stripe not configured' });
   }
 
-  const { code, plan_id } = req.body;
+  const code = req.body.code || req.body.promo_code;
+  const plan_id = req.body.plan_id || req.body.plan;
 
   if (!code || typeof code !== 'string') {
     return res.status(400).json({ success: false, error: 'Promo code required' });
