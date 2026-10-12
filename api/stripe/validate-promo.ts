@@ -108,7 +108,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       try {
         const allCoupons = await stripe.coupons.list({ limit: 100 });
         const search = normalizedCode.toLowerCase();
-        const match = allCoupons.data.find((c: Stripe.Coupon) =>
+        const match = allCoupons.data.find((c: any) =>
           !c.deleted && (
             (c.id && c.id.toLowerCase() === search) ||
             (c.name && c.name.toLowerCase() === search)

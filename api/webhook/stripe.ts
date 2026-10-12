@@ -1,4 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { createHmac, timingSafeEqual } from 'node:crypto';
 import { sendCustomerEnrollmentEmails } from '../client-email.js';
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN || '';
@@ -8,8 +9,66 @@ const FILE_PATH = 'data/members.json';
 const RESEND_KEY = process.env.RESEND_API_KEY || '';
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'support@cedexx.net';
 const JASMEL_EMAIL = process.env.JASMEL_EMAIL || 'jasmelacosta@gmail.com';
-const TELEGRAM_BOT = process.env.TELEGRAM_BOT_TOKEN || '8834617573:AAGANwBh_xp-MIZpqukctS2OAuJ2zxJOnrU';
-const TELEGRAM_CHAT = process.env.TELEGRAM_CHAT_ID || '7838956683';
+const TELEGRAM_BOT = process.env.TELEGRAM_BOT_TOKEN || '';
+const TELEGRAM_CHAT = process.env.TELEGRAM_CHAT_ID || '';
+const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET || '';
+
+// Disable automatic body parsing so we can read the raw buffer for signature verification
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
+async function getRawBody(req: VercelRequest, limit = 1024 * 1024): Promise<Buffer> {
+  // If already parsed as Buffer or string:
+  if (Buffer.isBuffer(req.body)) return req.body;
+  if (typeof req.body === 'string') return Buffer.from(req.body, 'utf8');
+
+  return new Promise((resolve, reject) => {
+    const chunks: Buffer[] = [];
+    let length = 0;
+    req.on('data', (chunk: Buffer) => {
+      chunks.push(chunk);
+      length += chunk.length;
+      if (length > limit) {
+        reject(new Error('Payload too large'));
+      }
+    });
+    req.on('end', () => {
+      resolve(Buffer.concat(chunks));
+    });
+    req.on('error', (err) => {
+      reject(err);
+    });
+  });
+}
+
+function verifyStripeSignature(raw: Buffer, header: string, secret: string, toleranceSec = 300): boolean {
+  if (!raw || raw.length === 0 || !header || !secret) return false;
+  const parts = header.split(',').map(part => part.trim().split('='));
+  const timestamps = parts.filter(([name]) => name === 't');
+  const signatures = parts.filter(([name, value]) => name === 'v1' && /^[a-f0-9]{64}$/i.test(value || ''));
+
+  if (timestamps.length !== 1 || !/^\d{1,12}$/.test(timestamps[0][1] || '') || !signatures.length) {
+    return false;
+  }
+
+  const timestamp = Number(timestamps[0][1]);
+  const age = Math.floor(Date.now() / 1000) - timestamp;
+  if (age > toleranceSec || age < -30) {
+    return false;
+  }
+
+  const digest = createHmac('sha256', secret).update(`${timestamps[0][1]}.`).update(raw).digest();
+  return signatures.some(([, value]) => {
+    try {
+      return timingSafeEqual(digest, Buffer.from(value, 'hex'));
+    } catch {
+      return false;
+    }
+  });
+}
 
 const REVERSE_PRICE_MAP: Record<string, string> = {
   'price_1U6wRRRPzCKs3jKTR9VQCVeS': 'carenow',
@@ -336,10 +395,39 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).end();
   }
 
-  const sig = req.headers['stripe-signature'];
-  const event = req.body;
+  let event: any;
+  const sig = req.headers['stripe-signature'] as string | undefined;
 
-  // Log webhook received
+  try {
+    const rawBody = await getRawBody(req);
+
+    if (STRIPE_WEBHOOK_SECRET) {
+      if (!sig) {
+        console.error('[STRIPE WEBHOOK] Missing stripe-signature header');
+        return res.status(400).json({ error: 'Missing stripe-signature header' });
+      }
+
+      const isValid = verifyStripeSignature(rawBody, sig, STRIPE_WEBHOOK_SECRET);
+      if (!isValid) {
+        console.error('[STRIPE WEBHOOK] Invalid stripe signature');
+        return res.status(400).json({ error: 'Invalid stripe signature' });
+      }
+    } else {
+      console.warn('[STRIPE WEBHOOK WARNING] STRIPE_WEBHOOK_SECRET not configured. Signature verification bypassed.');
+    }
+
+    try {
+      event = JSON.parse(rawBody.toString('utf8'));
+    } catch (parseErr) {
+      console.error('[STRIPE WEBHOOK] Invalid JSON body');
+      return res.status(400).json({ error: 'Invalid JSON payload' });
+    }
+  } catch (bodyErr: any) {
+    console.error('[STRIPE WEBHOOK] Error reading raw body:', bodyErr);
+    return res.status(400).json({ error: 'Failed to read request body' });
+  }
+
+  // Log webhook received safely
   console.log('[STRIPE WEBHOOK] Event received:', {
     type: event?.type,
     id: event?.id,
@@ -350,9 +438,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const members = await readMembers();
     let updated = false;
 
-    switch (event.type) {
+    switch (event?.type) {
       case 'checkout.session.completed': {
-        const session = event.data.object;
+        const session = event.data?.object;
+        if (!session) break;
+
         const rawEmail = session.customer_email || session.customer_details?.email;
         const email = rawEmail ? rawEmail.toLowerCase().trim() : '';
         const metadata = session.metadata || {};
@@ -363,6 +453,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         }
 
         let member = members.find((m: any) => m.email && m.email.toLowerCase() === email);
+
+        // IDEMPOTENCY GUARD:
+        // If this member already has status='paid' and matching stripe_session_id,
+        // or already processed, do not resend welcome emails or re-enroll in Lyric.
+        if (member && member.status === 'paid' && (member.stripe_session_id === session.id || member.paid_at)) {
+          console.log('[STRIPE WEBHOOK] Idempotency: Session or member already processed for email:', email);
+          return res.status(200).json({ received: true, already_processed: true });
+        }
+
         if (!member) {
           console.log('[STRIPE WEBHOOK] Creating new member from checkout:', email);
           const rawPhone = metadata.phone || '';

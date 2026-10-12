@@ -10,8 +10,8 @@ const FILE_PATH = 'data/members.json';
 const RESEND_KEY = process.env.RESEND_API_KEY || '';
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'support@cedexx.net';
 const JASMEL_EMAIL = process.env.JASMEL_EMAIL || 'jasmelacosta@gmail.com';
-const TELEGRAM_BOT = process.env.TELEGRAM_BOT_TOKEN || '8834617573:AAGANwBh_xp-MIZpqukctS2OAuJ2zxJOnrU';
-const TELEGRAM_CHAT = process.env.TELEGRAM_CHAT_ID || '7838956683';
+const TELEGRAM_BOT = process.env.TELEGRAM_BOT_TOKEN || '';
+const TELEGRAM_CHAT = process.env.TELEGRAM_CHAT_ID || '';
 
 const REVERSE_PRICE_MAP: Record<string, string> = {
   'price_1U6wRRRPzCKs3jKTR9VQCVeS': 'carenow',

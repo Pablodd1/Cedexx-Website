@@ -2,8 +2,8 @@ import Stripe from 'stripe';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 const RESEND_KEY = process.env.RESEND_API_KEY || '';
-const TELEGRAM_BOT = process.env.TELEGRAM_BOT_TOKEN || '8834617573:AAGANwBh_xp-MIZpqukctS2OAuJ2zxJOnrU';
-const TELEGRAM_CHAT = process.env.TELEGRAM_CHAT_ID || '7838956683';
+const TELEGRAM_BOT = process.env.TELEGRAM_BOT_TOKEN || '';
+const TELEGRAM_CHAT = process.env.TELEGRAM_CHAT_ID || '';
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'support@cedexx.net';
 const JASMEL_EMAIL = process.env.JASMEL_EMAIL || 'jasmelacosta@gmail.com';
 
@@ -151,7 +151,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           const couponAttempts = [normalized, normalized.toLowerCase()];
           for (const cid of couponAttempts) {
             try {
-              const c = await stripe.coupons.retrieve(cid);
+              const c = await stripe.coupons.retrieve(cid) as any;
               if (c && !c.deleted) {
                 couponId = c.id;
                 break;
@@ -160,7 +160,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           }
           if (!couponId) {
             const allCoupons = await stripe.coupons.list({ limit: 100 });
-            const match = allCoupons.data.find(c => !c.deleted && (c.id.toLowerCase() === normalized.toLowerCase() || (c.name && c.name.toLowerCase() === normalized.toLowerCase())));
+            const match = allCoupons.data.find((c: any) => !c.deleted && (c.id.toLowerCase() === normalized.toLowerCase() || (c.name && c.name.toLowerCase() === normalized.toLowerCase())));
             if (match) couponId = match.id;
           }
 
