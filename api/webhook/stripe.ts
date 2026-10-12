@@ -401,19 +401,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     const rawBody = await getRawBody(req);
 
-    if (STRIPE_WEBHOOK_SECRET) {
-      if (!sig) {
-        console.error('[STRIPE WEBHOOK] Missing stripe-signature header');
-        return res.status(400).json({ error: 'Missing stripe-signature header' });
-      }
+    if (!STRIPE_WEBHOOK_SECRET) {
+      console.error('[STRIPE WEBHOOK ERROR] STRIPE_WEBHOOK_SECRET not configured.');
+      return res.status(503).json({ error: 'Webhook signing secret not configured' });
+    }
 
-      const isValid = verifyStripeSignature(rawBody, sig, STRIPE_WEBHOOK_SECRET);
-      if (!isValid) {
-        console.error('[STRIPE WEBHOOK] Invalid stripe signature');
-        return res.status(400).json({ error: 'Invalid stripe signature' });
-      }
-    } else {
-      console.warn('[STRIPE WEBHOOK WARNING] STRIPE_WEBHOOK_SECRET not configured. Signature verification bypassed.');
+    if (!sig) {
+      console.error('[STRIPE WEBHOOK] Missing stripe-signature header');
+      return res.status(400).json({ error: 'Missing stripe-signature header' });
+    }
+
+    const isValid = verifyStripeSignature(rawBody, sig, STRIPE_WEBHOOK_SECRET);
+    if (!isValid) {
+      console.error('[STRIPE WEBHOOK] Invalid stripe signature');
+      return res.status(400).json({ error: 'Invalid stripe signature' });
     }
 
     try {
@@ -455,10 +456,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         let member = members.find((m: any) => m.email && m.email.toLowerCase() === email);
 
         // IDEMPOTENCY GUARD:
-        // If this member already has status='paid' and matching stripe_session_id,
-        // or already processed, do not resend welcome emails or re-enroll in Lyric.
-        if (member && member.status === 'paid' && (member.stripe_session_id === session.id || member.paid_at)) {
-          console.log('[STRIPE WEBHOOK] Idempotency: Session or member already processed for email:', email);
+        // Prevent duplicate processing if this exact checkout session was already fulfilled.
+        // If an existing member is purchasing a new plan or renewing (different session.id), allow it through.
+        if (member && member.stripe_session_id === session.id && member.status === 'paid') {
+          console.log('[STRIPE WEBHOOK] Idempotency: Session already processed for session id:', session.id);
           return res.status(200).json({ received: true, already_processed: true });
         }
 
@@ -666,11 +667,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       originalError: err,
     });
 
-    // Still return 200 to Stripe to prevent retries
-    // (we've already alerted, so manual intervention needed)
-    res.status(200).json({ 
-      received: true, 
-      warning: 'Processing error occurred — admin alerted' 
+    // Return 500 to Stripe so Stripe knows event delivery failed and retries according to policy
+    res.status(500).json({ 
+      error: 'Webhook processing failed',
+      message: err instanceof Error ? err.message : 'Unknown error'
     });
   }
 }
