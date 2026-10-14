@@ -420,6 +420,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   } catch (err: any) {
     console.error('[VERIFY SESSION ERROR]', err);
+    if (err?.code === 'resource_missing' || err?.message?.includes('No such checkout.session')) {
+      return res.status(404).json({ success: false, error: 'Checkout session not found' });
+    }
     return res.status(500).json({ success: false, error: err.message });
   }
 }
