@@ -136,6 +136,10 @@ function buildMedicalBusiness() {
     image: SCHEMA_CONFIG.ogImage,
     foundingDate: SCHEMA_CONFIG.founded,
     founders: SCHEMA_CONFIG.founder,
+    sameAs: [
+      'https://www.youtube.com/@Cedexx-bettercare',
+      'https://www.linkedin.com/company/cedexx-healthcare'
+    ],
     email: SCHEMA_CONFIG.email,
     telephone: SCHEMA_CONFIG.phone,
     address: SCHEMA_CONFIG.address,

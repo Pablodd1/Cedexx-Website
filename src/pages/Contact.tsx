@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { Mail, Clock, Send, CheckCircle2, Linkedin, Globe, Shield, MessageCircle, Phone } from 'lucide-react';
+import { Mail, Clock, Send, CheckCircle2, Linkedin, Youtube, Globe, Shield, MessageCircle, Phone } from 'lucide-react';
 import { Button } from '../components/ui';
 import { useLanguage } from '../context/LanguageContext';
 import { VirtualReceptionist } from '../components/VirtualReceptionist';
@@ -170,6 +170,14 @@ export function Contact() {
 
               {/* Social / Additional */}
               <div className="flex flex-wrap items-center gap-6">
+                <a
+                  href="https://www.youtube.com/@Cedexx-bettercare"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 text-[12px] font-black text-[#050249] hover:bg-red-600 hover:text-white transition-all bg-white border border-blue-50 rounded-2xl px-6 py-3 shadow-sm"
+                >
+                  <Youtube className="h-5 w-5 text-red-600 group-hover:text-white" /> YouTube
+                </a>
                 <a
                   href="https://www.linkedin.com/company/cedexx-healthcare"
                   target="_blank"

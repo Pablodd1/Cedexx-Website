@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { Menu, X, Mail, Globe, Shield, Check, LayoutDashboard, Phone } from 'lucide-react';
+import { Menu, X, Mail, Globe, Shield, Check, LayoutDashboard, Phone, Youtube, Linkedin } from 'lucide-react';
 import { SupportHub } from './SupportHub';
 import { motion, AnimatePresence } from 'motion/react';
 import { Logo } from './Logo';
@@ -272,6 +272,18 @@ export function Layout() {
                   <Globe className="h-4 w-4 text-blue-400 group-hover:text-[#23d9b0]" />
                 </div>
                 <a href="https://cedexx.net" className="hover:text-white transition-all text-blue-100 font-bold">cedexx.net</a>
+              </li>
+              <li className="flex items-center gap-4 group">
+                <div className="h-10 w-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:bg-red-500/20 transition-all duration-500">
+                  <Youtube className="h-4 w-4 text-red-400 group-hover:text-red-500" />
+                </div>
+                <a href="https://www.youtube.com/@Cedexx-bettercare" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-all text-blue-100 font-bold">@Cedexx-bettercare</a>
+              </li>
+              <li className="flex items-center gap-4 group">
+                <div className="h-10 w-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:bg-blue-500/20 transition-all duration-500">
+                  <Linkedin className="h-4 w-4 text-blue-400 group-hover:text-white" />
+                </div>
+                <a href="https://www.linkedin.com/company/cedexx-healthcare" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-all text-blue-100 font-bold">LinkedIn</a>
               </li>
             </ul>
           </div>
