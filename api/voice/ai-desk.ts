@@ -13,6 +13,8 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
  * 6. bargeIn="false" on prompts to prevent line noise and crossed speech
  */
 
+const DEEPSEEK_KEY = process.env.DEEPSEEK_API_KEY || '';
+const OPENAI_KEY = process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY || '';
 const GEMINI_KEY = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY || '';
 const TWILIO_PHONE = process.env.TWILIO_PHONE_NUMBER || '+17544322201';
 const STAFF_PHONE = process.env.STAFF_PHONE || process.env.DAISY_PHONE || '';
@@ -297,11 +299,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // 5. QUICK RESPONSE OR AI-GENERATED CONVERSATIONAL RESPONSE
   let spokenText = getQuickResponse(intent);
 
-  if (!spokenText && GEMINI_KEY) {
+  if (!spokenText) {
     try {
       spokenText = await getAIResponse(speech);
     } catch (err) {
-      console.error('[AI DESK] Gemini error:', err);
+      console.error('[AI DESK] AI generation error:', err);
     }
   }
 
@@ -322,29 +324,94 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   return res.status(200).send(twiml(followUpResponse));
 }
 
-// ─── Call Gemini AI ───
+// ─── Call Multi-Provider AI (DeepSeek → OpenAI → Gemini 2.0 Flash) ───
 async function getAIResponse(userSpeech: string): Promise<string> {
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{
-          role: 'user',
-          parts: [{
-            text: `${CEDEXX_KNOWLEDGE}\n\nCaller said: "${userSpeech}"\n\nRespond as Ceedex, the front desk receptionist. Keep it to 2 friendly, spoken sentences. Never mention employee names like Daisy; refer to "our staff". Offer to help enroll or connect with staff if relevant.`
-          }]
-        }],
-        generationConfig: { temperature: 0.3, maxOutputTokens: 120 },
-      }),
-    }
-  );
+  const promptInstruction = `Respond as Hannah at Ceedex, the front desk receptionist. Keep it to 2 friendly, spoken sentences (no markdown or bullet points). Never mention employee names like Daisy; refer to "our staff". Offer to help enroll at ceedex dot net slash enroll or connect with staff if relevant.`;
 
-  const data = await response.json();
-  const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-  if (text) return text;
-  
+  if (DEEPSEEK_KEY) {
+    try {
+      const res = await fetch('https://api.deepseek.com/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${DEEPSEEK_KEY}`,
+        },
+        body: JSON.stringify({
+          model: 'deepseek-chat',
+          messages: [
+            { role: 'system', content: `${CEDEXX_KNOWLEDGE}\n\n${promptInstruction}` },
+            { role: 'user', content: userSpeech },
+          ],
+          temperature: 0.3,
+          max_tokens: 120,
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const text = data.choices?.[0]?.message?.content?.replace(/[*#_~`]/g, '').trim();
+        if (text) return text;
+      }
+    } catch (e) {
+      console.warn('[AI DESK] DeepSeek failed:', e);
+    }
+  }
+
+  if (OPENAI_KEY) {
+    try {
+      const res = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${OPENAI_KEY}`,
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [
+            { role: 'system', content: `${CEDEXX_KNOWLEDGE}\n\n${promptInstruction}` },
+            { role: 'user', content: userSpeech },
+          ],
+          temperature: 0.3,
+          max_tokens: 120,
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const text = data.choices?.[0]?.message?.content?.replace(/[*#_~`]/g, '').trim();
+        if (text) return text;
+      }
+    } catch (e) {
+      console.warn('[AI DESK] OpenAI failed:', e);
+    }
+  }
+
+  if (GEMINI_KEY) {
+    try {
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{
+              role: 'user',
+              parts: [{
+                text: `${CEDEXX_KNOWLEDGE}\n\nCaller said: "${userSpeech}"\n\n${promptInstruction}`
+              }]
+            }],
+            generationConfig: { temperature: 0.3, maxOutputTokens: 120 },
+          }),
+        }
+      );
+      if (response.ok) {
+        const data = await response.json();
+        const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.replace(/[*#_~`]/g, '').trim();
+        if (text) return text;
+      }
+    } catch (e) {
+      console.warn('[AI DESK] Gemini failed:', e);
+    }
+  }
+
   return "I'd be happy to help with that. You can enroll online at ceedex dot net slash enroll, or I can connect you directly with our staff.";
 }
 

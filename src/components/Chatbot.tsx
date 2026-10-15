@@ -152,31 +152,6 @@ useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Auto-greeting after 5 seconds when chat opens
-  useEffect(() => {
-    if (isOpen && messages.length === 1) {
-      const timer = setTimeout(() => {
-        const greeting = "Hi there! I'm JasDex, your Cedexx AI Assistant. 👋 I can help you learn about our affordable physician access for families, enrollment options, or connect you with our team. How can I help you today?";
-        setMessages(prev => [...prev, { role: 'model', text: greeting }]);
-        speak(greeting);
-      }, 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [isOpen, messages.length]);
-
-  // Callback offer after 60 seconds of inactivity
-  useEffect(() => {
-    if (!isOpen || messages.length < 2) return;
-    
-    const inactivityTimer = setTimeout(() => {
-      const callbackMsg = "I haven't heard from you in a while. Would you like me to have our team call you back? Just leave your name and number, and we'll be in touch shortly!";
-      setMessages(prev => [...prev, { role: 'model', text: callbackMsg }]);
-      speak(callbackMsg);
-    }, 60000);
-    
-    return () => clearTimeout(inactivityTimer);
-  }, [isOpen, messages.length]);
-
   const speak = useCallback((text: string) => {
     if (!isVoiceEnabled || !synthRef.current) return;
     
@@ -226,19 +201,77 @@ useEffect(() => {
     setIsSpeaking(false);
   }, []);
 
+  // Speak initial greeting once when chat opens
+  const hasGreetedRef = useRef(false);
+  useEffect(() => {
+    if (isOpen && !hasGreetedRef.current && messages.length === 1) {
+      hasGreetedRef.current = true;
+      const timer = setTimeout(() => {
+        speak(messages[0].text);
+      }, 600);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, messages, speak]);
+
+  // Callback offer after 60 seconds of inactivity
+  useEffect(() => {
+    if (!isOpen || messages.length < 2) return;
+    
+    const inactivityTimer = setTimeout(() => {
+      const callbackMsg = "I haven't heard from you in a while. Would you like me to have our team call you back? Just leave your name and number, and we'll be in touch shortly!";
+      setMessages(prev => [...prev, { role: 'model', text: callbackMsg }]);
+      speak(callbackMsg);
+    }, 60000);
+    
+    return () => clearTimeout(inactivityTimer);
+  }, [isOpen, messages.length, speak]);
+
   const startListeningDeepgram = async () => {
     const key = import.meta.env.VITE_DEEPGRAM_API_KEY;
     if (!key) {
-      // Demo fallback
-      setIsListening(true);
-      setInterimText('Listening (demo)...');
-      setTimeout(() => {
-        const transcript = 'Demo spoken input';
-        setInput(transcript);
-        setInterimText('');
-        setIsListening(false);
-        handleSend(transcript);
-      }, 1500);
+      // Use browser Web Speech API if Deepgram key is not present on client
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        try {
+          const recognition = new SpeechRecognition();
+          recognition.lang = 'en-US';
+          recognition.interimResults = true;
+          recognition.maxAlternatives = 1;
+          recognitionRef.current = recognition;
+          recognition.onstart = () => {
+            setIsListening(true);
+            setInterimText('Listening...');
+          };
+          recognition.onresult = (event: any) => {
+            let transcript = '';
+            for (let i = event.resultIndex; i < event.results.length; ++i) {
+              transcript += event.results[i][0].transcript;
+            }
+            setInput(transcript);
+            if (event.results[event.results.length - 1].isFinal) {
+              setInterimText('');
+              setIsListening(false);
+              handleSend(transcript);
+            } else {
+              setInterimText(transcript);
+            }
+          };
+          recognition.onerror = () => {
+            setInterimText('');
+            setIsListening(false);
+          };
+          recognition.onend = () => {
+            setInterimText('');
+            setIsListening(false);
+          };
+          recognition.start();
+          return;
+        } catch (e) {
+          console.warn('Browser SpeechRecognition failed:', e);
+        }
+      }
+      setIsListening(false);
+      setInterimText('');
       return;
     }
     // Production: WebSocket Deepgram streaming bridge
@@ -302,20 +335,19 @@ useEffect(() => {
       setInterimText('Listening with Deepgram...');
     } catch (err) {
       console.error('Deepgram streaming setup failed', err);
-      // Fallback to demo
-      setIsListening(true);
-      setInterimText('Listening (demo)...');
-      setTimeout(() => {
-        const transcript = 'Demo spoken input';
-        setInput(transcript);
-        setInterimText('');
-        setIsListening(false);
-        handleSend(transcript);
-      }, 1500);
+      setIsListening(false);
+      setInterimText('');
     }
   };
 
   const toggleListening = () => {
+    if (isListening) {
+      recognitionRef.current?.stop?.();
+      dgWsRef.current?.close?.();
+      setIsListening(false);
+      setInterimText('');
+      return;
+    }
     startListeningDeepgram();
   };
 
@@ -325,35 +357,28 @@ useEffect(() => {
     
     setInput('');
     setInterimText('');
-    setMessages(prev => [...prev, { role: 'user', text }]);
+    const updatedHistory = [...messages, { role: 'user' as const, text }];
+    setMessages(updatedHistory);
     stopSpeaking();
 
     setIsLoading(true);
     
     try {
-      let response = await fetch('/api/chat', {
+      const apiMessages = updatedHistory.slice(-8).map(m => ({
+        role: m.role === 'model' ? 'assistant' : 'user',
+        content: m.text
+      }));
+
+      const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: [{ role: 'user', content: text }],
-          provider: 'kimi' // Use Kimi as primary
+          messages: apiMessages
         })
       });
-      // If primary provider fails, attempt backup provider
+
       if (!response.ok) {
-        const backup = await fetch('/api/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            messages: [{ role: 'user', content: text }],
-            provider: 'minimax' // Backup provider
-          })
-        });
-        if (backup.ok) {
-          response = backup;
-        } else {
-          throw new Error('API request failed');
-        }
+        throw new Error('API request failed');
       }
 
       const data = await response.json();
@@ -365,8 +390,13 @@ useEffect(() => {
         data.text ||
         "";
       
-      if (!reply) {
-        throw new Error('No response content');
+      if (!reply || reply.includes('experiencing technical difficulties')) {
+        const localFallback = getFallbackResponse(text);
+        if (localFallback) {
+          reply = localFallback;
+        } else if (!reply) {
+          throw new Error('No response content');
+        }
       }
       
       // Clean markdown

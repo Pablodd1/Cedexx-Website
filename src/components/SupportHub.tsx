@@ -104,19 +104,16 @@ export function SupportHub() {
             )}
 
             {activeMode === 'voice' && (
-              <div className="relative h-[250px] flex items-center justify-center bg-[#050249] text-white overflow-hidden p-8 text-center">
+              <div className="relative min-h-[340px] flex flex-col items-center justify-center bg-[#050249] text-white overflow-hidden px-6 pt-14 pb-6 text-center">
                 <button 
                   onClick={() => setActiveMode('menu')}
                   className="absolute top-4 left-4 z-10 bg-white/10 backdrop-blur-md p-2 rounded-xl text-white hover:bg-white/20 text-[10px] font-black uppercase tracking-widest border border-white/20 shadow-sm"
                 >
                   ← Support Hub
                 </button>
-                <div className="flex flex-col items-center gap-4">
-                  <div className="h-20 w-20 bg-blue-500/20 rounded-full flex items-center justify-center ring-8 ring-blue-500/10 animate-pulse">
-                    <Mic className="h-10 w-10 text-blue-400" />
-                  </div>
+                <div className="w-full flex flex-col items-center gap-2">
                   <h5 className="font-black italic text-xl">JasDex Voice Support</h5>
-                  <p className="text-blue-200/60 text-xs font-medium">Connecting you to JasDex, our AI Front Desk...</p>
+                  <p className="text-blue-200/70 text-xs font-medium mb-1">Speak directly with JasDex, our AI Front Desk</p>
                   <VoiceAssistant inline />
                 </div>
               </div>

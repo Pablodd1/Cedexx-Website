@@ -31,14 +31,17 @@ export const CEDEXX_KNOWLEDGE = {
   ],
 
   pricing: {
-    individual: '$18.99 per month',
-    family: '$34.99 per month (covers up to 7 members)',
+    careNow: '$18.99 per month (24/7 Urgent Care, covers up to 7 members)',
+    mentalWellness: '$18.99 per month (Mental Health & Therapy)',
+    careNowMental: '$26.99 per month (Urgent Care + Mental Wellness bundle)',
+    careComplete: '$34.99 per month (Full Primary Care + Urgent Care)',
+    careCompleteFamily: '$52.99 per month (Large Family Primary Care, up to 7 members)',
     notes: [
-      'No insurance needed for many services',
+      'No insurance needed for any membership plan',
       'No co-pays',
       'No insurance premiums',
       'No urgent care wait times',
-      'Transparent per-visit pricing available for some services',
+      'Up to 7 household members included',
     ],
   },
 

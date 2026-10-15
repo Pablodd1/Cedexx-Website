@@ -11,15 +11,14 @@ const VAPI_PUBLIC_KEY = import.meta.env.VITE_VAPI_PUBLIC_KEY || '5acddf90-ccad-4
 const ASSISTANT_CONFIG = {
   name: 'JasDex',
   model: {
-    provider: 'google',
-    model: 'gemini-1.5-flash',
-    temperature: 0.7,
+    provider: 'openai',
+    model: 'gpt-4o-mini',
+    temperature: 0.5,
     systemPrompt: buildSystemPrompt(),
   },
   voice: {
     provider: 'deepgram',
-    voiceId: 'flux-hannah-en',
-    speed: 1,
+    voiceId: 'aura-asteria-en',
   },
   firstMessage: "Hello! I'm JasDex, your Cedexx virtual front desk receptionist. I'm here to help you with Lyric Health virtual care access, pricing questions, or booking a consultation. How can I assist you today?",
   endCallFunctionEnabled: true,
@@ -74,6 +73,9 @@ export function VoiceAssistant({ inline = false }: { inline?: boolean }) {
   const [transcript, setTranscript] = useState('');
   const [isSpeaking, setIsSpeaking] = useState(false);
   const vapiRef = useRef<Vapi | null>(null);
+  const recognitionRef = useRef<any>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const isFallbackModeRef = useRef(false);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -82,14 +84,96 @@ export function VoiceAssistant({ inline = false }: { inline?: boolean }) {
         vapiRef.current.stop();
         vapiRef.current = null;
       }
+      recognitionRef.current?.stop?.();
+      audioRef.current?.pause?.();
     };
   }, []);
 
+  const speakViaDeepgramOrBrowser = useCallback(async (text: string, onDone?: () => void) => {
+    setIsSpeaking(true);
+    setTranscript(text);
+    try {
+      const audio = new Audio(`/api/voice/speak?text=${encodeURIComponent(text)}`);
+      audioRef.current = audio;
+      audio.onended = () => {
+        setIsSpeaking(false);
+        onDone?.();
+      };
+      audio.onerror = () => {
+        // Fallback to browser SpeechSynthesis
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.rate = 0.98;
+        utter.onend = () => {
+          setIsSpeaking(false);
+          onDone?.();
+        };
+        window.speechSynthesis?.speak(utter);
+      };
+      await audio.play();
+    } catch {
+      setIsSpeaking(false);
+      onDone?.();
+    }
+  }, []);
+
+  const listenForNextTurn = useCallback(() => {
+    if (!isFallbackModeRef.current) return;
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) return;
+    try {
+      const rec = new SpeechRecognition();
+      rec.lang = 'en-US';
+      rec.interimResults = false;
+      recognitionRef.current = rec;
+      rec.onresult = async (ev: any) => {
+        const userText = ev.results?.[0]?.[0]?.transcript || '';
+        if (!userText) return;
+        setTranscript(`You: "${userText}"`);
+        try {
+          const res = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ messages: [{ role: 'user', content: userText }] }),
+          });
+          const data = await res.json();
+          const reply = (data.choices?.[0]?.message?.content || "I'm here to help with CEDEXX plans and Lyric Health access.").replace(/\*+/g, '').trim();
+          speakViaDeepgramOrBrowser(reply, () => {
+            if (isFallbackModeRef.current) listenForNextTurn();
+          });
+        } catch {
+          speakViaDeepgramOrBrowser("You can enroll anytime at cedexx.net/enroll or call 754-432-2201.", () => {
+            if (isFallbackModeRef.current) listenForNextTurn();
+          });
+        }
+      };
+      rec.onend = () => {
+        if (isFallbackModeRef.current && !isSpeaking) {
+          try { rec.start(); } catch {}
+        }
+      };
+      rec.start();
+    } catch {}
+  }, [isSpeaking, speakViaDeepgramOrBrowser]);
+
+  const startDirectWebVoiceFallback = useCallback(() => {
+    isFallbackModeRef.current = true;
+    setIsConnecting(false);
+    setIsConnected(true);
+    const greeting = "Hello! I'm JasDex, your Cedexx virtual front desk receptionist. How can I assist you today?";
+    speakViaDeepgramOrBrowser(greeting, () => {
+      listenForNextTurn();
+    });
+  }, [listenForNextTurn, speakViaDeepgramOrBrowser]);
+
   const endCall = useCallback(() => {
+    isFallbackModeRef.current = false;
     if (vapiRef.current) {
       vapiRef.current.stop();
       vapiRef.current = null;
     }
+    recognitionRef.current?.stop?.();
+    audioRef.current?.pause?.();
+    window.speechSynthesis?.cancel?.();
     setIsConnected(false);
     setIsConnecting(false);
     setIsSpeaking(false);
@@ -98,13 +182,13 @@ export function VoiceAssistant({ inline = false }: { inline?: boolean }) {
   }, [inline]);
 
   const startCall = async () => {
+    setIsConnecting(true);
+    setTranscript('Connecting to JasDex...');
+
     if (!VAPI_PUBLIC_KEY || VAPI_PUBLIC_KEY.includes('REPLACE')) {
-      setTranscript('Vapi.ai not configured. Please add your public key to .env.local');
+      startDirectWebVoiceFallback();
       return;
     }
-
-    setIsConnecting(true);
-    setTranscript('Connecting to Cedex...');
 
     try {
       const vapi = new Vapi(VAPI_PUBLIC_KEY);
@@ -139,22 +223,21 @@ export function VoiceAssistant({ inline = false }: { inline?: boolean }) {
       });
 
       vapi.on('call-end', () => {
-        endCall();
+        if (!isFallbackModeRef.current) endCall();
       });
 
       vapi.on('error', (error) => {
-        console.error('Vapi error:', error);
-        setTranscript('Sorry, I encountered a connection issue. Please try again.');
-        setIsConnecting(false);
+        console.warn('Vapi error, switching to direct Deepgram/AI voice bridge:', error);
+        try { vapi.stop(); } catch {}
+        startDirectWebVoiceFallback();
       });
 
       // Start the call
       await vapi.start(ASSISTANT_CONFIG as any);
 
     } catch (err) {
-      console.error('Start call failed:', err);
-      setTranscript('Connection failed. Please check your microphone permissions and try again.');
-      setIsConnecting(false);
+      console.warn('Vapi start failed, switching to direct Deepgram/AI voice bridge:', err);
+      startDirectWebVoiceFallback();
     }
   };
 
@@ -163,11 +246,9 @@ export function VoiceAssistant({ inline = false }: { inline?: boolean }) {
 
     switch (name) {
       case 'bookAppointment':
-        // TODO: Integrate with Cal.com or your booking system
         console.log('Booking appointment:', parameters);
-        // Send to your booking API
         try {
-          await fetch('/api/book-voice', {
+          await fetch('/api/voice-booking', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(parameters),
@@ -178,12 +259,11 @@ export function VoiceAssistant({ inline = false }: { inline?: boolean }) {
         break;
 
       case 'transferToHuman':
-        // TODO: Implement human handoff (Twilio, Slack, etc.)
         console.log('Transfer to human:', parameters.reason);
+        window.location.href = 'tel:+17544322201';
         break;
 
       case 'sendPricingInfo':
-        // TODO: Send email via Brevo/Resend
         console.log('Send pricing to:', parameters.email);
         break;
 
@@ -194,8 +274,8 @@ export function VoiceAssistant({ inline = false }: { inline?: boolean }) {
 
   const assistantUI = (
     <div className={cn(
-      "bg-white flex flex-col overflow-hidden",
-      inline ? "w-full" : "fixed bottom-24 right-6 w-80 rounded-2xl shadow-2xl z-50 border border-blue-100"
+      "flex flex-col overflow-hidden",
+      inline ? "w-full bg-transparent" : "fixed bottom-24 right-6 w-80 rounded-2xl shadow-2xl z-50 border border-blue-100 bg-white"
     )}>
       {/* Header (Hidden if inline) */}
       {!inline && (
@@ -214,11 +294,11 @@ export function VoiceAssistant({ inline = false }: { inline?: boolean }) {
       )}
 
       {/* Body */}
-      <div className={cn("flex flex-col items-center gap-5", inline ? "" : "p-6 bg-slate-50")}>
+      <div className={cn("flex flex-col items-center gap-4", inline ? "p-2" : "p-6 bg-slate-50")}>
         {/* Waveform / Mic indicator */}
         <div className={cn(
-          'h-24 w-24 rounded-full flex items-center justify-center transition-all duration-500 relative',
-          isConnected ? 'bg-[#EBF3FB] pulse-ring' : 'bg-slate-100'
+          'h-20 w-20 rounded-full flex items-center justify-center transition-all duration-500 relative',
+          isConnected ? 'bg-[#EBF3FB] pulse-ring' : inline ? 'bg-white/10' : 'bg-slate-100'
         )}>
           {isConnected ? (
             isSpeaking ? (
@@ -243,15 +323,18 @@ export function VoiceAssistant({ inline = false }: { inline?: boolean }) {
               </div>
             )
           ) : (
-            <MicOff className="h-10 w-10 text-slate-400" />
+            <MicOff className={cn("h-8 w-8", inline ? "text-blue-200" : "text-slate-400")} />
           )}
         </div>
 
         {/* Status / Transcript */}
-        <div className="w-full bg-white rounded-xl border border-blue-100 p-3 min-h-[56px] flex items-center justify-center">
-          {isSpeaking && <Volume2 className="h-4 w-4 text-[#050249] mr-2 flex-shrink-0 animate-pulse" />}
-          {isConnecting && <Loader2 className="h-4 w-4 text-[#050249] mr-2 animate-spin" />}
-          <p className="text-center text-sm text-slate-600 leading-snug">
+        <div className={cn(
+          "w-full rounded-xl p-3 min-h-[56px] flex items-center justify-center",
+          inline ? "bg-white/10 border border-white/20 text-white" : "bg-white border border-blue-100 text-slate-600"
+        )}>
+          {isSpeaking && <Volume2 className={cn("h-4 w-4 mr-2 flex-shrink-0 animate-pulse", inline ? "text-[#23d9b0]" : "text-[#050249]")} />}
+          {isConnecting && <Loader2 className={cn("h-4 w-4 mr-2 animate-spin", inline ? "text-white" : "text-[#050249]")} />}
+          <p className={cn("text-center text-xs leading-snug", inline ? "text-blue-50" : "text-slate-600")}>
             {transcript || (isConnecting ? 'Connecting to JasDex...' : 'Click "Start Call" to speak with JasDex, our AI receptionist.')}
           </p>
         </div>
@@ -260,20 +343,26 @@ export function VoiceAssistant({ inline = false }: { inline?: boolean }) {
         {!isConnected && !isConnecting ? (
           <button
             onClick={startCall}
-            className="w-full bg-[#050249] hover:bg-[#03013b] text-white font-semibold rounded-xl py-3 transition-colors flex items-center justify-center gap-2"
+            className={cn(
+              "w-full font-semibold rounded-xl py-3 transition-colors flex items-center justify-center gap-2",
+              inline ? "bg-[#23d9b0] hover:bg-[#1ec29d] text-[#050249]" : "bg-[#050249] hover:bg-[#03013b] text-white"
+            )}
           >
             <Mic className="h-4 w-4" /> Start Call
           </button>
         ) : (
           <button
             onClick={endCall}
-            className="w-full border border-red-200 text-red-600 hover:bg-red-50 font-semibold rounded-xl py-3 transition-colors"
+            className={cn(
+              "w-full font-semibold rounded-xl py-3 transition-colors",
+              inline ? "bg-red-500/20 border border-red-400/40 text-red-200 hover:bg-red-500/30" : "border border-red-200 text-red-600 hover:bg-red-50"
+            )}
           >
             {isConnecting ? 'Cancel' : 'End Call'}
           </button>
         )}
 
-        <p className="text-[10px] text-slate-400 text-center leading-tight">
+        <p className={cn("text-[10px] text-center leading-tight", inline ? "text-blue-200/60" : "text-slate-400")}>
           AI responses are informational only and do not constitute medical advice.
         </p>
       </div>

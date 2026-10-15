@@ -41,8 +41,11 @@ FOUNDERS:
 ${k.founders.map(f => `- ${f.name}, ${f.role}: ${f.bio}`).join('\n')}
 
 PRICING:
-- Individual: ${k.pricing.individual}
-- Family: ${k.pricing.family}
+- CareNow™: ${k.pricing.careNow}
+- Mental Wellness: ${k.pricing.mentalWellness}
+- CareNow™ + Mental Wellness: ${k.pricing.careNowMental}
+- CareComplete™: ${k.pricing.careComplete}
+- CareComplete™ Family: ${k.pricing.careCompleteFamily}
 ${k.pricing.notes.map(n => `- ${n}`).join('\n')}
 
 6 CORE SERVICES:
@@ -96,7 +99,7 @@ GUIDELINES:
   // Try providers in order of preference
   const providers = [
     // Gemini — PRIMARY (fast, cheap, medical-safe)
-    { name: 'gemini', key: GEMINI_KEY, model: 'gemini-1.5-flash' },
+    { name: 'gemini', key: GEMINI_KEY, model: 'gemini-2.0-flash' },
     // OpenAI — Backup 1
     { name: 'openai', key: OPENAI_KEY, model: 'gpt-4o-mini' },
     // Kimi (Moonshot) — Backup 2
@@ -137,7 +140,7 @@ GUIDELINES:
         parts: [{ text: `SYSTEM INSTRUCTION: ${systemPrompt}\n\nYou are JasDex. Respond as instructed above.` }] 
       });
 
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`, {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -40,196 +40,198 @@ Key facts about CEDEXX + Lyric Health:
 - For emergencies, call 911
 - Keep responses short (2-3 sentences).`;
 
-  // Build provider list with available keys
+  // Build provider list with available keys (ordered by reliability & speed)
   const availableProviders = [];
   if (DEEPSEEK_KEY) availableProviders.push({ name: 'deepseek', key: DEEPSEEK_KEY, model: 'deepseek-chat' });
   if (OPENAI_KEY) availableProviders.push({ name: 'openai', key: OPENAI_KEY, model: 'gpt-4o-mini' });
-  if (KIMI_KEY) availableProviders.push({ name: 'kimi', key: KIMI_KEY, model: 'moonshot-v1-8k' });
-  if (GEMINI_KEY) availableProviders.push({ name: 'gemini', key: GEMINI_KEY, model: 'gemini-1.5-flash' });
+  if (GEMINI_KEY) availableProviders.push({ name: 'gemini', key: GEMINI_KEY, model: 'gemini-2.0-flash' });
   if (MINIMAX_KEY) availableProviders.push({ name: 'minimax', key: MINIMAX_KEY, model: 'abab6.5s-chat' });
+  if (KIMI_KEY) availableProviders.push({ name: 'kimi', key: KIMI_KEY, model: 'moonshot-v1-8k' });
 
-  // Select provider: requested > first available
-  let selectedProvider = null;
-  if (provider) {
-    selectedProvider = availableProviders.find(p => p.name === provider) || availableProviders[0];
-  } else {
-    selectedProvider = availableProviders[0];
-  }
-
-  if (!selectedProvider) {
+  if (availableProviders.length === 0) {
     console.error('[CHAT] No AI provider keys configured');
     const fallbackText = 'We are currently unavailable. Please try again in a moment or contact support at (754) 432-2201 for immediate assistance.';
     return res.status(200).json({ choices: [{ message: { content: fallbackText } }] });
   }
 
-  console.log(`[CHAT] Using provider: ${selectedProvider.name}`);
-
-  try {
-    // DeepSeek — PRIMARY
-    if (selectedProvider.name === 'deepseek') {
-      const response = await fetch('https://api.deepseek.com/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${DEEPSEEK_KEY}`
-        },
-        body: JSON.stringify({
-          model: 'deepseek-chat',
-          messages: [{ role: 'system', content: systemPrompt }, ...messages],
-          temperature: 0.3,
-          max_tokens: 500
-        })
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('[CHAT] DeepSeek HTTP error:', response.status, errorText);
-        throw new Error(`DeepSeek HTTP ${response.status}: ${errorText}`);
-      }
-
-      const data = await response.json();
-      if (data.choices?.[0]?.message?.content) {
-        return res.status(200).json(data);
-      }
-      console.error('[CHAT] DeepSeek unexpected response:', JSON.stringify(data).slice(0, 500));
-      throw new Error('DeepSeek invalid response');
+  // Order providers: put requested provider first if available, followed by all other available providers as automatic failover
+  let orderedProviders = [...availableProviders];
+  if (provider) {
+    const requestedIdx = orderedProviders.findIndex(p => p.name === provider);
+    if (requestedIdx > 0) {
+      const [reqProv] = orderedProviders.splice(requestedIdx, 1);
+      orderedProviders.unshift(reqProv);
     }
-
-    // OpenAI
-    if (selectedProvider.name === 'openai') {
-      const openaiKey = OPENAI_KEY;
-      const useAzure = openaiKey.includes('azure') || process.env.AZURE_OPENAI_ENDPOINT;
-      
-      const response = await fetch(useAzure 
-        ? `${process.env.AZURE_OPENAI_ENDPOINT}/openai/deployments/${process.env.AZURE_OPENAI_DEPLOYMENT}/chat/completions?api-version=2024-02-15`
-        : 'https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${openaiKey}`,
-          ...(useAzure && { 'api-key': openaiKey })
-        },
-        body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          messages: [{ role: "system", content: systemPrompt }, ...messages],
-          temperature: 0.3,
-          max_tokens: 500
-        })
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`OpenAI HTTP ${response.status}: ${errorText}`);
-      }
-
-      const data = await response.json();
-      if (data.choices?.[0]?.message?.content) {
-        return res.status(200).json(data);
-      }
-      throw new Error('OpenAI invalid response');
-    }
-
-    // Kimi (Moonshot)
-    if (selectedProvider.name === 'kimi') {
-      const response = await fetch('https://api.moonshot.cn/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${KIMI_KEY}`
-        },
-        body: JSON.stringify({
-          model: "moonshot-v1-8k",
-          messages: [{ role: "system", content: systemPrompt }, ...messages],
-          temperature: 0.3,
-          max_tokens: 500
-        })
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Kimi HTTP ${response.status}: ${errorText}`);
-      }
-
-      const data = await response.json();
-      if (data.choices?.[0]?.message?.content) {
-        return res.status(200).json(data);
-      }
-      throw new Error('Kimi invalid response');
-    }
-
-    // Gemini (Google)
-    if (selectedProvider.name === 'gemini') {
-      const geminiMessages = messages.map(m => ({
-        role: m.role === 'assistant' || m.role === 'model' ? 'model' : 'user',
-        parts: [{ text: m.content }]
-      }));
-
-      geminiMessages.unshift({ 
-        role: 'user', 
-        parts: [{ text: `SYSTEM INSTRUCTION: ${systemPrompt}\n\nYou are JasDex. Respond as instructed above.` }] 
-      });
-
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: geminiMessages,
-          generationConfig: { temperature: 0.3, maxOutputTokens: 500 }
-        })
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Gemini HTTP ${response.status}: ${errorText}`);
-      }
-
-      const data = await response.json();
-      const reply = data.candidates?.[0]?.content?.parts?.[0]?.text;
-      
-      if (reply) {
-        return res.status(200).json({
-          choices: [{ message: { content: reply } }]
-        });
-      }
-      throw new Error('Gemini invalid response');
-    }
-
-    // MiniMax
-    if (selectedProvider.name === 'minimax') {
-      const response = await fetch('https://api.minimax.chat/v1/text/chatcompletion_v2', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${MINIMAX_KEY}`
-        },
-        body: JSON.stringify({
-          model: 'abab6.5s-chat',
-          messages: [{ role: "system", content: systemPrompt }, ...messages]
-        })
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`MiniMax HTTP ${response.status}: ${errorText}`);
-      }
-
-      const data = await response.json();
-      if (data.choices?.[0]?.message?.content) {
-        return res.status(200).json(data);
-      }
-      throw new Error('MiniMax invalid response');
-    }
-
-    throw new Error('No matching provider handler');
-
-  } catch (error) {
-    console.error('[CHAT] Fatal error:', error.message);
-    // Return a graceful fallback instead of 500
-    const fallbackText = language === 'es' 
-      ? 'Lo siento, estoy teniendo problemas técnicos. Por favor contacta a soporte al (754) 432-2201.'
-      : language === 'ht'
-      ? 'Mwen regrèt, mwen gen pwoblèm teknik. Tanpri kontakte sipò nan (754) 432-2201.'
-      : 'I apologize, I\'m experiencing technical difficulties. Please contact support at (754) 432-2201.';
-    return res.status(200).json({ choices: [{ message: { content: fallbackText } }] });
   }
+
+  for (const currentProvider of orderedProviders) {
+    try {
+      console.log(`[CHAT] Attempting provider: ${currentProvider.name}`);
+
+      // DeepSeek — PRIMARY
+      if (currentProvider.name === 'deepseek') {
+        const response = await fetch('https://api.deepseek.com/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${DEEPSEEK_KEY}`
+          },
+          body: JSON.stringify({
+            model: 'deepseek-chat',
+            messages: [{ role: 'system', content: systemPrompt }, ...messages],
+            temperature: 0.3,
+            max_tokens: 500
+          })
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`DeepSeek HTTP ${response.status}: ${errorText}`);
+        }
+
+        const data = await response.json();
+        if (data.choices?.[0]?.message?.content) {
+          return res.status(200).json(data);
+        }
+        throw new Error('DeepSeek invalid response');
+      }
+
+      // OpenAI
+      if (currentProvider.name === 'openai') {
+        const openaiKey = OPENAI_KEY;
+        const useAzure = openaiKey.includes('azure') || process.env.AZURE_OPENAI_ENDPOINT;
+        
+        const response = await fetch(useAzure 
+          ? `${process.env.AZURE_OPENAI_ENDPOINT}/openai/deployments/${process.env.AZURE_OPENAI_DEPLOYMENT}/chat/completions?api-version=2024-02-15`
+          : 'https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${openaiKey}`,
+            ...(useAzure && { 'api-key': openaiKey })
+          },
+          body: JSON.stringify({
+            model: 'gpt-4o-mini',
+            messages: [{ role: "system", content: systemPrompt }, ...messages],
+            temperature: 0.3,
+            max_tokens: 500
+          })
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`OpenAI HTTP ${response.status}: ${errorText}`);
+        }
+
+        const data = await response.json();
+        if (data.choices?.[0]?.message?.content) {
+          return res.status(200).json(data);
+        }
+        throw new Error('OpenAI invalid response');
+      }
+
+      // Gemini (Google)
+      if (currentProvider.name === 'gemini') {
+        const geminiMessages = messages.map(m => ({
+          role: m.role === 'assistant' || m.role === 'model' ? 'model' : 'user',
+          parts: [{ text: m.content }]
+        }));
+
+        geminiMessages.unshift({ 
+          role: 'user', 
+          parts: [{ text: `SYSTEM INSTRUCTION: ${systemPrompt}\n\nYou are JasDex. Respond as instructed above.` }] 
+        });
+
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: geminiMessages,
+            generationConfig: { temperature: 0.3, maxOutputTokens: 500 }
+          })
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Gemini HTTP ${response.status}: ${errorText}`);
+        }
+
+        const data = await response.json();
+        const reply = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        
+        if (reply) {
+          return res.status(200).json({
+            choices: [{ message: { content: reply } }]
+          });
+        }
+        throw new Error('Gemini invalid response');
+      }
+
+      // MiniMax
+      if (currentProvider.name === 'minimax') {
+        const response = await fetch('https://api.minimax.chat/v1/text/chatcompletion_v2', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${MINIMAX_KEY}`
+          },
+          body: JSON.stringify({
+            model: 'abab6.5s-chat',
+            messages: [{ role: "system", content: systemPrompt }, ...messages]
+          })
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`MiniMax HTTP ${response.status}: ${errorText}`);
+        }
+
+        const data = await response.json();
+        if (data.choices?.[0]?.message?.content) {
+          return res.status(200).json(data);
+        }
+        throw new Error('MiniMax invalid response');
+      }
+
+      // Kimi (Moonshot)
+      if (currentProvider.name === 'kimi') {
+        const response = await fetch('https://api.moonshot.cn/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${KIMI_KEY}`
+          },
+          body: JSON.stringify({
+            model: "moonshot-v1-8k",
+            messages: [{ role: "system", content: systemPrompt }, ...messages],
+            temperature: 0.3,
+            max_tokens: 500
+          })
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Kimi HTTP ${response.status}: ${errorText}`);
+        }
+
+        const data = await response.json();
+        if (data.choices?.[0]?.message?.content) {
+          return res.status(200).json(data);
+        }
+        throw new Error('Kimi invalid response');
+      }
+    } catch (providerErr) {
+      console.warn(`[CHAT] Provider ${currentProvider.name} failed:`, providerErr.message);
+      // Continue to next available provider in orderedProviders
+    }
+  }
+
+  // If all providers failed, return graceful fallback
+  console.error('[CHAT] All providers failed');
+  const fallbackText = language === 'es' 
+    ? 'Lo siento, estoy teniendo problemas técnicos. Por favor contacta a soporte al (754) 432-2201.'
+    : language === 'ht'
+    ? 'Mwen regrèt, mwen gen pwoblèm teknik. Tanpri kontakte sipò nan (754) 432-2201.'
+    : 'I apologize, I\'m experiencing technical difficulties. Please contact support at (754) 432-2201.';
+  return res.status(200).json({ choices: [{ message: { content: fallbackText } }] });
 }

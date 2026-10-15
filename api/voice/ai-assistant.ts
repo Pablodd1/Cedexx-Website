@@ -12,6 +12,8 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
  * 4. Returns Twilio XML with AI response spoken
  */
 
+const DEEPSEEK_KEY = process.env.DEEPSEEK_API_KEY || '';
+const OPENAI_KEY = process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY || '';
 const GEMINI_KEY = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY || '';
 
 function twiml(xml: string) {
@@ -31,7 +33,7 @@ CRITICAL ACTIVATION TIMELINE:
 COMPANY:
 - CEDEXX is powered by Lyric Health, a leading integrated virtual primary care platform
 - We offer: 24/7 Urgent Care, Primary Care, Mental Health, Dermatology, Virtual MSK, Care Navigation, Labs, and GLP-1 Weight Loss
-- Pricing: CareNow™ $18.99/mo (Urgent care, up to 7 members), CareNow+Mental $26.99/mo, CareComplete™ $34.99/mo
+- Pricing: CareNow™ $18.99/mo (Urgent care, up to 7 members), Mental Wellness $18.99/mo, CareNow+Mental $26.99/mo, CareComplete™ $34.99/mo, CareComplete Family™ $52.99/mo
 - Contact: Phone desk (754) 432-2201 (Mon-Fri 9am-6pm EST), Email support@cedexx.net
 - No insurance needed, zero co-pays, zero deductibles, HIPAA Secure through Lyric Health
 
@@ -48,7 +50,7 @@ HEALTH BLOG & CLINICAL INSIGHTS:
 IMPORTANT RULES:
 - NEVER give medical diagnoses or advice
 - For emergencies, direct to 911 immediately
-- Keep responses short (2-3 sentences max)
+- Keep responses short (2-3 sentences max, no markdown)
 - Be warm, professional, and helpful
 - If they want to enroll, direct them to cedexx.net/enroll
 - If they need a human, connect them to (754) 432-2201 or support@cedexx.net
@@ -57,7 +59,11 @@ IMPORTANT RULES:
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') return res.status(405).end();
 
-  const { SpeechResult, Confidence, CallSid, From } = req.body;
+  const data = req.body || req.query || {};
+  const SpeechResult = data.SpeechResult || data.speech || '';
+  const Confidence = data.Confidence || '1.0';
+  const CallSid = data.CallSid || data.callSid || `call_${Date.now()}`;
+  const From = data.From || data.from || 'Unknown';
 
   console.log('[VOICE AI] Received speech:', {
     callSid: CallSid,
@@ -81,7 +87,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    // Get AI response from Gemini
+    // Get AI response from multi-provider AI
     const aiResponse = await getAIResponse(SpeechResult);
 
     // Build Twilio response
@@ -111,48 +117,100 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 }
 
-// ─── Call Gemini API ───
+// ─── Call Multi-Provider AI (DeepSeek → OpenAI → Gemini 2.0 Flash) ───
 async function getAIResponse(userSpeech: string): Promise<string> {
-  if (!GEMINI_KEY) {
-    return "Thank you for calling Ceedex. For enrollment, visit ceedex dot net slash enroll. For support, call 754-432-2201 or email support at cedexx dot net.";
-  }
+  const instruction = `Respond as JasDex, the CEDEXX AI assistant. Keep it to 2-3 spoken sentences maximum with no markdown.`;
 
-  try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`,
-      {
+  if (DEEPSEEK_KEY) {
+    try {
+      const res = await fetch('https://api.deepseek.com/chat/completions', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${DEEPSEEK_KEY}`,
+        },
         body: JSON.stringify({
-          contents: [
-            {
-              role: 'user',
-              parts: [
-                { text: `SYSTEM: ${CEDEXX_KNOWLEDGE}\n\nCaller said: "${userSpeech}"\n\nRespond as JasDex, the CEDEXX AI assistant. Keep it to 2-3 sentences maximum.` }
-              ]
-            }
+          model: 'deepseek-chat',
+          messages: [
+            { role: 'system', content: `${CEDEXX_KNOWLEDGE}\n\n${instruction}` },
+            { role: 'user', content: userSpeech },
           ],
-          generationConfig: {
-            temperature: 0.3,
-            maxOutputTokens: 150,
-          }
+          temperature: 0.3,
+          max_tokens: 150,
         }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const reply = data.choices?.[0]?.message?.content?.replace(/[*#_~`]/g, '').trim();
+        if (reply) return reply;
       }
-    );
-
-    const data = await response.json();
-    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text;
-
-    if (reply) {
-      return reply.trim();
+    } catch (e) {
+      console.warn('[VOICE AI] DeepSeek error:', e);
     }
-
-    throw new Error('Empty AI response');
-
-  } catch (err) {
-    console.error('[GEMINI ERROR]', err);
-    return "I apologize, I'm having trouble right now. Please visit cedexx dot net or call back later.";
   }
+
+  if (OPENAI_KEY) {
+    try {
+      const res = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${OPENAI_KEY}`,
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [
+            { role: 'system', content: `${CEDEXX_KNOWLEDGE}\n\n${instruction}` },
+            { role: 'user', content: userSpeech },
+          ],
+          temperature: 0.3,
+          max_tokens: 150,
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const reply = data.choices?.[0]?.message?.content?.replace(/[*#_~`]/g, '').trim();
+        if (reply) return reply;
+      }
+    } catch (e) {
+      console.warn('[VOICE AI] OpenAI error:', e);
+    }
+  }
+
+  if (GEMINI_KEY) {
+    try {
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [
+              {
+                role: 'user',
+                parts: [
+                  { text: `SYSTEM: ${CEDEXX_KNOWLEDGE}\n\nCaller said: "${userSpeech}"\n\n${instruction}` }
+                ]
+              }
+            ],
+            generationConfig: {
+              temperature: 0.3,
+              maxOutputTokens: 150,
+            }
+          }),
+        }
+      );
+      if (response.ok) {
+        const data = await response.json();
+        const reply = data.candidates?.[0]?.content?.parts?.[0]?.text?.replace(/[*#_~`]/g, '').trim();
+        if (reply) return reply;
+      }
+    } catch (err) {
+      console.warn('[VOICE AI] Gemini error:', err);
+    }
+  }
+
+  return "Thank you for calling Ceedex. For enrollment, visit ceedex dot net slash enroll. For support, call 754-432-2201 or email support at cedexx dot net.";
 }
 
 // Escape XML special characters for Twilio
