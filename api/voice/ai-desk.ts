@@ -110,8 +110,8 @@ function detectIntent(speech: string, digit: string): string {
     return 'member_id';
   }
 
-  // How it works / Lyric Health / Doctors
-  if (/how does it work|lyric|doctor|appointment|telehealth|telemedicine|prescription|pharmacy|urgent care/i.test(lower)) {
+  // How it works / general Lyric overview
+  if (/how does (it|ceedex|cedexx|lyric|this) work|how do i (use|access) (it|lyric|ceedex)|what is (ceedex|cedexx|lyric)/i.test(lower)) {
     return 'how_it_works';
   }
 
