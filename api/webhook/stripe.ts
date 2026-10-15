@@ -1,10 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import { sendCustomerEnrollmentEmails } from '../client-email.js';
-
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN || '';
-const REPO = 'Pablodd1/Cedexx-Website';
-const FILE_PATH = 'data/members.json';
+import { readMembers, writeMembers } from '../github-db.js';
 
 const RESEND_KEY = process.env.RESEND_API_KEY || '';
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'support@cedexx.net';
@@ -85,97 +82,6 @@ const PLAN_DISPLAY_NAMES: Record<string, string> = {
   'carecomplete': 'CareComplete™',
   'carecomplete-family': 'CareComplete™ Family',
 };
-
-async function readMembers() {
-  if (!GITHUB_TOKEN) return [];
-  try {
-    const res = await fetch(
-      `https://api.github.com/repos/${REPO}/contents/${FILE_PATH}?ref=main`,
-      {
-        headers: {
-          Authorization: `token ${GITHUB_TOKEN}`,
-          Accept: 'application/vnd.github.v3+json',
-        },
-      }
-    );
-    if (!res.ok) return [];
-    const data = await res.json();
-    return data.content ? JSON.parse(Buffer.from(data.content, 'base64').toString('utf8')).members || [] : [];
-  } catch (e) {
-    console.error('[STRIPE WEBHOOK DB READ ERROR]', e);
-    return [];
-  }
-}
-
-async function writeMembers(members: any[]) {
-  if (!GITHUB_TOKEN) return;
-  let attempts = 0;
-  const maxAttempts = 3;
-  let delayMs = 300;
-
-  while (attempts < maxAttempts) {
-    attempts++;
-    try {
-      const getRes = await fetch(
-        `https://api.github.com/repos/${REPO}/contents/${FILE_PATH}?ref=main`,
-        {
-          headers: {
-            Authorization: `token ${GITHUB_TOKEN}`,
-            Accept: 'application/vnd.github.v3+json',
-          },
-        }
-      );
-      let sha: string | undefined;
-      let created_at = new Date().toISOString();
-      if (getRes.ok) {
-        const fileData = await getRes.json();
-        sha = fileData.sha;
-        if (fileData.content) {
-          try {
-            const parsed = JSON.parse(Buffer.from(fileData.content, 'base64').toString('utf8'));
-            if (parsed.created_at) created_at = parsed.created_at;
-          } catch (_) {}
-        }
-      }
-
-      const payload = { members, created_at, version: '1.0' };
-      const putRes = await fetch(
-        `https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`,
-        {
-          method: 'PUT',
-          headers: {
-            Authorization: `token ${GITHUB_TOKEN}`,
-            Accept: 'application/vnd.github.v3+json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            message: `Update member payment status`,
-            content: Buffer.from(JSON.stringify(payload, null, 2)).toString('base64'),
-            sha,
-            branch: 'main',
-          }),
-        }
-      );
-
-      if (putRes.ok) {
-        return;
-      }
-
-      if (putRes.status === 409 && attempts < maxAttempts) {
-        await new Promise((r) => setTimeout(r, delayMs));
-        delayMs *= 2;
-        continue;
-      }
-      break;
-    } catch (e) {
-      console.error(`[STRIPE WEBHOOK DB WRITE ERROR attempt ${attempts}]`, e);
-      if (attempts < maxAttempts) {
-        await new Promise((r) => setTimeout(r, delayMs));
-        delayMs *= 2;
-      }
-    }
-  }
-}
 
 async function alertCritical(error: any, context: any) {
   const msg = error instanceof Error ? error.message : String(error);

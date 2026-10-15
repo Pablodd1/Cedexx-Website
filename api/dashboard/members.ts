@@ -1,27 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { readMembers } from '../github-db.js';
 
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN || '';
-const REPO = 'Pablodd1/Cedexx-Website';
-const FILE_PATH = 'data/members.json';
 const DASHBOARD_PASSWORD = process.env.DASHBOARD_PASSWORD || 'cedexx2024';
-
-async function readMembers() {
-  const res = await fetch(
-    `https://api.github.com/repos/${REPO}/contents/${FILE_PATH}?ref=main`,
-    {
-      headers: {
-        Authorization: `token ${GITHUB_TOKEN}`,
-        Accept: 'application/vnd.github.v3+json',
-      },
-    }
-  );
-  if (!res.ok) {
-    if (res.status === 404) return [];
-    throw new Error(`GitHub read failed: ${res.status}`);
-  }
-  const data = await res.json();
-  return data.content ? JSON.parse(Buffer.from(data.content, 'base64').toString('utf8')).members || [] : [];
-}
 
 function computeStats(members: any[]) {
   const total = members.length;
