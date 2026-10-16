@@ -1,3 +1,4 @@
+import Stripe from 'stripe';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import { sendCustomerEnrollmentEmails } from '../client-email.js';
@@ -9,6 +10,12 @@ const JASMEL_EMAIL = process.env.JASMEL_EMAIL || 'jasmelacosta@gmail.com';
 const TELEGRAM_BOT = process.env.TELEGRAM_BOT_TOKEN || '';
 const TELEGRAM_CHAT = process.env.TELEGRAM_CHAT_ID || '';
 const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET || '';
+const stripe = process.env.STRIPE_SECRET_KEY
+  ? new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: '2025-06-30.basil' as any,
+      appInfo: { name: 'CEDEXX', version: '1.0.0' },
+    })
+  : null;
 
 // Disable automatic body parsing so we can read the raw buffer for signature verification
 export const config = {
@@ -405,12 +412,49 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           exactPlan = member.plan || 'carenow';
         }
 
+        const previousSubId = member.stripe_subscription_id;
         member.plan = exactPlan;
         member.status = 'paid';
         member.paid_at = new Date().toISOString();
         member.stripe_session_id = session.id;
         member.stripe_customer_id = session.customer;
         member.stripe_subscription_id = session.subscription;
+
+        // ─── AUTOMATIC UPGRADE / DUPLICATE SUBSCRIPTION CLEANUP ───
+        // When a member upgrades or switches plans via a new checkout link, automatically
+        // cancel any older active Stripe subscriptions for the same email/customer so they
+        // are never double-billed.
+        if (stripe && session.subscription) {
+          try {
+            const subsToCancel = new Set<string>();
+            if (previousSubId && previousSubId !== session.subscription) {
+              subsToCancel.add(previousSubId);
+            }
+            const customersByEmail = await stripe.customers.list({ email, limit: 10 });
+            for (const cust of customersByEmail.data) {
+              const activeSubs = await stripe.subscriptions.list({
+                customer: cust.id,
+                status: 'active',
+                limit: 10,
+              });
+              for (const sub of activeSubs.data) {
+                if (sub.id !== session.subscription) {
+                  subsToCancel.add(sub.id);
+                }
+              }
+            }
+            for (const oldSubId of subsToCancel) {
+              try {
+                await stripe.subscriptions.cancel(oldSubId);
+                console.log('[STRIPE WEBHOOK] Auto-cancelled previous subscription on upgrade:', oldSubId);
+              } catch (cancelErr) {
+                console.warn('[STRIPE WEBHOOK] Could not cancel previous subscription:', oldSubId, cancelErr);
+              }
+            }
+          } catch (upgradeCleanErr) {
+            console.warn('[STRIPE WEBHOOK] Error checking previous subscriptions for upgrade cleanup:', upgradeCleanErr);
+          }
+        }
 
         // Persist address fields from session metadata
         if (metadata.address) member.address = metadata.address;
@@ -536,7 +580,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const customerId = sub.customer;
         const member = members.find((m: any) => m.stripe_customer_id === customerId);
         
-        if (member) {
+        // Only mark member cancelled if the deleted subscription is their CURRENT subscription
+        // (Do not mark cancelled if an old subscription was cancelled during a plan upgrade!)
+        if (member && (!member.stripe_subscription_id || member.stripe_subscription_id === sub.id)) {
           member.status = 'cancelled';
           member.cancelled_at = new Date().toISOString();
           updated = true;
