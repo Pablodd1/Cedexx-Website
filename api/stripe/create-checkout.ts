@@ -107,6 +107,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       mode: 'subscription',
       customer_email: email.toLowerCase().trim(),
       line_items: [{ price: priceId, quantity: 1 }],
+      phone_number_collection: { enabled: true },
+      billing_address_collection: 'required',
       success_url: `${baseUrl}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseUrl}/payment-cancel`,
       metadata: {

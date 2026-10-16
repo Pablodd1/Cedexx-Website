@@ -17,6 +17,7 @@ export const LYRIC_AUTH_PASS = process.env.LYRIC_API_PASS || 'YCc25aLkB&Fj5xZL';
 
 export const LYRIC_LOGIN_URL = 'https://portal.getlyric.com/go/api/login';
 export const LYRIC_CENSUS_URL = 'https://portal.getlyric.com/go/api/census/createMember';
+export const LYRIC_UPDATE_MEMBER_URL = 'https://portal.getlyric.com/go/api/census/updateMember';
 
 // Production Plan IDs confirmed by Emma
 export const LYRIC_PROD_PLAN_CONFIG: Record<string, { planId: string; planDetailsId: string; name: string }> = {
@@ -210,9 +211,28 @@ export async function callLyricApi(patient: PatientData, isStaging: boolean = fa
   const data = await res.json().catch(() => ({}));
 
   if (!res.ok && !data.success) {
-    // If already exists, treat as non-fatal warning
-    if (data.message && data.message.includes('already exists')) {
-      return { success: true, alreadyExists: true, detail: data };
+    // If member already exists in Lyric (e.g. upgrading plans), call /census/updateMember to update their plan
+    if (data.message && data.message.toLowerCase().includes('already exists')) {
+      try {
+        const updateRes = await fetch(LYRIC_UPDATE_MEMBER_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Authorization': token,
+          },
+          body: payload,
+        });
+        const updateData = await updateRes.json().catch(() => ({}));
+        return {
+          success: true,
+          alreadyExists: true,
+          updatedPlan: updateRes.ok || Boolean(updateData.success),
+          lyricUserId: updateData.userid || data.userid || null,
+          detail: updateData.message ? updateData : data,
+        };
+      } catch (_) {
+        return { success: true, alreadyExists: true, detail: data };
+      }
     }
     throw new Error(data.message || `Lyric API error HTTP ${res.status}`);
   }
@@ -269,11 +289,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ error: 'Patient data or patient_id required' });
   }
 
-  const required = ['first_name', 'last_name', 'email', 'phone', 'dob', 'plan'];
+  // Only first_name, last_name, email, and plan are strictly required to process the bridge;
+  // phone and dob are required for the automated Lyric Census API call, while email fallback
+  // can still notify enrollment@getlyric.com for existing member plan upgrades.
+  const required = ['first_name', 'last_name', 'email', 'plan'];
   const missing = required.filter(f => !patientData![f as keyof PatientData]);
   if (missing.length > 0) {
     return res.status(400).json({ error: `Missing required fields: ${missing.join(', ')}` });
   }
+
+  const hasCensusFields = Boolean(patientData.phone && patientData.dob);
 
   // DRY RUN
   if (dry_run) {
@@ -281,6 +306,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       success: true,
       dry_run: true,
       patient: patientData,
+      has_census_fields: hasCensusFields,
       email_preview: buildLyricEmail(patientData, !!use_staging),
       api_payload: buildApiPayload(patientData, !!use_staging),
     });
@@ -290,12 +316,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const results: any = { email: null, api: null, error: null };
 
   try {
-    // 1. Direct API call to Lyric Census
-    try {
-      results.api = await callLyricApi(patientData, !!use_staging);
-    } catch (apiErr: any) {
-      console.error('[LYRIC API CALL FAILED, FALLING BACK TO EMAIL]', apiErr);
-      results.api = { success: false, error: apiErr.message };
+    // 1. Direct API call to Lyric Census (if phone & dob are present)
+    if (hasCensusFields) {
+      try {
+        results.api = await callLyricApi(patientData, !!use_staging);
+      } catch (apiErr: any) {
+        console.error('[LYRIC API CALL FAILED, FALLING BACK TO EMAIL]', apiErr);
+        results.api = { success: false, error: apiErr.message };
+      }
+    } else {
+      results.api = {
+        success: false,
+        skipped: true,
+        error: 'Phone or DOB not provided on direct upgrade checkout; dispatched to Lyric Enrollment Desk via email',
+      };
     }
 
     // 2. Email notification dispatch to Lyric enrollment desk as backup/verification
@@ -389,7 +423,7 @@ Sent automatically from CEDEXX Enrollment System
 }
 
 // ─── Send Email to Lyric ───
-async function sendLyricEnrollmentEmail(patient: PatientData, isStaging: boolean = false) {
+export async function sendLyricEnrollmentEmail(patient: PatientData, isStaging: boolean = false) {
   if (!RESEND_KEY) {
     return { sent: false, error: 'No Resend API key' };
   }

@@ -456,16 +456,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           }
         }
 
-        // Persist address fields from session metadata
-        if (metadata.address) member.address = metadata.address;
-        if (metadata.city) member.city = metadata.city;
-        if (metadata.state) member.state = metadata.state;
-        if (metadata.zipcode) member.zipcode = metadata.zipcode;
+        // Persist address and phone fields from session metadata OR Stripe customer_details
+        const custDetails = session.customer_details || {};
+        const custAddress = custDetails.address || {};
+        const fallbackPhone = metadata.phone || custDetails.phone || '';
+        const fallbackAddress = metadata.address || custAddress.line1 || '';
+        const fallbackCity = metadata.city || custAddress.city || '';
+        const fallbackState = metadata.state || custAddress.state || '';
+        const fallbackZip = metadata.zipcode || custAddress.postal_code || '';
+
+        if (fallbackAddress) member.address = fallbackAddress;
+        if (fallbackCity) member.city = fallbackCity;
+        if (fallbackState) member.state = fallbackState;
+        if (fallbackZip) member.zipcode = fallbackZip;
         if (metadata.first_name && !member.first_name) member.first_name = metadata.first_name;
         if (metadata.last_name && !member.last_name) member.last_name = metadata.last_name;
-        if (metadata.phone) {
-          member.phone = metadata.phone;
-          const phoneDigits = metadata.phone.replace(/\D/g, '').slice(-10);
+        if (fallbackPhone) {
+          member.phone = fallbackPhone;
+          const phoneDigits = fallbackPhone.replace(/\D/g, '').slice(-10);
           if (phoneDigits.length === 10) member.id = phoneDigits;
         } else if (member.phone) {
           const phoneDigits = member.phone.replace(/\D/g, '').slice(-10);

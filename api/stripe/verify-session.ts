@@ -1,7 +1,7 @@
 import Stripe from 'stripe';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { sendCustomerEnrollmentEmails } from '../client-email.js';
-import { callLyricApi, getMemberId } from '../bridge/lyric.js';
+import { callLyricApi, sendLyricEnrollmentEmail, getMemberId } from '../bridge/lyric.js';
 import { readMembers, writeMembers } from '../github-db.js';
 
 const RESEND_KEY = process.env.RESEND_API_KEY || '';
@@ -231,6 +231,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       members.push(member);
     }
 
+    // Track whether the Stripe webhook already processed this payment session
+    const wasAlreadyPaidForSession = Boolean(
+      member && member.status === 'paid' && member.stripe_session_id === session.id
+    );
+
     // Update member record to paid
     member.plan = exactPlan;
     member.status = 'paid';
@@ -239,80 +244,113 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     member.stripe_customer_id = typeof session.customer === 'string' ? session.customer : (session.customer as any)?.id;
     member.stripe_subscription_id = typeof session.subscription === 'string' ? session.subscription : (session.subscription as any)?.id;
 
-    if (metadata.address) member.address = metadata.address;
-    if (metadata.city) member.city = metadata.city;
-    if (metadata.state) member.state = metadata.state;
-    if (metadata.zipcode) member.zipcode = metadata.zipcode;
+    const custDetails = session.customer_details || {};
+    const custAddress = custDetails.address || {};
+    const fallbackPhone = metadata.phone || custDetails.phone || '';
+    const fallbackAddress = metadata.address || custAddress.line1 || '';
+    const fallbackCity = metadata.city || custAddress.city || '';
+    const fallbackState = metadata.state || custAddress.state || '';
+    const fallbackZip = metadata.zipcode || custAddress.postal_code || '';
+
+    if (fallbackAddress) member.address = fallbackAddress;
+    if (fallbackCity) member.city = fallbackCity;
+    if (fallbackState) member.state = fallbackState;
+    if (fallbackZip) member.zipcode = fallbackZip;
     if (metadata.first_name && !member.first_name) member.first_name = metadata.first_name;
     if (metadata.last_name && !member.last_name) member.last_name = metadata.last_name;
-    if (metadata.phone && !member.phone) member.phone = metadata.phone;
+    if (fallbackPhone && !member.phone) {
+      member.phone = fallbackPhone;
+      const phoneDigits = fallbackPhone.replace(/\D/g, '').slice(-10);
+      if (phoneDigits.length === 10) member.id = phoneDigits;
+    }
     if (metadata.dob && !member.dob) member.dob = metadata.dob;
 
     // 3. Sync to Lyric Health if not already synced
     let lyricUserId = member.lyric_user_id || null;
     if (!member.lyric_synced) {
-      try {
-        const lyricResult = await callLyricApi({
-          id: member.id,
-          first_name: member.first_name,
-          last_name: member.last_name,
-          email: member.email,
-          phone: member.phone || '',
-          dob: member.dob || '',
-          plan: member.plan,
-          address: member.address || '',
-          city: member.city || '',
-          state: member.state || '',
-          zipcode: member.zipcode || '',
-          paid_at: member.paid_at,
-          stripe_customer_id: member.stripe_customer_id,
-          stripe_subscription_id: member.stripe_subscription_id,
-        });
+      const patientPayload = {
+        id: member.id,
+        first_name: member.first_name,
+        last_name: member.last_name,
+        email: member.email,
+        phone: member.phone || '',
+        dob: member.dob || '',
+        plan: member.plan,
+        address: member.address || '',
+        city: member.city || '',
+        state: member.state || '',
+        zipcode: member.zipcode || '',
+        paid_at: member.paid_at,
+        stripe_customer_id: member.stripe_customer_id,
+        stripe_subscription_id: member.stripe_subscription_id,
+      };
 
-        if (lyricResult && (lyricResult.success || lyricResult.alreadyExists)) {
-          member.lyric_synced = true;
-          member.lyric_synced_at = new Date().toISOString();
-          if (lyricResult.lyricUserId) {
-            member.lyric_user_id = lyricResult.lyricUserId;
-            lyricUserId = lyricResult.lyricUserId;
+      if (member.phone && member.dob) {
+        try {
+          const lyricResult = await callLyricApi(patientPayload);
+          if (lyricResult && (lyricResult.success || lyricResult.alreadyExists)) {
+            member.lyric_synced = true;
+            member.lyric_synced_at = new Date().toISOString();
+            member.lyric_sync_method = 'api';
+            if (lyricResult.lyricUserId) {
+              member.lyric_user_id = lyricResult.lyricUserId;
+              lyricUserId = lyricResult.lyricUserId;
+            }
           }
+        } catch (lyricErr) {
+          console.error('[VERIFY SESSION LYRIC API ERROR, FALLING BACK TO EMAIL]', lyricErr);
         }
-      } catch (lyricErr) {
-        console.error('[VERIFY SESSION LYRIC SYNC ERROR]', lyricErr);
+      }
+
+      // If API sync was skipped (missing phone/DOB on upgrade link) or failed, dispatch Lyric Enrollment Email
+      if (!member.lyric_synced) {
+        try {
+          const emailRes = await sendLyricEnrollmentEmail(patientPayload, false);
+          if (emailRes?.sent) {
+            member.lyric_synced = true;
+            member.lyric_synced_at = new Date().toISOString();
+            member.lyric_sync_method = 'email';
+            lyricUserId = lyricUserId || 'Synced via Lyric Enrollment Desk Email';
+          }
+        } catch (emailErr) {
+          console.error('[VERIFY SESSION LYRIC EMAIL FALLBACK ERROR]', emailErr);
+        }
       }
     }
 
     // 4. Save to members DB
     await writeMembers(members);
 
-    // 5. Send confirmation emails and admin notification
-    await Promise.allSettled([
-      sendPaymentConfirmation({
-        first_name: member.first_name,
-        last_name: member.last_name,
-        email: member.email,
-        phone: member.phone,
-        plan: member.plan,
-        amount: session.amount_total,
-      }),
-      sendCustomerEnrollmentEmails({
-        first_name: member.first_name,
-        last_name: member.last_name,
-        email: member.email,
-        phone: member.phone,
-        zipcode: member.zipcode,
-        member_id: member.id,
-        plan: member.plan,
-        dob: member.dob,
-      }),
-      notifyAdmin({
-        first_name: member.first_name,
-        last_name: member.last_name,
-        email: member.email,
-        plan: member.plan,
-        lyric_user_id: lyricUserId,
-      }),
-    ]);
+    // 5. Send confirmation emails and admin notification ONLY if the webhook hadn't already sent them
+    if (!wasAlreadyPaidForSession) {
+      await Promise.allSettled([
+        sendPaymentConfirmation({
+          first_name: member.first_name,
+          last_name: member.last_name,
+          email: member.email,
+          phone: member.phone,
+          plan: member.plan,
+          amount: session.amount_total,
+        }),
+        sendCustomerEnrollmentEmails({
+          first_name: member.first_name,
+          last_name: member.last_name,
+          email: member.email,
+          phone: member.phone,
+          zipcode: member.zipcode,
+          member_id: member.id,
+          plan: member.plan,
+          dob: member.dob,
+        }),
+        notifyAdmin({
+          first_name: member.first_name,
+          last_name: member.last_name,
+          email: member.email,
+          plan: member.plan,
+          lyric_user_id: lyricUserId || (member.lyric_synced ? 'Synced via Email' : 'Pending sync'),
+        }),
+      ]);
+    }
 
     return res.status(200).json({
       success: true,
