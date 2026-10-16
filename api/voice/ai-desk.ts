@@ -16,6 +16,8 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 const DEEPSEEK_KEY = process.env.DEEPSEEK_API_KEY || '';
 const OPENAI_KEY = process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY || '';
 const GEMINI_KEY = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY || '';
+const TYPESAFE_API_KEY = process.env.TYPESAFE_API_KEY || '';
+const JEV_MODEL = process.env.JEV_MODEL || 'jev-1.13.0';
 const TWILIO_PHONE = process.env.TWILIO_PHONE_NUMBER || '+17544322201';
 const STAFF_PHONE = process.env.STAFF_PHONE || process.env.DAISY_PHONE || '';
 const TELEGRAM_BOT = process.env.TELEGRAM_BOT_TOKEN || '';
@@ -60,8 +62,8 @@ CEEDEX FACTS:
 - Health Blogs: We publish clinical insights on pediatric AI diagnostics, healthcare economics, heat hydration, and chronic care management at ceedex.net/blog.
 `;
 
-// ─── Intent Detection ───
-function detectIntent(speech: string, digit: string): string {
+// ─── Intent Detection (Heuristic / Regex Pre-filter & Fallback) ───
+function detectIntentRegex(speech: string, digit: string): string {
   if (digit === '0' || digit === '9' || digit === '3') return 'transfer_staff';
   if (digit === '1') return 'enroll';
   if (digit === '2') return 'pricing';
@@ -70,7 +72,7 @@ function detectIntent(speech: string, digit: string): string {
   const lower = speech.toLowerCase().trim();
 
   // Emergency
-  if (/emergency|911|heart attack|chest pain|stroke|severe bleeding|unconscious|cant breathe|cannot breathe/i.test(lower)) {
+  if (/emergency|911|heart attack|chest pain|stroke|severe bleeding|unconscious|cant breathe|cannot breathe|suicid|overdose/i.test(lower)) {
     return 'emergency';
   }
 
@@ -131,6 +133,81 @@ function detectIntent(speech: string, digit: string): string {
   }
 
   return 'ai_fallback';
+}
+
+// ─── Jev System-1 Classifier (Ultra-fast calibrated triage + regex fallback) ───
+async function detectIntent(speech: string, digit: string): Promise<string> {
+  // Always honor keypad digits or explicit regex matches first (0ms latency)
+  const regexIntent = detectIntentRegex(speech, digit);
+  if (digit || (regexIntent !== 'ai_fallback' && !TYPESAFE_API_KEY)) {
+    return regexIntent;
+  }
+
+  // Hard safety: if regex immediately spots an emergency or goodbye, return immediately
+  if (regexIntent === 'emergency' || regexIntent === 'goodbye') {
+    return regexIntent;
+  }
+
+  // If TYPESAFE_API_KEY is configured, use Jev System-1 to classify natural/indirect speech
+  if (TYPESAFE_API_KEY && speech.length > 2) {
+    try {
+      const state = JSON.stringify({
+        caller_speech: speech,
+        service: 'Ceedex Telehealth Front Desk (powered by Lyric Health)',
+      });
+
+      const questions = {
+        is_medical_emergency: {
+          type: 'noul',
+          instructions: 'Is the caller describing an acute, life-threatening medical emergency (e.g., chest pain, difficulty breathing, stroke symptoms, severe bleeding, self-harm) that requires dialing 911 immediately?',
+        },
+        intent: {
+          type: 'choice',
+          instructions: 'Classify the caller speech into the best matching front-desk intent.',
+          criteria: {
+            emergency: 'Life-threatening medical emergency requiring 911',
+            transfer_staff: 'Caller explicitly asks to speak with a human, staff member, representative, operator, or office team',
+            voicemail: 'Caller wants to leave a voicemail or recorded message',
+            goodbye: 'Caller says no thank you, nothing else, goodbye, or is finished with the call',
+            pricing: 'Caller asks about plan prices, monthly cost, how much memberships cost, or affordability',
+            insurance_coverage: 'Caller asks if insurance is required, co-pays, deductibles, or how many family members are covered',
+            member_id: 'Caller asks what their Member ID number is or how to find their identification number',
+            how_it_works: 'Caller asks what Ceedex or Lyric Health is or how the virtual telehealth service works',
+            enroll: 'Caller asks how to sign up, enroll, register, or start a membership',
+            billing: 'Caller asks about a charge, payment, receipt, billing issue, or canceling a subscription',
+            blog: 'Caller asks about health blog articles, pediatric AI diagnostics, or hydration articles',
+            contact_phone: 'Caller asks for the phone number or email address to contact Ceedex',
+            ai_fallback: 'Nuanced or multi-part question best answered by the conversational AI assistant',
+          },
+        },
+      };
+
+      const res = await fetch('https://api.typesafe.ai/v1/systemone', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${TYPESAFE_API_KEY}`,
+        },
+        body: JSON.stringify({ model: JEV_MODEL, state, questions }),
+        signal: AbortSignal.timeout(1200),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        const a = data.answers || {};
+        if (a.is_medical_emergency?.noul > 0.65) {
+          return 'emergency';
+        }
+        if (a.intent?.choice) {
+          return a.intent.choice;
+        }
+      }
+    } catch (err) {
+      console.warn('[AI DESK] Jev System-1 classification timed out or failed, using regex fallback:', err);
+    }
+  }
+
+  return regexIntent;
 }
 
 // ─── Quick Natural Spoken Responses ───
@@ -199,8 +276,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     `));
   }
 
-  // Detect intent
-  const intent = detectIntent(speech, digit);
+  // Detect intent (Regex + Jev System-1 Classifier)
+  const intent = await detectIntent(speech, digit);
   console.log('[AI DESK] Detected intent:', intent, 'speech:', speech, 'digit:', digit);
 
   // Send Telegram event notification (HIPAA-compliant phone masking)

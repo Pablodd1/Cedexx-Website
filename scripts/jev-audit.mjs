@@ -30,9 +30,14 @@ const NOTIFY_WEBHOOK = process.env.NOTIFY_WEBHOOK || '';
 
 const ROUTES = [
   { path: '/', label: 'Homepage', critical: true },
-  { path: '/categories', label: 'Categories', critical: false },
-  { path: '/products', label: 'Products', critical: false },
+  { path: '/enroll', label: 'Enrollment', critical: true },
+  { path: '/pricing', label: 'Pricing', critical: true },
+  { path: '/services', label: 'Services', critical: true },
+  { path: '/faq', label: 'FAQ', critical: false },
+  { path: '/about', label: 'About', critical: false },
   { path: '/contact', label: 'Contact', critical: true },
+  { path: '/blog', label: 'Health Blog', critical: false },
+  { path: '/api/voice/speak?text=Ceedex', label: 'Voice TTS API', critical: true },
   { path: '/sitemap.xml', label: 'Sitemap', critical: false },
   { path: '/robots.txt', label: 'Robots', critical: false },
 ];

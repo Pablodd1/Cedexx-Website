@@ -11,12 +11,75 @@ export default async function handler(req, res) {
   const OPENAI_KEY = process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY;
   const MINIMAX_KEY = process.env.MINIMAX_API_KEY;
   const DEEPSEEK_KEY = process.env.DEEPSEEK_API_KEY;
+  const TYPESAFE_API_KEY = process.env.TYPESAFE_API_KEY;
+  const JEV_MODEL = process.env.JEV_MODEL || 'jev-1.13.0';
+
+  const lastUserMsg = Array.isArray(messages)
+    ? [...messages].reverse().find(m => m.role === 'user')?.content || ''
+    : '';
+
+  // ─── Jev System-1 + Heuristic Emergency & Clinical Triage Guardrail ───
+  let isEmergency = /emergency|911|heart attack|chest pain|stroke|severe bleeding|unconscious|cant breathe|cannot breathe|suicid|overdose/i.test(lastUserMsg);
+  let asksDiagnosis = false;
+
+  if (TYPESAFE_API_KEY && lastUserMsg.length > 3 && !isEmergency) {
+    try {
+      const jevRes = await fetch('https://api.typesafe.ai/v1/systemone', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${TYPESAFE_API_KEY}`,
+        },
+        body: JSON.stringify({
+          model: JEV_MODEL,
+          state: JSON.stringify({ user_message: lastUserMsg, language }),
+          questions: {
+            is_medical_emergency: {
+              type: 'noul',
+              instructions: 'Is the user describing an acute, life-threatening medical or psychiatric emergency requiring immediate 911 or crisis intervention?',
+            },
+            asks_clinical_diagnosis: {
+              type: 'noul',
+              instructions: 'Is the user sharing personal symptoms or asking for a clinical medical diagnosis or treatment recommendation?',
+            },
+          },
+        }),
+        signal: AbortSignal.timeout(1000),
+      });
+      if (jevRes.ok) {
+        const jevData = await jevRes.json();
+        const a = jevData.answers || {};
+        if (a.is_medical_emergency?.noul > 0.7) isEmergency = true;
+        if (a.asks_clinical_diagnosis?.noul > 0.65) asksDiagnosis = true;
+      }
+    } catch (e) {
+      // Non-blocking fallback if Jev times out
+    }
+  }
+
+  // Immediate deterministic response for life-threatening emergencies (0 hallucination risk)
+  if (isEmergency) {
+    const emergencyReply =
+      language === 'es'
+        ? '🚨 Si usted o alguien más está experimentando una emergencia médica, por favor llame al 911 de inmediato o acuda a la sala de emergencias más cercana. CEDEXX no es un servicio de emergencias.'
+        : language === 'ht'
+        ? '🚨 Si ou menm oswa yon lòt moun ap fè fas ak yon ijans medikal, tanpri rele 911 imedyatman oswa ale nan sal ijans ki pi pre a.'
+        : '🚨 If you or someone else is experiencing a medical emergency, please dial 911 immediately or go to the nearest emergency room. CEDEXX is a non-emergency platform.';
+    return res.status(200).json({
+      choices: [{ message: { content: emergencyReply } }],
+      triage: { emergency: true, engine: TYPESAFE_API_KEY ? 'jev' : 'heuristic' },
+    });
+  }
 
   const langInstruction = 
     language === 'es' ? "Responde en español profesional (Latinoamérica). " :
     language === 'ht' ? "Reponn an kreyòl ayisyen. " : "Respond in English. ";
 
-  const systemPrompt = `${langInstruction} You are JasDex, a warm and professional AI for Cedexx — powered by Lyric Health, our exclusive telehealth partner. No insurance needed.
+  const clinicalGuardrailNote = asksDiagnosis
+    ? "\nIMPORTANT TRIAGE ALERT: Jev detected the user is asking about clinical symptoms or diagnosis. Remind them warmly that JasDex does not give medical advice or collect PHI in chat, and guide them to consult a board-certified Lyric Health physician through their CEDEXX membership."
+    : "";
+
+  const systemPrompt = `${langInstruction} You are JasDex, a warm and professional AI for Cedexx — powered by Lyric Health, our exclusive telehealth partner. No insurance needed.${clinicalGuardrailNote}
 
 CRITICAL ACTIVATION & ONBOARDING RULE:
 - Lyric Health communication and account activation is NOT immediate. It takes 24 to 48 hours after enrollment.
