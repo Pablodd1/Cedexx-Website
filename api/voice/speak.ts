@@ -23,20 +23,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    // Priority 1: xAI Grok Voice 3.0 Standalone TTS ($15 / 1M chars)
+    // Priority 1: xAI Grok Voice 3.0 Standalone TTS ($15 / 1M chars — https://api.x.ai/v1/tts)
     if (XAI_API_KEY) {
       try {
-        const grokRes = await fetch('https://api.x.ai/v1/audio/speech', {
+        const grokRes = await fetch('https://api.x.ai/v1/tts', {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${XAI_API_KEY}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            model: 'grok-voice-3.0',
-            input: text,
-            voice,
-            response_format: 'mp3',
+            text,
+            voice_id: voice,
+            language: 'auto',
           }),
         });
 
