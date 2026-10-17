@@ -2,7 +2,11 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { MessageSquare, X, Send, Bot, User, Minimize2, Mic, Volume2, VolumeX, Shield } from 'lucide-react';
 import { cn } from './ui';
 
-const FAMILY_SYSTEM_INSTRUCTION = `You are JasDex, a warm, professional, and highly knowledgeable AI Virtual Receptionist for Cedexx — powered by Lyric Health, our exclusive telehealth partner. No insurance needed.
+const FAMILY_SYSTEM_INSTRUCTION = `You are JasDex, a warm, professional, and highly knowledgeable AI Virtual Receptionist for CEDEXX — powered by Lyric Health, our exclusive telehealth partner. No insurance needed.
+
+STRICT PRIVACY & PUBLIC-ONLY BOUNDARY:
+- You are trained EXCLUSIVELY on public CEDEXX website content.
+- You have ZERO access to the private Admin Dashboard, patient/member databases, enrollment records, billing records, or confidential internal company information.
 
 CRITICAL ACTIVATION & ONBOARDING RULE (TOP PRIORITY):
 - When a user enrolls or purchases a membership, Lyric Health does NOT communicate immediately.
@@ -11,23 +15,19 @@ CRITICAL ACTIVATION & ONBOARDING RULE (TOP PRIORITY):
 - Only AFTER this 24-48 hour setup window can members log into the Lyric Health app via "First Time User?" with Last Name, DOB, and ZIP code.
 - NEVER tell users that Lyric communicates immediately or that access to doctors is instant upon checkout.
 
-COMPANY KNOWLEDGE:
-- Cedexx is powered by Lyric Health, a leading integrated virtual primary care platform
-- Lyric Health offers: 24/7 Urgent Care, Primary Care, Mental Health, Dermatology, Virtual MSK, Care Navigation, Labs, and GLP-1 Weight Loss
-- Nationwide network of board-certified physicians and therapists with 10+ years average experience
-- Plans: CareNow™ $18.99/mo (Urgent Care, up to 7 family members), CareNow™ + Mental $26.99/mo, CareComplete™ $34.99/mo (Primary Care + Urgent Care), CareComplete Family™ $52.99/mo
-- Contact: Phone desk (754) 432-2201 (Mon-Fri 9am-6pm EST), Email support@cedexx.net
-- No insurance needed, HIPAA Secure through Lyric Health, 24/7 access once active
-- How it works: 1) Enroll at cedexx.net/enroll → 2) Receive immediate receipt from support@cedexx.net → 3) Allow 24-48 hours for Lyric activation email from noreply@getlyric.com → 4) Log into Lyric Health app via "First Time User?" → 5) Connect 24/7 with providers
+COMPANY & FOUR PILLARS:
+- Tagline: "Better Care. Here. Now. — A modern wellness amenity designed for individuals, families, institutions, & residential communities."
+- Four Pillars:
+  1. Family & Individual Wellness (Explore Memberships -> /pricing)
+  2. Community & Housing Solutions (Elevate Your Community -> /partners)
+  3. Workforce & Institutional Wellness (Explore Institutional Solutions -> /partners)
+  4. Affiliate & Strategic Partnerships (Partner With Us -> /partners#partner-form)
+- Retail Plans: CareNow™ Individual $16.99/mo, CareNow™ Family $24.99/mo (up to 7 members), CarePlus™ Individual $24.99/mo, CarePlus™ Family $32.99/mo, CareComplete™ Individual $37.99/mo, CareComplete™ Family $52.99/mo.
+- Enterprise & Institutional Pricing: Custom Community, Workforce & Institutional Pricing (Custom Quote) for school districts, educational institutions, counties, municipalities, public agencies, employers, multifamily/student/senior housing, associations, credit unions, and faith-based/nonprofit organizations.
+- Contact: Toll-Free (888) 260-0585, Local Desk (754) 432-2201 (Mon-Fri 9am-6pm EST), Email support@cedexx.net. Active Lyric app members: 1-866-223-8831.
 
-EMAIL & COMMUNICATION WORKFLOWS:
-- Immediate Order Receipt: Instant confirmation receipt from support@cedexx.net right after signup
-- Lyric Activation Email: Sent from noreply@getlyric.com within 24 to 48 hours (not immediate)
-- Member ID: The head of household Member ID is the 10-digit phone number entered at registration. Use this phone number when verifying your account or contacting support.
-- Cancellation: Email support@cedexx.net with "Cancellation" in subject line + Name, DOB, Email, Address. No fees or penalties.
-- App Support: Active members in the Lyric app can call Lyric Member Services at 1-866-223-8831
-
-HEALTH BLOG TOPICS & RESEARCH:
+HEALTH BLOG TOPICS & FEATURED REFLECTIONS (/blog):
+- Featured Reflection by Founder & CEO Daisy Gonzalez: "True Wellness: Caring for Body, Mind, and Spirit" (Faith & Wholeness) — reflects on whole-person wellness (body, mind, and spirit) with Scriptures 3 John 1:2, Romans 12:2, Matthew 11:28, and Psalm 23:3 ("He restores my soul"), plus Daily Scripture & Wellness Reflections signup.
 - Pediatric AI Diagnostics: Smartphone acoustic analysis identifying pediatric respiratory issues with 94% accuracy
 - Modern Virtual Care: Over 90% of parents prefer hybrid/virtual models to reduce ER/urgent care stress
 - Financial Savings: Flat monthly memberships eliminate surprise $150-$300 urgent care co-pays
@@ -40,40 +40,49 @@ IMPORTANT DISCLAIMERS:
 - For medical emergencies, call 911 immediately.
 - Prescriptions are at provider clinical discretion (no controlled substances).
 
-TONE: Friendly, professional, concise. Keep responses short (2-3 sentences). No markdown formatting.`;
+TONE: Friendly, professional, concise. Keep responses short (2-4 sentences). No markdown formatting.`;
 
 const FALLBACK_RESPONSES: Record<string, string> = {
   'member id': "Your Member ID is the 10-digit phone number you entered at registration. When contacting Member Services, pharmacy support, or verifying your account, simply provide this phone number.",
   'member number': "Your Member ID is the 10-digit phone number you entered at registration. When contacting Member Services, pharmacy support, or verifying your account, simply provide this phone number.",
-  'hello': "Hi! Welcome to Cedexx powered by Lyric Health. I'm JasDex, your AI assistant. I can help you with virtual care plans, pricing, blog insights, or enrollment. What would you like to know?",
-  'hi': "Hey there! Welcome to Cedexx powered by Lyric Health. How can I assist you today?",
-  'pricing': "Our plans are straightforward: CareNow™ is $18.99/month for 24/7 urgent care for up to 7 family members, CareNow+Mental is $26.99/month, and CareComplete™ with primary care is $34.99/month. No insurance needed!",
-  'price': "We offer three simple tiers: CareNow™ at $18.99/month, CareNow + Mental Wellness at $26.99/month, and CareComplete™ at $34.99/month. All cover up to 7 household members!",
-  'cost': "Plans start at $18.99/month for CareNow™ urgent care, $26.99/month with mental wellness, and $34.99/month for full primary care. Zero co-pays and no hidden fees!",
+  'four pillars': "Our four homepage pillars are: 1) Family & Individual Wellness, 2) Community & Housing Solutions, 3) Workforce & Institutional Wellness (for school districts, employers, and public agencies), and 4) Affiliate & Strategic Partnerships.",
+  'pillars': "Our four pillars are Family & Individual Wellness, Community & Housing Solutions, Workforce & Institutional Wellness, and Affiliate & Strategic Partnerships.",
+  'school': "CEDEXX offers Custom Community, Workforce & Institutional Pricing for school districts, educational institutions, counties, municipalities, and public agencies. You can request a custom quote at cedexx.net/partners!",
+  'institution': "We provide scalable Workforce & Institutional Wellness solutions with custom volume-based pricing for school districts, educational institutions, employers, and public agencies at cedexx.net/partners.",
+  'enterprise': "Our Enterprise & Community Solutions offer custom per-door, per-member, or organization-sponsored pricing for school districts, public agencies, employers, and residential communities. Visit cedexx.net/partners to request a custom quote!",
+  'ecosystem': "Under Ecosystems We Serve on cedexx.net/partners, we connect people, communities, and institutions across four areas: Family & Individual Wellness, Community & Housing Solutions, Workforce & Institutional Wellness, and Affiliate & Strategic Partnerships.",
+  'partner': "You can partner with CEDEXX across five tracks: Housing & Residential Communities, Hospitality & Wellness Concierge Solutions, Workforce & Institutional Partnerships, Affiliate & Community Partners, and Physician Opportunities. Visit cedexx.net/partners to connect!",
+  'faith': "On our blog at cedexx.net/blog, Founder & CEO Daisy Gonzalez shares a featured reflection titled 'True Wellness: Caring for Body, Mind, and Spirit', highlighting 3 John 1:2, Romans 12:2, Matthew 11:28, and Psalm 23:3 ('He restores my soul').",
+  'scripture': "You can read Founder Daisy Gonzalez's featured reflection 'True Wellness: Caring for Body, Mind, and Spirit' and subscribe to Daily Scripture & Wellness Reflections at cedexx.net/blog.",
+  'hello': "Hi! Welcome to CEDEXX powered by Lyric Health. I'm JasDex, your AI assistant. I can help you with Individual & Family plans, Institutional & Community partnerships, blog insights, or enrollment. What would you like to know?",
+  'hi': "Hey there! Welcome to CEDEXX powered by Lyric Health. How can I assist you today?",
+  'pricing': "Our retail plans start at $16.99/mo for CareNow™ Individual ($24.99/mo Family for up to 7 members), $24.99/mo for CarePlus™ Individual ($32.99/mo Family), and $37.99/mo for CareComplete™ Individual ($52.99/mo Family). We also offer Custom Quote pricing for school districts, institutions, employers, and communities!",
+  'price': "Individual plans are $16.99/mo (CareNow™), $24.99/mo (CarePlus™), and $37.99/mo (CareComplete™). Family plans covering up to 7 members are $24.99/mo, $32.99/mo, and $52.99/mo, plus Custom Quotes for institutions and communities!",
+  'cost': "Plans start at $16.99/mo for individuals and $24.99/mo for families of up to 7, up to $52.99/mo for CareComplete™ Family primary care. Zero co-pays, no insurance needed, and custom volume pricing for institutions!",
   'enroll': "You can enroll at cedexx.net/enroll. Please note that after enrolling, Lyric Health account activation takes 24 to 48 hours before you can log in, so communication is not immediate.",
   'signup': "To get started, visit cedexx.net/enroll. Once enrolled, please allow 24 to 48 hours for Lyric Health to activate your membership and email your setup instructions.",
   'how it works': "You enroll online at cedexx.net/enroll. Please note that Lyric Health communication and account activation is not immediate and takes 24 to 48 hours. Within 24-48 hours, you will receive activation instructions from noreply@getlyric.com to access 24/7 care through the Lyric app!",
   'how does it work': "You enroll online at cedexx.net/enroll. Lyric Health communication and account activation takes 24 to 48 hours. Once activated via instructions from noreply@getlyric.com, you can consult with board-certified physicians 24/7!",
-  'services': "Through our exclusive partner Lyric Health, we provide 24/7 urgent care, primary care, therapy and mental wellness, dermatology, virtual MSK, care navigation, labs, and GLP-1 weight loss consultations.",
-  'contact': "You can reach our member desk at (754) 432-2201 (Mon-Fri 9am-6pm EST) or email support@cedexx.net. For active Lyric app support, call 1-866-223-8831.",
-  'phone': "Our member phone desk is (754) 432-2201, and email is support@cedexx.net. For active Lyric app users, member services is 1-866-223-8831.",
-  'human': "I would be delighted to connect you with our team! You can call our phone desk at (754) 432-2201 or email support@cedexx.net.",
-  'agent': "To speak with a live team member, call (754) 432-2201 or email support@cedexx.net.",
-  'representative': "You can reach our live representative desk by calling (754) 432-2201 or emailing support@cedexx.net.",
+  'services': "Through our exclusive partner Lyric Health, we provide 24/7 urgent care, primary care, therapy and mental wellness, pediatrics, dermatology, virtual MSK, care navigation, labs, and GLP-1 weight loss consultations.",
+  'contact': "You can reach our support desk toll-free at (888) 260-0585 or local at (754) 432-2201 (Mon-Fri 9am-6pm EST), or email support@cedexx.net. For active Lyric app support, call 1-866-223-8831.",
+  'phone': "Our support phone desk is (888) 260-0585 (toll-free) or (754) 432-2201, and email is support@cedexx.net. For active Lyric app users, member services is 1-866-223-8831.",
+  'human': "I would be delighted to connect you with our team! You can call our desk at (888) 260-0585 or (754) 432-2201, or email support@cedexx.net.",
+  'agent': "To speak with a live team member, call (888) 260-0585 or (754) 432-2201, or email support@cedexx.net.",
+  'representative': "You can reach our live representative desk by calling (888) 260-0585 or (754) 432-2201, or emailing support@cedexx.net.",
   'emergency': "⚠️ If you are experiencing a medical emergency, please call 911 immediately. Cedexx and Lyric Health provide non-emergency virtual care.",
   'insurance': "No insurance needed! Cedexx powered by Lyric Health works on a simple monthly membership with zero co-pays and zero deductibles.",
-  'who are you': "I'm JasDex, your AI assistant for Cedexx — powered by Lyric Health. I can answer questions about our virtual care services, pricing, blog insights, and enrollment timeline!",
-  'what is cedexx': "Cedexx is a healthcare technology platform powered by Lyric Health. We connect families to Lyric Health's integrated virtual care services including 24/7 urgent care, primary care, mental health, and more.",
+  'who are you': "I'm JasDex, your AI assistant for CEDEXX — powered by Lyric Health. I can answer questions about our virtual care memberships, institutional & school-district solutions, blog reflections, and enrollment!",
+  'what is cedexx': "CEDEXX is a modern wellness platform designed for individuals, families, institutions, and residential communities, powered by Lyric Health for 24/7 urgent care, primary care, and mental wellness.",
   'cancel': "To cancel, email support@cedexx.net with 'Cancellation' in the subject. Include your Full Name, DOB, Email, and Address. No penalties or cancellation fees.",
   'cancellation': "To cancel, email support@cedexx.net with 'Cancellation' in the subject. Include your Full Name, DOB, Email, and Address. No penalties or cancellation fees.",
-  'account': "For account access help, contact support@cedexx.net or call (754) 432-2201.",
+  'account': "For account access help, contact support@cedexx.net or call (888) 260-0585 / (754) 432-2201.",
   'access': "After enrolling, Lyric Health activation takes 24 to 48 hours — communication is not immediate. After 24-48 hours, download the Lyric Health app, tap 'First Time User?', verify with Last Name/DOB/ZIP, and check your email (including spam) from noreply@getlyric.com.",
   'immediate': "Lyric Health does NOT communicate immediately after enrollment. Account activation takes 24 to 48 hours, after which you will receive an email from noreply@getlyric.com to log into the Lyric app.",
   'activation': "Account activation takes 24 to 48 hours through Lyric Health. Lyric will communicate with you via email from noreply@getlyric.com within that 24-48 hour window.",
   'email': "You will receive an immediate receipt from support@cedexx.net, and Lyric Health will send your membership activation email from noreply@getlyric.com within 24 to 48 hours.",
   'app': "Download the Lyric Health app from the App Store or Google Play. After waiting 24-48 hours for activation, tap 'First Time User?' and enter your Last Name, DOB, and ZIP code to locate your membership.",
   'lyric': "Lyric Health is our exclusive telehealth provider. Please note that Lyric activation and communication takes 24 to 48 hours after signup. Active members can also call Lyric Member Services at 1-866-223-8831.",
-  'blog': "Our health blog covers pediatric AI respiratory diagnostics, telehealth economics saving families hundreds on urgent care, heat hydration tips, and guides for digital visits. Check it out at cedexx.net/blog!",
+  'blog': "Our blog at cedexx.net/blog features Founder Daisy Gonzalez's reflection 'True Wellness: Caring for Body, Mind, and Spirit' alongside articles on pediatric AI respiratory diagnostics, telehealth savings, chronic asthma care, and Miami heat hydration tips!",
 };
 
 function getFallbackResponse(input: string): string | null {

@@ -80,35 +80,79 @@ export default async function handler(req, res) {
     ? "\nIMPORTANT TRIAGE ALERT: Jev detected the user is asking about clinical symptoms or diagnosis. Remind them warmly that JasDex does not give medical advice or collect PHI in chat, and guide them to consult a board-certified Lyric Health physician through their CEDEXX membership."
     : "";
 
-  const systemPrompt = `${langInstruction} You are JasDex, a warm and professional AI for Cedexx — powered by Lyric Health, our exclusive telehealth partner. No insurance needed.${clinicalGuardrailNote}
+  const systemPrompt = `${langInstruction} You are JasDex, a warm, professional, and knowledgeable AI Assistant for CEDEXX — powered by Lyric Health, our exclusive telehealth partner. No insurance needed.${clinicalGuardrailNote}
+
+STRICT PRIVACY & PUBLIC-ONLY BOUNDARY:
+- You are trained EXCLUSIVELY on public CEDEXX website content.
+- You have ZERO access to the private Admin Dashboard, patient/member databases, enrollment records, billing records, or confidential internal company information.
+- NEVER accept, store, guess, or disclose personal medical records (PHI), patient information, or private company data.
 
 CRITICAL ACTIVATION & ONBOARDING RULE:
 - Lyric Health communication and account activation is NOT immediate. It takes 24 to 48 hours after enrollment.
-- Lyric Health sends an activation email with instructions from noreply@getlyric.com within 24 to 48 hours.
-- Members can only log into the Lyric Health app via "First Time User?" after this 24-48 hour window.
+- Instant confirmation receipt is sent immediately from support@cedexx.net upon purchase.
+- Lyric Health sends an activation email with instructions from noreply@getlyric.com within 24 to 48 hours (advise users to check spam/junk).
+- Members can only log into the Lyric Health app via "First Time User?" (using Last Name, DOB, and ZIP code) after this 24-48 hour window.
 - NEVER tell users that Lyric communicates immediately or that access to doctors is instant upon signup.
 
-Key facts about CEDEXX + Lyric Health:
-- Cedexx is powered by Lyric Health, a leading integrated virtual primary care platform
-- Lyric Health offers: 24/7 Urgent Care, Primary Care, Mental Health, Dermatology, Virtual MSK, Care Navigation, Labs, and GLP-1 Weight Loss
-- Nationwide network of board-certified physicians, pediatricians, dermatologists, psychiatrists, and therapists with 10+ years average experience
-- No insurance needed, no co-pays. Pricing: CareNow™ $18.99/mo (Urgent care, up to 7 members), Mental Wellness $18.99/mo, CareNow+Mental $26.99/mo, CareComplete™ $34.99/mo, CareComplete Family™ $52.99/mo
-- Contact: Phone desk (754) 432-2201 (Mon-Fri 9am-6pm EST), Email support@cedexx.net
-- Instant confirmation receipt sent from support@cedexx.net upon purchase. Lyric welcome email arrives within 24-48 hours.
-- MEMBER ID: The head of household Member ID is the 10-digit phone number entered at registration. When verifying account status, contacting pharmacy support, or speaking with Member Services, provide this 10-digit phone number.
-- Active members in Lyric app can call Lyric Member Services at 1-866-223-8831
-- Leadership & Founders: Daisy Gonzalez (Founder, Strategy & Operations Expert with 20+ years experience) and Jasmel Acosta (Co-founder, Engineering Leadership & Technology Strategy).
-- Health Blog (cedexx.net/blog): Articles on pediatric AI respiratory diagnostics (94% accuracy via audio), telehealth economics eliminating co-pays, heat hydration tips, and chronic asthma care.
-- Cedexx is NOT a healthcare provider — we are the technology platform. Lyric Health delivers all medical care.
-- NEVER give medical diagnoses or advice. Redirect medical questions to enrolling and speaking with Lyric Health providers.
-- HIPAA SAFEGUARD: You are a platform support AI, not a healthcare provider. NEVER ask for, accept, or analyze personal medical histories, symptoms, or clinical records in this chat. Remind members that clinical care is provided confidentially by licensed Lyric Health doctors.
-- For emergencies, call 911
-- Keep responses short (2-3 sentences).`;
+HOMEPAGE TAGLINE & BRANDING:
+- Tagline: "Better Care. Here. Now. — A modern wellness amenity designed for individuals, families, institutions, & residential communities."
+- Closing Tagline: "One connected wellness solution. Built for families. Designed for communities. Scaled for institutions."
 
-  // Build provider list with available keys (ordered by Option B: DeepSeek Fast, Grok, and Kimi first)
+FOUR PILLARS ON THE HOMEPAGE:
+1. Family & Individual Wellness: Affordable virtual healthcare and mental wellness for you and your loved ones. Accessible anytime, wherever life takes you. (CTA: Explore Memberships -> /pricing)
+2. Community & Housing Solutions: Bringing accessible healthcare to multifamily, affordable housing, student housing, and residential communities. (CTA: Elevate Your Community -> /partners)
+3. Workforce & Institutional Wellness: Scalable wellness solutions for school districts, educational institutions, employers, and public organizations—supporting the people who make them thrive. (CTA: Explore Institutional Solutions -> /partners)
+4. Affiliate & Strategic Partnerships: Expanding wellness access through organizations, associations, and community partnerships built for scale. (CTA: Partner With Us -> /partners#partner-form)
+
+RETAIL PLANS & PRICING (/pricing & /enroll — No insurance needed, $0 visit fees, $0 co-pays, cancel anytime):
+- CareNow™ Individual: $16.99/mo (24/7 Urgent Care for 1 adult)
+- CareNow™ Family: $24.99/mo (24/7 Urgent Care for up to 7 family members)
+- CarePlus™ Individual: $24.99/mo (24/7 Urgent Care + Mental Health Counseling for 1 adult)
+- CarePlus™ Family: $32.99/mo (24/7 Urgent Care + Mental Health Counseling for up to 7 family members)
+- CareComplete™ Individual: $37.99/mo (Dedicated Virtual Primary Care + Urgent Care + Mental Health + Preventive Labs for 1 adult)
+- CareComplete™ Family: $52.99/mo (Full Virtual Primary Care + Pediatric Care + Urgent Care + Mental Health for up to 7 family members)
+
+ENTERPRISE, COMMUNITY, WORKFORCE & INSTITUTIONAL PRICING (/pricing & /partners):
+- Title: Custom Community, Workforce & Institutional Pricing (Pricing: Custom Quote)
+- Summary: Scalable digital wellness memberships for residential communities, employers, school districts, educational institutions, public agencies, and member organizations. Flexible, volume-based pricing makes accessible wellness more affordable at scale.
+- Ideal For (9 segments): School Districts & Educational Institutions; Counties, Municipalities & Public Agencies; Multifamily & Build-to-Rent Communities; Student, Senior & Lifestyle Housing; Employers & Workforce Benefits; Health-Sharing & Transportation Networks; REALTOR®, Trade & Professional Associations; HOAs, Credit Unions & Faith-Based Organizations; Community & Nonprofit Organizations.
+- Enterprise & Institutional Benefits (7 benefits): Custom per-door, per-member, or organization-sponsored pricing; Reduced pricing through volume implementation; Scalable wellness programs for school districts, public agencies, and employers; Resident wellness amenities and household membership options; Exclusive affiliate, association, and institutional membership plans; Flexible voluntary or organization-sponsored enrollment; Dedicated implementation, organization-wide rollout, and ongoing support.
+
+ECOSYSTEMS WE SERVE (/partners — "Connecting People, Communities & Institutions to Better Care"):
+- Family & Individual Wellness: Ideal for uninsured individuals, gig workers, independent contractors, and frequent travelers; can also complement an existing health plan.
+- Community & Housing Solutions: Multifamily, affordable, student, senior, and workforce housing resident wellness amenities, plus customized wellness concierge solutions for hotels and hospitality partners.
+- Workforce & Institutional Wellness: Scalable healthcare and mental wellness for employers, school districts, educational institutions, counties, municipalities, and public agencies (educators, school personnel, corporate teams, transportation networks, essential workers, and their families).
+- Affiliate & Strategic Partnerships: Customized membership programs with associations, credit unions, nonprofits, faith-based organizations, hospitality groups, and community networks.
+
+PARTNER WITH CEDEXX (/partners#partner-form — 5 Partnership Categories):
+1. Housing & Residential Communities (multifamily, student, senior, and workforce housing)
+2. Hospitality & Wellness Concierge Solutions (hotel guest digital wellness concierge)
+3. Workforce & Institutional Partnerships (employers, school districts, educational institutions, counties, municipalities, public agencies)
+4. Affiliate & Community Partners (associations, nonprofits, faith-based organizations, community networks)
+5. Physician Opportunities (flexible virtual care opportunities through our partner network)
+
+BLOGS & CLINICAL/WELLNESS INSIGHTS (cedexx.net/blog):
+- Featured Article by Founder & CEO Daisy Gonzalez: "True Wellness: Caring for Body, Mind, and Spirit" (Faith & Wholeness) — reflects on caring for the whole person (body, mind, and spirit) with Scriptures including 3 John 1:2, Romans 12:2, Matthew 11:28, and Psalm 23:3 ("He restores my soul"), plus Daily Scripture & Wellness Reflections signup.
+- Clinical & Wellness Posts:
+  1. "AI & Clinical Intelligence: The Future of Pediatric Diagnosis in 2025" (94% accuracy identifying pediatric respiratory conditions via smartphone audio)
+  2. "Telemedicine Trends for 2025: Why Modern Parents Choose Virtual Care" (90%+ parent preference for hybrid/virtual care)
+  3. "The Financial Impact: How Virtual Visits Save Families Hundreds Annually" (eliminating $150-$300 urgent care co-pays)
+  4. "Managing Pediatric Chronic Conditions via Digital Platforms" (asthma, allergies, developmental check-ins without missing school)
+  5. "Healthy Living Tips: Staying Hydrated in the Miami Heat" (heat exhaustion vs heat stroke, hydration in South Florida)
+  6. "Telemedicine: A Parent's Guide to 24/7 Care" (preparing for pediatric telehealth visits, prescriptions, digital excuse notes)
+
+KEY SUPPORT & COMPANY FACTS:
+- Clinical Services via Lyric Health: 24/7 Urgent Care, Primary Care, Mental Health, Pediatrics, Dermatology, Virtual MSK, Care Navigation, Labs, GLP-1 Weight Loss, Prescription Access (no controlled substances), Work & School Notes.
+- Leadership & Founders: Daisy Gonzalez (Founder & CEO, Strategy & Operations Expert with 20+ years experience) and Jasmel Acosta (Co-founder, Engineering Leadership & Technology Strategy).
+- Contact: Toll-Free (888) 260-0585, Local Desk (754) 432-2201 (Mon-Fri 9am-6pm EST), Email support@cedexx.net. Active Lyric app members can call Lyric Member Services at 1-866-223-8831.
+- MEMBER ID: The head of household Member ID is the 10-digit phone number entered at registration.
+- COMPLIANCE GUARDRAILS: CEDEXX is a technology platform, NOT a healthcare provider (Lyric Health delivers all medical care). NEVER give medical diagnoses or advice. Do NOT claim that no SSN or government ID is required to enroll, and do NOT promise specific numerical capacity like "hundreds of thousands". For emergencies, call 911.
+- Keep responses concise, warm, and helpful (2-4 sentences).`;
+
+  // Build provider list with available keys (Grok 3.0 + DeepSeek Fast + Kimi + OpenAI + Gemini)
   const availableProviders = [];
+  if (XAI_KEY) availableProviders.push({ name: 'grok', key: XAI_KEY, model: 'grok-3' });
   if (DEEPSEEK_KEY) availableProviders.push({ name: 'deepseek', key: DEEPSEEK_KEY, model: 'deepseek-chat' });
-  if (XAI_KEY) availableProviders.push({ name: 'grok', key: XAI_KEY, model: 'grok-3-mini-fast' });
   if (KIMI_KEY) availableProviders.push({ name: 'kimi', key: KIMI_KEY, model: 'kimi-k2.6' });
   if (OPENAI_KEY) availableProviders.push({ name: 'openai', key: OPENAI_KEY, model: 'gpt-4o-mini' });
   if (GEMINI_KEY) availableProviders.push({ name: 'gemini', key: GEMINI_KEY, model: 'gemini-2.0-flash' });
@@ -116,7 +160,7 @@ Key facts about CEDEXX + Lyric Health:
 
   if (availableProviders.length === 0) {
     console.error('[CHAT] No AI provider keys configured');
-    const fallbackText = 'We are currently unavailable. Please try again in a moment or contact support at (754) 432-2201 for immediate assistance.';
+    const fallbackText = 'We are currently unavailable. Please try again in a moment or contact support at (888) 260-0585 or (754) 432-2201 for immediate assistance.';
     return res.status(200).json({ choices: [{ message: { content: fallbackText } }] });
   }
 
@@ -134,7 +178,7 @@ Key facts about CEDEXX + Lyric Health:
     try {
       console.log(`[CHAT] Attempting provider: ${currentProvider.name}`);
 
-      // DeepSeek V3.2 Fast — PRIMARY
+      // DeepSeek V3.2 Fast
       if (currentProvider.name === 'deepseek') {
         const response = await fetch('https://api.deepseek.com/chat/completions', {
           method: 'POST',
@@ -157,14 +201,14 @@ Key facts about CEDEXX + Lyric Health:
 
         const data = await response.json();
         if (data.choices?.[0]?.message?.content) {
-          return res.status(200).json(data);
+          return res.status(200).json({ ...data, provider: 'deepseek' });
         }
         throw new Error('DeepSeek invalid response');
       }
 
-      // xAI Grok — SECONDARY FAST BRAIN
+      // xAI Grok 3.0 — PRIMARY BRAIN
       if (currentProvider.name === 'grok') {
-        const grokModels = [process.env.GROK_MODEL, 'grok-3-mini-fast', 'grok-3-mini', 'grok-3-fast'].filter(Boolean);
+        const grokModels = ['grok-3', 'grok-3-fast', 'grok-3-mini-fast', 'grok-3-mini', process.env.GROK_MODEL].filter(Boolean);
         let grokErr = 'Grok failed';
         for (const gModel of grokModels) {
           const response = await fetch('https://api.x.ai/v1/chat/completions', {
@@ -184,7 +228,11 @@ Key facts about CEDEXX + Lyric Health:
           if (response.ok) {
             const data = await response.json();
             if (data.choices?.[0]?.message?.content) {
-              return res.status(200).json(data);
+              return res.status(200).json({
+                ...data,
+                provider: 'grok-3.0',
+                requested_model: gModel,
+              });
             }
           } else {
             grokErr = `Grok (${gModel}) HTTP ${response.status}: ${(await response.text()).slice(0, 160)}`;

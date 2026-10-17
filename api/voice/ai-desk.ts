@@ -13,6 +13,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
  * 6. bargeIn="false" on prompts to prevent line noise and crossed speech
  */
 
+const XAI_KEY = process.env.XAI_API_KEY || process.env.GROK_API_KEY || '';
 const DEEPSEEK_KEY = process.env.DEEPSEEK_API_KEY || '';
 const OPENAI_KEY = process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY || '';
 const GEMINI_KEY = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY || '';
@@ -27,39 +28,55 @@ function twiml(xml: string) {
   return `<?xml version="1.0" encoding="UTF-8"?>\n<Response>\n${xml}\n</Response>`;
 }
 
-// Speaks via Deepgram Flux Hannah (American Feminine, 1x speed, 1 expressivity)
+// Speaks via Deepgram Flux Hannah / Grok Voice 3.0
 function hannah(text: string): string {
   const url = `https://www.cedexx.net/api/voice/speak?text=${encodeURIComponent(text.trim())}`;
   return `<Play>${url}</Play>`;
 }
 
-// ─── Ceedex Knowledge Base ───
+// ─── Ceedex Public Knowledge Base ───
 const CEDEXX_KNOWLEDGE = `
 You are Hannah, the warm, friendly, and enthusiastic virtual front desk receptionist for Ceedex Healthcare, powered by Lyric Health.
-You are on a live phone call with a patient or prospective member.
+You are on a live phone call with a patient, institutional partner, or prospective member.
+
+STRICT PRIVACY & PUBLIC-ONLY BOUNDARY:
+- You are trained ONLY on public Ceedex website information.
+- You have ZERO access to the private Admin Dashboard, patient/member databases, enrollment records, billing records, or confidential internal company operations.
+- NEVER disclose, guess, or collect private patient records (PHI) or internal company information.
 
 CRITICAL PRONUNCIATION & RULES:
 1. Company Name: Always pronounce and spell as "Ceedex" (sounds like "See-dex").
-2. Staff Referrals: NEVER mention individual employee names like Daisy to the caller. Always say "our staff", "a team member", or "our office team".
+2. Staff Referrals: NEVER mention individual employee names like Daisy when transferring a caller. Always say "our staff", "a team member", or "our office team".
 3. Receptionist Buffer: Answer caller questions quickly, accurately, and naturally based ONLY on the website facts below so staff only takes calls when human assistance is specifically requested.
 4. Keep answers concise: 2 spoken sentences maximum. This is a voice phone conversation.
 5. NEVER provide medical advice, diagnosis, or write prescriptions. For medical emergencies, advise dialing 911 immediately.
 6. Follow-up: Ask "Would you like to enroll online at ceedex dot net slash enroll, or can I connect you with our staff?"
 
-CEEDEX FACTS:
-- Partnership: Ceedex is powered by Lyric Health, delivering 24/7 integrated virtual primary care, urgent care, and mental health therapy.
-- Contact: Front desk line is (754) 432-2201. Support email is support@cedexx.net. Website is ceedex.net. All CEDEXX phone references are (754) 432-2201.
-- Plans & Pricing:
-  * CareNow™: $18.99/mo (24/7 virtual urgent care, up to 7 household members included, no co-pays)
-  * CareNow™ + Mental Wellness: $26.99/mo (Urgent care + therapy & behavioral health)
-  * Mental Wellness: $18.99/mo (Therapy, counseling, mental health sessions)
-  * CareComplete™: $34.99/mo (Full virtual primary care physician + urgent care)
-  * CareComplete™ Family: $52.99/mo (Primary care for large families, up to 7 members)
-- Key Benefits: No insurance needed, no co-pays, no deductibles. Family coverage covers up to 7 household members at no extra cost.
-- Prescriptions: Lyric doctors can send prescriptions directly to any local pharmacy.
-- How to enroll: Visit ceedex.net/enroll to choose your plan.
+CEEDEX PUBLIC WEBSITE FACTS:
+- Tagline: "Better Care. Here. Now. — A modern wellness amenity designed for individuals, families, institutions, and residential communities."
+- Partnership: Ceedex is powered by Lyric Health, delivering 24/7 integrated virtual primary care, urgent care, pediatrics, and mental health therapy across all 50 states.
+- Contact: Toll-Free line is (888) 260-0585, Local desk line is (754) 432-2201. Support email is support@cedexx.net. Website is ceedex.net.
+- Four Homepage Pillars:
+  1. Family & Individual Wellness (Explore Memberships at ceedex.net/pricing)
+  2. Community & Housing Solutions (Multifamily, affordable, student, senior, and residential communities)
+  3. Workforce & Institutional Wellness (School districts, educational institutions, employers, counties, municipalities, and public agencies)
+  4. Affiliate & Strategic Partnerships (Associations, credit unions, nonprofits, faith-based organizations, and community networks)
+- Retail Plans & Pricing (No insurance needed, $0 visit fees, $0 co-pays):
+  * CareNow™ Individual: $16.99/mo | CareNow™ Family (up to 7 members): $24.99/mo (24/7 virtual urgent care)
+  * CarePlus™ Individual: $24.99/mo | CarePlus™ Family (up to 7 members): $32.99/mo (24/7 urgent care + mental health counseling)
+  * CareComplete™ Individual: $37.99/mo | CareComplete™ Family (up to 7 members): $52.99/mo (Dedicated virtual primary care + urgent care + mental health + preventive labs)
+- Enterprise, Community, Workforce & Institutional Pricing:
+  * Custom Community, Workforce & Institutional Pricing (Custom Quote) with flexible volume-based per-door, per-member, or organization-sponsored pricing.
+  * Ideal For: School Districts & Educational Institutions, Counties/Municipalities/Public Agencies, Multifamily & Build-to-Rent, Student/Senior Housing, Employers, Health-Sharing & Transportation Networks, REALTOR®/Trade Associations, HOAs/Credit Unions/Faith-Based Organizations, and Nonprofits.
+- Partner With Ceedex (5 Partnership Tracks at ceedex.net/partners):
+  1. Housing & Residential Communities
+  2. Hospitality & Wellness Concierge Solutions (for hotel guests)
+  3. Workforce & Institutional Partnerships (employers, school districts, public agencies)
+  4. Affiliate & Community Partners
+  5. Physician Opportunities (through our partner network)
 - CRITICAL ACTIVATION RULE: Lyric Health communication and account activation is NOT immediate; it takes 24 to 48 hours. Lyric Health sends welcome and activation instructions from noreply@getlyric.com within 24 to 48 hours.
-- Health Blogs: We publish clinical insights on pediatric AI diagnostics, healthcare economics, heat hydration, and chronic care management at ceedex.net/blog.
+- Member ID: The head of household Member ID is the 10-digit phone number entered at registration.
+- Health Blogs (ceedex.net/blog): Features Founder & CEO Daisy Gonzalez's reflection "True Wellness: Caring for Body, Mind, and Spirit" (Faith & Wholeness, 3 John 1:2, Romans 12:2, Matthew 11:28, Psalm 23:3), plus clinical articles on pediatric AI respiratory diagnostics (94% accuracy), telehealth cost savings, chronic asthma care, and Miami heat hydration tips.
 `;
 
 // ─── Intent Detection (Heuristic / Regex Pre-filter & Fallback) ───
@@ -92,6 +109,11 @@ function detectIntentRegex(speech: string, digit: string): string {
     return 'voicemail';
   }
 
+  // Institutional / School District / Enterprise / Partner
+  if (/school|district|institution|municipality|county|public agency|enterprise|custom quote|partner|property|multifamily|hotel|hospitality|employer|workforce/i.test(lower)) {
+    return 'institutional_partners';
+  }
+
   // Pricing
   if (/price|cost|how much|pricing|fee|charge|rate|monthly|afford/i.test(lower)) {
     return 'pricing';
@@ -102,8 +124,8 @@ function detectIntentRegex(speech: string, digit: string): string {
     return 'insurance_coverage';
   }
 
-  // Blog / Articles
-  if (/blog|article|pediatric ai|research|hydration|heat exhaustion/i.test(lower)) {
+  // Blog / Articles / Faith reflection
+  if (/blog|article|pediatric ai|research|hydration|heat exhaustion|faith|scripture|true wellness/i.test(lower)) {
     return 'blog';
   }
 
@@ -113,7 +135,7 @@ function detectIntentRegex(speech: string, digit: string): string {
   }
 
   // How it works / general Lyric overview
-  if (/how does (it|ceedex|cedexx|lyric|this) work|how do i (use|access) (it|lyric|ceedex)|what is (ceedex|cedexx|lyric)/i.test(lower)) {
+  if (/how does (it|ceedex|cedexx|lyric|this) work|how do i (use|access) (it|lyric|ceedex)|what is (ceedex|cedexx|lyric)|four pillars|pillars/i.test(lower)) {
     return 'how_it_works';
   }
 
@@ -169,13 +191,14 @@ async function detectIntent(speech: string, digit: string): Promise<string> {
             transfer_staff: 'Caller explicitly asks to speak with a human, staff member, representative, operator, or office team',
             voicemail: 'Caller wants to leave a voicemail or recorded message',
             goodbye: 'Caller says no thank you, nothing else, goodbye, or is finished with the call',
+            institutional_partners: 'Caller asks about school districts, educational institutions, public agencies, employers, residential communities, hospitality, or custom partnership quotes',
             pricing: 'Caller asks about plan prices, monthly cost, how much memberships cost, or affordability',
             insurance_coverage: 'Caller asks if insurance is required, co-pays, deductibles, or how many family members are covered',
             member_id: 'Caller asks what their Member ID number is or how to find their identification number',
-            how_it_works: 'Caller asks what Ceedex or Lyric Health is or how the virtual telehealth service works',
+            how_it_works: 'Caller asks what Ceedex or Lyric Health is, the four pillars, or how the virtual telehealth service works',
             enroll: 'Caller asks how to sign up, enroll, register, or start a membership',
             billing: 'Caller asks about a charge, payment, receipt, billing issue, or canceling a subscription',
-            blog: 'Caller asks about health blog articles, pediatric AI diagnostics, or hydration articles',
+            blog: 'Caller asks about health blog articles, faith and wellness reflections, pediatric AI diagnostics, or hydration articles',
             contact_phone: 'Caller asks for the phone number or email address to contact Ceedex',
             ai_fallback: 'Nuanced or multi-part question best answered by the conversational AI assistant',
           },
@@ -216,26 +239,29 @@ function getQuickResponse(intent: string): string | null {
     case 'member_id':
       return "Your Member ID number is simply the 10-digit phone number you entered when you registered. Whenever you need to verify your account or speak with pharmacy support, just provide your registered phone number.";
 
+    case 'institutional_partners':
+      return "Ceedex offers Custom Community, Workforce, and Institutional Pricing for school districts, educational institutions, public agencies, employers, and residential communities. You can request a custom volume quote online at ceedex dot net slash partners, or I can connect you directly with our staff.";
+
     case 'pricing':
-      return "Our plans are very affordable. CareNow is 18 dollars and 99 cents a month for 24/7 virtual urgent care. CareNow plus Mental Wellness is 26 dollars and 99 cents. And CareComplete, with your own dedicated primary care doctor, is 34 dollars and 99 cents a month. All plans cover up to 7 family members with zero insurance needed.";
+      return "Our individual plans start at 16 dollars and 99 cents a month for CareNow urgent care, 24 dollars and 99 cents for CarePlus with mental wellness, and 37 dollars and 99 cents for CareComplete primary care. Family plans covering up to 7 members are 24.99, 32.99, and 52 dollars and 99 cents a month, plus custom volume quotes for institutions and communities.";
     
     case 'insurance_coverage':
-      return "You do not need health insurance at all. There are no co-pays, no deductibles, and no surprise charges. Best of all, our plans cover up to 7 household members under one subscription at no extra cost.";
+      return "You do not need health insurance at all. There are zero co-pays, zero deductibles, and no surprise charges, and our family plans cover up to 7 household members under one subscription.";
     
     case 'how_it_works':
-      return "Ceedex is powered by Lyric Health. You enroll online at ceedex dot net slash enroll. Please note that Lyric Health communication and account activation takes 24 to 48 hours. Once active, you can consult with licensed doctors and therapists 24/7.";
+      return "Ceedex is a modern wellness platform for individuals, families, institutions, and residential communities, powered by Lyric Health. After you enroll at ceedex dot net slash enroll, Lyric Health account activation takes 24 to 48 hours, and then you have 24/7 access to board-certified doctors and therapists.";
 
     case 'enroll':
       return "Enrolling is quick and simple online at ceedex dot net slash enroll. Please keep in mind that Lyric Health communication and account activation takes 24 to 48 hours before you can log in, so welcome communication is not immediate.";
 
     case 'blog':
-      return "Our health blog covers pediatric AI respiratory analysis, healthcare savings that eliminate urgent care co-pays, and summer heat hydration tips. You can read all articles at ceedex dot net slash blog.";
+      return "Our blog at ceedex dot net slash blog features True Wellness: Caring for Body, Mind, and Spirit, alongside clinical articles on pediatric AI respiratory analysis, healthcare cost savings, and summer heat hydration tips.";
 
     case 'billing':
       return "You can manage your account and billing anytime at ceedex dot net, or email us at support at cedexx dot net. I can also connect you with our staff if you need direct billing assistance.";
 
     case 'contact_phone':
-      return "You can reach Ceedex by phone anytime at 7 5 4, 4 3 2, 2 2 0 1, or by email at support at cedexx dot net.";
+      return "You can reach Ceedex toll-free at 8 8 8, 2 6 0, 0 5 8 5, or at our local desk at 7 5 4, 4 3 2, 2 2 0 1, or by email at support at cedexx dot net.";
 
     default:
       return null;
@@ -385,7 +411,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   if (!spokenText) {
-    spokenText = "Ceedex offers 24/7 virtual urgent care and primary care powered by Lyric Health, starting at 18 dollars and 99 cents a month with no insurance needed.";
+    spokenText = "Ceedex offers 24/7 virtual urgent care, primary care, and mental wellness powered by Lyric Health, starting at 16 dollars and 99 cents a month with no insurance needed.";
   }
 
   // Coherent delivery: play answer in full, then prompt with bargeIn="false" to prevent line cutoffs
@@ -401,9 +427,39 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   return res.status(200).send(twiml(followUpResponse));
 }
 
-// ─── Call Multi-Provider AI (DeepSeek → OpenAI → Gemini 2.0 Flash) ───
+// ─── Call Multi-Provider AI (Grok 3.0 → DeepSeek → OpenAI → Gemini 2.0 Flash) ───
 async function getAIResponse(userSpeech: string): Promise<string> {
-  const promptInstruction = `Respond as Hannah at Ceedex, the front desk receptionist. Keep it to 2 friendly, spoken sentences (no markdown or bullet points). Never mention employee names like Daisy; refer to "our staff". Offer to help enroll at ceedex dot net slash enroll or connect with staff if relevant.`;
+  const promptInstruction = `Respond as Hannah at Ceedex, the front desk receptionist. Keep it to 2 friendly, spoken sentences (no markdown or bullet points). Never mention employee names like Daisy when transferring calls; refer to "our staff". Offer to help enroll at ceedex dot net slash enroll or connect with staff if relevant.`;
+
+  if (XAI_KEY) {
+    for (const gModel of ['grok-3', 'grok-3-fast', 'grok-3-mini-fast']) {
+      try {
+        const res = await fetch('https://api.x.ai/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${XAI_KEY}`,
+          },
+          body: JSON.stringify({
+            model: gModel,
+            messages: [
+              { role: 'system', content: `${CEDEXX_KNOWLEDGE}\n\n${promptInstruction}` },
+              { role: 'user', content: userSpeech },
+            ],
+            temperature: 0.3,
+            max_tokens: 120,
+          }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const text = data.choices?.[0]?.message?.content?.replace(/[*#_~`]/g, '').trim();
+          if (text) return text;
+        }
+      } catch (e) {
+        console.warn(`[AI DESK] Grok (${gModel}) failed:`, e);
+      }
+    }
+  }
 
   if (DEEPSEEK_KEY) {
     try {

@@ -1,5 +1,5 @@
 import express from 'express';
-import { CEDEXX_KNOWLEDGE } from '../src/data/cedexx-knowledge';
+import { buildSystemPrompt } from '../src/data/cedexx-knowledge';
 
 const router = express.Router();
 
@@ -22,88 +22,20 @@ router.post('/chat', async (req, res) => {
   const OPENAI_KEY = process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY;
   const MINIMAX_KEY = process.env.MINIMAX_API_KEY;
 
-  // Build comprehensive system prompt from real website knowledge
-  const k = CEDEXX_KNOWLEDGE;
-  
   const langInstruction = 
     language === 'es' ? "Responde en español profesional (Latinoamérica). " :
     language === 'ht' ? "Reponn an kreyòl ayisyen. " :
     language === 'ru' ? "Отвечайте на русском языке. " :
     "Respond in English. ";
 
-  const systemPrompt = `${langInstruction}
+  const systemPrompt = `${langInstruction}\n\n${buildSystemPrompt()}`;
 
-You are JasDex, the CEDEXX Healthcare AI Assistant. You help customers learn about our telemedicine platform.
-
-COMPANY: ${k.company.description}
-Website: ${k.company.website} | Email: ${k.company.email} | Phone: ${k.company.phone}
-Coverage: ${k.company.coverage} | Languages: ${k.company.languages.join(', ')}
-
-FOUNDERS:
-${k.founders.map(f => `- ${f.name}, ${f.role}: ${f.bio}`).join('\n')}
-
-PRICING:
-- CareNow™: ${k.pricing.careNow}
-- Mental Wellness: ${k.pricing.mentalWellness}
-- CareNow™ + Mental Wellness: ${k.pricing.careNowMental}
-- CareComplete™: ${k.pricing.careComplete}
-- CareComplete™ Family: ${k.pricing.careCompleteFamily}
-${k.pricing.notes.map(n => `- ${n}`).join('\n')}
-
-6 CORE SERVICES:
-${k.coreServices.map(s => `
-${s.name}: ${s.description}
-Conditions: ${s.conditions.join(', ')}
-${s.restrictions ? `Restrictions: ${s.restrictions}` : ''}`).join('')}
-
-HOW IT WORKS:
-${k.howItWorks.map((step, i) => `${i + 1}. ${step}`).join('\n')}
-
-PROPERTY & HOSPITALITY:
-${k.propertyHospitality.description}
-Segments: ${k.propertyHospitality.segments.join(', ')}
-
-ENROLLMENT TYPES:
-${k.enrollmentTypes.join(', ')}
-
-SCHEDULE SLOTS (EST):
-${k.scheduleSlots.join(', ')}
-
-KEY BENEFITS:
-${k.keyBenefits.map(b => `- ${b}`).join('\n')}
-
-CRITICAL ACTIVATION & ONBOARDING RULE:
-${k.activationTimeline.rule}
-${k.activationTimeline.explanation}
-Support contact: ${k.activationTimeline.supportContact}
-
-EMAIL & COMMUNICATION WORKFLOWS:
-- Immediate Order Receipt: ${k.emailCommunications.receiptEmail}
-- Lyric Health Welcome/Activation: ${k.emailCommunications.lyricActivationEmail}
-- Cancellation: ${k.emailCommunications.cancellationEmail}
-- Support: ${k.emailCommunications.supportDesk}
-
-HEALTH BLOG & CLINICAL RESEARCH:
-${k.blogArticles.map(b => `- "${b.title}" (${b.category}): ${b.summary}`).join('\n')}
-
-CRITICAL RULES:
-${k.criticalRules.map(r => `- ${r}`).join('\n')}
-
-GUIDELINES:
-- Keep responses short (2-3 sentences max)
-- Be warm, professional, and helpful
-- NEVER tell a user that Lyric Health communicates immediately or that access is instant upon checkout. Always clarify that Lyric Health account activation and communication takes 24 to 48 hours.
-- Reference health blog articles when asked about research, pediatric health, hydration, or virtual care
-- NEVER give medical diagnoses or advice
-- For emergencies, direct to 911 immediately
-- If booking: collect name, email, phone, service type, date/time`;
-
-  // Try providers in order of preference (with automatic failover loop)
+  // Try providers in order of preference (Grok 3.0 first, followed by automatic failover loop)
   const availableProviders = [
-    // DeepSeek V3.2 Fast — PRIMARY ($0.07-$0.14/1M tokens, ultra-fast)
+    // xAI Grok 3.0 — PRIMARY BRAIN
+    { name: 'grok', key: XAI_KEY, model: 'grok-3' },
+    // DeepSeek V3.2 Fast
     { name: 'deepseek', key: DEEPSEEK_KEY, model: 'deepseek-chat' },
-    // xAI Grok — Secondary Fast Brain
-    { name: 'grok', key: XAI_KEY, model: 'grok-3-mini-fast' },
     // Kimi (Moonshot Global api.moonshot.ai — kimi-k2.6 ~800ms non-thinking mode)
     { name: 'kimi', key: KIMI_KEY, model: 'kimi-k2.6' },
     // Gemini — Fast fallback
@@ -115,7 +47,7 @@ GUIDELINES:
   ].filter(p => Boolean(p.key));
 
   if (availableProviders.length === 0) {
-    const fallbackText = 'We are currently unavailable. Please try again in a moment or contact support at (754) 432-2201 for immediate assistance.';
+    const fallbackText = 'We are currently unavailable. Please try again in a moment or contact support at (888) 260-0585 or (754) 432-2201 for immediate assistance.';
     return res.status(200).json({ choices: [{ message: { content: fallbackText } }] });
   }
 
@@ -149,15 +81,15 @@ GUIDELINES:
         if (response.ok) {
           const data = await response.json();
           if (data.choices?.[0]?.message?.content) {
-            return res.status(200).json(data);
+            return res.status(200).json({ ...data, provider: 'deepseek' });
           }
         }
         throw new Error('DeepSeek failed');
       }
 
-      // xAI Grok
+      // xAI Grok 3.0
       if (selectedProvider.name === 'grok' && XAI_KEY) {
-        for (const gModel of ['grok-3-mini-fast', 'grok-3-mini', 'grok-3-fast']) {
+        for (const gModel of ['grok-3', 'grok-3-fast', 'grok-3-mini-fast', 'grok-3-mini']) {
           const response = await fetch('https://api.x.ai/v1/chat/completions', {
             method: 'POST',
             headers: {
@@ -175,7 +107,7 @@ GUIDELINES:
           if (response.ok) {
             const data = await response.json();
             if (data.choices?.[0]?.message?.content) {
-              return res.status(200).json(data);
+              return res.status(200).json({ ...data, provider: 'grok-3.0', requested_model: gModel });
             }
           }
         }

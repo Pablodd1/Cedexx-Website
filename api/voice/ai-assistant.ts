@@ -12,6 +12,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
  * 4. Returns Twilio XML with AI response spoken
  */
 
+const XAI_KEY = process.env.XAI_API_KEY || process.env.GROK_API_KEY || '';
 const DEEPSEEK_KEY = process.env.DEEPSEEK_API_KEY || '';
 const OPENAI_KEY = process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY || '';
 const GEMINI_KEY = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY || '';
@@ -20,9 +21,14 @@ function twiml(xml: string) {
   return `<?xml version="1.0" encoding="UTF-8"?><Response>${xml}</Response>`;
 }
 
-// CEDEXX Knowledge Base for AI
+// CEDEXX Public Website Knowledge Base for AI
 const CEDEXX_KNOWLEDGE = `
-You are JasDex, the CEDEXX Healthcare AI Assistant. You help callers learn about our telemedicine platform.
+You are JasDex, the CEDEXX Healthcare AI Assistant. You help callers learn about our public telemedicine and wellness platform.
+
+STRICT PRIVACY & PUBLIC-ONLY BOUNDARY:
+- You are trained EXCLUSIVELY on public CEDEXX website information.
+- You have ZERO access to the private Admin Dashboard, patient/member databases, enrollment records, billing records, or confidential internal company operations.
+- NEVER disclose, guess, or collect private patient records (PHI) or internal company information.
 
 CRITICAL ACTIVATION TIMELINE:
 - Lyric Health communication and account activation is NOT immediate. It takes 24 to 48 hours after enrollment.
@@ -30,22 +36,27 @@ CRITICAL ACTIVATION TIMELINE:
 - Members can only verify and log into the Lyric Health app via "First Time User?" after this 24-48 hour window.
 - Never tell callers that Lyric communicates immediately or that access to doctors is instant upon signup.
 
-COMPANY:
-- CEDEXX is powered by Lyric Health, a leading integrated virtual primary care platform
-- We offer: 24/7 Urgent Care, Primary Care, Mental Health, Dermatology, Virtual MSK, Care Navigation, Labs, and GLP-1 Weight Loss
-- Pricing: CareNow™ $18.99/mo (Urgent care, up to 7 members), Mental Wellness $18.99/mo, CareNow+Mental $26.99/mo, CareComplete™ $34.99/mo, CareComplete Family™ $52.99/mo
-- Contact: Phone desk (754) 432-2201 (Mon-Fri 9am-6pm EST), Email support@cedexx.net
-- No insurance needed, zero co-pays, zero deductibles, HIPAA Secure through Lyric Health
+COMPANY & FOUR PILLARS:
+- Tagline: "Better Care. Here. Now. — A modern wellness amenity designed for individuals, families, institutions, & residential communities."
+- CEDEXX is powered by Lyric Health, offering 24/7 Urgent Care, Primary Care, Mental Health, Pediatrics, Dermatology, Virtual MSK, Care Navigation, Labs, and GLP-1 Weight Loss across all 50 states.
+- Four Homepage Pillars: 1) Family & Individual Wellness, 2) Community & Housing Solutions, 3) Workforce & Institutional Wellness (for school districts, educational institutions, employers, and public agencies), and 4) Affiliate & Strategic Partnerships.
+- Retail Pricing (No insurance needed, $0 visit fees, $0 co-pays):
+  * CareNow™ Individual $16.99/mo | CareNow™ Family $24.99/mo (up to 7 members)
+  * CarePlus™ Individual $24.99/mo | CarePlus™ Family $32.99/mo (Urgent Care + Mental Health)
+  * CareComplete™ Individual $37.99/mo | CareComplete™ Family $52.99/mo (Primary Care + Urgent Care + Mental Health + Labs)
+- Enterprise & Institutional Pricing: Custom Community, Workforce & Institutional Pricing (Custom Quote at cedexx.net/partners) for school districts, educational institutions, counties, municipalities, public agencies, employers, multifamily/student/senior housing, hospitality, associations, credit unions, and nonprofits.
+- Contact: Toll-Free (888) 260-0585, Local Desk (754) 432-2201 (Mon-Fri 9am-6pm EST), Email support@cedexx.net.
 
 HOW IT WORKS & COMMUNICATION:
 1. Sign up at cedexx.net/enroll — you receive an immediate receipt from support@cedexx.net
 2. Allow 24 to 48 hours for Lyric Health to provision your account and send setup email from noreply@getlyric.com
 3. Download Lyric Health app, select "First Time User?", and enter Last Name, DOB, and ZIP
 4. Once active, connect with board-certified physicians and therapists 24/7
-5. Get prescriptions sent to your local pharmacy and digital excuse notes for school/work
+5. Member ID is the 10-digit phone number entered at registration
 
-HEALTH BLOG & CLINICAL INSIGHTS:
-- Articles on cedexx.net/blog cover pediatric AI respiratory diagnostics (94% accuracy via phone audio), healthcare cost savings eliminating urgent care fees, and summer heat hydration tips.
+HEALTH BLOG & FEATURED REFLECTIONS (cedexx.net/blog):
+- Featured Article by Founder & CEO Daisy Gonzalez: "True Wellness: Caring for Body, Mind, and Spirit" (Faith & Wholeness, 3 John 1:2, Romans 12:2, Matthew 11:28, Psalm 23:3).
+- Clinical Articles: Pediatric AI respiratory diagnostics (94% accuracy via phone audio), healthcare cost savings eliminating urgent care fees, chronic asthma care, and Miami heat hydration tips.
 
 IMPORTANT RULES:
 - NEVER give medical diagnoses or advice
@@ -53,7 +64,7 @@ IMPORTANT RULES:
 - Keep responses short (2-3 sentences max, no markdown)
 - Be warm, professional, and helpful
 - If they want to enroll, direct them to cedexx.net/enroll
-- If they need a human, connect them to (754) 432-2201 or support@cedexx.net
+- If they need a human, connect them to (888) 260-0585 or (754) 432-2201 or support@cedexx.net
 `;
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -110,16 +121,46 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.setHeader('Content-Type', 'text/xml');
     res.status(200).send(twiml(`
       <Say voice="Polly.Joanna">
-        I'm sorry, I'm having trouble understanding. Please visit ceedex dot net or call us at 754-432-2201 for assistance. Thank you for calling!
+        I'm sorry, I'm having trouble understanding. Please visit ceedex dot net or call us at 888-260-0585 for assistance. Thank you for calling!
       </Say>
       <Hangup/>
     `));
   }
 }
 
-// ─── Call Multi-Provider AI (DeepSeek → OpenAI → Gemini 2.0 Flash) ───
+// ─── Call Multi-Provider AI (Grok 3.0 → DeepSeek → OpenAI → Gemini 2.0 Flash) ───
 async function getAIResponse(userSpeech: string): Promise<string> {
   const instruction = `Respond as JasDex, the CEDEXX AI assistant. Keep it to 2-3 spoken sentences maximum with no markdown.`;
+
+  if (XAI_KEY) {
+    for (const gModel of ['grok-3', 'grok-3-fast', 'grok-3-mini-fast']) {
+      try {
+        const res = await fetch('https://api.x.ai/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${XAI_KEY}`,
+          },
+          body: JSON.stringify({
+            model: gModel,
+            messages: [
+              { role: 'system', content: `${CEDEXX_KNOWLEDGE}\n\n${instruction}` },
+              { role: 'user', content: userSpeech },
+            ],
+            temperature: 0.3,
+            max_tokens: 150,
+          }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const reply = data.choices?.[0]?.message?.content?.replace(/[*#_~`]/g, '').trim();
+          if (reply) return reply;
+        }
+      } catch (e) {
+        console.warn(`[VOICE AI] Grok (${gModel}) error:`, e);
+      }
+    }
+  }
 
   if (DEEPSEEK_KEY) {
     try {
