@@ -12,6 +12,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
  */
 
 const DEEPGRAM_API_KEY = process.env.DEEPGRAM_API_KEY || 'b0e085008baa62122bb769ac64c4dbaf2f49831b';
+const XAI_API_KEY = process.env.XAI_API_KEY || process.env.GROK_API_KEY || '';
 
 export interface TranscriptionResult {
   transcript: string;
@@ -31,7 +32,7 @@ export interface TranscriptionResult {
 export async function transcribeAudio(audioUrl: string): Promise<TranscriptionResult | null> {
   try {
     const response = await fetch(
-      'https://api.deepgram.com/v1/listen?punctuate=true&utterances=true&diarize=true&model=nova-2&smart_format=true',
+      'https://api.deepgram.com/v1/listen?punctuate=true&utterances=true&diarize=true&model=nova-3&smart_format=true',
       {
         method: 'POST',
         headers: {
@@ -73,12 +74,49 @@ export async function transcribeAudio(audioUrl: string): Promise<TranscriptionRe
 }
 
 /**
- * Transcribe audio buffer (for uploaded files)
+ * Transcribe audio buffer (Priority 1: xAI Grok STT 2.0 if configured, Priority 2: Deepgram Nova-3)
  */
 export async function transcribeBuffer(audioBuffer: Buffer, contentType: string = 'audio/wav'): Promise<TranscriptionResult | null> {
+  if (XAI_API_KEY) {
+    try {
+      const formData = new FormData();
+      const blob = new Blob([audioBuffer], { type: contentType });
+      formData.append('file', blob, 'audio.wav');
+      formData.append('model', 'grok-stt-2.0');
+      formData.append('response_format', 'verbose_json');
+
+      const grokRes = await fetch('https://api.x.ai/v1/audio/transcriptions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${XAI_API_KEY}`,
+        },
+        body: formData as any,
+      });
+
+      if (grokRes.ok) {
+        const gData = await grokRes.json();
+        if (gData.text) {
+          return {
+            transcript: gData.text,
+            confidence: 0.99,
+            words: (gData.words || []).map((w: any) => ({
+              word: w.word || '',
+              start: w.start || 0,
+              end: w.end || 0,
+              confidence: 0.99,
+            })),
+            duration: gData.duration || 0,
+          };
+        }
+      }
+    } catch (e) {
+      console.warn('[GROK STT] Fallback to Deepgram Nova-3:', (e as Error).message);
+    }
+  }
+
   try {
     const response = await fetch(
-      'https://api.deepgram.com/v1/listen?punctuate=true&utterances=true&model=nova-2&smart_format=true',
+      'https://api.deepgram.com/v1/listen?punctuate=true&utterances=true&model=nova-3&smart_format=true',
       {
         method: 'POST',
         headers: {

@@ -11,6 +11,7 @@ export default async function handler(req, res) {
   const OPENAI_KEY = process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY;
   const MINIMAX_KEY = process.env.MINIMAX_API_KEY;
   const DEEPSEEK_KEY = process.env.DEEPSEEK_API_KEY;
+  const XAI_KEY = process.env.XAI_API_KEY || process.env.GROK_API_KEY;
   const TYPESAFE_API_KEY = process.env.TYPESAFE_API_KEY;
   const JEV_MODEL = process.env.JEV_MODEL || 'jev-1.13.0';
 
@@ -104,13 +105,14 @@ Key facts about CEDEXX + Lyric Health:
 - For emergencies, call 911
 - Keep responses short (2-3 sentences).`;
 
-  // Build provider list with available keys (ordered by reliability & speed)
+  // Build provider list with available keys (ordered by Option B: DeepSeek Fast, Grok, and Kimi first)
   const availableProviders = [];
   if (DEEPSEEK_KEY) availableProviders.push({ name: 'deepseek', key: DEEPSEEK_KEY, model: 'deepseek-chat' });
+  if (XAI_KEY) availableProviders.push({ name: 'grok', key: XAI_KEY, model: 'grok-3-mini-fast' });
+  if (KIMI_KEY) availableProviders.push({ name: 'kimi', key: KIMI_KEY, model: 'kimi-k2.6' });
   if (OPENAI_KEY) availableProviders.push({ name: 'openai', key: OPENAI_KEY, model: 'gpt-4o-mini' });
   if (GEMINI_KEY) availableProviders.push({ name: 'gemini', key: GEMINI_KEY, model: 'gemini-2.0-flash' });
   if (MINIMAX_KEY) availableProviders.push({ name: 'minimax', key: MINIMAX_KEY, model: 'abab6.5s-chat' });
-  if (KIMI_KEY) availableProviders.push({ name: 'kimi', key: KIMI_KEY, model: 'moonshot-v1-8k' });
 
   if (availableProviders.length === 0) {
     console.error('[CHAT] No AI provider keys configured');
@@ -132,7 +134,7 @@ Key facts about CEDEXX + Lyric Health:
     try {
       console.log(`[CHAT] Attempting provider: ${currentProvider.name}`);
 
-      // DeepSeek — PRIMARY
+      // DeepSeek V3.2 Fast — PRIMARY
       if (currentProvider.name === 'deepseek') {
         const response = await fetch('https://api.deepseek.com/chat/completions', {
           method: 'POST',
@@ -158,6 +160,78 @@ Key facts about CEDEXX + Lyric Health:
           return res.status(200).json(data);
         }
         throw new Error('DeepSeek invalid response');
+      }
+
+      // xAI Grok — SECONDARY FAST BRAIN
+      if (currentProvider.name === 'grok') {
+        const grokModels = [process.env.GROK_MODEL, 'grok-3-mini-fast', 'grok-3-mini', 'grok-3-fast'].filter(Boolean);
+        let grokErr = 'Grok failed';
+        for (const gModel of grokModels) {
+          const response = await fetch('https://api.x.ai/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${XAI_KEY}`
+            },
+            body: JSON.stringify({
+              model: gModel,
+              messages: [{ role: 'system', content: systemPrompt }, ...messages],
+              temperature: 0.3,
+              max_tokens: 500
+            })
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            if (data.choices?.[0]?.message?.content) {
+              return res.status(200).json(data);
+            }
+          } else {
+            grokErr = `Grok (${gModel}) HTTP ${response.status}: ${(await response.text()).slice(0, 160)}`;
+          }
+        }
+        throw new Error(grokErr);
+      }
+
+      // Kimi (Moonshot Global api.moonshot.ai — kimi-k2.6 / kimi-k3 non-thinking fast mode)
+      if (currentProvider.name === 'kimi') {
+        const kimiEndpoints = [
+          'https://api.moonshot.ai/v1/chat/completions',
+          'https://api.moonshot.cn/v1/chat/completions'
+        ];
+        const kimiModels = ['kimi-k2.6', 'kimi-k3'];
+        let kimiErr = 'Kimi failed';
+
+        for (const endpoint of kimiEndpoints) {
+          for (const kModel of kimiModels) {
+            const response = await fetch(endpoint, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${KIMI_KEY}`
+              },
+              body: JSON.stringify({
+                model: kModel,
+                messages: [{ role: 'system', content: systemPrompt }, ...messages],
+                thinking: { type: 'disabled' },
+                temperature: 0.6,
+                max_tokens: 500
+              })
+            });
+
+            if (response.ok) {
+              const data = await response.json();
+              if (data.choices?.[0]?.message?.content) {
+                return res.status(200).json(data);
+              }
+            } else {
+              const errTxt = await response.text();
+              kimiErr = `Kimi (${kModel}) HTTP ${response.status}: ${errTxt.slice(0, 160)}`;
+              if (response.status === 401) break; // Wrong region endpoint, try next endpoint
+            }
+          }
+        }
+        throw new Error(kimiErr);
       }
 
       // OpenAI
@@ -255,34 +329,6 @@ Key facts about CEDEXX + Lyric Health:
           return res.status(200).json(data);
         }
         throw new Error('MiniMax invalid response');
-      }
-
-      // Kimi (Moonshot)
-      if (currentProvider.name === 'kimi') {
-        const response = await fetch('https://api.moonshot.cn/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${KIMI_KEY}`
-          },
-          body: JSON.stringify({
-            model: "moonshot-v1-8k",
-            messages: [{ role: "system", content: systemPrompt }, ...messages],
-            temperature: 0.3,
-            max_tokens: 500
-          })
-        });
-
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`Kimi HTTP ${response.status}: ${errorText}`);
-        }
-
-        const data = await response.json();
-        if (data.choices?.[0]?.message?.content) {
-          return res.status(200).json(data);
-        }
-        throw new Error('Kimi invalid response');
       }
     } catch (providerErr) {
       console.warn(`[CHAT] Provider ${currentProvider.name} failed:`, providerErr.message);
