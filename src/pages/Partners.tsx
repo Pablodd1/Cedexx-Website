@@ -74,16 +74,6 @@ export function Partners() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                 <motion.div {...fadeIn} className="space-y-6">
                   <div className="h-14 w-14 bg-blue-50 rounded-2xl flex items-center justify-center text-[#050249]">
-                     <Smartphone className="h-8 w-8" />
-                  </div>
-                  <p className="text-slate-600 leading-relaxed font-medium">
-                    <strong className="text-[#050249] block text-xl mb-2 font-black uppercase">{t('partners.ecosystems.workforce.title')}</strong>
-                    {t('partners.ecosystems.workforce.desc')}
-                  </p>
-                </motion.div>
-
-                <motion.div {...fadeIn} transition={{ delay: 0.2 }} className="space-y-6">
-                  <div className="h-14 w-14 bg-blue-50 rounded-2xl flex items-center justify-center text-[#050249]">
                      <Users className="h-8 w-8" />
                   </div>
                   <p className="text-slate-600 leading-relaxed font-medium">
@@ -92,13 +82,23 @@ export function Partners() {
                   </p>
                 </motion.div>
 
-                <motion.div {...fadeIn} className="space-y-6">
+                <motion.div {...fadeIn} transition={{ delay: 0.2 }} className="space-y-6">
                   <div className="h-14 w-14 bg-blue-50 rounded-2xl flex items-center justify-center text-[#050249]">
                      <Building2 className="h-8 w-8" />
                   </div>
                   <p className="text-slate-600 leading-relaxed font-medium">
                     <strong className="text-[#050249] block text-xl mb-2 font-black uppercase">{t('partners.ecosystems.housing.title')}</strong>
                     {t('partners.ecosystems.housing.desc')}
+                  </p>
+                </motion.div>
+
+                <motion.div {...fadeIn} className="space-y-6">
+                  <div className="h-14 w-14 bg-blue-50 rounded-2xl flex items-center justify-center text-[#050249]">
+                     <Shield className="h-8 w-8" />
+                  </div>
+                  <p className="text-slate-600 leading-relaxed font-medium">
+                    <strong className="text-[#050249] block text-xl mb-2 font-black uppercase">{t('partners.ecosystems.workforce.title')}</strong>
+                    {t('partners.ecosystems.workforce.desc')}
                   </p>
                 </motion.div>
 
@@ -114,12 +114,12 @@ export function Partners() {
               </div>
 
               <motion.div {...fadeIn} className="text-center pt-12 space-y-4">
-                <p className="text-2xl font-black text-[#050249] italic uppercase leading-tight">
+                <div className="text-[#050249] font-black italic uppercase tracking-widest text-2xl">
+                  Better Care. Here. Now.
+                </div>
+                <p className="text-xl font-black text-[#050249] italic uppercase leading-tight">
                   {t('partners.ecosystems.footer')}
                 </p>
-                <div className="text-[#050249] font-black italic uppercase tracking-widest text-lg">
-                  {t('footer.tagline')}
-                </div>
               </motion.div>
             </div>
           </div>
@@ -127,7 +127,7 @@ export function Partners() {
       </section>
 
       {/* ── PARTNER WITH US ── */}
-      <section className="py-32 bg-[#EBF3FB] relative overflow-hidden">
+      <section id="partner-form" className="py-32 bg-[#EBF3FB] relative overflow-hidden">
         <div className="container mx-auto px-6">
           <div className="max-w-6xl mx-auto flex flex-col lg:flex-row gap-20 items-center">
             <motion.div className="flex-1" {...fadeIn}>
@@ -144,23 +144,28 @@ export function Partners() {
                   {[
                     { 
                       icon: Building2, 
-                      title: 'Multifamily/Student Housing REIT', 
-                      text: 'Add value to your property with a premium digital care amenity.' 
+                      title: 'Housing & Residential Communities', 
+                      text: 'Enhance multifamily, student, senior, and workforce housing with accessible wellness amenities designed for residents and their families.' 
                     },
                     { 
                       icon: Smartphone, 
-                      title: 'Hospitality Solutions', 
-                      text: 'Add convenience and practicality for your hotel guests.' 
+                      title: 'Hospitality & Wellness Concierge Solutions', 
+                      text: 'Offer customized digital wellness concierge services that help hotel guests access convenient virtual care during their stay.' 
+                    },
+                    { 
+                      icon: Shield, 
+                      title: 'Workforce & Institutional Partnerships', 
+                      text: 'Bring scalable wellness solutions to employers, school districts, educational institutions, counties, municipalities, and public agencies.' 
+                    },
+                    { 
+                      icon: Users, 
+                      title: 'Affiliate & Community Partners', 
+                      text: 'Join our referral and strategic partnership network to expand wellness access through associations, nonprofits, faith-based organizations, and community networks.' 
                     },
                     { 
                       icon: Activity, 
                       title: 'Physician Opportunities', 
-                      text: 'Earn flexible income through our scheduled block model.' 
-                    },
-                    { 
-                      icon: Users, 
-                      title: 'Affiliate Partner', 
-                      text: 'Join our referral network and help bring premium digital care to your community.' 
+                      text: 'Explore flexible virtual care opportunities through our partner network and help deliver convenient care to members.' 
                     }
                   ].map((item, id) => (
                     <div key={id} className="flex gap-6 group">

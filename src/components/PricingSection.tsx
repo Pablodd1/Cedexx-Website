@@ -196,23 +196,25 @@ const PLANS: PricingPlan[] = [
 ];
 
 const ENTERPRISE_IDEAL = [
+  'School Districts & Educational Institutions',
+  'Counties, Municipalities & Public Agencies',
   'Multifamily & Build-to-Rent Communities',
-  'Student & Senior Housing',
-  'Luxury-Living & Lifestyle Communities',
-  'Health-sharing Networks',
+  'Student, Senior & Lifestyle Housing',
   'Employers & Workforce Benefits',
-  'Transportation & Driver Networks',
+  'Health-Sharing & Transportation Networks',
   'REALTOR®, Trade & Professional Associations',
-  "HOA's, Credit Unions, Community & Faith-Based Organizations",
+  'HOAs, Credit Unions & Faith-Based Organizations',
+  'Community & Nonprofit Organizations',
 ];
 
 const ENTERPRISE_BENEFITS = [
-  'Custom per-door, per-member, or employer-sponsored pricing',
+  'Custom per-door, per-member, or organization-sponsored pricing',
   'Reduced pricing through volume implementation',
-  'Rent-inclusive resident wellness amenity programs',
-  'Affiliate and association-exclusive membership plans',
-  'Family household membership options',
-  'Dedicated implementation and portfolio-wide rollout with ongoing management & support',
+  'Scalable wellness programs for school districts, public agencies, and employers',
+  'Resident wellness amenities and household membership options',
+  'Exclusive affiliate, association, and institutional membership plans',
+  'Flexible voluntary or organization-sponsored enrollment',
+  'Dedicated implementation, organization-wide rollout, and ongoing support',
 ];
 
 function PlanCard({ plan, index }: { plan: PricingPlan; index: number; key?: React.Key }) {
@@ -511,7 +513,7 @@ function EnterpriseCard({ index }: { index: number }) {
             <div>
               <p className="text-[10px] font-black text-[#23d9b0] uppercase tracking-[0.4em] mb-1">Enterprise & Community Solutions</p>
               <h3 className="text-2xl md:text-3xl font-black uppercase italic tracking-tighter text-white leading-tight">
-                Custom Portfolio &<br />Workforce Pricing
+                Custom Community, Workforce &<br />Institutional Pricing
               </h3>
             </div>
           </div>
@@ -524,7 +526,7 @@ function EnterpriseCard({ index }: { index: number }) {
         </div>
 
         <p className="text-blue-200 font-medium leading-relaxed mb-8 max-w-3xl italic">
-          Scalable digital wellness memberships designed for residential communities, workforce ecosystems, and member organizations. Volume-based pricing reduces cost while increasing value.
+          Scalable digital wellness memberships for residential communities, employers, school districts, educational institutions, public agencies, and member organizations. Flexible, volume-based pricing makes accessible wellness more affordable at scale.
         </p>
 
         <div className="h-px w-full bg-white/10 mb-8" />
@@ -544,9 +546,9 @@ function EnterpriseCard({ index }: { index: number }) {
             </ul>
           </div>
 
-          {/* Enterprise Benefits */}
+          {/* Enterprise & Institutional Benefits */}
           <div>
-            <p className="text-[10px] font-black text-[#23d9b0] uppercase tracking-[0.35em] mb-4">Enterprise Benefits</p>
+            <p className="text-[10px] font-black text-[#23d9b0] uppercase tracking-[0.35em] mb-4">Enterprise & Institutional Benefits</p>
             <ul className="space-y-2.5">
               {ENTERPRISE_BENEFITS.map((item, i) => (
                 <li key={i} className="flex items-start gap-3">
@@ -559,7 +561,7 @@ function EnterpriseCard({ index }: { index: number }) {
         </div>
 
         <p className="text-blue-300/80 text-sm font-medium italic leading-relaxed mb-8 max-w-3xl">
-          Designed to increase resident satisfaction, workforce wellness, and organizational value. Whether you're serving hundreds or hundreds of thousands of members, CEDEXX delivers scalable wellness solutions tailored to your community, portfolio, or workforce.
+          Designed to strengthen communities, support workforce and family wellness, and deliver lasting organizational value. CEDEXX provides scalable, affordable wellness solutions tailored to your institution, community, portfolio, or workforce.
         </p>
 
         {/* CTA */}

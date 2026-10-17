@@ -123,26 +123,27 @@ const PLANS = [
 
 const ENTERPRISE = {
   name: 'Enterprise & Community Solutions',
-  subtitle: 'Custom Portfolio & Workforce Pricing',
-  description: 'Scalable digital wellness memberships designed for residential communities, workforce ecosystems, and member organizations. Volume-based pricing reduces cost while increasing value.',
+  subtitle: 'Custom Community, Workforce & Institutional Pricing',
+  description: 'Scalable digital wellness memberships for residential communities, employers, school districts, educational institutions, public agencies, and member organizations. Flexible, volume-based pricing makes accessible wellness more affordable at scale.',
   idealFor: [
+    'School Districts & Educational Institutions',
+    'Counties, Municipalities & Public Agencies',
     'Multifamily & Build-to-Rent Communities',
-    'Student & Senior Housing',
-    'Luxury-Living & Lifestyle Communities',
-    'Health-sharing Networks',
+    'Student, Senior & Lifestyle Housing',
     'Employers & Workforce Benefits',
-    'Transportation & Driver Networks',
+    'Health-Sharing & Transportation Networks',
     'REALTOR®, Trade & Professional Associations',
-    "HOA's, Credit Unions, Community & Faith-Based Organizations",
+    'HOAs, Credit Unions & Faith-Based Organizations',
+    'Community & Nonprofit Organizations',
   ],
   benefits: [
-    'Custom per-door, per-member, or employer-sponsored pricing',
+    'Custom per-door, per-member, or organization-sponsored pricing',
     'Reduced pricing through volume implementation',
-    'Rent-inclusive resident wellness amenity programs',
-    'Affiliate and association-exclusive membership plans',
-    'Family household membership options',
-    'Dedicated implementation and portfolio-wide rollout',
-    'Ongoing management & support',
+    'Scalable wellness programs for school districts, public agencies, and employers',
+    'Resident wellness amenities and household membership options',
+    'Exclusive affiliate, association, and institutional membership plans',
+    'Flexible voluntary or organization-sponsored enrollment',
+    'Dedicated implementation, organization-wide rollout, and ongoing support',
   ],
 };
 
@@ -281,9 +282,15 @@ export function Pricing() {
 
             <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12">
               <div>
-                <div className="inline-flex items-center gap-2 bg-white/10 rounded-full px-4 py-2 mb-6">
-                  <Users className="h-4 w-4 text-[#23d9b0]" />
-                  <span className="text-xs font-black uppercase tracking-widest text-blue-200">Enterprise</span>
+                <div className="flex items-center justify-between gap-4 mb-6 flex-wrap">
+                  <div className="inline-flex items-center gap-2 bg-white/10 rounded-full px-4 py-2">
+                    <Users className="h-4 w-4 text-[#23d9b0]" />
+                    <span className="text-xs font-black uppercase tracking-widest text-blue-200">Enterprise & Community Solutions</span>
+                  </div>
+                  <div className="bg-[#23d9b0]/10 border border-[#23d9b0]/30 rounded-xl px-4 py-1.5 text-center">
+                    <span className="text-[10px] font-black text-[#23d9b0] uppercase tracking-widest mr-2">Pricing:</span>
+                    <span className="text-sm font-black text-white">Custom Quote</span>
+                  </div>
                 </div>
 
                 <h2 className="text-3xl md:text-4xl font-black mb-4">
@@ -319,7 +326,7 @@ export function Pricing() {
 
               <div>
                 <h4 className="text-sm font-black uppercase tracking-widest text-[#23d9b0] mb-6">
-                  Enterprise Benefits
+                  Enterprise & Institutional Benefits
                 </h4>
                 <ul className="space-y-4">
                   {ENTERPRISE.benefits.map((benefit, i) => (
@@ -334,7 +341,7 @@ export function Pricing() {
 
                 <div className="mt-8 p-6 bg-white/5 rounded-2xl border border-white/10">
                   <p className="text-sm text-blue-300/80 leading-relaxed">
-                    Designed to increase resident satisfaction, workforce wellness, and organizational value. Whether you're serving hundreds or hundreds of thousands of members, CEDEXX delivers scalable wellness solutions tailored to your community, portfolio, or workforce.
+                    Designed to strengthen communities, support workforce and family wellness, and deliver lasting organizational value. CEDEXX provides scalable, affordable wellness solutions tailored to your institution, community, portfolio, or workforce.
                   </p>
                 </div>
               </div>

@@ -14,29 +14,43 @@ export function PartnerForm() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSent, setIsSent] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const roles = [
-    t('role.physician'),
+    'School District / Educational Institution',
+    'County / Municipality / Public Agency',
+    'Employer / Workforce Benefits',
+    'Housing / Residential Community Partner',
+    'Hospitality & Wellness Concierge Partner',
     t('role.affiliate'),
-    'Hospitality Partner',
-    'Housing / REIT Partner',
-    'Broker / Agent'
+    'Broker / Benefits Consultant',
+    t('role.physician'),
   ];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setSubmitError(null);
     try {
-      await fetch('/api/partner-lead', {
+      const res = await fetch('/api/partner-lead', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
-    } catch (err) {
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || data.success === false) {
+        throw new Error(data.error || `Submission failed (HTTP ${res.status})`);
+      }
+      setIsSent(true);
+      setFormData({ name: '', email: '', phone: '', role: '', message: '' });
+    } catch (err: any) {
       console.error('[PARTNER FORM SUBMISSION ERROR]', err);
+      setSubmitError(
+        err?.message ||
+          'We could not submit your inquiry right now. Please try again or email support@cedexx.net directly.'
+      );
     } finally {
       setIsSubmitting(false);
-      setIsSent(true);
     }
   };
 
@@ -51,7 +65,14 @@ export function PartnerForm() {
           <CheckCircle2 className="h-10 w-10 text-green-600" />
         </div>
         <h3 className="text-3xl font-black text-[#050249] mb-4">Request Sent</h3>
-        <p className="text-slate-600 font-medium">Thank you for your interest in CEDEXX. Our partnership team will contact you within one business day.</p>
+        <p className="text-slate-600 font-medium mb-6">Thank you for your interest in CEDEXX. Our partnership team will contact you within one business day.</p>
+        <button
+          type="button"
+          onClick={() => setIsSent(false)}
+          className="text-xs font-black uppercase tracking-widest text-[#050249] hover:underline"
+        >
+          Submit Another Inquiry
+        </button>
       </motion.div>
     );
   }
@@ -121,6 +142,15 @@ export function PartnerForm() {
           onChange={(e) => setFormData({ ...formData, message: e.target.value })}
         />
       </div>
+
+      {submitError && (
+        <div
+          role="alert"
+          className="mb-6 rounded-2xl bg-red-50 border border-red-200 px-6 py-4 text-sm font-semibold text-red-700"
+        >
+          {submitError}
+        </div>
+      )}
 
       <button
         disabled={isSubmitting}

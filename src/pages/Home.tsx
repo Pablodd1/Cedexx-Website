@@ -287,10 +287,10 @@ export function Home() {
           </div>
           <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8" {...fadeIn}>
             {[
-              { title: t('serve.card1.title'), desc: t('serve.card1.desc'), cta: t('serve.card1.cta'), link: '/partners' },
+              { title: t('serve.card1.title'), desc: t('serve.card1.desc'), cta: t('serve.card1.cta'), link: '/pricing' },
               { title: t('serve.card2.title'), desc: t('serve.card2.desc'), cta: t('serve.card2.cta'), link: '/partners' },
-              { title: t('serve.card4.title'), desc: t('serve.card4.desc'), cta: t('serve.card4.cta'), link: '/partners' },
-              { title: 'Travelers & Gig Workers', desc: 'Instant access to licensed physicians-at your hotel or on the move.', cta: 'About Us', link: '/about' }
+              { title: t('serve.card3.title'), desc: t('serve.card3.desc'), cta: t('serve.card3.cta'), link: '/partners' },
+              { title: t('serve.card4.title'), desc: t('serve.card4.desc'), cta: t('serve.card4.cta'), link: '/partners#partner-form' }
             ].map((card, i) => (
               <motion.div
                 key={i}
@@ -476,18 +476,19 @@ export function Home() {
             <motion.div {...fadeIn}>
               <div className="inline-block bg-blue-100 text-[#050249] text-[10px] font-black px-4 py-2 rounded-full mb-8 border border-blue-200 uppercase tracking-widest font-sans">Strategic Partnerships</div>
               <h2 className="text-4xl md:text-7xl font-black text-[#050249] mb-10 leading-[0.9] tracking-tighter italic uppercase">
-                Strategic Partnerships
+                Partner With CEDEXX
               </h2>
               <p className="text-xl text-slate-500 mb-12 font-medium leading-relaxed italic">
-                We partner with leading healthcare organizations and licensed physicians to deliver a premium mobile healthcare experience-seamless, trusted, and always within reach. Keep It in Your <span className="text-[#23d9b0]">Back Pocket.</span>
+                Build strategic partnerships that expand access to affordable digital healthcare and mental wellness across communities, workplaces, institutions, and hospitality networks. Keep It in Your <span className="text-[#23d9b0]">Back Pocket.</span>
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                 {[
-                  { title: t('serve.card1.title'), desc: t('serve.card1.desc'), icon: Smartphone },
-                  { title: t('serve.card2.title'), desc: t('serve.card2.desc'), icon: Users },
-                  { title: t('serve.card4.title'), desc: t('serve.card4.desc'), icon: Building2 },
-                  { title: 'Join Lyric Health Provider Network', desc: 'Secure clinical blocks and earn flexible income with our Lyric Health provider network.', icon: Heart }
+                  { title: 'Housing & Residential Communities', desc: 'Enhance multifamily, student, senior, and workforce housing with accessible wellness amenities designed for residents and their families.', icon: Building2 },
+                  { title: 'Hospitality & Wellness Concierge Solutions', desc: 'Offer customized digital wellness concierge services that help hotel guests access convenient virtual care during their stay.', icon: Smartphone },
+                  { title: 'Workforce & Institutional Partnerships', desc: 'Bring scalable wellness solutions to employers, school districts, educational institutions, counties, municipalities, and public agencies.', icon: Shield },
+                  { title: 'Affiliate & Community Partners', desc: 'Join our referral and strategic partnership network to expand wellness access through associations, nonprofits, faith-based organizations, and community networks.', icon: Users },
+                  { title: 'Physician Opportunities', desc: 'Explore flexible virtual care opportunities through our partner network and help deliver convenient care to members.', icon: Heart }
                 ].map((p, i) => (
                   <div key={i} className="space-y-3 group">
                     <div className="h-12 w-12 rounded-2xl bg-white flex items-center justify-center text-[#050249] shadow-sm border border-slate-100 group-hover:bg-[#050249] group-hover:text-white transition-all">

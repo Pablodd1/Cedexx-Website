@@ -28,11 +28,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ success: false, error: 'Name and email are required.' });
   }
 
+  let emailDelivered = false;
+  let telegramDelivered = false;
+  let deliveryError = '';
+
   // 1. Send Email Notification to Admins
   if (RESEND_KEY) {
     const adminRecipients = getAdminEmails();
     try {
-      await fetch('https://api.resend.com/emails', {
+      const resendRes = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -42,11 +46,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           from: 'CEDEXX Partnerships <support@cedexx.net>',
           to: adminRecipients,
           reply_to: email,
-          subject: `🤝 New Partner/Broker Lead: ${name} (${role || 'Partner'})`,
+          subject: `🤝 New Partner/Institutional Lead: ${name} (${role || 'Partner'})`,
           html: `
             <div style="font-family: sans-serif; padding: 20px; color: #1e293b;">
-              <h2 style="color: #050249; margin-bottom: 4px;">🤝 New Partner Lead Received</h2>
-              <p style="color: #64748b; font-size: 14px; margin-top: 0;">A new partner or broker inquiry was submitted via the CEDEXX Partners portal.</p>
+              <h2 style="color: #050249; margin-bottom: 4px;">🤝 New Partner / Institutional Lead Received</h2>
+              <p style="color: #64748b; font-size: 14px; margin-top: 0;">A new partner or institutional inquiry was submitted via the CEDEXX Partners portal.</p>
               <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 20px 0;" />
               <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
                 <tr><td style="padding: 8px 0; color: #64748b; width: 140px;"><strong>Name:</strong></td><td>${name}</td></tr>
@@ -61,7 +65,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           `,
         }),
       });
-    } catch (e) {
+      if (resendRes.ok) {
+        emailDelivered = true;
+      } else {
+        const errBody = await resendRes.text().catch(() => '');
+        deliveryError = `Resend HTTP ${resendRes.status}: ${errBody.slice(0, 150)}`;
+        console.error('[PARTNER LEAD EMAIL ERROR]', deliveryError);
+      }
+    } catch (e: any) {
+      deliveryError = e?.message || String(e);
       console.error('[PARTNER LEAD EMAIL ERROR]', e);
     }
   }
@@ -70,7 +82,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (TELEGRAM_BOT && TELEGRAM_CHAT) {
     try {
       const text = [
-        '🤝 <b>NEW PARTNER / BROKER LEAD</b> — CEDEXX',
+        '🤝 <b>NEW PARTNER / INSTITUTIONAL LEAD</b> — CEDEXX',
         `👤 <b>Name:</b> ${name}`,
         `📧 <b>Email:</b> ${email}`,
         phone ? `📞 <b>Phone:</b> ${phone}` : null,
@@ -78,7 +90,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         message ? `💬 <b>Message:</b> ${message}` : null,
       ].filter(Boolean).join('\n');
 
-      await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT}/sendMessage`, {
+      const tgRes = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -87,9 +99,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           parse_mode: 'HTML',
         }),
       });
+      if (tgRes.ok) {
+        telegramDelivered = true;
+      }
     } catch (e) {
       console.error('[PARTNER TELEGRAM ERROR]', e);
     }
+  }
+
+  if (!emailDelivered && !telegramDelivered) {
+    return res.status(502).json({
+      success: false,
+      error: 'Unable to deliver partner inquiry right now. Please email support@cedexx.net or call (754) 432-2201.',
+      detail: deliveryError || 'No delivery channel succeeded',
+    });
   }
 
   return res.status(200).json({ success: true, message: 'Partner inquiry received successfully.' });
