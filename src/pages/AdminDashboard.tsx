@@ -4,8 +4,9 @@ import {
   Users, CreditCard, UserCheck, Search, Download, RefreshCw,
   LogOut, Shield, Filter, ChevronUp, ChevronDown, Phone, Mail,
   Calendar, Package, Clock, CheckCircle2, AlertCircle, PhoneCall,
-  Voicemail, BarChart3, Eye, Globe, Monitor, Smartphone, TrendingUp
+  Voicemail, BarChart3, Eye, Globe, Monitor, Smartphone, TrendingUp, Send
 } from 'lucide-react';
+import { B2B_CAMPAIGN_SEQUENCE } from '../data/b2b-email-campaigns';
 
 // ─── Types ───
 interface Member {
@@ -72,7 +73,7 @@ interface Visit {
   duration?: number;
 }
 
-type Tab = 'members' | 'calls' | 'analytics';
+type Tab = 'members' | 'calls' | 'analytics' | 'campaigns';
 
 // ─── Constants ───
 const PLAN_LABELS: Record<string, string> = {
@@ -361,6 +362,7 @@ export function AdminDashboard() {
             { id: 'members' as Tab, label: 'Members', icon: Users },
             { id: 'calls' as Tab, label: 'Calls & Voicemails', icon: PhoneCall },
             { id: 'analytics' as Tab, label: 'Visitor Analytics', icon: BarChart3 },
+            { id: 'campaigns' as Tab, label: '5 B2B Email Campaigns', icon: Mail },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -413,6 +415,11 @@ export function AdminDashboard() {
             recentVisits={recentVisits}
             loading={analyticsLoading}
           />
+        )}
+
+        {/* ─── B2B EMAIL CAMPAIGNS TAB ─── */}
+        {activeTab === 'campaigns' && (
+          <CampaignsTab password={password} />
         )}
       </div>
     </div>
@@ -864,5 +871,268 @@ function AnalyticsTab({ stats, topPages, topReferrers, devices, browsers, osList
         )}
       </div>
     </>
+  );
+}
+
+// ─── 5 B2B Email Campaigns Tab Component ───
+function CampaignsTab({ password }: { password: string }) {
+  const [selectedStep, setSelectedStep] = useState<number>(1);
+  const [sampleFirstName, setSampleFirstName] = useState<string>('Decision Maker');
+  const [sampleCompany, setSampleCompany] = useState<string>('Your Organization');
+  const [customSubject, setCustomSubject] = useState<string>('');
+  const [recipientsRaw, setRecipientsRaw] = useState<string>('');
+  const [sending, setSending] = useState<boolean>(false);
+  const [sendResult, setSendResult] = useState<any>(null);
+  const [sendError, setSendError] = useState<string>('');
+
+  const activeCampaign = B2B_CAMPAIGN_SEQUENCE.find(c => c.step === selectedStep) || B2B_CAMPAIGN_SEQUENCE[0];
+  const previewHtml = activeCampaign.buildHtml({
+    email: 'prospect@organization.org',
+    first_name: sampleFirstName,
+    company: sampleCompany,
+  });
+
+  const handleSendCampaign = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSendError('');
+    setSendResult(null);
+
+    if (!recipientsRaw.trim()) {
+      setSendError('Please paste at least one recipient email address.');
+      return;
+    }
+
+    setSending(true);
+    try {
+      const res = await fetch('/api/b2b-campaign', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          pass: password,
+          step: selectedStep,
+          recipientsRaw,
+          customSubject: customSubject.trim() || undefined,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setSendError(data.error || 'Failed to send campaign emails.');
+      } else {
+        setSendResult(data);
+      }
+    } catch (err: any) {
+      setSendError(err.message || 'Network error while sending campaign.');
+    } finally {
+      setSending(false);
+    }
+  };
+
+  return (
+    <div className="space-y-8">
+      {/* Top Cadence Strategy Banner */}
+      <div className="bg-[#050249] text-white rounded-3xl p-6 md:p-8 shadow-xl border border-blue-900">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <span className="inline-block bg-[#23d9b0]/20 text-[#23d9b0] text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full mb-2">
+              B2B Enterprise, Institutional &amp; Community Outreach Engine
+            </span>
+            <h2 className="text-xl md:text-2xl font-black italic tracking-tight">
+              5-Touch Follow-Up Sequence (Optimal 5–7 Day Cadence)
+            </h2>
+            <p className="text-blue-200 text-xs md:text-sm mt-1 max-w-3xl leading-relaxed">
+              Designed for School Districts, Public Agencies, Employers, Multifamily/Housing Groups, and Associations. Each email uses a distinct executive angle (Problem Disruption &rarr; 4 Ecosystems &rarr; Volume Pricing ROI &rarr; Turnkey 24–48h Rollout &rarr; Reply 1-2-3 Pilot Close).
+            </p>
+          </div>
+          <div className="bg-white/10 rounded-2xl p-4 text-xs space-y-1 shrink-0 border border-white/10">
+            <div className="font-black text-[#23d9b0] uppercase tracking-wider">Best Send Windows (EST)</div>
+            <div>• <strong>Email 1:</strong> Day 1 (Tue 9:30 AM)</div>
+            <div>• <strong>Email 2:</strong> Day 6 (Thu 10:00 AM)</div>
+            <div>• <strong>Email 3:</strong> Day 12 (Wed 9:30 AM)</div>
+            <div>• <strong>Email 4:</strong> Day 18 (Tue 10:00 AM)</div>
+            <div>• <strong>Email 5:</strong> Day 25 (Tue 9:30 AM)</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Step Selector (1 to 5) */}
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
+        {B2B_CAMPAIGN_SEQUENCE.map((c) => {
+          const isSelected = c.step === selectedStep;
+          return (
+            <button
+              key={c.id}
+              onClick={() => {
+                setSelectedStep(c.step);
+                setCustomSubject('');
+                setSendResult(null);
+                setSendError('');
+              }}
+              className={`text-left p-4 rounded-2xl border transition-all ${
+                isSelected
+                  ? 'bg-[#050249] text-white border-[#050249] shadow-lg'
+                  : 'bg-white text-slate-700 border-slate-200 hover:border-[#050249]/40'
+              }`}
+            >
+              <div className="flex items-center justify-between mb-1.5">
+                <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full ${
+                  isSelected ? 'bg-[#23d9b0] text-[#050249]' : 'bg-slate-100 text-[#050249]'
+                }`}>
+                  Email {c.step} of 5
+                </span>
+                <span className={`text-[10px] font-bold ${isSelected ? 'text-blue-200' : 'text-slate-400'}`}>
+                  {c.recommendedDelayDays === 0 ? 'Day 1' : `+${c.recommendedDelayDays}d`}
+                </span>
+              </div>
+              <div className="font-black text-xs leading-snug line-clamp-2 mb-1">
+                {c.title.replace(/^Email \d:\s*/, '')}
+              </div>
+              <div className={`text-[10px] line-clamp-2 ${isSelected ? 'text-blue-200' : 'text-slate-500'}`}>
+                {c.cadenceLabel}
+              </div>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Main Workspace: Left = Dispatch Form & Details, Right = Live Branded HTML Preview */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Left Column: Campaign Controls & Recipient List */}
+        <div className="lg:col-span-5 space-y-6">
+          <div className="bg-white rounded-3xl p-6 shadow-md border border-slate-100 space-y-4">
+            <div>
+              <span className="text-[10px] font-black uppercase tracking-widest text-[#23d9b0] bg-[#050249] px-2.5 py-1 rounded-full">
+                Step {activeCampaign.step} Strategy
+              </span>
+              <h3 className="text-lg font-black text-[#050249] mt-2">{activeCampaign.title}</h3>
+              <p className="text-xs text-slate-500 font-semibold mt-0.5">{activeCampaign.angle}</p>
+              <p className="text-xs text-slate-600 mt-2 leading-relaxed">{activeCampaign.summary}</p>
+            </div>
+
+            <div className="pt-3 border-t border-slate-100 space-y-2 text-xs">
+              <div>
+                <span className="font-black text-slate-400 uppercase tracking-wider block text-[10px]">Primary Subject Line</span>
+                <span className="font-bold text-[#050249]">{activeCampaign.subject}</span>
+              </div>
+              <div>
+                <span className="font-black text-slate-400 uppercase tracking-wider block text-[10px]">A/B Alternative Subject Line</span>
+                <span className="font-medium text-slate-600">{activeCampaign.altSubject}</span>
+              </div>
+            </div>
+
+            <form onSubmit={handleSendCampaign} className="pt-4 border-t border-slate-100 space-y-4">
+              <div>
+                <label className="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">
+                  Custom Subject Override (Optional)
+                </label>
+                <input
+                  type="text"
+                  value={customSubject}
+                  onChange={e => setCustomSubject(e.target.value)}
+                  placeholder={activeCampaign.subject}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-medium focus:ring-2 focus:ring-[#050249] outline-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">
+                    Preview First Name
+                  </label>
+                  <input
+                    type="text"
+                    value={sampleFirstName}
+                    onChange={e => setSampleFirstName(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs font-medium"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">
+                    Preview Organization
+                  </label>
+                  <input
+                    type="text"
+                    value={sampleCompany}
+                    onChange={e => setSampleCompany(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs font-medium"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">
+                  Recipient Email List (1 per line: <code className="text-[#050249]">email, First Name, Company</code>)
+                </label>
+                <textarea
+                  rows={6}
+                  value={recipientsRaw}
+                  onChange={e => setRecipientsRaw(e.target.value)}
+                  placeholder={`superintendent@browardschools.com, Dr. Martinez, Broward County Schools\nhr@propertygroup.com, Sarah, Horizon Multifamily\nceo@company.com`}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono focus:ring-2 focus:ring-[#050249] outline-none"
+                />
+                <p className="text-[11px] text-slate-400 mt-1">
+                  Sent from <strong>Daisy Gonzalez — CEDEXX &lt;daisy@cedexx.net&gt;</strong> via Resend.
+                </p>
+              </div>
+
+              {sendError && (
+                <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-bold flex items-center gap-2">
+                  <AlertCircle className="h-4 w-4 shrink-0" />
+                  <span>{sendError}</span>
+                </div>
+              )}
+
+              {sendResult && (
+                <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs space-y-1">
+                  <div className="font-black flex items-center gap-1.5">
+                    <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                    Dispatched Email {sendResult.step}: {sendResult.sentCount} of {sendResult.total} sent!
+                  </div>
+                  {sendResult.failedCount > 0 && (
+                    <div className="text-red-600 font-semibold">
+                      {sendResult.failedCount} failed — check email formatting.
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={sending}
+                className="w-full flex items-center justify-center gap-2 bg-[#050249] text-white font-black text-xs uppercase tracking-widest py-3.5 rounded-2xl hover:bg-[#03013b] disabled:opacity-50 transition-all shadow-lg"
+              >
+                <Send className="h-4 w-4" />
+                {sending ? 'Dispatching Campaign...' : `Send Email ${activeCampaign.step} to List`}
+              </button>
+            </form>
+          </div>
+        </div>
+
+        {/* Right Column: Live Email Preview */}
+        <div className="lg:col-span-7">
+          <div className="bg-white rounded-3xl p-6 shadow-md border border-slate-100">
+            <div className="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
+              <div>
+                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 block">
+                  Live HTML Email Preview
+                </span>
+                <h4 className="font-black text-[#050249] text-sm">
+                  Subject: {customSubject.trim() || activeCampaign.subject}
+                </h4>
+              </div>
+              <span className="text-[10px] font-bold bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full border border-emerald-200">
+                Mobile &amp; Outlook Ready
+              </span>
+            </div>
+            <div className="rounded-2xl overflow-hidden border border-slate-200 bg-slate-100">
+              <iframe
+                title={`Campaign ${activeCampaign.step} Preview`}
+                srcDoc={previewHtml}
+                className="w-full h-[680px] border-0"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
