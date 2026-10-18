@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { B2B_CAMPAIGN_SEQUENCE, CampaignRecipient } from '../src/data/b2b-email-campaigns.js';
 
-const DASHBOARD_PASSWORD = process.env.DASHBOARD_PASSWORD || 'cedexx2024';
+const DASHBOARD_PASSWORD = (process.env.DASHBOARD_PASSWORD || '').trim();
 const RESEND_API_KEY = process.env.RESEND_API_KEY || '';
 const FROM_CAMPAIGN = 'Daisy Gonzalez — CEDEXX <daisy@cedexx.net>';
 const REPLY_TO = 'daisy@cedexx.net';
@@ -32,8 +32,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  const pass = req.query.pass || req.headers['x-dashboard-pass'] || req.body?.pass;
-  if (pass !== DASHBOARD_PASSWORD) {
+  // Fail closed if DASHBOARD_PASSWORD is not configured on the server
+  if (!DASHBOARD_PASSWORD) {
+    return res.status(503).json({
+      success: false,
+      error: 'Admin password (DASHBOARD_PASSWORD) is not configured in server environment variables.',
+    });
+  }
+
+  const pass = String(req.query.pass || req.headers['x-dashboard-pass'] || req.body?.pass || '').trim();
+  if (!pass || pass !== DASHBOARD_PASSWORD) {
     return res.status(401).json({ success: false, error: 'Unauthorized' });
   }
 

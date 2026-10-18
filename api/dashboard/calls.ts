@@ -8,7 +8,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN || '';
 const REPO = 'Pablodd1/Cedexx-Website';
 const FILE_PATH = 'data/calls.json';
-const DASHBOARD_PASSWORD = process.env.DASHBOARD_PASSWORD || 'cedexx2024';
+const DASHBOARD_PASSWORD = (process.env.DASHBOARD_PASSWORD || '').trim();
 
 async function readCalls() {
   try {
@@ -37,9 +37,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
 
+  if (!DASHBOARD_PASSWORD) {
+    return res.status(503).json({ success: false, error: 'DASHBOARD_PASSWORD is not configured on the server.' });
+  }
+
   // Check password
-  const pass = req.query.pass || req.headers['x-dashboard-pass'];
-  if (pass !== DASHBOARD_PASSWORD) {
+  const pass = String(req.query.pass || req.headers['x-dashboard-pass'] || '').trim();
+  if (!pass || pass !== DASHBOARD_PASSWORD) {
     return res.status(401).json({ success: false, error: 'Unauthorized' });
   }
 

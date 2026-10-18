@@ -253,13 +253,16 @@ export function AdminDashboard() {
     setPassError('');
     try {
       const res = await fetch(`/api/dashboard/members?pass=${encodeURIComponent(passInput)}`);
+      const data = await res.json().catch(() => ({}));
       if (res.status === 401) { setPassError('Incorrect password'); return; }
-      const data = await res.json();
+      if (res.status === 503) { setPassError(data.error || 'DASHBOARD_PASSWORD is not configured in Vercel.'); return; }
       if (data.success) {
         setPassword(passInput);
         setAuthed(true);
         setMembers(data.members);
         setMemberStats(data.stats);
+      } else {
+        setPassError(data.error || 'Authentication failed.');
       }
     } catch {
       setPassError('Connection error. Try again.');
