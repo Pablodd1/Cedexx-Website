@@ -142,18 +142,22 @@ function wrapBrandedEmail({
             </td>
           </tr>
 
-          <!-- Lyric Trust Strip -->
+          <!-- Lyric Trust Strip & Compliance Disclaimer -->
           <tr>
             <td style="padding:18px 36px;background-color:#f8fafc;border-top:1px solid #e2e8f0;text-align:center;">
               <p style="margin:0 0 8px 0;color:#64748b;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;">
                 Clinical Care Nationwide Powered By
               </p>
               <img src="${LOGO_URL}" alt="Lyric Health" width="115" style="display:block;margin:0 auto;border:0;" />
-              <p style="margin:10px 0 0 0;color:#94a3b8;font-size:11px;line-height:1.5;">
+              <p style="margin:10px 0 0 0;color:#64748b;font-size:11px;line-height:1.5;">
                 One connected wellness solution. Built for families. Designed for communities. Scaled for institutions.<br/>
                 <a href="${CEDEXX_URL}" style="color:#050249;text-decoration:none;font-weight:600;">cedexx.net</a> · 
                 <a href="${PRICING_URL}" style="color:#64748b;text-decoration:none;">Plans &amp; Pricing</a> · 
-                <a href="${ENROLL_URL}" style="color:#64748b;text-decoration:none;">Enroll Now</a>
+                <a href="${ENROLL_URL}" style="color:#64748b;text-decoration:none;">Enroll Now</a> · 
+                <a href="${CEDEXX_URL}/terms" style="color:#64748b;text-decoration:none;">Terms</a>
+              </p>
+              <p style="margin:10px 0 0 0;color:#94a3b8;font-size:10px;line-height:1.5;text-align:left;border-top:1px solid #e2e8f0;padding-top:10px;">
+                <strong>IMPORTANT COMPLIANCE &amp; NON-PROVIDER DISCLOSURE:</strong> CEDEXX is a technology and wellness membership platform, <strong>not a medical provider, doctor, or health insurance company</strong>. CEDEXX does not practice medicine, give medical advice, diagnose conditions, or prescribe medications. All clinical, medical, and behavioral health services are provided independently by licensed healthcare professionals in the <strong>Lyric Health</strong> nationwide network, solely at the treating clinician’s professional judgment (no controlled substances are prescribed). This platform is not for medical emergencies—if you are experiencing a medical emergency, call 911 immediately.
               </p>
             </td>
           </tr>
@@ -274,7 +278,10 @@ Enroll Your Family Starting at $18.99/mo: ${ENROLL_URL}
 
 With intention & care,
 Daisy Gonzalez | Founder & CEO, CEDEXX
-(888) 260-0585 | daisy@cedexx.net`,
+(888) 260-0585 | daisy@cedexx.net
+
+---
+COMPLIANCE DISCLOSURE: CEDEXX is a technology and wellness membership platform, not a medical provider, doctor, or health insurance company. CEDEXX does not practice medicine, give medical advice, diagnose conditions, or prescribe medications. All clinical and behavioral health services are provided independently by licensed professionals in the Lyric Health network. For medical emergencies, call 911 immediately.`,
   },
 
   // ─── FAMILY EMAIL 2: DAY 6 — MENTAL WELLNESS, THERAPY & COUNSELING FOR PARENTS, TEENS & COUPLES ───
@@ -347,7 +354,10 @@ Start CareNow + Mental Wellness ($26.99/mo): ${ENROLL_URL}
 
 With intention & care,
 Daisy Gonzalez | Founder & CEO, CEDEXX
-(888) 260-0585 | daisy@cedexx.net`,
+(888) 260-0585 | daisy@cedexx.net
+
+---
+COMPLIANCE DISCLOSURE: CEDEXX is a technology and wellness membership platform, not a medical provider, doctor, or health insurance company. CEDEXX does not practice medicine, give medical advice, diagnose conditions, or prescribe medications. All clinical and behavioral health services are provided independently by licensed professionals in the Lyric Health network. For medical emergencies, call 911 immediately.`,
   },
 
   // ─── FAMILY EMAIL 3: DAY 12 — CARECOMPLETE™ PRIMARY CARE, $0 LABS & 237+ $0 MEDICATIONS ───
@@ -436,7 +446,10 @@ Explore CareComplete™ ($34.99 Individual | $52.99 Family): ${ENROLL_URL}
 
 With intention & care,
 Daisy Gonzalez | Founder & CEO, CEDEXX
-(888) 260-0585 | daisy@cedexx.net`,
+(888) 260-0585 | daisy@cedexx.net
+
+---
+COMPLIANCE DISCLOSURE: CEDEXX is a technology and wellness membership platform, not a medical provider, doctor, or health insurance company. CEDEXX does not practice medicine, give medical advice, diagnose conditions, or prescribe medications. All clinical and behavioral health services are provided independently by licensed professionals in the Lyric Health network. For medical emergencies, call 911 immediately.`,
   },
 
   // ─── FAMILY EMAIL 4: DAY 18 — SIDE-BY-SIDE PLAN GUIDE & HOW EASY IT IS TO USE ───
@@ -532,7 +545,10 @@ How It Works:
 
 With intention & care,
 Daisy Gonzalez | Founder & CEO, CEDEXX
-(888) 260-0585 | daisy@cedexx.net`,
+(888) 260-0585 | daisy@cedexx.net
+
+---
+COMPLIANCE DISCLOSURE: CEDEXX is a technology and wellness membership platform, not a medical provider, doctor, or health insurance company. CEDEXX does not practice medicine, give medical advice, diagnose conditions, or prescribe medications. All clinical and behavioral health services are provided independently by licensed professionals in the Lyric Health network. For medical emergencies, call 911 immediately.`,
   },
 
   // ─── FAMILY EMAIL 5: DAY 25 — PERSONAL INVITATION FROM FOUNDER DAISY GONZALEZ ───
@@ -578,7 +594,7 @@ Daisy Gonzalez | Founder & CEO, CEDEXX
 
           <p style="margin:0;">
             <em>"Beloved, I pray that you may prosper in all things and be in health, just as your soul prospers." (3 John 1:2)</em><br/><br/>
-            We would be honored to care for you and your loved ones whenever you are ready.
+            We would be honored to connect you and your loved ones to dependable virtual care through our Lyric Health provider network whenever you are ready.
           </p>
         `,
       });
@@ -597,7 +613,10 @@ Enroll Your Household Today: ${ENROLL_URL}
 
 With intention & care,
 Daisy Gonzalez | Founder & CEO, CEDEXX
-(888) 260-0585 | daisy@cedexx.net`,
+(888) 260-0585 | daisy@cedexx.net
+
+---
+COMPLIANCE DISCLOSURE: CEDEXX is a technology and wellness membership platform, not a medical provider, doctor, or health insurance company. CEDEXX does not practice medicine, give medical advice, diagnose conditions, or prescribe medications. All clinical and behavioral health services are provided independently by licensed professionals in the Lyric Health network. For medical emergencies, call 911 immediately.`,
   },
 ];
 
@@ -670,7 +689,10 @@ Explore Institutional & Community Solutions: ${PARTNER_URL}
 
 With intention & care,
 Daisy Gonzalez | Founder & CEO, CEDEXX
-(888) 260-0585 | daisy@cedexx.net`,
+(888) 260-0585 | daisy@cedexx.net
+
+---
+COMPLIANCE DISCLOSURE: CEDEXX is a technology and wellness membership platform, not a medical provider, doctor, or health insurance company. CEDEXX does not practice medicine, give medical advice, diagnose conditions, or prescribe medications. All clinical and behavioral health services are provided independently by licensed professionals in the Lyric Health network. For medical emergencies, call 911 immediately.`,
   },
 
   // ─── B2B EMAIL 2: DAY 6 — ECOSYSTEM FIT & TAILORED USE CASES ───
@@ -746,7 +768,10 @@ See the Ecosystems We Serve: ${CEDEXX_URL}/partners
 
 With intention & care,
 Daisy Gonzalez | Founder & CEO, CEDEXX
-(888) 260-0585 | daisy@cedexx.net`,
+(888) 260-0585 | daisy@cedexx.net
+
+---
+COMPLIANCE DISCLOSURE: CEDEXX is a technology and wellness membership platform, not a medical provider, doctor, or health insurance company. CEDEXX does not practice medicine, give medical advice, diagnose conditions, or prescribe medications. All clinical and behavioral health services are provided independently by licensed professionals in the Lyric Health network. For medical emergencies, call 911 immediately.`,
   },
 
   // ─── B2B EMAIL 3: DAY 12 — FINANCIAL ROI & VOLUME PRICING BREAKDOWN ───
@@ -813,7 +838,10 @@ Request a Custom Volume Quote: ${PARTNER_URL}
 
 With intention & care,
 Daisy Gonzalez | Founder & CEO, CEDEXX
-(888) 260-0585 | daisy@cedexx.net`,
+(888) 260-0585 | daisy@cedexx.net
+
+---
+COMPLIANCE DISCLOSURE: CEDEXX is a technology and wellness membership platform, not a medical provider, doctor, or health insurance company. CEDEXX does not practice medicine, give medical advice, diagnose conditions, or prescribe medications. All clinical and behavioral health services are provided independently by licensed professionals in the Lyric Health network. For medical emergencies, call 911 immediately.`,
   },
 
   // ─── B2B EMAIL 4: DAY 18 — TURNKEY ROLLOUT, COMPLIANCE & WHOLE-PERSON CARE ───
@@ -874,7 +902,10 @@ Schedule a 15-Minute Rollout Walkthrough: ${PARTNER_URL}
 
 With intention & care,
 Daisy Gonzalez | Founder & CEO, CEDEXX
-(888) 260-0585 | daisy@cedexx.net`,
+(888) 260-0585 | daisy@cedexx.net
+
+---
+COMPLIANCE DISCLOSURE: CEDEXX is a technology and wellness membership platform, not a medical provider, doctor, or health insurance company. CEDEXX does not practice medicine, give medical advice, diagnose conditions, or prescribe medications. All clinical and behavioral health services are provided independently by licensed professionals in the Lyric Health network. For medical emergencies, call 911 immediately.`,
   },
 
   // ─── B2B EMAIL 5: DAY 25 — DIRECT 1-LINE CLOSE / PILOT INVITATION ───
@@ -941,6 +972,9 @@ Or request a quote directly: ${PARTNER_URL}
 
 With intention & care,
 Daisy Gonzalez | Founder & CEO, CEDEXX
-(888) 260-0585 | daisy@cedexx.net`,
+(888) 260-0585 | daisy@cedexx.net
+
+---
+COMPLIANCE DISCLOSURE: CEDEXX is a technology and wellness membership platform, not a medical provider, doctor, or health insurance company. CEDEXX does not practice medicine, give medical advice, diagnose conditions, or prescribe medications. All clinical and behavioral health services are provided independently by licensed professionals in the Lyric Health network. For medical emergencies, call 911 immediately.`,
   },
 ];
