@@ -6,7 +6,7 @@ import {
   Calendar, Package, Clock, CheckCircle2, AlertCircle, PhoneCall,
   Voicemail, BarChart3, Eye, Globe, Monitor, Smartphone, TrendingUp, Send
 } from 'lucide-react';
-import { B2B_CAMPAIGN_SEQUENCE } from '../data/b2b-email-campaigns';
+import { B2B_CAMPAIGN_SEQUENCE, FAMILY_CAMPAIGN_SEQUENCE } from '../data/b2b-email-campaigns';
 
 // ─── Types ───
 interface Member {
@@ -877,10 +877,11 @@ function AnalyticsTab({ stats, topPages, topReferrers, devices, browsers, osList
   );
 }
 
-// ─── 5 B2B Email Campaigns Tab Component ───
+// ─── 5 Email Campaigns Tab Component (Family & B2B Sequences) ───
 function CampaignsTab({ password }: { password: string }) {
+  const [selectedTrack, setSelectedTrack] = useState<'family' | 'b2b'>('family');
   const [selectedStep, setSelectedStep] = useState<number>(1);
-  const [sampleFirstName, setSampleFirstName] = useState<string>('Decision Maker');
+  const [sampleFirstName, setSampleFirstName] = useState<string>('Maria');
   const [sampleCompany, setSampleCompany] = useState<string>('Your Organization');
   const [customSubject, setCustomSubject] = useState<string>('');
   const [recipientsRaw, setRecipientsRaw] = useState<string>('');
@@ -888,9 +889,10 @@ function CampaignsTab({ password }: { password: string }) {
   const [sendResult, setSendResult] = useState<any>(null);
   const [sendError, setSendError] = useState<string>('');
 
-  const activeCampaign = B2B_CAMPAIGN_SEQUENCE.find(c => c.step === selectedStep) || B2B_CAMPAIGN_SEQUENCE[0];
+  const activeSequence = selectedTrack === 'family' ? FAMILY_CAMPAIGN_SEQUENCE : B2B_CAMPAIGN_SEQUENCE;
+  const activeCampaign = activeSequence.find(c => c.step === selectedStep) || activeSequence[0];
   const previewHtml = activeCampaign.buildHtml({
-    email: 'prospect@organization.org',
+    email: selectedTrack === 'family' ? 'family@example.com' : 'prospect@organization.org',
     first_name: sampleFirstName,
     company: sampleCompany,
   });
@@ -912,6 +914,7 @@ function CampaignsTab({ password }: { password: string }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           pass: password,
+          track: selectedTrack,
           step: selectedStep,
           recipientsRaw,
           customSubject: customSubject.trim() || undefined,
@@ -932,34 +935,80 @@ function CampaignsTab({ password }: { password: string }) {
 
   return (
     <div className="space-y-8">
+      {/* Audience Track Switcher: Families vs. B2B Institutions */}
+      <div className="flex flex-wrap items-center gap-3 bg-white p-3 rounded-2xl shadow-sm border border-slate-200">
+        <button
+          type="button"
+          onClick={() => {
+            setSelectedTrack('family');
+            setSelectedStep(1);
+            setSampleFirstName('Maria');
+            setCustomSubject('');
+            setSendResult(null);
+            setSendError('');
+          }}
+          className={`flex-1 py-3 px-5 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${
+            selectedTrack === 'family'
+              ? 'bg-[#050249] text-white shadow-md'
+              : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
+          }`}
+        >
+          👨‍👩‍👧‍👦 For Families — 5 Clear Service Benefit Emails (Default)
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setSelectedTrack('b2b');
+            setSelectedStep(1);
+            setSampleFirstName('Decision Maker');
+            setCustomSubject('');
+            setSendResult(null);
+            setSendError('');
+          }}
+          className={`flex-1 py-3 px-5 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${
+            selectedTrack === 'b2b'
+              ? 'bg-[#050249] text-white shadow-md'
+              : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
+          }`}
+        >
+          🏢 For Companies, Schools &amp; Communities — 5 B2B Follow-Up Emails
+        </button>
+      </div>
+
       {/* Top Cadence Strategy Banner */}
       <div className="bg-[#050249] text-white rounded-3xl p-6 md:p-8 shadow-xl border border-blue-900">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <span className="inline-block bg-[#23d9b0]/20 text-[#23d9b0] text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full mb-2">
-              B2B Enterprise, Institutional &amp; Community Outreach Engine
+              {selectedTrack === 'family'
+                ? 'Family Wellness 5-Email Follow-Up Sequence (Up to 7 Family Members Included)'
+                : 'B2B Enterprise, Institutional & Community Outreach Engine'}
             </span>
             <h2 className="text-xl md:text-2xl font-black italic tracking-tight">
-              5-Touch Follow-Up Sequence (Optimal 5–7 Day Cadence)
+              {selectedTrack === 'family'
+                ? '5 Clear Family Follow-Up Emails — Exact CEDEXX Services & Benefits'
+                : '5-Touch Follow-Up Sequence (Optimal 5–7 Day Cadence)'}
             </h2>
             <p className="text-blue-200 text-xs md:text-sm mt-1 max-w-3xl leading-relaxed">
-              Designed for School Districts, Public Agencies, Employers, Multifamily/Housing Groups, and Associations. Each email uses a distinct executive angle (Problem Disruption &rarr; 4 Ecosystems &rarr; Volume Pricing ROI &rarr; Turnkey 24–48h Rollout &rarr; Reply 1-2-3 Pilot Close).
+              {selectedTrack === 'family'
+                ? 'Each email highlights one clear, high-impact family benefit: (1) 24/7 Urgent Care & Pediatrics for up to 7 members at $18.99/mo ($0 copay, acute RX, school/work notes) → (2) Unlimited Family Therapy & Mental Wellness (+$8/mo bundle or $18.99/mo standalone) → (3) CareComplete Family ($52.99/mo) with Dedicated PCP, $0 Annual Lab Panel & 237+ $0 Medications → (4) Side-by-Side 5-Plan Comparison & 24–48hr Activation → (5) Personal Founder Invite from Daisy Gonzalez.'
+                : 'Designed for School Districts, Public Agencies, Employers, Multifamily/Housing Groups, and Associations. Each email uses a distinct executive angle (Problem Disruption → 4 Ecosystems → Volume Pricing ROI → Turnkey 24–48h Rollout → Reply 1-2-3 Pilot Close).'}
             </p>
           </div>
           <div className="bg-white/10 rounded-2xl p-4 text-xs space-y-1 shrink-0 border border-white/10">
             <div className="font-black text-[#23d9b0] uppercase tracking-wider">Best Send Windows (EST)</div>
-            <div>• <strong>Email 1:</strong> Day 1 (Tue 9:30 AM)</div>
-            <div>• <strong>Email 2:</strong> Day 6 (Thu 10:00 AM)</div>
-            <div>• <strong>Email 3:</strong> Day 12 (Wed 9:30 AM)</div>
-            <div>• <strong>Email 4:</strong> Day 18 (Tue 10:00 AM)</div>
-            <div>• <strong>Email 5:</strong> Day 25 (Tue 9:30 AM)</div>
+            <div>• <strong>Email 1:</strong> Day 1 (Week 1)</div>
+            <div>• <strong>Email 2:</strong> Day 6 (Week 2)</div>
+            <div>• <strong>Email 3:</strong> Day 12 (Week 3)</div>
+            <div>• <strong>Email 4:</strong> Day 18 (Week 4)</div>
+            <div>• <strong>Email 5:</strong> Day 25 (Week 5)</div>
           </div>
         </div>
       </div>
 
       {/* Step Selector (1 to 5) */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
-        {B2B_CAMPAIGN_SEQUENCE.map((c) => {
+        {activeSequence.map((c) => {
           const isSelected = c.step === selectedStep;
           return (
             <button
@@ -1004,7 +1053,7 @@ function CampaignsTab({ password }: { password: string }) {
           <div className="bg-white rounded-3xl p-6 shadow-md border border-slate-100 space-y-4">
             <div>
               <span className="text-[10px] font-black uppercase tracking-widest text-[#23d9b0] bg-[#050249] px-2.5 py-1 rounded-full">
-                Step {activeCampaign.step} Strategy
+                Step {activeCampaign.step} Strategy ({selectedTrack === 'family' ? 'Family Track' : 'B2B Track'})
               </span>
               <h3 className="text-lg font-black text-[#050249] mt-2">{activeCampaign.title}</h3>
               <p className="text-xs text-slate-500 font-semibold mt-0.5">{activeCampaign.angle}</p>
@@ -1063,13 +1112,15 @@ function CampaignsTab({ password }: { password: string }) {
 
               <div>
                 <label className="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">
-                  Recipient Email List (1 per line: <code className="text-[#050249]">email, First Name, Company</code>)
+                  Recipient Email List (1 per line: <code className="text-[#050249]">email, First Name</code>)
                 </label>
                 <textarea
                   rows={6}
                   value={recipientsRaw}
                   onChange={e => setRecipientsRaw(e.target.value)}
-                  placeholder={`superintendent@browardschools.com, Dr. Martinez, Broward County Schools\nhr@propertygroup.com, Sarah, Horizon Multifamily\nceo@company.com`}
+                  placeholder={selectedTrack === 'family'
+                    ? 'maria@gmail.com, Maria\ncarlos.family@yahoo.com, Carlos\njohnson.household@outlook.com, Sarah'
+                    : 'superintendent@browardschools.com, Dr. Martinez, Broward County Schools\nhr@propertygroup.com, Sarah, Horizon Multifamily'}
                   className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono focus:ring-2 focus:ring-[#050249] outline-none"
                 />
                 <p className="text-[11px] text-slate-400 mt-1">
@@ -1116,7 +1167,7 @@ function CampaignsTab({ password }: { password: string }) {
             <div className="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
               <div>
                 <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 block">
-                  Live HTML Email Preview
+                  Live HTML Email Preview ({selectedTrack === 'family' ? 'Family Sequence' : 'B2B Sequence'})
                 </span>
                 <h4 className="font-black text-[#050249] text-sm">
                   Subject: {customSubject.trim() || activeCampaign.subject}

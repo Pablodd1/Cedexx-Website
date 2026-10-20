@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { B2B_CAMPAIGN_SEQUENCE, CampaignRecipient } from '../src/data/b2b-email-campaigns.js';
+import { B2B_CAMPAIGN_SEQUENCE, FAMILY_CAMPAIGN_SEQUENCE, CampaignRecipient } from '../src/data/b2b-email-campaigns.js';
 
 const DASHBOARD_PASSWORD = (process.env.DASHBOARD_PASSWORD || '').trim();
 const RESEND_API_KEY = process.env.RESEND_API_KEY || '';
@@ -47,15 +47,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   // GET: Return all 5 campaign metadata & preview HTML
   if (req.method === 'GET') {
+    const track = (req.query.track as string) === 'b2b' ? 'b2b' : 'family';
+    const sequence = track === 'b2b' ? B2B_CAMPAIGN_SEQUENCE : FAMILY_CAMPAIGN_SEQUENCE;
     const sampleRecipient: CampaignRecipient = {
-      email: 'prospect@organization.org',
-      first_name: (req.query.first_name as string) || 'Alex',
+      email: track === 'b2b' ? 'prospect@organization.org' : 'family@example.com',
+      first_name: (req.query.first_name as string) || (track === 'b2b' ? 'Alex' : 'Maria'),
       company: (req.query.company as string) || 'Your Organization',
     };
 
     return res.status(200).json({
       success: true,
-      campaigns: B2B_CAMPAIGN_SEQUENCE.map(c => ({
+      track,
+      campaigns: sequence.map(c => ({
         step: c.step,
         id: c.id,
         title: c.title,
@@ -84,13 +87,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     const {
+      track = 'family',
       step = 1,
       recipientsRaw = '',
       recipients = [],
       customSubject = '',
     } = req.body || {};
 
-    const campaign = B2B_CAMPAIGN_SEQUENCE.find(c => c.step === Number(step));
+    const sequence = track === 'b2b' ? B2B_CAMPAIGN_SEQUENCE : FAMILY_CAMPAIGN_SEQUENCE;
+    const campaign = sequence.find(c => c.step === Number(step));
     if (!campaign) {
       return res.status(400).json({
         success: false,
