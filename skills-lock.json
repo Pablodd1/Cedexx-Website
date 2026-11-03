@@ -78,6 +78,96 @@
       "sourceType": "github",
       "skillPath": "skills/web-quality-audit/SKILL.md",
       "computedHash": "9be796fc70ff05cf9842327d234b019376dc1abad8d7e3c4e3ea2dab8d8d3deb"
+    },
+    "linkedin-comment-drafter": {
+      "source": "sergebulaev/linkedin-skills",
+      "sourceType": "github",
+      "skillPath": "skills/linkedin-comment-drafter/SKILL.md",
+      "computedHash": "159b59658697687f3ffb767330c3d07f2801ec9c88cda5400e0b67f41709e67f"
+    },
+    "linkedin-content-planner": {
+      "source": "sergebulaev/linkedin-skills",
+      "sourceType": "github",
+      "skillPath": "skills/linkedin-content-planner/SKILL.md",
+      "computedHash": "85006d4d15fce41b43c0aa5685cc6fa1d6e9dfe415aaa8ea81bcffa80705b104"
+    },
+    "linkedin-employee-advocacy": {
+      "source": "sergebulaev/linkedin-skills",
+      "sourceType": "github",
+      "skillPath": "skills/linkedin-employee-advocacy/SKILL.md",
+      "computedHash": "7be15d7b95ff5dd60622ea56b4e4f46b9bd9880ad2136f97ef14ebb7c55710ac"
+    },
+    "linkedin-engager-analytics": {
+      "source": "sergebulaev/linkedin-skills",
+      "sourceType": "github",
+      "skillPath": "skills/linkedin-engager-analytics/SKILL.md",
+      "computedHash": "c5f075bf7f5eced1d7d1fe10756c41048cceb21a5b55e9c4162535719a3200d3"
+    },
+    "linkedin-hook-extractor": {
+      "source": "sergebulaev/linkedin-skills",
+      "sourceType": "github",
+      "skillPath": "skills/linkedin-hook-extractor/SKILL.md",
+      "computedHash": "3913fe24b96b44d8a1b64be99f82456e5b4abd195781900948abcba9ff24a380"
+    },
+    "linkedin-humanizer": {
+      "source": "sergebulaev/linkedin-skills",
+      "sourceType": "github",
+      "skillPath": "skills/linkedin-humanizer/SKILL.md",
+      "computedHash": "cd2088ea03b596f83dad2ee03d2520dc593c6fc08c55aedfbd5a1ccf08c70c14"
+    },
+    "linkedin-interviewer": {
+      "source": "sergebulaev/linkedin-skills",
+      "sourceType": "github",
+      "skillPath": "skills/linkedin-interviewer/SKILL.md",
+      "computedHash": "e5b4dcda815afefb2e75230fa247a70cb75fac66c4cb129e74508844c7381b35"
+    },
+    "linkedin-post-writer": {
+      "source": "sergebulaev/linkedin-skills",
+      "sourceType": "github",
+      "skillPath": "skills/linkedin-post-writer/SKILL.md",
+      "computedHash": "65cebac55bddc6f4f42d4469503e7e830267a61280314dbc771f4f2b8de4a563"
+    },
+    "linkedin-profile-optimizer": {
+      "source": "sergebulaev/linkedin-skills",
+      "sourceType": "github",
+      "skillPath": "skills/linkedin-profile-optimizer/SKILL.md",
+      "computedHash": "f5c06b2c922cd7841de154dff122aee1b9794ef37146bfa739759df6877a3687"
+    },
+    "linkedin-reply-handler": {
+      "source": "sergebulaev/linkedin-skills",
+      "sourceType": "github",
+      "skillPath": "skills/linkedin-reply-handler/SKILL.md",
+      "computedHash": "57a0812e5c0f7a731b0bdd56d3442b69d55031c9f3c43e7f128f57a29d7cbef1"
+    },
+    "linkedin-repurposer": {
+      "source": "sergebulaev/linkedin-skills",
+      "sourceType": "github",
+      "skillPath": "skills/linkedin-repurposer/SKILL.md",
+      "computedHash": "e5b54bd1ded16e60023771cbebebad29cf6e647ce90d03640f087caed2ad406b"
+    },
+    "linkedin-thread-monitor": {
+      "source": "sergebulaev/linkedin-skills",
+      "sourceType": "github",
+      "skillPath": "skills/linkedin-thread-monitor/SKILL.md",
+      "computedHash": "3e684f9addb6b572858cbae01b856fb1502663e7a84dab273167571bf292da8b"
+    },
+    "b2b-local-lead-scraper": {
+      "source": "gosom/google-maps-scraper",
+      "sourceType": "github",
+      "skillPath": "skills/b2b-local-lead-scraper/SKILL.md",
+      "computedHash": "868e58218680ecdee290c83f288800c202cc65253fa8c6aca6e4b892d4ef1fab"
+    },
+    "agency-growth-specialists": {
+      "source": "msitarzewski/agency-agents",
+      "sourceType": "github",
+      "skillPath": "skills/agency-growth-specialists/SKILL.md",
+      "computedHash": "f359633d3a190a1b1d6740cb4705fcae603dc51740355b990c513c669909a85a"
+    },
+    "open-seo-keyword-strategy": {
+      "source": "every-app/open-seo",
+      "sourceType": "github",
+      "skillPath": "skills/open-seo-keyword-strategy/SKILL.md",
+      "computedHash": "fcd5c6d922f338f727a3a0948024934e60464c2e5acb3999618ae8baf1036bc8"
     }
   }
 }

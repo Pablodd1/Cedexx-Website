@@ -88,6 +88,22 @@ All frontend work MUST comply with:
 
 ---
 
+## 3. Growth, LinkedIn Content Engineering, B2B Lead Gen & OpenSEO Skills
+
+All marketing, social media, LinkedIn, SEO, and B2B outreach tasks in this repository MUST leverage the installed `.agents/skills/` suite:
+
+### LinkedIn Content Engineering Suite (`sergebulaev/linkedin-skills` + `.agents/references/voice-profile.md`)
+- **`linkedin-post-writer` & `linkedin-repurposer`:** Draft and repurpose blogs, videos, and mission updates into native 900–1,300 character LinkedIn posts using number-first hooks (never open with a question; place external links in `firstComment`, 0–2 hashtags at the end).
+- **`linkedin-humanizer`:** Run the 4-pass forensic + strict humanizer scrub on all social captions, blog posts, and emails to eliminate AI vocabulary density, staccato fragments, and reveal bridges ("The result?", "It's not X, it's Y").
+- **`linkedin-comment-drafter`, `linkedin-reply-handler`, `linkedin-hook-extractor`, `linkedin-content-planner`, `linkedin-profile-optimizer`, `linkedin-employee-advocacy`, `linkedin-engager-analytics`, `linkedin-interviewer`, `linkedin-thread-monitor`:** Use for founder authority, engagement cadence, and inbound B2B pipeline generation.
+
+### B2B Local Lead Discovery, Agency Growth & OpenSEO (`gosom/google-maps-scraper`, `msitarzewski/agency-agents`, `every-app/open-seo`)
+- **`b2b-local-lead-scraper`:** Build targeted local prospect lists (Multifamily Property Managers, Student Housing, School Districts, Restaurants/Employers) formatted for `api/b2b-campaign.ts`.
+- **`agency-growth-specialists`:** Apply B2B Healthcare Outbound, Motion-Comic Social Creative Director, and Lyric Health Compliance Auditor workflows.
+- **`open-seo-keyword-strategy`:** Map every blog post and landing page to high-intent telehealth, student mental wellness, and multifamily wellness amenity keywords.
+
+---
+
 ## Verification Checklist (run before every push)
 
 - [ ] `npm run build` passes with 0 errors, 0 warnings
