@@ -761,7 +761,7 @@
       "state": "TX",
       "zipcode": "77084",
       "plan": "carecomplete",
-      "status": "paid",
+      "status": "payment_failed",
       "registered_at": "2026-10-06T18:46:24.676Z",
       "checkout_started_at": "2026-10-06T18:47:19.088Z",
       "stripe_session_id": "cs_live_b1nCV4JYV9TVEILNBlIwi64SXnROtUlK5OG3tafAYMGYZ8XaU5ejO7bOzG",
@@ -775,7 +775,8 @@
       "stripe_subscription_id": "sub_1UNdR2RPzCKs3jKTrkox6FxY",
       "lyric_synced": true,
       "lyric_synced_at": "2026-10-06T18:50:02.740Z",
-      "lyric_user_id": 10453182
+      "lyric_user_id": 10453182,
+      "payment_failed_at": "2026-11-06T19:50:58.402Z"
     },
     {
       "id": "mem_1792161110349_eiz0q3",
