@@ -4,7 +4,7 @@ import { Menu, X, Mail, Globe, Shield, Check, LayoutDashboard, Phone, Youtube, L
 import { SupportHub } from './SupportHub';
 import { motion, AnimatePresence } from 'motion/react';
 import { Logo } from './Logo';
-import { EcosystemSection } from './EcosystemSection';
+
 import { useLanguage, type Lang } from '../context/LanguageContext';
 
 const LANG_OPTIONS: { code: Lang; label: string }[] = [
@@ -299,7 +299,7 @@ export function Layout() {
 
         {/* Connected Innovation Ecosystem Cross-Marketing Network */}
         <div className="container mx-auto px-6">
-          <EcosystemSection />
+
         </div>
 
         <div className="container mx-auto px-6 mt-16 pt-10 border-t border-white/5">

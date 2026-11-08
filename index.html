@@ -8,6 +8,7 @@
     <meta name="keywords" content="telehealth, virtual urgent care, 24/7 doctor online, virtual primary care, Lyric Health, mental wellness therapy, affordable health membership, telemedicine Florida, no insurance healthcare, CEDEXX" />
     <meta name="author" content="Cedexx" />
     <link rel="icon" type="image/png" href="/favicon-bird.png" />
+    <link rel="help" type="text/plain" href="/llms.txt" title="CEDEXX LLM & AI Search Knowledge Index" />
     
     <!-- Google Analytics 4 (GA4) -->
     <script>
@@ -17,9 +18,9 @@
       gtag('js', new Date());
 
       (function() {
-        // Automatically loads GA4 if window.GA_MEASUREMENT_ID is configured
-        const gaId = (window.GA_MEASUREMENT_ID || '').trim();
-        if (gaId && gaId !== 'G-PLACEHOLDER') {
+        // Automatically loads GA4 from window.GA_MEASUREMENT_ID or defaults to portfolio property G-K6JSWT8YWN
+        const gaId = (window.GA_MEASUREMENT_ID || 'G-K6JSWT8YWN').trim();
+        if (gaId) {
           const script = document.createElement('script');
           script.async = true;
           script.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(gaId);
@@ -380,7 +381,7 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <!-- Connected Innovation Ecosystem Universal Widget -->
-    <script src="https://www.aidynamic.pro/ecosystem-widget.js" defer></script>
+
+
   </body>
 </html>
