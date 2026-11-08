@@ -270,10 +270,101 @@ async function sendPaymentConfirmation(data: any) {
   }).catch(() => {});
 }
 
+async function sendPaymentFailedCustomerEmail(data: any) {
+  if (!RESEND_KEY || !data.email) return;
+  const planKey = data.plan || 'carenow';
+  const planName = PLAN_DISPLAY_NAMES[planKey] || planKey;
+  const amountStr = data.amount ? `$${(data.amount / 100).toFixed(2)}` : '$18.99';
+  const updateUrl = data.hosted_invoice_url || 'https://www.cedexx.net/enroll';
+
+  const html = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+    <body style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background-color:#F8FAFC;color:#1e293b;">
+      <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#F8FAFC;padding:32px 16px;">
+        <tr>
+          <td align="center">
+            <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:24px;border:1px solid #e2e8f0;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.06);">
+              <tr>
+                <td style="background:#050249;padding:32px;text-align:center;">
+                  <h1 style="margin:0;color:#ffffff;font-size:24px;font-weight:900;letter-spacing:-0.5px;text-transform:uppercase;font-style:italic;">CEDEXX</h1>
+                  <p style="margin:8px 0 0;color:#fbbf24;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;">Action Required — Membership Renewal</p>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:36px 32px;">
+                  <h2 style="margin:0 0 16px;font-size:20px;font-weight:800;color:#050249;">Hi ${data.first_name || 'Member'},</h2>
+                  <p style="margin:0 0 20px;font-size:15px;line-height:1.6;color:#475569;">
+                    We were unable to process your monthly renewal payment of <strong>${amountStr}</strong> for your <strong>${planName}</strong> membership.
+                  </p>
+                  <p style="margin:0 0 24px;font-size:15px;line-height:1.6;color:#475569;">
+                    To keep your 24/7 Lyric Health telemedicine access active without interruption, please update your payment method using the secure link below:
+                  </p>
+                  <div style="text-align:center;margin:28px 0;">
+                    <a href="${updateUrl}" style="display:inline-block;background:#050249;color:#23d9b0;text-decoration:none;padding:14px 28px;border-radius:12px;font-size:15px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;">
+                      Update Payment Method →
+                    </a>
+                  </div>
+                  <div style="background:#f8fafc;border-radius:16px;padding:20px;border:1px solid #e2e8f0;font-size:13px;color:#475569;line-height:1.6;">
+                    <p style="margin:0 0 8px;font-weight:700;color:#050249;">Need Help Updating Your Card?</p>
+                    <p style="margin:0;">
+                      Call or email our support desk anytime at <strong>(754) 432-2201</strong> or <a href="mailto:support@cedexx.net" style="color:#050249;font-weight:700;">support@cedexx.net</a>.
+                    </p>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td style="background:#f8fafc;padding:20px 32px;text-align:center;border-top:1px solid #e2e8f0;">
+                  <p style="margin:0;font-size:12px;color:#94a3b8;">
+                    © ${new Date().getFullYear()} CEDEXX. Telehealth technology platform powered by Lyric Health.<br>
+                    CEDEXX is not an insurance provider.
+                  </p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </body>
+    </html>
+  `;
+
+  await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${RESEND_KEY}`,
+    },
+    body: JSON.stringify({
+      from: 'CEDEXX Support <support@cedexx.net>',
+      to: [data.email],
+      subject: `Action Required — Update Payment Method for Your CEDEXX ${planName} Membership`,
+      html,
+    }),
+  }).catch(() => {});
+}
+
 async function notifyAdmin(data: any) {
+  const isFailed = data.type === 'payment_failed';
+  const isCancelled = data.type === 'cancelled';
+  const amountFormatted = `$${((data.amount || 0) / 100).toFixed(2)}`;
+
+  const subject = isFailed
+    ? `⚠️ Renewal Payment Declined — ${data.first_name} ${data.last_name}`
+    : isCancelled
+    ? `🚫 Membership Cancelled — ${data.first_name} ${data.last_name}`
+    : `💳 Payment Received — ${data.first_name} ${data.last_name}`;
+
+  const heading = isFailed
+    ? 'Renewal Payment Declined'
+    : isCancelled
+    ? 'Membership Cancelled'
+    : 'New Payment';
+
   if (RESEND_KEY) {
     const adminRecipients = ['support@cedexx.net', 'daisy@cedexx.net', 'jasmelacosta@gmail.com'];
-    fetch('https://api.resend.com/emails', {
+    await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -282,16 +373,21 @@ async function notifyAdmin(data: any) {
       body: JSON.stringify({
         from: 'CEDEXX Notifications <support@cedexx.net>',
         to: adminRecipients,
-        subject: `💳 Payment Received — ${data.first_name} ${data.last_name}`,
-        html: `<h2>New Payment</h2><p><strong>Name:</strong> ${data.first_name} ${data.last_name}</p><p><strong>Email:</strong> ${data.email}</p><p><strong>Plan:</strong> ${data.plan}</p><p><strong>Amount:</strong> $${((data.amount || 0) / 100).toFixed(2)}</p>`,
+        subject,
+        html: `<h2>${heading}</h2><p><strong>Name:</strong> ${data.first_name} ${data.last_name}</p><p><strong>Email:</strong> ${data.email}</p><p><strong>Phone:</strong> ${data.phone || 'N/A'}</p><p><strong>Plan:</strong> ${data.plan}</p>${!isCancelled ? `<p><strong>Amount:</strong> ${amountFormatted}</p>` : ''}${data.stripe_session_id ? `<p><strong>Stripe Ref:</strong> ${data.stripe_session_id}</p>` : ''}${data.hosted_invoice_url ? `<p><strong>Invoice Link:</strong> <a href="${data.hosted_invoice_url}">Pay / Update Card</a></p>` : ''}`,
       }),
     }).catch(() => {});
   }
   if (TELEGRAM_BOT && TELEGRAM_CHAT) {
     const maskedName = `${(data.first_name || '').charAt(0)}. ${(data.last_name || '').charAt(0)}.`;
     const maskedEmail = data.email ? `${data.email.charAt(0)}***@${data.email.split('@')[1] || '***'}` : '***';
-    const text = `💳 <b>NEW PAYMENT</b> — CEDEXX\n👤 Member: <code>${maskedName}</code>\n📧 Contact: <code>${maskedEmail}</code>\n📦 Plan: ${data.plan}\n💰 Amount: $${((data.amount || 0) / 100).toFixed(2)}\n🔒 Protected in Admin Dashboard\n🕒 ${new Date().toLocaleString()}`;
-    fetch(`https://api.telegram.org/bot${TELEGRAM_BOT}/sendMessage`, {
+    const headerTag = isFailed
+      ? '⚠️ <b>RENEWAL PAYMENT DECLINED</b>'
+      : isCancelled
+      ? '🚫 <b>MEMBERSHIP CANCELLED</b>'
+      : '💳 <b>NEW PAYMENT</b>';
+    const text = `${headerTag} — CEDEXX\n👤 Member: <code>${maskedName}</code>\n📧 Contact: <code>${maskedEmail}</code>\n📦 Plan: ${data.plan}\n💰 Amount: ${amountFormatted}\n🔒 Protected in Admin Dashboard\n🕒 ${new Date().toLocaleString()}`;
+    await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -544,22 +640,73 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         break;
       }
 
+      case 'invoice.payment_succeeded':
+      case 'invoice.paid': {
+        const invoice = event.data.object;
+        // Skip initial checkout invoices since checkout.session.completed handles those
+        if (invoice.billing_reason === 'subscription_create') break;
+
+        const rawEmail = invoice.customer_email || '';
+        const email = rawEmail.toLowerCase().trim();
+        const customerId = invoice.customer;
+
+        const member = members.find(
+          (m: any) =>
+            (email && m.email && m.email.toLowerCase() === email) ||
+            (customerId && m.stripe_customer_id === customerId)
+        );
+
+        if (member) {
+          const wasFailed = member.status === 'payment_failed';
+          member.status = 'paid';
+          member.paid_at = new Date().toISOString();
+          delete member.payment_failed_at;
+          updated = true;
+
+          if (wasFailed || invoice.billing_reason === 'subscription_cycle') {
+            await Promise.allSettled([
+              notifyAdmin({
+                type: 'payment' as const,
+                first_name: member.first_name,
+                last_name: member.last_name,
+                email: member.email,
+                phone: member.phone || '',
+                plan: member.plan || '',
+                amount: invoice.amount_paid || invoice.amount_due || 0,
+                stripe_session_id: invoice.id,
+              }),
+            ]);
+          }
+        }
+        break;
+      }
+
       case 'invoice.payment_failed': {
         const invoice = event.data.object;
-        const email = invoice.customer_email;
-        
-        if (!email) break;
+        const rawEmail = invoice.customer_email || '';
+        const email = rawEmail.toLowerCase().trim();
+        const customerId = invoice.customer;
 
-        const member = members.find((m: any) => m.email === email);
+        if (!email && !customerId) break;
+
+        const member = members.find(
+          (m: any) =>
+            (email && m.email && m.email.toLowerCase() === email) ||
+            (customerId && m.stripe_customer_id === customerId)
+        );
         if (member) {
           member.status = 'payment_failed';
           member.payment_failed_at = new Date().toISOString();
+          member.last_failed_invoice_id = invoice.id;
+          if (invoice.hosted_invoice_url) {
+            member.hosted_invoice_url = invoice.hosted_invoice_url;
+          }
           updated = true;
 
-          // Notify admin of payment failure
-          Promise.allSettled([
+          // Notify admin AND send automated card-update link to the member
+          await Promise.allSettled([
             notifyAdmin({
-              type: 'payment' as const,
+              type: 'payment_failed' as const,
               first_name: member.first_name,
               last_name: member.last_name,
               email: member.email,
@@ -567,18 +714,29 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
               plan: member.plan || '',
               amount: invoice.amount_due || 0,
               stripe_session_id: invoice.id,
+              hosted_invoice_url: invoice.hosted_invoice_url,
+            }),
+            sendPaymentFailedCustomerEmail({
+              first_name: member.first_name,
+              last_name: member.last_name,
+              email: member.email,
+              plan: member.plan || 'carecomplete',
+              amount: invoice.amount_due || 1899,
+              hosted_invoice_url: invoice.hosted_invoice_url,
             }),
             alertCritical(
-              new Error(`Payment failed for ${member.email}`),
+              new Error(`Renewal payment failed for ${member.email} (Attempt #${invoice.attempt_count || 1})`),
               {
                 endpoint: '/api/webhook/stripe',
                 patientEmail: member.email,
                 patientName: `${member.first_name} ${member.last_name}`,
                 plan: member.plan,
-                stripeSessionId: invoice.id,
+                stripeInvoiceId: invoice.id,
+                attemptCount: invoice.attempt_count || 1,
+                hostedInvoiceUrl: invoice.hosted_invoice_url || null,
               }
             ),
-          ]).catch(() => {});
+          ]);
         }
         break;
       }
@@ -596,16 +754,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           updated = true;
 
           // Notify admin of cancellation
-          Promise.allSettled([
+          await Promise.allSettled([
             notifyAdmin({
-              type: 'registration' as const,
+              type: 'cancelled' as const,
               first_name: member.first_name,
               last_name: member.last_name,
               email: member.email,
               phone: member.phone || '',
               plan: member.plan || '',
             }),
-          ]).catch(() => {});
+          ]);
         }
         break;
       }
