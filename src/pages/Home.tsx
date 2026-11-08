@@ -33,7 +33,7 @@ export function Home() {
       {/* ── HERO SECTION ── */}
       <section className="relative bg-[#050249] text-white min-h-[56vh] lg:min-h-[72vh] flex items-center overflow-hidden">
         <div className="absolute inset-0 w-full h-full">
-          <div className="absolute inset-0 bg-gradient-to-r from-[#050249]/90 via-[#050249]/80 to-black/40 z-10" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#050249]/35 via-[#050249]/75 to-[#050249]/90 z-10" />
           <video
             autoPlay
             loop
@@ -54,22 +54,6 @@ export function Home() {
               transition={{ duration: 0.8 }}
               className="flex flex-col items-end"
             >
-
-              {/* Prominent Social Proof Pill */}
-              <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 mb-6 shadow-xl">
-                <div className="flex items-center text-amber-400">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                  ))}
-                </div>
-                <span className="text-white text-xs font-black tracking-wide">
-                  {t('social.rating')}
-                </span>
-                <span className="flex h-2 w-2 relative">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#23d9b0] opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[#23d9b0]"></span>
-                </span>
-              </div>
 
               <h1 className="text-4xl md:text-7xl font-black leading-[0.9] mb-6 tracking-tighter uppercase italic">
                 Better Care. Here. <span className="text-[#23d9b0]">Now.</span>
@@ -193,12 +177,12 @@ export function Home() {
               </div>
               <div>
                 <div className="flex items-center gap-1.5">
-                  <span className="text-sm font-black uppercase tracking-tight text-white">Rated 4.9 / 5</span>
+                  <span className="text-sm font-black uppercase tracking-tight text-white">24/7 Care Access</span>
                   <div className="flex text-amber-400">
                     <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
                   </div>
                 </div>
-                <p className="text-[11px] text-blue-200/70 font-medium">Over 12,400+ Families Enrolled</p>
+                <p className="text-[11px] text-blue-200/70 font-medium">All 50 States • Up to 7 Family Members</p>
               </div>
             </div>
           </div>
