@@ -47,7 +47,7 @@ router.post('/chat', async (req, res) => {
   ].filter(p => Boolean(p.key));
 
   if (availableProviders.length === 0) {
-    const fallbackText = 'We are currently unavailable. Please try again in a moment or contact support at (888) 260-0585 or (754) 432-2201 for immediate assistance.';
+    const fallbackText = 'We are currently unavailable. Please try again in a moment or contact support at (754) 432-2201 or (754) 432-2201 for immediate assistance.';
     return res.status(200).json({ choices: [{ message: { content: fallbackText } }] });
   }
 

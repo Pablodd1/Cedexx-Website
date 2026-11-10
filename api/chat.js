@@ -144,7 +144,7 @@ BLOGS & CLINICAL/WELLNESS INSIGHTS (cedexx.net/blog):
 KEY SUPPORT & COMPANY FACTS:
 - Clinical Services via Lyric Health: 24/7 Urgent Care, Primary Care, Mental Health, Pediatrics, Dermatology, Virtual MSK, Care Navigation, Labs, GLP-1 Weight Loss, Prescription Access (no controlled substances), Work & School Notes.
 - Leadership & Founders: Daisy Gonzalez (Founder & CEO, Strategy & Operations Expert with 20+ years experience) and Jasmel Acosta (Co-founder, Engineering Leadership & Technology Strategy).
-- Contact: Toll-Free (888) 260-0585, Local Desk (754) 432-2201 (Mon-Fri 9am-6pm EST), Email support@cedexx.net. Active Lyric app members can call Lyric Member Services at 1-866-223-8831.
+- Contact: Toll-Free (754) 432-2201, Local Desk (754) 432-2201 (Mon-Fri 9am-6pm EST), Email support@cedexx.net. Active Lyric app members can call Lyric Member Services at 1-866-223-8831.
 - MEMBER ID: The head of household Member ID is the 10-digit phone number entered at registration.
 - COMPLIANCE GUARDRAILS: CEDEXX is a technology platform, NOT a healthcare provider (Lyric Health delivers all medical care). NEVER give medical diagnoses or advice. Do NOT claim that no SSN or government ID is required to enroll, and do NOT promise specific numerical capacity like "hundreds of thousands". For emergencies, call 911.
 - Keep responses concise, warm, and helpful (2-4 sentences).`;
@@ -160,7 +160,7 @@ KEY SUPPORT & COMPANY FACTS:
 
   if (availableProviders.length === 0) {
     console.error('[CHAT] No AI provider keys configured');
-    const fallbackText = 'We are currently unavailable. Please try again in a moment or contact support at (888) 260-0585 or (754) 432-2201 for immediate assistance.';
+    const fallbackText = 'We are currently unavailable. Please try again in a moment or contact support at (754) 432-2201 or (754) 432-2201 for immediate assistance.';
     return res.status(200).json({ choices: [{ message: { content: fallbackText } }] });
   }
 

@@ -127,7 +127,7 @@ function wrapBrandedEmail({
                   ${footerSubline || 'Founder & CEO, CEDEXX · Family, Community & Institutional Wellness'}
                 </p>
                 <p style="margin:6px 0 0 0;font-size:12px;color:#475569;">
-                  📞 <a href="tel:8882600585" style="color:#050249;text-decoration:none;font-weight:600;">(888) 260-0585</a> · 
+                  📞 <a href="tel:7544322201" style="color:#050249;text-decoration:none;font-weight:600;">(754) 432-2201</a> · 
                   ✉️ <a href="mailto:daisy@cedexx.net" style="color:#050249;text-decoration:none;font-weight:600;">daisy@cedexx.net</a> · 
                   🌐 <a href="${CEDEXX_URL}" style="color:#050249;text-decoration:none;font-weight:600;">cedexx.net</a>
                 </p>
@@ -213,7 +213,7 @@ export const FAMILY_CAMPAIGN_SEQUENCE: CampaignTemplate[] = [
         ctaUrl: ENROLL_URL,
         secondaryCtaLabel: 'Compare All Family Plans',
         secondaryCtaUrl: PRICING_URL,
-        psText: 'Have questions before enrolling? Call our friendly support desk anytime at (888) 260-0585 or reply directly to this email.',
+        psText: 'Have questions before enrolling? Call our friendly support desk anytime at (754) 432-2201 or reply directly to this email.',
         bodyHtml: `
           <p style="margin:0 0 14px 0;">${greeting}</p>
           <p style="margin:0 0 14px 0;">
@@ -278,7 +278,7 @@ Enroll Your Family Starting at $18.99/mo: ${ENROLL_URL}
 
 With intention & care,
 Daisy Gonzalez | Founder & CEO, CEDEXX
-(888) 260-0585 | daisy@cedexx.net
+(754) 432-2201 | daisy@cedexx.net
 
 ---
 COMPLIANCE DISCLOSURE: CEDEXX is a technology and wellness membership platform, not a medical provider, doctor, or health insurance company. CEDEXX does not practice medicine, give medical advice, diagnose conditions, or prescribe medications. All clinical and behavioral health services are provided independently by licensed professionals in the Lyric Health network. For medical emergencies, call 911 immediately.`,
@@ -354,7 +354,7 @@ Start CareNow + Mental Wellness ($26.99/mo): ${ENROLL_URL}
 
 With intention & care,
 Daisy Gonzalez | Founder & CEO, CEDEXX
-(888) 260-0585 | daisy@cedexx.net
+(754) 432-2201 | daisy@cedexx.net
 
 ---
 COMPLIANCE DISCLOSURE: CEDEXX is a technology and wellness membership platform, not a medical provider, doctor, or health insurance company. CEDEXX does not practice medicine, give medical advice, diagnose conditions, or prescribe medications. All clinical and behavioral health services are provided independently by licensed professionals in the Lyric Health network. For medical emergencies, call 911 immediately.`,
@@ -446,7 +446,7 @@ Explore CareComplete™ ($34.99 Individual | $52.99 Family): ${ENROLL_URL}
 
 With intention & care,
 Daisy Gonzalez | Founder & CEO, CEDEXX
-(888) 260-0585 | daisy@cedexx.net
+(754) 432-2201 | daisy@cedexx.net
 
 ---
 COMPLIANCE DISCLOSURE: CEDEXX is a technology and wellness membership platform, not a medical provider, doctor, or health insurance company. CEDEXX does not practice medicine, give medical advice, diagnose conditions, or prescribe medications. All clinical and behavioral health services are provided independently by licensed professionals in the Lyric Health network. For medical emergencies, call 911 immediately.`,
@@ -545,7 +545,7 @@ How It Works:
 
 With intention & care,
 Daisy Gonzalez | Founder & CEO, CEDEXX
-(888) 260-0585 | daisy@cedexx.net
+(754) 432-2201 | daisy@cedexx.net
 
 ---
 COMPLIANCE DISCLOSURE: CEDEXX is a technology and wellness membership platform, not a medical provider, doctor, or health insurance company. CEDEXX does not practice medicine, give medical advice, diagnose conditions, or prescribe medications. All clinical and behavioral health services are provided independently by licensed professionals in the Lyric Health network. For medical emergencies, call 911 immediately.`,
@@ -574,8 +574,8 @@ COMPLIANCE DISCLOSURE: CEDEXX is a technology and wellness membership platform, 
         headline: 'The best time to have a family doctor in your pocket is before someone wakes up sick.',
         ctaLabel: 'Enroll Your Household Today',
         ctaUrl: ENROLL_URL,
-        secondaryCtaLabel: 'Call Us: (888) 260-0585',
-        secondaryCtaUrl: 'tel:8882600585',
+        secondaryCtaLabel: 'Call Us: (754) 432-2201',
+        secondaryCtaUrl: 'tel:7544322201',
         psText: 'Also looking to bring CEDEXX to your workplace, school, church, or apartment community? Reply "PARTNER" and I will personally send you our custom group options.',
         bodyHtml: `
           <p style="margin:0 0 14px 0;">${greeting}</p>
@@ -589,7 +589,7 @@ COMPLIANCE DISCLOSURE: CEDEXX is a technology and wellness membership platform, 
           <div style="background-color:#f8fafc;border:1px solid #cbd5e1;border-radius:12px;padding:18px 20px;margin:18px 0;">
             <p style="margin:0 0 8px 0;font-size:14px;color:#050249;"><strong>✓ Plans Start at Just $18.99/mo:</strong> Covering up to 7 household members for 24/7 Urgent Care.</p>
             <p style="margin:0 0 8px 0;font-size:14px;color:#050249;"><strong>✓ Zero Visit Fees, Zero Co-Pays, Zero Contracts:</strong> Stay only as long as your family loves the care. Cancel anytime with no fees.</p>
-            <p style="margin:0;font-size:14px;color:#050249;"><strong>✓ Real Human Support:</strong> Have a question about which plan fits your family? Reply to this email or call our desk at <strong>(888) 260-0585</strong>.</p>
+            <p style="margin:0;font-size:14px;color:#050249;"><strong>✓ Real Human Support:</strong> Have a question about which plan fits your family? Reply to this email or call our desk at <strong>(754) 432-2201</strong>.</p>
           </div>
 
           <p style="margin:0;">
@@ -607,13 +607,13 @@ One important tip I always share with families: Lyric Health account activation 
 
 - Plans start at $18.99/mo for up to 7 family members (CareNow™), $26.99/mo with Mental Wellness, or $52.99/mo for CareComplete Family™ Primary Care + $0 Labs + 237 $0 Medications.
 - $0 visit fees, $0 co-pays, no insurance needed, and cancel anytime with zero fees.
-- Have questions? Reply directly to this email or call us at (888) 260-0585.
+- Have questions? Reply directly to this email or call us at (754) 432-2201.
 
 Enroll Your Household Today: ${ENROLL_URL}
 
 With intention & care,
 Daisy Gonzalez | Founder & CEO, CEDEXX
-(888) 260-0585 | daisy@cedexx.net
+(754) 432-2201 | daisy@cedexx.net
 
 ---
 COMPLIANCE DISCLOSURE: CEDEXX is a technology and wellness membership platform, not a medical provider, doctor, or health insurance company. CEDEXX does not practice medicine, give medical advice, diagnose conditions, or prescribe medications. All clinical and behavioral health services are provided independently by licensed professionals in the Lyric Health network. For medical emergencies, call 911 immediately.`,
@@ -689,7 +689,7 @@ Explore Institutional & Community Solutions: ${PARTNER_URL}
 
 With intention & care,
 Daisy Gonzalez | Founder & CEO, CEDEXX
-(888) 260-0585 | daisy@cedexx.net
+(754) 432-2201 | daisy@cedexx.net
 
 ---
 COMPLIANCE DISCLOSURE: CEDEXX is a technology and wellness membership platform, not a medical provider, doctor, or health insurance company. CEDEXX does not practice medicine, give medical advice, diagnose conditions, or prescribe medications. All clinical and behavioral health services are provided independently by licensed professionals in the Lyric Health network. For medical emergencies, call 911 immediately.`,
@@ -768,7 +768,7 @@ See the Ecosystems We Serve: ${CEDEXX_URL}/partners
 
 With intention & care,
 Daisy Gonzalez | Founder & CEO, CEDEXX
-(888) 260-0585 | daisy@cedexx.net
+(754) 432-2201 | daisy@cedexx.net
 
 ---
 COMPLIANCE DISCLOSURE: CEDEXX is a technology and wellness membership platform, not a medical provider, doctor, or health insurance company. CEDEXX does not practice medicine, give medical advice, diagnose conditions, or prescribe medications. All clinical and behavioral health services are provided independently by licensed professionals in the Lyric Health network. For medical emergencies, call 911 immediately.`,
@@ -838,7 +838,7 @@ Request a Custom Volume Quote: ${PARTNER_URL}
 
 With intention & care,
 Daisy Gonzalez | Founder & CEO, CEDEXX
-(888) 260-0585 | daisy@cedexx.net
+(754) 432-2201 | daisy@cedexx.net
 
 ---
 COMPLIANCE DISCLOSURE: CEDEXX is a technology and wellness membership platform, not a medical provider, doctor, or health insurance company. CEDEXX does not practice medicine, give medical advice, diagnose conditions, or prescribe medications. All clinical and behavioral health services are provided independently by licensed professionals in the Lyric Health network. For medical emergencies, call 911 immediately.`,
@@ -881,7 +881,7 @@ COMPLIANCE DISCLOSURE: CEDEXX is a technology and wellness membership platform, 
             <p style="margin:0 0 8px 0;font-size:14px;color:#050249;"><strong>✓ Dedicated Organization-Wide Rollout:</strong> We supply ready-to-send digital enrollment links or roster provisioning.</p>
             <p style="margin:0 0 8px 0;font-size:14px;color:#050249;"><strong>✓ 24–48 Hour Lyric Health Activation:</strong> Once enrolled, Lyric Health provisions accounts within 24–48 hours and emails simple app setup instructions directly to each family.</p>
             <p style="margin:0 0 8px 0;font-size:14px;color:#050249;"><strong>✓ Simple Phone-Number Member ID:</strong> No plastic cards to mail or lose—a member’s 10-digit phone number is their Member ID.</p>
-            <p style="margin:0;font-size:14px;color:#050249;"><strong>✓ Multilingual Member Support:</strong> Live phone desk at (888) 260-0585 and 24/7 AI support in English, Spanish, Haitian Creole, and Russian.</p>
+            <p style="margin:0;font-size:14px;color:#050249;"><strong>✓ Multilingual Member Support:</strong> Live phone desk at (754) 432-2201 and 24/7 AI support in English, Spanish, Haitian Creole, and Russian.</p>
           </div>
           <p style="margin:0;">
             At CEDEXX, we believe true wellness cares for the whole person—body, mind, and spirit. When families feel supported at home, they show up stronger at work, at school, and in your community.
@@ -896,13 +896,13 @@ We engineered CEDEXX so rolling out to ${orgMentionFor(r)} requires zero heavy l
 - Dedicated Organization-Wide Rollout: Ready-to-send digital enrollment links or roster provisioning.
 - 24–48 Hour Lyric Health Activation: Families receive direct setup instructions to access the Lyric Health app.
 - Simple Phone-Number Member ID: No plastic cards to mail—their 10-digit phone number is their Member ID.
-- Multilingual Support: Toll-free desk at (888) 260-0585 and 24/7 digital support in English, Spanish, Haitian Creole, and Russian.
+- Multilingual Support: Toll-free desk at (754) 432-2201 and 24/7 digital support in English, Spanish, Haitian Creole, and Russian.
 
 Schedule a 15-Minute Rollout Walkthrough: ${PARTNER_URL}
 
 With intention & care,
 Daisy Gonzalez | Founder & CEO, CEDEXX
-(888) 260-0585 | daisy@cedexx.net
+(754) 432-2201 | daisy@cedexx.net
 
 ---
 COMPLIANCE DISCLOSURE: CEDEXX is a technology and wellness membership platform, not a medical provider, doctor, or health insurance company. CEDEXX does not practice medicine, give medical advice, diagnose conditions, or prescribe medications. All clinical and behavioral health services are provided independently by licensed professionals in the Lyric Health network. For medical emergencies, call 911 immediately.`,
@@ -972,7 +972,7 @@ Or request a quote directly: ${PARTNER_URL}
 
 With intention & care,
 Daisy Gonzalez | Founder & CEO, CEDEXX
-(888) 260-0585 | daisy@cedexx.net
+(754) 432-2201 | daisy@cedexx.net
 
 ---
 COMPLIANCE DISCLOSURE: CEDEXX is a technology and wellness membership platform, not a medical provider, doctor, or health insurance company. CEDEXX does not practice medicine, give medical advice, diagnose conditions, or prescribe medications. All clinical and behavioral health services are provided independently by licensed professionals in the Lyric Health network. For medical emergencies, call 911 immediately.`,

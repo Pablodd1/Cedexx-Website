@@ -55,7 +55,7 @@ CRITICAL PRONUNCIATION & RULES:
 CEEDEX PUBLIC WEBSITE FACTS:
 - Tagline: "Better Care. Here. Now. — A modern wellness amenity designed for individuals, families, institutions, and residential communities."
 - Partnership: Ceedex is powered by Lyric Health, delivering 24/7 integrated virtual primary care, urgent care, pediatrics, and mental health therapy across all 50 states.
-- Contact: Toll-Free line is (888) 260-0585, Local desk line is (754) 432-2201. Support email is support@cedexx.net. Website is ceedex.net.
+- Contact: Toll-Free line is (754) 432-2201, Local desk line is (754) 432-2201. Support email is support@cedexx.net. Website is ceedex.net.
 - Four Homepage Pillars:
   1. Family & Individual Wellness (Explore Memberships at ceedex.net/pricing)
   2. Community & Housing Solutions (Multifamily, affordable, student, senior, and residential communities)

@@ -10,7 +10,7 @@ export const CEDEXX_KNOWLEDGE = {
     description: 'A modern digital healthcare and mental wellness platform powered by Lyric Health, connecting individuals, families, residential communities, workplaces, school districts, educational institutions, and public agencies with licensed healthcare providers nationwide.',
     website: 'cedexx.net',
     email: 'support@cedexx.net',
-    phone: '(888) 260-0585 (Toll-Free) | (754) 432-2201 (Local Desk)',
+    phone: '(754) 432-2201 (Toll-Free) | (754) 432-2201 (Local Desk)',
     coverage: 'Nationwide through Lyric Health network (50 states)',
     languages: ['English', 'Spanish', 'Russian', 'Haitian Creole'],
     compliance: 'HIPAA compliant and secure',
@@ -290,31 +290,31 @@ export const CEDEXX_KNOWLEDGE = {
     { name: 'Enroll', path: '/enroll', description: 'Self-service membership enrollment and Stripe checkout' },
     { name: 'Blog', path: '/blog', description: 'Featured Faith & Wholeness reflection by Daisy Gonzalez + 6 clinical & wellness articles' },
     { name: 'FAQ', path: '/faq', description: 'Frequently asked questions on activation, Member ID, coverage, and billing' },
-    { name: 'Contact', path: '/contact', description: 'Contact form, toll-free (888) 260-0585, local (754) 432-2201, support@cedexx.net' },
+    { name: 'Contact', path: '/contact', description: 'Contact form, toll-free (754) 432-2201, local (754) 432-2201, support@cedexx.net' },
     { name: 'Privacy Policy', path: '/privacy', description: 'HIPAA and privacy compliance' },
     { name: 'Terms of Service', path: '/terms', description: 'Service terms and conditions' },
   ],
 
   membershipSupport: {
     memberId: 'The head of household Member ID number is the 10-digit phone number entered at registration. When contacting Member Services, pharmacy support, or verifying your account, simply provide this phone number.',
-    accountAccess: 'For assistance accessing your CEDEXX membership account, contact support@cedexx.net or call (888) 260-0585 / (754) 432-2201.',
+    accountAccess: 'For assistance accessing your CEDEXX membership account, contact support@cedexx.net or call (754) 432-2201 / (754) 432-2201.',
     cancellation: 'Send cancellation request to support@cedexx.net with "Cancellation" in subject line. Include: Full Name, Date of Birth, Email Address on File, Full Address. No penalties or fees. Previously billed fees are non-refundable.',
     lyricAppSupport: 'For active members using the Lyric Health mobile app, call Lyric Health Member Services directly at 1-866-223-8831.',
     addOrChangePlan: 'For adding a membership, upgrading to a Family plan, or changing your plan, contact support@cedexx.net. When upgrading an existing member to a new plan, our team verifies the new plan activation and cancels the previous subscription so you are never double-billed.',
-    postPurchaseAccess: 'After purchasing, Lyric Health communication and activation is NOT immediate; it takes 24-48 hours. Then: 1) Download Lyric Health app, 2) Tap "First Time User?" link, 3) Verify with Last Name, DOB, ZIP, 4) Check email (including spam) from noreply@getlyric.com. If still unable after 48 hours, contact support@cedexx.net or call (888) 260-0585.',
+    postPurchaseAccess: 'After purchasing, Lyric Health communication and activation is NOT immediate; it takes 24-48 hours. Then: 1) Download Lyric Health app, 2) Tap "First Time User?" link, 3) Verify with Last Name, DOB, ZIP, 4) Check email (including spam) from noreply@getlyric.com. If still unable after 48 hours, contact support@cedexx.net or call (754) 432-2201.',
   },
 
   activationTimeline: {
     rule: 'Lyric Health communication and account activation is NOT immediate. It takes 24 to 48 hours.',
     explanation: 'When someone enrolls on CEDEXX, their membership details are sent to Lyric Health for provisioning. Lyric Health will communicate with the user via email from noreply@getlyric.com within 24 to 48 hours. Only after this 24-48 hour window can members verify their account in the Lyric Health app using "First Time User?" with Last Name, DOB, and ZIP code. Immediate access to doctors is NOT available upon checkout.',
-    supportContact: 'If 48 hours have passed and no email has arrived, check spam/junk folders first, then contact support@cedexx.net or call (888) 260-0585 / (754) 432-2201.',
+    supportContact: 'If 48 hours have passed and no email has arrived, check spam/junk folders first, then contact support@cedexx.net or call (754) 432-2201 / (754) 432-2201.',
   },
 
   emailCommunications: {
     receiptEmail: 'Sent immediately from CEDEXX Support (support@cedexx.net) confirming plan purchase and order details.',
     lyricActivationEmail: 'Sent within 24 to 48 hours from noreply@getlyric.com containing member setup and account activation instructions.',
     cancellationEmail: 'Handled by emailing support@cedexx.net with subject "Cancellation", full name, DOB, email, and address. Processed promptly with confirmation reply.',
-    supportDesk: 'Member support email: support@cedexx.net | Toll-Free: (888) 260-0585 | Local Desk: (754) 432-2201 (Mon-Fri 9am-6pm EST).',
+    supportDesk: 'Member support email: support@cedexx.net | Toll-Free: (754) 432-2201 | Local Desk: (754) 432-2201 (Mon-Fri 9am-6pm EST).',
   },
 
   blogArticles: [

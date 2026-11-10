@@ -45,7 +45,7 @@ COMPANY & FOUR PILLARS:
   * CarePlus™ Individual $24.99/mo | CarePlus™ Family $32.99/mo (Urgent Care + Mental Health)
   * CareComplete™ Individual $37.99/mo | CareComplete™ Family $52.99/mo (Primary Care + Urgent Care + Mental Health + Labs)
 - Enterprise & Institutional Pricing: Custom Community, Workforce & Institutional Pricing (Custom Quote at cedexx.net/partners) for school districts, educational institutions, counties, municipalities, public agencies, employers, multifamily/student/senior housing, hospitality, associations, credit unions, and nonprofits.
-- Contact: Toll-Free (888) 260-0585, Local Desk (754) 432-2201 (Mon-Fri 9am-6pm EST), Email support@cedexx.net.
+- Contact: Toll-Free (754) 432-2201, Local Desk (754) 432-2201 (Mon-Fri 9am-6pm EST), Email support@cedexx.net.
 
 HOW IT WORKS & COMMUNICATION:
 1. Sign up at cedexx.net/enroll — you receive an immediate receipt from support@cedexx.net
@@ -64,7 +64,7 @@ IMPORTANT RULES:
 - Keep responses short (2-3 sentences max, no markdown)
 - Be warm, professional, and helpful
 - If they want to enroll, direct them to cedexx.net/enroll
-- If they need a human, connect them to (888) 260-0585 or (754) 432-2201 or support@cedexx.net
+- If they need a human, connect them to (754) 432-2201 or (754) 432-2201 or support@cedexx.net
 `;
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -121,7 +121,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.setHeader('Content-Type', 'text/xml');
     res.status(200).send(twiml(`
       <Say voice="Polly.Joanna">
-        I'm sorry, I'm having trouble understanding. Please visit ceedex dot net or call us at 888-260-0585 for assistance. Thank you for calling!
+        I'm sorry, I'm having trouble understanding. Please visit ceedex dot net or call us at 754-432-2201 for assistance. Thank you for calling!
       </Say>
       <Hangup/>
     `));
