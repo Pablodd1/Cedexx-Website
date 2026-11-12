@@ -776,9 +776,9 @@
       "lyric_synced": true,
       "lyric_synced_at": "2026-10-06T18:50:02.740Z",
       "lyric_user_id": 10453182,
-      "payment_failed_at": "2026-11-10T21:51:03.676Z",
+      "payment_failed_at": "2026-11-12T21:51:10.821Z",
       "last_failed_invoice_id": "in_1UYsD0RPzCKs3jKTCA0NXM8X",
-      "hosted_invoice_url": "https://invoice.stripe.com/i/acct_1Tr1f4RPzCKs3jKT/live_YWNjdF8xVHIxZjRSUHpDS3MzaktULF9WYTJIV1hTM0JibEJzREV2MmxYb0RYdWlYYjMyT2ptLDE4NDg4ODI2Mg0200dbp7XUVV?s=ap"
+      "hosted_invoice_url": "https://invoice.stripe.com/i/acct_1Tr1f4RPzCKs3jKT/live_YWNjdF8xVHIxZjRSUHpDS3MzaktULF9WYTJIV1hTM0JibEJzREV2MmxYb0RYdWlYYjMyT2ptLDE4NTA2MTA2OQ020076EcZThN?s=ap"
     },
     {
       "id": "mem_1792161110349_eiz0q3",
