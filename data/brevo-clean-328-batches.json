@@ -1,0 +1,2656 @@
+{
+  "updatedAt": "2026-11-13T15:52:27.569Z",
+  "totalVerified": 359,
+  "erasedCount": 10,
+  "erasedContacts": [
+    {
+      "id": "3226",
+      "email": "accounting@willismg.com",
+      "reason": "Dead domain (No MX record / ENODATA)"
+    },
+    {
+      "id": "3367",
+      "email": "info@willismg.com",
+      "reason": "Dead domain (No MX record / ENODATA)"
+    },
+    {
+      "id": "3259",
+      "email": "board@scwhoa.org",
+      "reason": "Non-existent domain (ENOTFOUND)"
+    },
+    {
+      "id": "3294",
+      "email": "cswhoatreasurer@gmai.com",
+      "reason": "Typo domain (gmai.com)"
+    },
+    {
+      "id": "3303",
+      "email": "dferg@games.com",
+      "reason": "No valid mail server (ENODATA)"
+    },
+    {
+      "id": "3548",
+      "email": "webmaster@veronapointehoa.com",
+      "reason": "System webmaster@ role trap"
+    },
+    {
+      "id": "3382",
+      "email": "joseph.a.myrda2.civ@mail.mil",
+      "reason": "Federal .mil military firewall"
+    },
+    {
+      "id": "3383",
+      "email": "joseph.myrda@dfas.mil",
+      "reason": "Federal .mil military firewall"
+    },
+    {
+      "id": "3272",
+      "email": "carlasue57@att.net",
+      "reason": "Hard Bounce on Batch 1 Send (AT&T mailbox inactive)"
+    },
+    {
+      "id": "3281",
+      "email": "chris9646@sbcglobal.net",
+      "reason": "Hard Bounce on Batch 1 Send (SBCGlobal mailbox inactive)"
+    }
+  ],
+  "batches": [
+    {
+      "batch": 1,
+      "label": "Day 1 (Today - Nov 13)",
+      "contacts": [
+        {
+          "id": "3222",
+          "email": "500khill@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3223",
+          "email": "ablatch@atlantaga.gov",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mxa-003fa601.gslb.pphosted.com"
+        },
+        {
+          "id": "3224",
+          "email": "acahhoa@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3225",
+          "email": "acc@chantarelle.org",
+          "firstName": "",
+          "lastName": "",
+          "mx": "chantarelle-org.mail.protection.outlook.com"
+        },
+        {
+          "id": "3227",
+          "email": "achoa@comcast.net",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx2.mxge.comcast.net"
+        },
+        {
+          "id": "3229",
+          "email": "ahmadb@mattehrg.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mattehrg-com.mail.protection.outlook.com"
+        },
+        {
+          "id": "3230",
+          "email": "aimee.cehoa@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3231",
+          "email": "allensmith0620@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3232",
+          "email": "amber@choicemanagementsolutions.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "choicemanagementsolutions-com.mail.protection.outlook.com"
+        },
+        {
+          "id": "3233",
+          "email": "amberiu99@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3234",
+          "email": "amberridge@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3235",
+          "email": "amg@sdamg.net",
+          "firstName": "",
+          "lastName": "",
+          "mx": "sdamg-net.mail.protection.outlook.com"
+        },
+        {
+          "id": "3236",
+          "email": "amthoa@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3237",
+          "email": "andrewk@blackhawk-hoa.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "blackhawkhoa-com02c.mail.protection.outlook.com"
+        },
+        {
+          "id": "3238",
+          "email": "angielamblake@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3239",
+          "email": "aphillipscitybusiness@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3240",
+          "email": "applecreekpoa@yahoo.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mta6.am0.yahoodns.net"
+        },
+        {
+          "id": "3241",
+          "email": "april@aprilthomasandassociates.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "aprilthomasandassociates-com.mail.protection.outlook.com"
+        },
+        {
+          "id": "3242",
+          "email": "april_hlpoa@iendeavor.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mail.iendeavor.com"
+        },
+        {
+          "id": "3243",
+          "email": "arborlanehoa16@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3244",
+          "email": "arborsonbluffhoa@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3245",
+          "email": "archeri2002@yahoo.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mta6.am0.yahoodns.net"
+        },
+        {
+          "id": "3246",
+          "email": "arlingtonmeadows.hoa@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3247",
+          "email": "arnwoodhoa@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3248",
+          "email": "asburyknollhoa@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3249",
+          "email": "audreymstrecker@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3250",
+          "email": "bartfox@comcast.net",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx2.mxge.comcast.net"
+        },
+        {
+          "id": "3251",
+          "email": "bayberryvillage@outlook.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "outlook-com.olc.protection.outlook.com"
+        },
+        {
+          "id": "3252",
+          "email": "bbaird426@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3253",
+          "email": "begin@actionlife.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mxa-0088e401.gslb.pphosted.com"
+        },
+        {
+          "id": "3254",
+          "email": "blackhawk@blackhawk-hoa.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "blackhawkhoa-com02c.mail.protection.outlook.com"
+        },
+        {
+          "id": "3255",
+          "email": "bmurphy@monumentcompanies.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "monumentcompanies-com.mail.protection.outlook.com"
+        },
+        {
+          "id": "3261",
+          "email": "bobfodstad@hotmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "hotmail-com.olc.protection.outlook.com"
+        },
+        {
+          "id": "3262",
+          "email": "bradley.rochford@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3263",
+          "email": "bridgewood_homeowners@yahoo.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mta6.am0.yahoodns.net"
+        },
+        {
+          "id": "3264",
+          "email": "brownsmillparkca@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3265",
+          "email": "brysls@yahoo.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mta6.am0.yahoodns.net"
+        },
+        {
+          "id": "3266",
+          "email": "bwhite@indyami.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "indyami-com.mail.protection.outlook.com"
+        },
+        {
+          "id": "3267",
+          "email": "c.watkins@att.net",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx-att.mail.am0.yahoodns.net"
+        },
+        {
+          "id": "3269",
+          "email": "cbaute7@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3270",
+          "email": "cdevans@indybluesky.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "aspmx2.googlemail.com"
+        },
+        {
+          "id": "3271",
+          "email": "centuryglenhoa@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3272",
+          "email": "cfoggatt-mail@yahoo.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mta6.am0.yahoodns.net"
+        },
+        {
+          "id": "3273",
+          "email": "chair@nputatlanta.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "smtp.google.com"
+        },
+        {
+          "id": "3274",
+          "email": "cherylbtroyer@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3275",
+          "email": "chris.collins9646@outlook.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "outlook-com.olc.protection.outlook.com"
+        },
+        {
+          "id": "3276",
+          "email": "chris.elliott@fsresidential.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "fsresidential-com.mail.protection.outlook.com"
+        },
+        {
+          "id": "3278",
+          "email": "chris@elitemanagement.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "elitemanagement-com.mail.protection.outlook.com"
+        }
+      ]
+    },
+    {
+      "batch": 2,
+      "label": "Day 2 (Nov 14)",
+      "contacts": [
+        {
+          "id": "3279",
+          "email": "chrisharder63@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3280",
+          "email": "chucknkatie0725@att.net",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx-att.mail.am0.yahoodns.net"
+        },
+        {
+          "id": "3281",
+          "email": "closings@ardsleymgmt.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "ardsleymgmt-com.mail.protection.outlook.com"
+        },
+        {
+          "id": "3282",
+          "email": "cmlowden@aol.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx-aol.mail.gm0.yahoodns.net"
+        },
+        {
+          "id": "3283",
+          "email": "communications@sequoyahhome.org",
+          "firstName": "",
+          "lastName": "",
+          "mx": "sequoyahhome.org"
+        },
+        {
+          "id": "3284",
+          "email": "communitycare@actionlife.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mxa-0088e401.gslb.pphosted.com"
+        },
+        {
+          "id": "3286",
+          "email": "countrysidejess@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3287",
+          "email": "crybanks@iupui.edu",
+          "firstName": "",
+          "lastName": "",
+          "mx": "iupui-edu.mail.protection.outlook.com"
+        },
+        {
+          "id": "3288",
+          "email": "cservice@cidcllc.us",
+          "firstName": "",
+          "lastName": "",
+          "mx": "cidcllc-us.mail.protection.outlook.com"
+        },
+        {
+          "id": "3289",
+          "email": "cswhoaatlarge@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3290",
+          "email": "cswhoaboard@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3291",
+          "email": "cswhoaboards@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3292",
+          "email": "cswhoapresident@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3293",
+          "email": "cswhoasecretary@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3295",
+          "email": "cswhoavicepresident@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3296",
+          "email": "customerservice@cas-indiana.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "casindiana-com0i.mail.protection.outlook.com"
+        },
+        {
+          "id": "3297",
+          "email": "danvan46@comcast.net",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx2.mxge.comcast.net"
+        },
+        {
+          "id": "3298",
+          "email": "daved38@outlook.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "outlook-com.olc.protection.outlook.com"
+        },
+        {
+          "id": "3299",
+          "email": "david.nurkiewicz@pearson.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "pearson-com.mail.protection.outlook.com"
+        },
+        {
+          "id": "3300",
+          "email": "david@zoorob.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx01.ionos.com"
+        },
+        {
+          "id": "3301",
+          "email": "davidstuckey05@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3302",
+          "email": "derrick@oaktreeprops.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "aspmx.l.google.com"
+        },
+        {
+          "id": "3304",
+          "email": "dg099@aol.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx-aol.mail.gm0.yahoodns.net"
+        },
+        {
+          "id": "3305",
+          "email": "dgrogers421@earthlink.net",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx04.earthlink-vadesecure.net"
+        },
+        {
+          "id": "3306",
+          "email": "dianaj_tompkins@yahoo.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mta6.am0.yahoodns.net"
+        },
+        {
+          "id": "3307",
+          "email": "directory@ssrchoa.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx02.hoa.email"
+        },
+        {
+          "id": "3308",
+          "email": "diroycraft@sbcglobal.net",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx-att.mail.am0.yahoodns.net"
+        },
+        {
+          "id": "3309",
+          "email": "dlawson41@hotmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "hotmail-com.olc.protection.outlook.com"
+        },
+        {
+          "id": "3310",
+          "email": "dmarkovich@indyami.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "indyami-com.mail.protection.outlook.com"
+        },
+        {
+          "id": "3311",
+          "email": "donalea@mylordon.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mylordon-com.mail.protection.outlook.com"
+        },
+        {
+          "id": "3312",
+          "email": "dontwintowers@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3313",
+          "email": "donydunn@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3314",
+          "email": "draboyd@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3315",
+          "email": "droccaforte@msn.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "msn-com.olc.protection.outlook.com"
+        },
+        {
+          "id": "3316",
+          "email": "drpowers@indybluesky.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "aspmx2.googlemail.com"
+        },
+        {
+          "id": "3317",
+          "email": "duesrequest@mainstreetmanagementllc.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mainstreetmanagementllc-com.inbound.emailservice.co"
+        },
+        {
+          "id": "3318",
+          "email": "duncanhuse@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3319",
+          "email": "dvasquez@atlantaga.gov",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mxa-003fa601.gslb.pphosted.com"
+        },
+        {
+          "id": "3320",
+          "email": "eahindy@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3321",
+          "email": "edgar@dpghoa.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt1.aspmx.l.google.com"
+        },
+        {
+          "id": "3322",
+          "email": "emily@communitasinc.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "communitasinc-com.mail.protection.outlook.com"
+        },
+        {
+          "id": "3323",
+          "email": "environmental@sequoyahhome.org",
+          "firstName": "",
+          "lastName": "",
+          "mx": "sequoyahhome.org"
+        },
+        {
+          "id": "3324",
+          "email": "escrow@actionlife.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mxa-0088e401.gslb.pphosted.com"
+        },
+        {
+          "id": "3325",
+          "email": "escrow@cidcllc.us",
+          "firstName": "",
+          "lastName": "",
+          "mx": "cidcllc-us.mail.protection.outlook.com"
+        },
+        {
+          "id": "3326",
+          "email": "evanschuck1@aol.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx-aol.mail.gm0.yahoodns.net"
+        },
+        {
+          "id": "3327",
+          "email": "ezlaty@cas-indiana.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "casindiana-com0i.mail.protection.outlook.com"
+        },
+        {
+          "id": "3328",
+          "email": "fallcreekplace@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3329",
+          "email": "featherstone2hoa@yahoo.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mta6.am0.yahoodns.net"
+        },
+        {
+          "id": "3330",
+          "email": "feedback@ssrchoa.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx02.hoa.email"
+        },
+        {
+          "id": "3331",
+          "email": "finance@chantarelle.org",
+          "firstName": "",
+          "lastName": "",
+          "mx": "chantarelle-org.mail.protection.outlook.com"
+        },
+        {
+          "id": "3332",
+          "email": "focusreannie@sbcglobal.net",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx-att.mail.am0.yahoodns.net"
+        },
+        {
+          "id": "3333",
+          "email": "fridding@indy.rr.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "chr-west.mx.a.cloudfilter.net"
+        },
+        {
+          "id": "3334",
+          "email": "garrity7114@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3335",
+          "email": "gary.skillett@zurichna.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "tempmx2.zurichna.com"
+        },
+        {
+          "id": "3336",
+          "email": "gatewaywesthoa@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3337",
+          "email": "geistwoodsestateshoa@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3338",
+          "email": "geremy@360hoa.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "360hoa-com.mail.protection.outlook.com"
+        },
+        {
+          "id": "3339",
+          "email": "ginosgro220@hotmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "hotmail-com.olc.protection.outlook.com"
+        },
+        {
+          "id": "3340",
+          "email": "glenroseneighbors@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3341",
+          "email": "harvesterindy71@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3342",
+          "email": "heathelyn@hotmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "hotmail-com.olc.protection.outlook.com"
+        },
+        {
+          "id": "3343",
+          "email": "heatherwoodhoa@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3344",
+          "email": "heathstonehoa@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3345",
+          "email": "hedoc52@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3346",
+          "email": "hherron@litchfieldmgmt.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt4.aspmx.l.google.com"
+        }
+      ]
+    },
+    {
+      "batch": 3,
+      "label": "Day 3 (Nov 15)",
+      "contacts": [
+        {
+          "id": "3347",
+          "email": "hoa-board@spyglassfallshoa.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx1.emailsrvr.com"
+        },
+        {
+          "id": "3348",
+          "email": "hoa.secretary@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3351",
+          "email": "hoaauburnhills@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3352",
+          "email": "hoaduesrequest@omni-property.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "omniproperty-com01b.mail.eo.outlook.com"
+        },
+        {
+          "id": "3353",
+          "email": "hoafeather1@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3354",
+          "email": "hoamanager@elitepmgt.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "elitepmgt-com.mail.protection.outlook.com"
+        },
+        {
+          "id": "3355",
+          "email": "hoascw.atlarge@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3356",
+          "email": "hoascw.boardtreasurer@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3357",
+          "email": "hoascw.vp@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3358",
+          "email": "hoascw@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3359",
+          "email": "holly.maddalena@fsresidential.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "fsresidential-com.mail.protection.outlook.com"
+        },
+        {
+          "id": "3360",
+          "email": "homeowners@yourhoahelp.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt4.aspmx.l.google.com"
+        },
+        {
+          "id": "3361",
+          "email": "hrhaplainfield@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3362",
+          "email": "hunterspointehoa46143@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3368",
+          "email": "jamesanicely@aol.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx-aol.mail.gm0.yahoodns.net"
+        },
+        {
+          "id": "3369",
+          "email": "janet@hammer-realestate.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx2-usg2.ppe-hosted.com"
+        },
+        {
+          "id": "3370",
+          "email": "jarnoldin@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3371",
+          "email": "jchhillis@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3372",
+          "email": "jdavis331@comcast.net",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx2.mxge.comcast.net"
+        },
+        {
+          "id": "3373",
+          "email": "jdhilton@alumni.iu.edu",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.aspmx.l.google.com"
+        },
+        {
+          "id": "3374",
+          "email": "jenniferburkle@hotmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "hotmail-com.olc.protection.outlook.com"
+        },
+        {
+          "id": "3375",
+          "email": "jgroves@ardsleymgmt.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "ardsleymgmt-com.mail.protection.outlook.com"
+        },
+        {
+          "id": "3376",
+          "email": "jhbaggerly@att.net",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx-att.mail.am0.yahoodns.net"
+        },
+        {
+          "id": "3377",
+          "email": "jimg.stonebraehoa@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3378",
+          "email": "jimjr@cmsmgmt.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "d194730b.ess.barracudanetworks.com"
+        },
+        {
+          "id": "3379",
+          "email": "jmoore26@indy.rr.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "chr-west.mx.a.cloudfilter.net"
+        },
+        {
+          "id": "3380",
+          "email": "jodytzucker@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3381",
+          "email": "jonathan.delatorre@nsc.team",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt4.aspmx.l.google.com"
+        },
+        {
+          "id": "3384",
+          "email": "joywilsonx@sbcglobal.net",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx-att.mail.am0.yahoodns.net"
+        },
+        {
+          "id": "3385",
+          "email": "jrc2arc1@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3386",
+          "email": "jrc2arc2@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3387",
+          "email": "jrc2arc3@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3388",
+          "email": "jrc2preservationpers2@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3389",
+          "email": "jrc2president1@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3390",
+          "email": "jrc2secretary@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3391",
+          "email": "jrc2treasurer2@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3392",
+          "email": "jrc2vp@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3393",
+          "email": "js46214@ameritech.net",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx-att.mail.am0.yahoodns.net"
+        },
+        {
+          "id": "3394",
+          "email": "jstaples@atlantaga.gov",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mxa-003fa601.gslb.pphosted.com"
+        },
+        {
+          "id": "3395",
+          "email": "judyandmike@colby.net",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx.netidentity.com.cust.hostedemail.com"
+        },
+        {
+          "id": "3396",
+          "email": "jwillilwilli@att.net",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx-att.mail.am0.yahoodns.net"
+        },
+        {
+          "id": "3397",
+          "email": "jwinecpa@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3398",
+          "email": "kathibridgewater@sbcglobal.net",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx-att.mail.am0.yahoodns.net"
+        },
+        {
+          "id": "3399",
+          "email": "kathleenlupke@hotmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "hotmail-com.olc.protection.outlook.com"
+        },
+        {
+          "id": "3400",
+          "email": "kcase@jgregallen.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "jgregallen-com.mail.eo.outlook.com"
+        },
+        {
+          "id": "3401",
+          "email": "kdaigle@actionlife.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mxa-0088e401.gslb.pphosted.com"
+        },
+        {
+          "id": "3402",
+          "email": "kelly@ark-management.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "arkmanagement-com0i.mail.protection.outlook.com"
+        },
+        {
+          "id": "3403",
+          "email": "kelly@armourproperty.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "armourproperty-com.mail.protection.outlook.com"
+        },
+        {
+          "id": "3404",
+          "email": "kevinmtwintowershoa@yahoo.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mta6.am0.yahoodns.net"
+        },
+        {
+          "id": "3405",
+          "email": "kjhome58@yahoo.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mta6.am0.yahoodns.net"
+        },
+        {
+          "id": "3406",
+          "email": "kmcquay@blueandco.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "us-smtp-inbound-1.mimecast.com"
+        },
+        {
+          "id": "3407",
+          "email": "kmholmes@atlantaga.gov",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mxa-003fa601.gslb.pphosted.com"
+        },
+        {
+          "id": "3408",
+          "email": "korzekwaf@sbcglobal.net",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx-att.mail.am0.yahoodns.net"
+        },
+        {
+          "id": "3409",
+          "email": "kpernet@yahoo.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mta6.am0.yahoodns.net"
+        },
+        {
+          "id": "3410",
+          "email": "kreddick@atlantaga.gov",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mxa-003fa601.gslb.pphosted.com"
+        },
+        {
+          "id": "3411",
+          "email": "ktspenc@sbcglobal.net",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx-att.mail.am0.yahoodns.net"
+        },
+        {
+          "id": "3412",
+          "email": "landscape@chantarelle.org",
+          "firstName": "",
+          "lastName": "",
+          "mx": "chantarelle-org.mail.protection.outlook.com"
+        },
+        {
+          "id": "3413",
+          "email": "lanetwintowers@outlook.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "outlook-com.olc.protection.outlook.com"
+        },
+        {
+          "id": "3414",
+          "email": "lanpc@michiana.org",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mail.mangobay.com"
+        },
+        {
+          "id": "3415",
+          "email": "lanternoverlook@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3416",
+          "email": "larryd.baker@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3417",
+          "email": "lcarter@actionlife.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mxa-0088e401.gslb.pphosted.com"
+        },
+        {
+          "id": "3418",
+          "email": "lclark7339@yahoo.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mta6.am0.yahoodns.net"
+        },
+        {
+          "id": "3419",
+          "email": "lewis.jerry@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3420",
+          "email": "lgordon.cehoa@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3421",
+          "email": "lgreene@peopleunitedfoundation.org",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx1.mailchannels.net"
+        },
+        {
+          "id": "3422",
+          "email": "libertygrovehoa@outlook.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "outlook-com.olc.protection.outlook.com"
+        },
+        {
+          "id": "3423",
+          "email": "lijones@elwood.k12.in.us",
+          "firstName": "",
+          "lastName": "",
+          "mx": "ASPMX.L.GOOGLE.com"
+        },
+        {
+          "id": "3424",
+          "email": "lindaglaze@sbcglobal.net",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx-att.mail.am0.yahoodns.net"
+        },
+        {
+          "id": "3425",
+          "email": "lisa.cehoa@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        }
+      ]
+    },
+    {
+      "batch": 4,
+      "label": "Day 4 (Nov 16)",
+      "contacts": [
+        {
+          "id": "3426",
+          "email": "lonerojackie@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3427",
+          "email": "managerassistanthelp@actionlife.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mxa-0088e401.gslb.pphosted.com"
+        },
+        {
+          "id": "3428",
+          "email": "margo@ch-pm.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "chpm-com0e.mail.protection.outlook.com"
+        },
+        {
+          "id": "3429",
+          "email": "markdlewis78@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3430",
+          "email": "marks42@iendeavor.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mail.iendeavor.com"
+        },
+        {
+          "id": "3431",
+          "email": "mchristoffersen@actionlife.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mxa-0088e401.gslb.pphosted.com"
+        },
+        {
+          "id": "3432",
+          "email": "melissaemilyhoa@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3433",
+          "email": "melissap@blackhawk-hoa.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "blackhawkhoa-com02c.mail.protection.outlook.com"
+        },
+        {
+          "id": "3434",
+          "email": "mika.prow@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3435",
+          "email": "mjones@avalonweb.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "smtp.google.com"
+        },
+        {
+          "id": "3436",
+          "email": "mm@koseneandkosene.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "usa.mx2.mx25.net"
+        },
+        {
+          "id": "3437",
+          "email": "mmockus@cas-indiana.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "casindiana-com0i.mail.protection.outlook.com"
+        },
+        {
+          "id": "3438",
+          "email": "mohamed@ocmanagementllc.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "ocmanagementllc-com.mail.protection.outlook.com"
+        },
+        {
+          "id": "3439",
+          "email": "mr.josh.king@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3440",
+          "email": "mrmac@aol.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx-aol.mail.gm0.yahoodns.net"
+        },
+        {
+          "id": "3441",
+          "email": "mtdean88@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3442",
+          "email": "mtdeering@sbcglobal.net",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx-att.mail.am0.yahoodns.net"
+        },
+        {
+          "id": "3443",
+          "email": "mtodisco32@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3444",
+          "email": "natcarson@atlantaga.gov",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mxa-003fa601.gslb.pphosted.com"
+        },
+        {
+          "id": "3445",
+          "email": "nazh@blackhawk-hoa.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "blackhawkhoa-com02c.mail.protection.outlook.com"
+        },
+        {
+          "id": "3446",
+          "email": "nchazin@apsmanagement.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "apsmanagement-com.mail.protection.outlook.com"
+        },
+        {
+          "id": "3447",
+          "email": "newkirkjackie@yahoo.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mta6.am0.yahoodns.net"
+        },
+        {
+          "id": "3448",
+          "email": "news@chantarelle.org",
+          "firstName": "",
+          "lastName": "",
+          "mx": "chantarelle-org.mail.protection.outlook.com"
+        },
+        {
+          "id": "3449",
+          "email": "newsletter@ssrchoa.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx02.hoa.email"
+        },
+        {
+          "id": "3450",
+          "email": "njcoughlan@sbcglobal.net",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx-att.mail.am0.yahoodns.net"
+        },
+        {
+          "id": "3451",
+          "email": "nlobo@gpresorts.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mxa-00387001.gslb.pphosted.com"
+        },
+        {
+          "id": "3452",
+          "email": "norman-stuart@sbcglobal.net",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx-att.mail.am0.yahoodns.net"
+        },
+        {
+          "id": "3453",
+          "email": "norman.reed@att.net",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx-att.mail.am0.yahoodns.net"
+        },
+        {
+          "id": "3454",
+          "email": "npukatlanta@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3455",
+          "email": "npuzatlanta@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3457",
+          "email": "operations@bayviewmgmt.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "bayviewmgmt-com.mail.protection.outlook.com"
+        },
+        {
+          "id": "3458",
+          "email": "palo@pdaw.org",
+          "firstName": "",
+          "lastName": "",
+          "mx": "pdaw-org.mail.protection.outlook.com"
+        },
+        {
+          "id": "3459",
+          "email": "patti@corvusmc.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "corvusmc-com.mail.protection.outlook.com"
+        },
+        {
+          "id": "3460",
+          "email": "paul@strongmgt.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "aspmx.l.google.com"
+        },
+        {
+          "id": "3461",
+          "email": "paulbrady5@comcast.net",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx2.mxge.comcast.net"
+        },
+        {
+          "id": "3462",
+          "email": "pegasus.properties@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3463",
+          "email": "peninsulaverde@cox.net",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mta5.am0.yahoodns.net"
+        },
+        {
+          "id": "3464",
+          "email": "phyrnk@yahoo.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mta6.am0.yahoodns.net"
+        },
+        {
+          "id": "3465",
+          "email": "piercee317@att.net",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx-att.mail.am0.yahoodns.net"
+        },
+        {
+          "id": "3466",
+          "email": "pinespringshoa@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3467",
+          "email": "pinewoodshoa@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3468",
+          "email": "plainfieldwalnuthill@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3469",
+          "email": "plumcreeknorthhoa@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3472",
+          "email": "preslex1@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3473",
+          "email": "promenadevillashoa@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3474",
+          "email": "rachelle@ccandrs.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx2-us1.ppe-hosted.com"
+        },
+        {
+          "id": "3475",
+          "email": "raeann_moore@yahoo.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mta6.am0.yahoodns.net"
+        },
+        {
+          "id": "3476",
+          "email": "rajiv4sandcreekhoa@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3477",
+          "email": "ramburgey3@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3478",
+          "email": "randy@mcpikeinsurance.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mcpikeinsurance-com.mail.protection.outlook.com"
+        },
+        {
+          "id": "3479",
+          "email": "rebadrees@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3480",
+          "email": "receivables@elitepmgt.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "elitepmgt-com.mail.protection.outlook.com"
+        },
+        {
+          "id": "3481",
+          "email": "reneepasta@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3482",
+          "email": "resosflw@verizon.net",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx-aol.mail.gm0.yahoodns.net"
+        },
+        {
+          "id": "3483",
+          "email": "richard@arrc-capital.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "arrccapital-com01b.mail.protection.outlook.com"
+        },
+        {
+          "id": "3484",
+          "email": "richard@cprindy.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "cprindy-com.mail.protection.outlook.com"
+        },
+        {
+          "id": "3485",
+          "email": "riverrun.hoa.treasury@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3486",
+          "email": "rlindley@capincrouse.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "capincrouse-com.mail.protection.outlook.com"
+        },
+        {
+          "id": "3487",
+          "email": "robertbrian1969@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3488",
+          "email": "robertsridgearchitecture@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3489",
+          "email": "robertsridgehoa@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3490",
+          "email": "rodkarg@yahoo.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mta6.am0.yahoodns.net"
+        },
+        {
+          "id": "3491",
+          "email": "rosedaleheightsatl@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3492",
+          "email": "roy@rrayconsulting.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "aspmx.l.google.com"
+        },
+        {
+          "id": "3493",
+          "email": "rpv.choa@outlook.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "outlook-com.olc.protection.outlook.com"
+        },
+        {
+          "id": "3494",
+          "email": "rules@ssrchoa.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx02.hoa.email"
+        },
+        {
+          "id": "3495",
+          "email": "russcourtney@att.net",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx-att.mail.am0.yahoodns.net"
+        },
+        {
+          "id": "3496",
+          "email": "safety@sequoyahhome.org",
+          "firstName": "",
+          "lastName": "",
+          "mx": "sequoyahhome.org"
+        },
+        {
+          "id": "3497",
+          "email": "sandcreekfarmshoajamey@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3498",
+          "email": "sandra.pruitt@live.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "live-com.olc.protection.outlook.com"
+        }
+      ]
+    },
+    {
+      "batch": 5,
+      "label": "Day 5 (Nov 17)",
+      "contacts": [
+        {
+          "id": "3499",
+          "email": "sargentcreek@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3500",
+          "email": "scfhoashawn@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3501",
+          "email": "securebooks@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3502",
+          "email": "serenav@blackhawk-hoa.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "blackhawkhoa-com02c.mail.protection.outlook.com"
+        },
+        {
+          "id": "3503",
+          "email": "sfrazier@omni-property.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "omniproperty-com01b.mail.eo.outlook.com"
+        },
+        {
+          "id": "3504",
+          "email": "shuel@comcast.net",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx2.mxge.comcast.net"
+        },
+        {
+          "id": "3505",
+          "email": "silversands@drminternet.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "drminternet-com.mail.protection.outlook.com"
+        },
+        {
+          "id": "3506",
+          "email": "sirohnke@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3507",
+          "email": "skforgeng@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3508",
+          "email": "smmead@frontier.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mta5.am0.yahoodns.net"
+        },
+        {
+          "id": "3509",
+          "email": "smstonebraehoa@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3510",
+          "email": "social@sequoyahhome.org",
+          "firstName": "",
+          "lastName": "",
+          "mx": "sequoyahhome.org"
+        },
+        {
+          "id": "3511",
+          "email": "southrivergardens@aol.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx-aol.mail.gm0.yahoodns.net"
+        },
+        {
+          "id": "3512",
+          "email": "southsideccpresident@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3513",
+          "email": "spaulding.4@nd.edu",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt3.aspmx.l.google.com"
+        },
+        {
+          "id": "3514",
+          "email": "sphomeunited@yahoo.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mta6.am0.yahoodns.net"
+        },
+        {
+          "id": "3515",
+          "email": "springknollpoaboard@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3516",
+          "email": "stanlynnschill@comcast.net",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx2.mxge.comcast.net"
+        },
+        {
+          "id": "3517",
+          "email": "staylornp@icloud.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx01.mail.icloud.com"
+        },
+        {
+          "id": "3518",
+          "email": "steve@collinsindianarealty.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt1.aspmx.l.google.com"
+        },
+        {
+          "id": "3519",
+          "email": "steven@hoasmanagement.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "aspmx.l.google.com"
+        },
+        {
+          "id": "3520",
+          "email": "stevewitwer@att.net",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx-att.mail.am0.yahoodns.net"
+        },
+        {
+          "id": "3521",
+          "email": "stockach@aol.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx-aol.mail.gm0.yahoodns.net"
+        },
+        {
+          "id": "3522",
+          "email": "sue_wells@comcast.net",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx2.mxge.comcast.net"
+        },
+        {
+          "id": "3523",
+          "email": "summerfieldpoway@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3524",
+          "email": "susanharless@sbcglobal.net",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx-att.mail.am0.yahoodns.net"
+        },
+        {
+          "id": "3525",
+          "email": "swebb@homesandhomesites.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx1-usg2.ppe-hosted.com"
+        },
+        {
+          "id": "3526",
+          "email": "swhite5231310@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3527",
+          "email": "tami@armourproperty.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "armourproperty-com.mail.protection.outlook.com"
+        },
+        {
+          "id": "3528",
+          "email": "tami@indycrossroads.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "indycrossroads-com.mail.protection.outlook.com"
+        },
+        {
+          "id": "3529",
+          "email": "tatkins@omni-property.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "omniproperty-com01b.mail.eo.outlook.com"
+        },
+        {
+          "id": "3530",
+          "email": "td858@hotmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "hotmail-com.olc.protection.outlook.com"
+        },
+        {
+          "id": "3531",
+          "email": "terikeesler@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3532",
+          "email": "terry.musso@yahoo.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mta6.am0.yahoodns.net"
+        },
+        {
+          "id": "3533",
+          "email": "tfernandezfspm@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3534",
+          "email": "theboard@oakhillshoa.org",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt4.aspmx.l.google.com"
+        },
+        {
+          "id": "3535",
+          "email": "timbleasdaletthoa@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3536",
+          "email": "tomdominy@outlook.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "outlook-com.olc.protection.outlook.com"
+        },
+        {
+          "id": "3537",
+          "email": "tonyjorgetwintowersboard@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3538",
+          "email": "topaz3@att.net",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx-att.mail.am0.yahoodns.net"
+        },
+        {
+          "id": "3539",
+          "email": "totoo@atlantaga.gov",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mxa-003fa601.gslb.pphosted.com"
+        },
+        {
+          "id": "3540",
+          "email": "traci@grgmgmt.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx2-us1.ppe-hosted.com"
+        },
+        {
+          "id": "3542",
+          "email": "tscg@sbcglobal.net",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx-att.mail.am0.yahoodns.net"
+        },
+        {
+          "id": "3543",
+          "email": "vicki@indyami.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "indyami-com.mail.protection.outlook.com"
+        },
+        {
+          "id": "3544",
+          "email": "walnutridgewestfield@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3545",
+          "email": "wanat@peoplepc.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx01.earthlink-vadesecure.net"
+        },
+        {
+          "id": "3546",
+          "email": "warrenlakeshoa@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3547",
+          "email": "watsonfarmshoa@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3549",
+          "email": "westonridgecottages@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3550",
+          "email": "whhoabod@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3551",
+          "email": "windingcreek.hoa@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3552",
+          "email": "woodgateglenhoa@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3553",
+          "email": "wpritt@sbcglobal.net",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx-att.mail.am0.yahoodns.net"
+        },
+        {
+          "id": "3554",
+          "email": "wstevensharp@gmail.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.gmail-smtp-in.l.google.com"
+        },
+        {
+          "id": "3555",
+          "email": "wyoung4078@yahoo.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mta6.am0.yahoodns.net"
+        },
+        {
+          "id": "3556",
+          "email": "zibby@arrow-re.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "arrowre-com01c.mail.protection.outlook.com"
+        },
+        {
+          "id": "3557",
+          "email": "zoning@nputatlanta.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "smtp.google.com"
+        },
+        {
+          "id": "3228",
+          "email": "admin@lindsaymgt.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "lindsaymgt-com.mail.protection.outlook.com"
+        },
+        {
+          "id": "3256",
+          "email": "board@arborgrovehoa.org",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx2.zoho.com"
+        },
+        {
+          "id": "3257",
+          "email": "board@ccwhoa.org",
+          "firstName": "",
+          "lastName": "",
+          "mx": "ccwhoa-org.mail.protection.outlook.com"
+        },
+        {
+          "id": "3258",
+          "email": "board@chantarelle.org",
+          "firstName": "",
+          "lastName": "",
+          "mx": "chantarelle-org.mail.protection.outlook.com"
+        },
+        {
+          "id": "3260",
+          "email": "board@veronapointehoa.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx.veronapointehoa.com"
+        },
+        {
+          "id": "3285",
+          "email": "contact@lifetimehoa.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "smtp.google.com"
+        },
+        {
+          "id": "3349",
+          "email": "hoa@pdaw.org",
+          "firstName": "",
+          "lastName": "",
+          "mx": "pdaw-org.mail.protection.outlook.com"
+        },
+        {
+          "id": "3350",
+          "email": "hoa@summerfieldpoway.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "smtp.secureserver.net"
+        },
+        {
+          "id": "3363",
+          "email": "info@hoaorganizers.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt2.aspmx.l.google.com"
+        },
+        {
+          "id": "3364",
+          "email": "info@indybluesky.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "aspmx2.googlemail.com"
+        },
+        {
+          "id": "3365",
+          "email": "info@ssrchoa.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx02.hoa.email"
+        },
+        {
+          "id": "3366",
+          "email": "info@veronapointehoa.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx.veronapointehoa.com"
+        },
+        {
+          "id": "3456",
+          "email": "office@oakhillshoa.org",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt4.aspmx.l.google.com"
+        },
+        {
+          "id": "3470",
+          "email": "president@atlantawestend.com",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt1.aspmx.l.google.com"
+        },
+        {
+          "id": "3471",
+          "email": "president@westviewatlanta.org",
+          "firstName": "",
+          "lastName": "",
+          "mx": "alt4.aspmx.l.google.com"
+        },
+        {
+          "id": "3541",
+          "email": "treasurer@austinwinds.org",
+          "firstName": "",
+          "lastName": "",
+          "mx": "mx2.spacemail.com"
+        }
+      ]
+    },
+    {
+      "batch": 6,
+      "label": "Batch 6 — Multi-State Nonprofit & Community Partner Track (CA, GA, TX, FL, WA)",
+      "totalVerified": 33,
+      "primaryContactsCount": 28,
+      "secondarySameOrgCount": 5,
+      "erasedFromThisList": [
+        {
+          "email": "dlooper@georgiacharitablecarenetwork.org",
+          "company": "Georgia Charitable Care Network",
+          "reason": "Dead domain (No MX record / ENODATA)"
+        }
+      ],
+      "contacts": [
+        {
+          "email": "californiafamilyresource@gmail.com",
+          "firstName": "CFRA Team",
+          "company": "California Family Resource Association",
+          "state": "California",
+          "focus": "Family resource network",
+          "primary": true
+        },
+        {
+          "email": "office@namisacramento.org",
+          "firstName": "NAMI Sacramento Team",
+          "company": "NAMI Sacramento",
+          "state": "California",
+          "focus": "Mental-health education and family support",
+          "primary": true
+        },
+        {
+          "email": "info@namisb.org",
+          "firstName": "NAMI San Bernardino Team",
+          "company": "NAMI San Bernardino Area",
+          "state": "California",
+          "focus": "Mental-health education and family support",
+          "primary": true
+        },
+        {
+          "email": "info@namiventura.org",
+          "firstName": "NAMI Ventura Team",
+          "company": "NAMI Ventura County",
+          "state": "California",
+          "focus": "Mental-health education and family support",
+          "primary": true
+        },
+        {
+          "email": "info@namiurbanla.org",
+          "firstName": "NAMI Urban LA Team",
+          "company": "NAMI Urban Los Angeles",
+          "state": "California",
+          "focus": "Mental-health education and family support",
+          "primary": true
+        },
+        {
+          "email": "info@tccfamilyhealth.org",
+          "firstName": "TCC Family Health Team",
+          "company": "TCC Family Health",
+          "state": "California",
+          "focus": "Family health and community services",
+          "primary": true
+        },
+        {
+          "email": "info@ca211.org",
+          "firstName": "211 California Team",
+          "company": "211 California",
+          "state": "California",
+          "focus": "Statewide health and human-services referral network",
+          "primary": true
+        },
+        {
+          "email": "mbyron@fsn-oc.org",
+          "firstName": "M. Byron",
+          "company": "Family Support Network (Orange County)",
+          "state": "California",
+          "focus": "Family support and wellness services",
+          "primary": true
+        },
+        {
+          "email": "wellness@groveparkatlanta.com",
+          "firstName": "Wellness Committee",
+          "company": "Grove Park Neighborhood Association",
+          "state": "Georgia",
+          "focus": "Community wellness programming",
+          "primary": true
+        },
+        {
+          "email": "hello@groveparkatlanta.com",
+          "firstName": "Grove Park Team",
+          "company": "Grove Park Neighborhood Association",
+          "state": "Georgia",
+          "focus": "Neighborhood/community organization",
+          "primary": false,
+          "note": "Secondary inbox at Grove Park Atlanta (send only if wellness@ does not reply)"
+        },
+        {
+          "email": "president@eaca.net",
+          "firstName": "EACA Leadership",
+          "company": "East Atlanta Community Association",
+          "state": "Georgia",
+          "focus": "Neighborhood/community organization",
+          "primary": true
+        },
+        {
+          "email": "president@gpna.org",
+          "firstName": "GPNA Leadership",
+          "company": "Grant Park Neighborhood Association",
+          "state": "Georgia",
+          "focus": "Neighborhood/community organization",
+          "primary": true
+        },
+        {
+          "email": "info@midtownatlanta.org",
+          "firstName": "Midtown Atlanta Team",
+          "company": "Midtown Atlanta",
+          "state": "Georgia",
+          "focus": "Community and neighborhood organization",
+          "primary": true
+        },
+        {
+          "email": "atorres@thelaa.org",
+          "firstName": "A. Torres",
+          "company": "Georgia Latin American Association",
+          "state": "Georgia",
+          "focus": "Family and community services",
+          "primary": true
+        },
+        {
+          "email": "info@naacpga.org",
+          "firstName": "Georgia NAACP Team",
+          "company": "Georgia NAACP",
+          "state": "Georgia",
+          "focus": "Community advocacy and outreach",
+          "primary": true
+        },
+        {
+          "email": "calexander@tacfs.org",
+          "firstName": "C. Alexander",
+          "company": "Texas Family Support Network (TACFS)",
+          "state": "Texas",
+          "focus": "Family resource centers and family-strengthening network",
+          "primary": true
+        },
+        {
+          "email": "tcaldwell@tacfs.org",
+          "firstName": "T. Caldwell",
+          "company": "Texas Family Support Network (TACFS)",
+          "state": "Texas",
+          "focus": "Family resource centers and family-strengthening network",
+          "primary": false,
+          "note": "Secondary contact at TACFS (stagger 48h after calexander@tacfs.org)"
+        },
+        {
+          "email": "info@sowfamilyfoundation.org",
+          "firstName": "Sow Family Foundation Team",
+          "company": "Sow Family Foundation",
+          "state": "Texas",
+          "focus": "Housing stability, family support and community wellness",
+          "primary": true
+        },
+        {
+          "email": "business@cftexas.org",
+          "firstName": "Business Impact Team",
+          "company": "Communities Foundation of Texas",
+          "state": "Texas",
+          "focus": "Community and business impact initiatives",
+          "primary": true
+        },
+        {
+          "email": "communications@cftexas.org",
+          "firstName": "Communications Team",
+          "company": "Communities Foundation of Texas",
+          "state": "Texas",
+          "focus": "Community foundation and nonprofit network",
+          "primary": false,
+          "note": "Secondary inbox at CFTexas (stagger after business@cftexas.org)"
+        },
+        {
+          "email": "sperwaiz@flnonprofits.org",
+          "firstName": "S. Perwaiz",
+          "company": "Florida Nonprofit Alliance",
+          "state": "Florida",
+          "focus": "Statewide nonprofit network",
+          "primary": true
+        },
+        {
+          "email": "cbrown@cfbroward.org",
+          "firstName": "C. Brown",
+          "company": "Community Foundation of Broward",
+          "state": "Florida",
+          "focus": "Nonprofit capacity-building and community foundation",
+          "primary": true
+        },
+        {
+          "email": "tbeachy@cnencf.org",
+          "firstName": "T. Beachy",
+          "company": "Center for Nonprofit Excellence of North Central Florida",
+          "state": "Florida",
+          "focus": "Nonprofit capacity-building",
+          "primary": true
+        },
+        {
+          "email": "dlockhart@nonprofitctr.org",
+          "firstName": "D. Lockhart",
+          "company": "Nonprofit Center of Northeast Florida",
+          "state": "Florida",
+          "focus": "Nonprofit capacity-building and community network",
+          "primary": true
+        },
+        {
+          "email": "cimbergamo@nlctb.org",
+          "firstName": "C. Imbergamo",
+          "company": "Nonprofit Leadership Center of Tampa Bay",
+          "state": "Florida",
+          "focus": "Nonprofit leadership and capacity-building",
+          "primary": true
+        },
+        {
+          "email": "fernanda@philanthropymiami.org",
+          "firstName": "Fernanda",
+          "company": "Philanthropy Miami",
+          "state": "Florida",
+          "focus": "Philanthropy and nonprofit network",
+          "primary": true
+        },
+        {
+          "email": "tcrowetz@nonprofitsfirst.org",
+          "firstName": "T. Crowetz",
+          "company": "Nonprofits First",
+          "state": "Florida",
+          "focus": "Nonprofit leadership and capacity-building",
+          "primary": true
+        },
+        {
+          "email": "cmiller@miamifoundation.org",
+          "firstName": "C. Miller",
+          "company": "The Miami Foundation",
+          "state": "Florida",
+          "focus": "Community foundation and nonprofit network",
+          "primary": true
+        },
+        {
+          "email": "linda@wapartnership.org",
+          "firstName": "Linda",
+          "company": "Washington State Community Action Partnership",
+          "state": "Washington",
+          "focus": "Policy and outreach",
+          "primary": true
+        },
+        {
+          "email": "mia@wapartnership.org",
+          "firstName": "Mia",
+          "company": "Washington State Community Action Partnership",
+          "state": "Washington",
+          "focus": "Operations and engagement",
+          "primary": false,
+          "note": "Secondary contact at WA Partnership (stagger after linda@)"
+        },
+        {
+          "email": "info@wapartnership.org",
+          "firstName": "WSCAP Team",
+          "company": "Washington State Community Action Partnership",
+          "state": "Washington",
+          "focus": "Statewide community-action network",
+          "primary": false,
+          "note": "General inbox at WA Partnership (skip if linda@/mia@ are contacted)"
+        },
+        {
+          "email": "info@washingtoncan.org",
+          "firstName": "Washington CAN Team",
+          "company": "Washington Community Action Network",
+          "state": "Washington",
+          "focus": "Community advocacy and engagement",
+          "primary": true
+        },
+        {
+          "email": "sam.pike@akinfamily.org",
+          "firstName": "Sam",
+          "company": "Washington Family Support Network / Akin",
+          "state": "Washington",
+          "focus": "Statewide family resource center network",
+          "primary": true
+        }
+      ]
+    }
+  ]
+}
