@@ -1,7 +1,7 @@
 {
-  "updatedAt": "2026-11-13T15:52:27.569Z",
-  "totalVerified": 359,
-  "erasedCount": 10,
+  "updatedAt": "2026-11-14T16:55:49.845Z",
+  "totalVerified": 354,
+  "erasedCount": 15,
   "erasedContacts": [
     {
       "id": "3226",
@@ -52,6 +52,31 @@
       "id": "3281",
       "email": "chris9646@sbcglobal.net",
       "reason": "Hard Bounce on Batch 1 Send (SBCGlobal mailbox inactive)"
+    },
+    {
+      "id": "3291",
+      "email": "cswhoaboards@gmail.com",
+      "reason": "Hard Bounce on Batch 2 Send (Nov 14)"
+    },
+    {
+      "id": "3305",
+      "email": "dgrogers421@earthlink.net",
+      "reason": "Hard Bounce on Batch 2 Send (Nov 14)"
+    },
+    {
+      "id": "californiafamilyresource@gmail.com",
+      "email": "californiafamilyresource@gmail.com",
+      "reason": "Hard Bounce on Batch 6 Send (Nov 14)"
+    },
+    {
+      "id": "wellness@groveparkatlanta.com",
+      "email": "wellness@groveparkatlanta.com",
+      "reason": "Hard Bounce on Batch 6 Send (Nov 14)"
+    },
+    {
+      "id": "atorres@thelaa.org",
+      "email": "atorres@thelaa.org",
+      "reason": "Hard Bounce on Batch 6 Send (Nov 14)"
     }
   ],
   "batches": [
@@ -479,13 +504,6 @@
           "mx": "alt2.gmail-smtp-in.l.google.com"
         },
         {
-          "id": "3291",
-          "email": "cswhoaboards@gmail.com",
-          "firstName": "",
-          "lastName": "",
-          "mx": "alt2.gmail-smtp-in.l.google.com"
-        },
-        {
           "id": "3292",
           "email": "cswhoapresident@gmail.com",
           "firstName": "",
@@ -561,13 +579,6 @@
           "firstName": "",
           "lastName": "",
           "mx": "mx-aol.mail.gm0.yahoodns.net"
-        },
-        {
-          "id": "3305",
-          "email": "dgrogers421@earthlink.net",
-          "firstName": "",
-          "lastName": "",
-          "mx": "mx04.earthlink-vadesecure.net"
         },
         {
           "id": "3306",
@@ -2382,14 +2393,6 @@
       ],
       "contacts": [
         {
-          "email": "californiafamilyresource@gmail.com",
-          "firstName": "CFRA Team",
-          "company": "California Family Resource Association",
-          "state": "California",
-          "focus": "Family resource network",
-          "primary": true
-        },
-        {
           "email": "office@namisacramento.org",
           "firstName": "NAMI Sacramento Team",
           "company": "NAMI Sacramento",
@@ -2446,14 +2449,6 @@
           "primary": true
         },
         {
-          "email": "wellness@groveparkatlanta.com",
-          "firstName": "Wellness Committee",
-          "company": "Grove Park Neighborhood Association",
-          "state": "Georgia",
-          "focus": "Community wellness programming",
-          "primary": true
-        },
-        {
           "email": "hello@groveparkatlanta.com",
           "firstName": "Grove Park Team",
           "company": "Grove Park Neighborhood Association",
@@ -2484,14 +2479,6 @@
           "company": "Midtown Atlanta",
           "state": "Georgia",
           "focus": "Community and neighborhood organization",
-          "primary": true
-        },
-        {
-          "email": "atorres@thelaa.org",
-          "firstName": "A. Torres",
-          "company": "Georgia Latin American Association",
-          "state": "Georgia",
-          "focus": "Family and community services",
           "primary": true
         },
         {

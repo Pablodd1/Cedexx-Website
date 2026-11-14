@@ -75,7 +75,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { 
     plan_id, plan, email, first_name, last_name, 
     phone, dob, address, city, state, zipcode, 
-    promo_code 
+    promo_code, ad_attribution
   } = req.body;
 
   // Accept plan_id or plan (frontend sends plan_id)
@@ -123,6 +123,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         state: state ? sanitizeText(state).toUpperCase() : '',
         zipcode: zipcode ? sanitizeText(zipcode) : '',
         promo_code: promo_code ? sanitizeText(promo_code) : '',
+        utm_source: ad_attribution?.utm_source ? sanitizeText(String(ad_attribution.utm_source)).substring(0, 100) : '',
+        utm_campaign: ad_attribution?.utm_campaign ? sanitizeText(String(ad_attribution.utm_campaign)).substring(0, 100) : '',
+        utm_content: ad_attribution?.utm_content ? sanitizeText(String(ad_attribution.utm_content)).substring(0, 100) : '',
       },
       subscription_data: {
         metadata: {

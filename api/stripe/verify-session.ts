@@ -244,6 +244,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     member.stripe_customer_id = typeof session.customer === 'string' ? session.customer : (session.customer as any)?.id;
     member.stripe_subscription_id = typeof session.subscription === 'string' ? session.subscription : (session.subscription as any)?.id;
 
+    // Cancel scheduled 15-minute abandoned-checkout recovery email if member paid before it fired
+    if (RESEND_KEY && member.abandoned_recovery_email_id) {
+      fetch(`https://api.resend.com/emails/${member.abandoned_recovery_email_id}/cancel`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${RESEND_KEY}` },
+      }).catch(() => {});
+      member.abandoned_recovery_cancelled_on_payment = true;
+    }
+
     const custDetails = session.customer_details || {};
     const custAddress = custDetails.address || {};
     const fallbackPhone = metadata.phone || custDetails.phone || '';

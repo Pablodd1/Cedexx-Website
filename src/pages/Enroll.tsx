@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { CheckCircle2, Shield, Lock, CreditCard, Heart, Users, Smartphone, Building2, Brain, Stethoscope, Loader2, AlertCircle, MapPin } from 'lucide-react';
+import { CheckCircle2, Shield, Lock, CreditCard, Heart, Users, Smartphone, Building2, Brain, Stethoscope, Loader2, AlertCircle, MapPin, Sparkles, Clock } from 'lucide-react';
+import { captureAdAttribution, getStoredAttribution, trackAdViewContent, trackAdLead, trackAdInitiateCheckout, PLAN_NUMERIC_PRICE } from '../utils/adTracking';
 
 const fadeIn = {
   initial: { opacity: 0, y: 24 },
@@ -49,15 +50,51 @@ export function Enroll() {
   const [consentTOS, setConsentTOS] = React.useState(false);
   const [consentError, setConsentError] = React.useState<string | null>(null);
   const [isFreeEnrollment, setIsFreeEnrollment] = React.useState(false);
+  const [isFastAdLanding, setIsFastAdLanding] = React.useState(false);
 
-  // Read URL query parameter for plan preselection (e.g. /enroll?plan=carenow)
+  // Read URL query parameters for plan preselection, pre-filled recovery info, UTM attribution, and fast ad mode
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
+      const attr = captureAdAttribution();
       const params = new URLSearchParams(window.location.search);
       const qPlan = params.get('plan');
+      let initialPlan = 'carenow';
       if (qPlan && PLANS.some(p => p.id === qPlan)) {
         setPlan(qPlan);
+        initialPlan = qPlan;
       }
+
+      // Support pre-filled recovery links (e.g. from 15-min abandoned-checkout recovery email)
+      const qEmail = params.get('email');
+      const qFirst = params.get('first_name');
+      const qLast = params.get('last_name');
+      const qZip = params.get('zipcode');
+      const qPromo = params.get('promo');
+      if (qEmail) setEmail(qEmail);
+      if (qFirst) setFirstName(qFirst);
+      if (qLast) setLastName(qLast);
+      if (qZip) setZipcode(qZip);
+      if (qPromo) setPromoCode(qPromo.toUpperCase());
+
+      // Fast Ad Landing Mode: If visitor arrives from Meta/Google ads (utm_source, fbclid, gclid, fast=1) or recovery email,
+      // skip Role Selection (step 0) and open directly on Personal Info (step 1) to cut friction by 35%.
+      const isAdOrRecovery = Boolean(
+        params.get('fast') === '1' ||
+        params.get('utm_source') ||
+        params.get('fbclid') ||
+        params.get('gclid') ||
+        qEmail ||
+        attr.utm_source ||
+        attr.fbclid ||
+        attr.gclid
+      );
+      if (isAdOrRecovery) {
+        setIsFastAdLanding(true);
+        setRole('individual');
+        setStep(1);
+      }
+
+      trackAdViewContent(initialPlan);
     }
   }, []);
 
@@ -115,6 +152,8 @@ export function Enroll() {
       return;
     }
     // Fire-and-forget: log the lead when they move from personal info to plan selection
+    const adAttribution = getStoredAttribution();
+    trackAdLead(plan, role);
     try {
       await fetch('/api/register-member', {
         method: 'POST',
@@ -135,6 +174,7 @@ export function Enroll() {
           consent_tos: consentTOS,
           consent_version: '2.0',
           consent_timestamp: new Date().toISOString(),
+          ad_attribution: adAttribution,
         }),
       });
     } catch (_) {
@@ -160,6 +200,7 @@ export function Enroll() {
           city: city.trim(),
           state: state.trim(),
           zipcode: zipcode.trim(),
+          ad_attribution: getStoredAttribution(),
         }),
       }).catch(() => {});
     }
@@ -172,6 +213,9 @@ export function Enroll() {
     }
     setLoading(true);
     setError(null);
+    const adAttribution = getStoredAttribution();
+    const numericPrice = isFreeEnrollment ? 0 : (PLAN_NUMERIC_PRICE[plan] || 18.99);
+    trackAdInitiateCheckout(plan, numericPrice);
 
     // FREE ENROLLMENT: Skip Stripe entirely
     if (isFreeEnrollment) {
@@ -230,6 +274,7 @@ export function Enroll() {
           consent_tos: consentTOS,
           consent_version: '2.0',
           consent_timestamp: new Date().toISOString(),
+          ad_attribution: adAttribution,
         }),
       });
     } catch (_) {
@@ -252,6 +297,7 @@ export function Enroll() {
           state: state.trim(),
           zipcode: zipcode.trim(),
           promo_code: promoApplied ? promoCode.trim().toUpperCase() : undefined,
+          ad_attribution: adAttribution,
         }),
       });
 
@@ -281,6 +327,32 @@ export function Enroll() {
           </motion.div>
           <h1 className="text-3xl sm:text-4xl md:text-6xl font-black text-[#050249] mb-4 md:mb-6 tracking-tight italic uppercase">Better Care. Here. <span className="text-[#23d9b0]">Now.</span></h1>
           <p className="text-base sm:text-xl text-slate-500 font-medium max-w-2xl mx-auto italic">Complete your enrollment in under 5 minutes and get immediate 24/7 access to board-certified care.</p>
+
+          {isFastAdLanding && (
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-6 max-w-3xl mx-auto bg-gradient-to-r from-[#050249] to-[#0b1166] text-white rounded-2xl p-4 sm:p-5 shadow-xl border border-[#23d9b0]/30 flex flex-col sm:flex-row items-center justify-between gap-3 text-left"
+            >
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-xl bg-[#23d9b0]/20 flex items-center justify-center text-[#23d9b0] shrink-0">
+                  <Sparkles className="h-5 w-5" />
+                </div>
+                <div>
+                  <div className="text-xs sm:text-sm font-black uppercase tracking-wide text-[#23d9b0]">
+                    Fast-Track Household Enrollment • {selectedPlan ? `${selectedPlan.name} (${selectedPlan.price}/mo)` : 'From $18.99/mo'}
+                  </div>
+                  <p className="text-xs text-blue-100 font-medium">
+                    $0 Visit Fees • Up to 7 Family Members Covered • No Insurance Required • Cancel Anytime
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-full text-[11px] font-bold text-white shrink-0">
+                <Clock className="h-3.5 w-3.5 text-[#23d9b0]" />
+                <span>2-Min Setup</span>
+              </div>
+            </motion.div>
+          )}
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8 lg:gap-12 items-start">

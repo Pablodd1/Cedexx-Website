@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { CheckCircle2, Home, ArrowRight, Loader2, ShieldCheck, HeartPulse } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { trackAdPurchase } from '../utils/adTracking';
 
 interface VerificationResult {
   success: boolean;
@@ -26,6 +27,9 @@ export function PaymentSuccess() {
   useEffect(() => {
     if (!sessionId) {
       setVerifying(false);
+      if (isFree && planParam) {
+        trackAdPurchase(planParam, `free_${planParam}_${Date.now()}`, 0);
+      }
       return;
     }
 
@@ -41,6 +45,9 @@ export function PaymentSuccess() {
         if (isMounted) {
           setVerifyResult(data);
           setVerifying(false);
+          if (data?.success) {
+            trackAdPurchase(data.plan || planParam || 'carenow', sessionId);
+          }
         }
       } catch (err: any) {
         console.error('[PAYMENT SUCCESS VERIFY ERROR]', err);
@@ -56,7 +63,7 @@ export function PaymentSuccess() {
     return () => {
       isMounted = false;
     };
-  }, [sessionId]);
+  }, [sessionId, isFree, planParam]);
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] py-24 font-sans">
