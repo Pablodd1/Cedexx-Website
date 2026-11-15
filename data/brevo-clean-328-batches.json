@@ -1,7 +1,7 @@
 {
-  "updatedAt": "2026-11-15T16:40:08.280Z",
-  "totalVerified": 344,
-  "erasedCount": 25,
+  "updatedAt": "2026-11-15T20:13:03.275Z",
+  "totalVerified": 338,
+  "erasedCount": 31,
   "erasedContacts": [
     {
       "id": "3226",
@@ -127,6 +127,36 @@
       "id": "3421",
       "email": "lgreene@peopleunitedfoundation.org",
       "reason": "Hard Bounce on Batch 3 Send (Nov 15)"
+    },
+    {
+      "id": "3436",
+      "email": "mm@koseneandkosene.com",
+      "reason": "Hard Bounce on Batch 4 Send (Nov 15 PM)"
+    },
+    {
+      "id": "3463",
+      "email": "peninsulaverde@cox.net",
+      "reason": "Hard Bounce on Batch 4 Send (Nov 15 PM)"
+    },
+    {
+      "id": "3464",
+      "email": "phyrnk@yahoo.com",
+      "reason": "Hard Bounce on Batch 4 Send (Nov 15 PM)"
+    },
+    {
+      "id": "3477",
+      "email": "ramburgey3@gmail.com",
+      "reason": "Hard Bounce on Batch 4 Send (Nov 15 PM)"
+    },
+    {
+      "id": "3482",
+      "email": "resosflw@verizon.net",
+      "reason": "Hard Bounce on Batch 4 Send (Nov 15 PM)"
+    },
+    {
+      "id": "3487",
+      "email": "robertbrian1969@gmail.com",
+      "reason": "Hard Bounce on Batch 4 Send (Nov 15 PM)"
     }
   ],
   "batches": [
@@ -1420,13 +1450,6 @@
           "mx": "smtp.google.com"
         },
         {
-          "id": "3436",
-          "email": "mm@koseneandkosene.com",
-          "firstName": "",
-          "lastName": "",
-          "mx": "usa.mx2.mx25.net"
-        },
-        {
           "id": "3437",
           "email": "mmockus@cas-indiana.com",
           "firstName": "",
@@ -1602,20 +1625,6 @@
           "mx": "alt2.gmail-smtp-in.l.google.com"
         },
         {
-          "id": "3463",
-          "email": "peninsulaverde@cox.net",
-          "firstName": "",
-          "lastName": "",
-          "mx": "mta5.am0.yahoodns.net"
-        },
-        {
-          "id": "3464",
-          "email": "phyrnk@yahoo.com",
-          "firstName": "",
-          "lastName": "",
-          "mx": "mta6.am0.yahoodns.net"
-        },
-        {
           "id": "3465",
           "email": "piercee317@att.net",
           "firstName": "",
@@ -1686,13 +1695,6 @@
           "mx": "alt2.gmail-smtp-in.l.google.com"
         },
         {
-          "id": "3477",
-          "email": "ramburgey3@gmail.com",
-          "firstName": "",
-          "lastName": "",
-          "mx": "alt2.gmail-smtp-in.l.google.com"
-        },
-        {
           "id": "3478",
           "email": "randy@mcpikeinsurance.com",
           "firstName": "",
@@ -1721,13 +1723,6 @@
           "mx": "alt2.gmail-smtp-in.l.google.com"
         },
         {
-          "id": "3482",
-          "email": "resosflw@verizon.net",
-          "firstName": "",
-          "lastName": "",
-          "mx": "mx-aol.mail.gm0.yahoodns.net"
-        },
-        {
           "id": "3483",
           "email": "richard@arrc-capital.com",
           "firstName": "",
@@ -1754,13 +1749,6 @@
           "firstName": "",
           "lastName": "",
           "mx": "capincrouse-com.mail.protection.outlook.com"
-        },
-        {
-          "id": "3487",
-          "email": "robertbrian1969@gmail.com",
-          "firstName": "",
-          "lastName": "",
-          "mx": "alt2.gmail-smtp-in.l.google.com"
         },
         {
           "id": "3488",
