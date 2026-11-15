@@ -183,6 +183,48 @@ function orgMentionFor(r?: CampaignRecipient, fallback = 'your organization'): s
   return r?.company?.trim() ? r.company.trim() : fallback;
 }
 
+/**
+ * Y Combinator High-Reply Personal Founder Wrapper (5-6 sentences, mobile 1-screen, zero fluff,
+ * immediate proof, low-friction reply ask + clean required non-provider compliance footer).
+ */
+function wrapYCFounderEmail({
+  preheader,
+  bodyHtml,
+  psText,
+}: {
+  preheader: string;
+  bodyHtml: string;
+  psText?: string;
+}): string {
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin:0;padding:0;background-color:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#111827;">
+  <div style="display:none;max-height:0;overflow:hidden;opacity:0;font-size:1px;line-height:1px;">
+    ${preheader}
+  </div>
+  <div style="max-width:580px;padding:18px 16px;font-size:15px;line-height:1.62;color:#111827;">
+    ${bodyHtml}
+    <div style="margin-top:20px;font-size:14px;line-height:1.5;color:#111827;">
+      Best,<br/>
+      <strong>Daisy Gonzalez</strong><br/>
+      Founder &amp; CEO, <a href="${CEDEXX_URL}" style="color:#050249;font-weight:700;text-decoration:none;">CEDEXX</a> (Powered by Lyric Health)<br/>
+      <span style="color:#475569;font-size:13px;">(754) 432-2201 · <a href="mailto:daisy@cedexx.net" style="color:#050249;text-decoration:none;">daisy@cedexx.net</a> · <a href="${PARTNER_URL}" style="color:#050249;text-decoration:underline;">cedexx.net/partners</a></span>
+    </div>
+    ${psText ? `<p style="margin:14px 0 0 0;font-size:13px;color:#475569;"><strong>P.S.</strong> ${psText}</p>` : ''}
+    <div style="margin-top:28px;padding-top:12px;border-top:1px solid #e5e7eb;font-size:10px;line-height:1.45;color:#94a3b8;">
+      <strong>Compliance Disclosure:</strong> CEDEXX is a technology and wellness membership platform, not a medical provider, doctor, or health insurance company. All clinical and behavioral health services are provided independently by licensed professionals in the Lyric Health nationwide network. For medical emergencies, call 911. To opt out of future notes, reply "unsubscribe".
+    </div>
+  </div>
+</body>
+</html>
+  `.trim();
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // TRACK 1: 5-EMAIL FAMILY & HOUSEHOLD FOLLOW-UP CAMPAIGN SEQUENCE
 // Crystal-clear benefits of CEDEXX services for families (up to 7 members)
@@ -622,359 +664,263 @@ COMPLIANCE DISCLOSURE: CEDEXX is a technology and wellness membership platform, 
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TRACK 2: 5-EMAIL B2B INSTITUTIONAL, WORKFORCE & COMMUNITY SEQUENCE
-// Clear benefits of CEDEXX family services for School Districts, Employers & Communities
+// Y Combinator High-Reply Personal Founder Format (5-6 sentences, 1-screen mobile,
+// plain-English opening sentence, immediate proof, and low-friction reply ask)
 // ═══════════════════════════════════════════════════════════════════════════
 export const B2B_CAMPAIGN_SEQUENCE: CampaignTemplate[] = [
-  // ─── B2B EMAIL 1: DAY 1 — THE EXECUTIVE HOOK & CLEAR FAMILY BENEFITS ───
+  // ─── B2B EMAIL 1: DAY 1 — Y COMBINATOR 5-SENTENCE FOUNDER INTRO ───
   {
     track: 'b2b',
     step: 1,
     id: 'campaign-1-executive-intro',
-    title: 'Email 1: Give Every Household 24/7 Doctors & Therapy with $0 Co-Pays (Up to 7 Family Members)',
-    cadenceLabel: 'Day 1 (Tuesday 9:30 AM EST)',
+    title: 'Email 1 (YC 5-Sentence Format): Plain-English Context + Lyric Proof + Low-Friction Ask',
+    cadenceLabel: 'Day 1 (9:30 AM EST)',
     recommendedDelayDays: 0,
-    angle: 'Problem Disruption — Eliminating $150–$300 Urgent Care Costs & Absenteeism for Your Families',
-    subject: 'A $0-copay 24/7 family doctor & mental wellness benefit for your people',
-    altSubject: 'Covering up to 7 family members per household with $0-copay virtual care',
-    preheader: 'How school districts, employers, and residential communities give every household 24/7 Urgent Care, Primary Care, Therapy, and $0 prescriptions.',
-    ctaLabel: 'Explore Institutional & Community Solutions',
+    angle: 'Y Combinator Cold Email Formula — Clear Context in Sentence 1, Immediate Proof, Low-Friction Reply Ask',
+    subject: '24/7 $0-copay family doctor benefit for your community?',
+    altSubject: 'covering up to 7 family members per home ($0 visit fees)',
+    preheader: 'We help residential communities, nonprofits, and employers give every household 24/7 virtual doctors and therapy with $0 visit fees.',
+    ctaLabel: 'See 60-Second Partner Overview',
     ctaUrl: PARTNER_URL,
-    summary: 'Introduces CEDEXX (powered by Lyric Health) to organizations by clearly highlighting the concrete benefits for their families: 24/7 Urgent Care & Pediatrics, Unlimited Mental Health Therapy, $0 Annual Labs, 237+ $0 Medications, and up to 7 household members covered per plan.',
+    summary: 'Follows the Y Combinator cold email formula: 5 sentences total, starts with plain-English context in sentence 1 (no fluff), shows immediate proof (Lyric Health nationwide network + up to 7 family members covered from $18.99/mo + $0 budget option), and ends with a low-friction reply ask.',
     buildHtml: (r) => {
       const greeting = greetingFor(r);
-      const org = orgMentionFor(r, 'your organization');
-      return wrapBrandedEmail({
-        preheader: 'How school districts, employers, and residential communities give every household 24/7 Urgent Care, Primary Care, Therapy, and $0 prescriptions.',
-        badge: 'B2B Series 1 of 5 · Executive Introduction',
-        headline: 'What happens when every family in your organization can see a doctor or therapist 24/7—with $0 co-pays?',
-        ctaLabel: 'Explore Institutional & Community Solutions',
-        ctaUrl: PARTNER_URL,
-        psText: 'You can simply reply "QUOTE" to this email with your approximate headcount or unit count, and I will prepare a custom volume overview for your team.',
+      const org = orgMentionFor(r, 'your community');
+      return wrapYCFounderEmail({
+        preheader: 'We help residential communities, nonprofits, and employers give every household 24/7 virtual doctors and therapy with $0 visit fees.',
+        psText: 'Even if you have zero budget allocated right now, we can set up a 100% voluntary resident/member perk link at $0 cost to your board.',
         bodyHtml: `
           <p style="margin:0 0 14px 0;">${greeting}</p>
           <p style="margin:0 0 14px 0;">
-            Across school districts, workplaces, and residential communities, one challenge comes up repeatedly: even when people have insurance, a single urgent care visit for a sick child or spouse costs <strong>$150 to $300+ out of pocket</strong>—plus hours lost away from work or school.
+            I’m the founder of <strong>CEDEXX</strong>—we help residential communities, associations, and nonprofits give every household 24/7 virtual urgent care, pediatrics, and licensed mental health therapy with <strong>$0 visit fees and $0 copays</strong>.
           </p>
-          <p style="margin:0 0 16px 0;">
-            At <strong>CEDEXX</strong> (powered by <strong>Lyric Health</strong>), we built a turnkey digital healthcare and mental wellness amenity so <strong>${org}</strong> can protect not just the individual employee, resident, or member—but their <strong>entire household (up to 7 family members)</strong>.
+          <p style="margin:0 0 14px 0;">
+            Powered by <strong>Lyric Health’s</strong> nationwide physician network, a single membership starting at <strong>$18.99/month</strong> covers <strong>up to 7 family members in one home</strong> with no insurance required (saving families $150–$300+ every time someone wakes up sick).
           </p>
-          <div style="background-color:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:18px 20px;margin:18px 0;">
-            <p style="margin:0 0 10px 0;font-weight:800;color:#050249;font-size:14px;text-transform:uppercase;letter-spacing:0.5px;">
-              Clear Family Benefits Inside CEDEXX Memberships:
-            </p>
-            <ul style="margin:0;padding-left:18px;color:#334155;font-size:14px;line-height:1.7;">
-              <li><strong>Up to 7 Family Members Included:</strong> One membership covers the adult, spouse/partner, and children at no extra per-person cost.</li>
-              <li><strong>24/7 Virtual Urgent Care &amp; Pediatrics ($0 Visit Fee):</strong> Same-day care for flu, sinus/ear infections, allergies, and digital school/work excuse notes.</li>
-              <li><strong>Unlimited Licensed Therapists &amp; Family Counseling:</strong> Confidential mental health, stress, anxiety, and crisis support with $0 co-pays.</li>
-              <li><strong>Dedicated Primary Care, $0 Annual Labs &amp; 237+ $0 Meds:</strong> Available on CareComplete™ tiers (37 acute + 200+ chronic medications at $0 cost).</li>
-            </ul>
-          </div>
+          <p style="margin:0 0 14px 0;">
+            We can roll this out for <strong>${org}</strong> either as a group-sponsored benefit or as a <strong>$0-cost voluntary community perk</strong> where we handle 100% of the enrollment and bilingual member support.
+          </p>
           <p style="margin:0;">
-            Whether you are supporting educators and staff, corporate teams, multifamily residents, or association members, CEDEXX makes whole-family wellness remarkably affordable at scale.
+            <strong>Are you the right person to send a 1-page overview to, or is there someone else on your team I should reach out to?</strong>
           </p>
         `,
       });
     },
     buildPlainText: (r) => `${greetingFor(r)}
 
-Across school districts, workplaces, and residential communities, a single urgent care visit for a sick child or spouse often costs $150 to $300+ out of pocket—plus hours lost away from work or school.
+I’m the founder of CEDEXX—we help residential communities, associations, and nonprofits give every household 24/7 virtual urgent care, pediatrics, and licensed mental health therapy with $0 visit fees and $0 copays.
 
-At CEDEXX (powered by Lyric Health), we deliver a modern digital healthcare and mental wellness benefit for ${orgMentionFor(r)} that protects the entire household:
-- Up to 7 Family Members covered under a single membership
-- 24/7 Virtual Urgent Care & Pediatrics ($0 visit fees, $0 co-pays, digital school/work notes)
-- Unlimited Licensed Therapists & Family Counseling
-- Dedicated Virtual Primary Care, $0 Annual Wellness Labs & 237+ Medications at $0 cost (CareComplete™)
+Powered by Lyric Health’s nationwide physician network, a single membership starting at $18.99/month covers up to 7 family members in one home with no insurance required (saving families $150–$300+ every time someone wakes up sick).
 
-Explore Institutional & Community Solutions: ${PARTNER_URL}
+We can roll this out for ${orgMentionFor(r, 'your community')} either as a group-sponsored benefit or as a $0-cost voluntary community perk where we handle 100% of the enrollment and bilingual member support.
 
-With intention & care,
-Daisy Gonzalez | Founder & CEO, CEDEXX
-(754) 432-2201 | daisy@cedexx.net
+Are you the right person to send a 1-page overview to, or is there someone else on your team I should reach out to?
+
+Best,
+Daisy Gonzalez | Founder & CEO, CEDEXX (Powered by Lyric Health)
+(754) 432-2201 | daisy@cedexx.net | ${PARTNER_URL}
 
 ---
-COMPLIANCE DISCLOSURE: CEDEXX is a technology and wellness membership platform, not a medical provider, doctor, or health insurance company. CEDEXX does not practice medicine, give medical advice, diagnose conditions, or prescribe medications. All clinical and behavioral health services are provided independently by licensed professionals in the Lyric Health network. For medical emergencies, call 911 immediately.`,
+COMPLIANCE DISCLOSURE: CEDEXX is a technology and wellness membership platform, not a medical provider, doctor, or health insurance company. All clinical and behavioral health services are provided independently by licensed professionals in the Lyric Health network. For medical emergencies, call 911.`,
   },
 
-  // ─── B2B EMAIL 2: DAY 6 — ECOSYSTEM FIT & TAILORED USE CASES ───
+  // ─── B2B EMAIL 2: DAY 5 — 4-SENTENCE VALUE FOLLOW-UP ───
   {
     track: 'b2b',
     step: 2,
     id: 'campaign-2-ecosystems-scale',
-    title: 'Email 2: How Organizations Like Yours Deploy CEDEXX for Families (4 Ecosystems)',
-    cadenceLabel: 'Day 6 (5 Days Later — Thursday 10:00 AM EST)',
-    recommendedDelayDays: 5,
-    angle: 'Sector Relevance — School Districts, Public Agencies, Employers & Residential Communities',
-    subject: 'How schools, employers & communities roll out 24/7 family care',
-    altSubject: 'Following up: Tailoring CEDEXX family wellness for your community or workforce',
-    preheader: 'See how our 4 Ecosystems support educators, employees, residents, and their households.',
-    ctaLabel: 'See the Ecosystems We Serve',
+    title: 'Email 2 (YC Short Follow-Up): How Zero-Admin Rollout Works for Families',
+    cadenceLabel: 'Day 5 (4 Days Later — 10:00 AM EST)',
+    recommendedDelayDays: 4,
+    angle: 'Y Combinator Short Follow-Up — Zero Admin Burden + 3 Concrete Proof Points',
+    subject: 'Re: 24/7 $0-copay family doctor benefit for your community?',
+    altSubject: 'quick question on resident / family wellness perks',
+    preheader: 'Quick follow-up on how organizations roll out 24/7 Lyric Health family care with zero admin work.',
+    ctaLabel: 'View Partner Options',
     ctaUrl: `${CEDEXX_URL}/partners`,
-    summary: 'Follows up on Email 1 by showing concrete deployment models across the 4 CEDEXX pillars: Workforce & Institutional (Schools/Public Agencies), Community & Housing (Multifamily/Student/Hospitality), Family & Individual, and Affiliate/Associations.',
+    summary: 'Short 4-sentence YC follow-up explaining how organizations launch CEDEXX with zero administrative workload.',
     buildHtml: (r) => {
       const greeting = greetingFor(r);
-      const org = orgMentionFor(r, 'your organization');
-      return wrapBrandedEmail({
-        preheader: 'See how our 4 Ecosystems support educators, employees, residents, and their households.',
-        badge: 'B2B Series 2 of 5 · Ecosystems We Serve',
-        headline: 'One connected family wellness platform—tailored to how your organization operates.',
-        ctaLabel: 'See the Ecosystems We Serve',
-        ctaUrl: `${CEDEXX_URL}/partners`,
-        psText: 'Not sure whether an organization-sponsored or voluntary member-paid rollout fits best? Reply here and we can walk through both models in 10 minutes.',
+      const org = orgMentionFor(r, 'your community');
+      return wrapYCFounderEmail({
+        preheader: 'Quick follow-up on how organizations roll out 24/7 Lyric Health family care with zero admin work.',
         bodyHtml: `
           <p style="margin:0 0 14px 0;">${greeting}</p>
           <p style="margin:0 0 14px 0;">
-            Following up on my note earlier this week—organizations often ask how <strong>CEDEXX</strong> supports their families without adding administrative burden to HR or property teams.
+            Following up quickly on my last note—the #1 question boards and community leaders ask us is whether offering <strong>CEDEXX</strong> creates extra administrative work for their team.
           </p>
-          <p style="margin:0 0 16px 0;">
-            We structure our partnerships around core ecosystems so <strong>${org}</strong> can choose the exact fit:
+          <p style="margin:0 0 14px 0;">
+            It takes <strong>zero admin time</strong>: we provide a custom digital enrollment flyer for <strong>${org}</strong>, Lyric Health activates each family’s app within 24–48 hours using their 10-digit phone number as their Member ID, and our bilingual desk at <strong>(754) 432-2201</strong> handles all member questions.
           </p>
-          <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:12px 0 18px 0;">
-            <tr>
-              <td style="padding:14px 16px;background-color:#f8fafc;border-left:4px solid #050249;border-radius:8px;margin-bottom:10px;">
-                <strong style="color:#050249;font-size:14px;">1. School Districts, Public Agencies &amp; Employers</strong><br/>
-                <span style="font-size:13px;color:#475569;">Cut absenteeism when an employee or their child wakes up sick: 24/7 urgent care, pediatrics, unlimited licensed therapy, $0 common prescriptions, and instant digital work/school excuse notes.</span>
-              </td>
-            </tr>
-            <tr><td height="10"></td></tr>
-            <tr>
-              <td style="padding:14px 16px;background-color:#f8fafc;border-left:4px solid #23d9b0;border-radius:8px;">
-                <strong style="color:#050249;font-size:14px;">2. Multifamily, Student, Senior &amp; Workforce Housing</strong><br/>
-                <span style="font-size:13px;color:#475569;">Offer "Rent-Included" or resident-perk household healthcare (covering up to 7 family members per unit) that boosts lease renewals and property value.</span>
-              </td>
-            </tr>
-            <tr><td height="10"></td></tr>
-            <tr>
-              <td style="padding:14px 16px;background-color:#f8fafc;border-left:4px solid #3b82f6;border-radius:8px;">
-                <strong style="color:#050249;font-size:14px;">3. Associations, Credit Unions, Faith &amp; Nonprofit Networks</strong><br/>
-                <span style="font-size:13px;color:#475569;">Provide exclusive affiliate or member-sponsored family plans for independent contractors, REALTORS®, gig workers, and uninsured households.</span>
-              </td>
-            </tr>
-          </table>
           <p style="margin:0;">
-            Because all clinical care is delivered nationwide by board-certified <strong>Lyric Health</strong> physicians and therapists, your team never handles medical data or claims administration.
+            <strong>Worth sending over a 1-page sample flyer so you can see how it looks for your families?</strong>
           </p>
         `,
       });
     },
     buildPlainText: (r) => `${greetingFor(r)}
 
-Following up on my note earlier this week—here is how organizations deploy CEDEXX for their families without adding administrative burden:
+Following up quickly on my last note—the #1 question boards and community leaders ask us is whether offering CEDEXX creates extra administrative work for their team.
 
-1. School Districts, Public Agencies & Employers: Cut absenteeism with 24/7 urgent care, pediatrics, unlimited therapy, $0 common medications, and digital work/school notes.
-2. Multifamily, Student & Senior Housing: Offer resident household wellness amenities (covering up to 7 family members per unit) that boost lease renewals.
-3. Associations, Credit Unions & Faith/Nonprofit Networks: Exclusive member family wellness plans for independent contractors and households.
+It takes zero admin time: we provide a custom digital enrollment flyer for ${orgMentionFor(r, 'your community')}, Lyric Health activates each family’s app within 24–48 hours using their 10-digit phone number as their Member ID, and our bilingual desk at (754) 432-2201 handles all member questions.
 
-See the Ecosystems We Serve: ${CEDEXX_URL}/partners
+Worth sending over a 1-page sample flyer so you can see how it looks for your families?
 
-With intention & care,
-Daisy Gonzalez | Founder & CEO, CEDEXX
-(754) 432-2201 | daisy@cedexx.net
+Best,
+Daisy Gonzalez | Founder & CEO, CEDEXX (Powered by Lyric Health)
+(754) 432-2201 | daisy@cedexx.net | ${CEDEXX_URL}/partners
 
 ---
-COMPLIANCE DISCLOSURE: CEDEXX is a technology and wellness membership platform, not a medical provider, doctor, or health insurance company. CEDEXX does not practice medicine, give medical advice, diagnose conditions, or prescribe medications. All clinical and behavioral health services are provided independently by licensed professionals in the Lyric Health network. For medical emergencies, call 911 immediately.`,
+COMPLIANCE DISCLOSURE: CEDEXX is a technology and wellness membership platform, not a medical provider, doctor, or health insurance company. All clinical and behavioral health services are provided independently by licensed professionals in the Lyric Health network. For medical emergencies, call 911.`,
   },
 
-  // ─── B2B EMAIL 3: DAY 12 — FINANCIAL ROI & VOLUME PRICING BREAKDOWN ───
+  // ─── B2B EMAIL 3: DAY 10 — THE MATH IN 4 SENTENCES ───
   {
     track: 'b2b',
     step: 3,
     id: 'campaign-3-roi-volume-pricing',
-    title: 'Email 3: The Math Behind Volume Pricing vs. Traditional Family Care Costs',
-    cadenceLabel: 'Day 12 (6 Days Later — Wednesday 9:30 AM EST)',
-    recommendedDelayDays: 6,
-    angle: 'CFO / Benefits ROI — Custom Per-Door, Per-Member, or Organization-Sponsored Economics',
-    subject: 'The math: $150+ urgent care visits vs. volume-priced 24/7 family coverage',
-    altSubject: 'Custom Community, Workforce & Institutional Pricing for your group',
-    preheader: 'How flexible per-door, per-member, or voluntary pricing lowers family healthcare costs at scale.',
-    ctaLabel: 'Request a Custom Volume Quote',
+    title: 'Email 3 (YC Proof & Math): $220 Urgent Care Visit vs. $18.99/mo for 7 Family Members',
+    cadenceLabel: 'Day 10 (5 Days Later — 9:30 AM EST)',
+    recommendedDelayDays: 5,
+    angle: 'Y Combinator Proof Email — Simple Side-by-Side Math & Volume Discount Offer',
+    subject: '$220 walk-in clinic bill vs. $18.99/mo for all 7 family members',
+    altSubject: 'custom group pricing vs. $0-budget voluntary rollout',
+    preheader: 'One avoided urgent care visit pays for nearly a full year of 24/7 family coverage.',
+    ctaLabel: 'See Group & Voluntary Options',
     ctaUrl: PARTNER_URL,
-    summary: 'Presents the clear financial case for CFOs, Superintendents, HR Directors, and Property Owners: retail family plans run $18.99–$52.99/mo for up to 7 members, and Institutional partners unlock reduced volume pricing or $0-budget voluntary rollouts.',
+    summary: 'Presents the simple math in 4 sentences: 1 urgent care visit costs $220+ vs. $18.99/mo for up to 7 family members (or custom volume pricing).',
     buildHtml: (r) => {
       const greeting = greetingFor(r);
       const org = orgMentionFor(r, 'your organization');
-      return wrapBrandedEmail({
-        preheader: 'How flexible per-door, per-member, or voluntary pricing lowers family healthcare costs at scale.',
-        badge: 'B2B Series 3 of 5 · ROI & Volume Pricing',
-        headline: 'High-impact family wellness doesn’t require a fortune—especially at volume.',
-        ctaLabel: 'Request a Custom Volume Quote',
-        ctaUrl: PARTNER_URL,
-        psText: 'Even if you have zero budget allocated right now, we can launch a 100% voluntary member-paid program with an exclusive institutional discount for your families.',
+      return wrapYCFounderEmail({
+        preheader: 'One avoided urgent care visit pays for nearly a full year of 24/7 family coverage.',
         bodyHtml: `
           <p style="margin:0 0 14px 0;">${greeting}</p>
           <p style="margin:0 0 14px 0;">
-            When evaluating a new benefit for <strong>${org}</strong>, leadership teams always ask two questions: <em>"What does it actually cost?"</em> and <em>"What do families actually get?"</em>
+            Here is the simple math behind why families love <strong>CEDEXX</strong>: a single walk-in urgent care visit for a child’s ear infection or flu costs <strong>$180 to $250+</strong> out of pocket.
           </p>
-          <p style="margin:0 0 16px 0;">
-            Even at our public retail rates ($18.99/mo for <em>CareNow™</em> up to $52.99/mo for <em>CareComplete Family™</em>), a single avoided urgent care visit ($150–$300+) pays for months of membership. For institutional, workforce, and community partners, we go further with <strong>Custom Volume Pricing</strong>:
+          <p style="margin:0 0 14px 0;">
+            With our Lyric Health-powered memberships, households get <strong>unlimited $0-copay 24/7 Urgent Care for up to 7 family members at $18.99/mo</strong>, Unlimited Therapy at <strong>$26.99/mo</strong>, or Dedicated Primary Care + <strong>$0 Annual Labs + 237 $0 Medications</strong> on CareComplete™—with deeper volume discounts for groups.
           </p>
-          <div style="background-color:#050249;color:#ffffff;border-radius:12px;padding:20px 22px;margin:18px 0;">
-            <p style="margin:0 0 10px 0;color:#23d9b0;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:1px;">
-              Enterprise &amp; Institutional Pricing Options
-            </p>
-            <ul style="margin:0;padding-left:18px;color:#e2e8f0;font-size:14px;line-height:1.75;">
-              <li><strong style="color:#ffffff;">Custom Per-Door or Per-Employee Wholesale Pricing:</strong> Reduced rates based on your unit count, staff size, or member roster.</li>
-              <li><strong style="color:#ffffff;">3 Flexible Funding Models:</strong> 100% Organization-Sponsored, Cost-Shared, or 100% Voluntary (zero cost to your budget).</li>
-              <li><strong style="color:#ffffff;">Complete Care Suite:</strong> Choose from 24/7 Urgent Care (<em>CareNow™</em>), Urgent Care + Unlimited Therapy (<em>CareNow + Mental</em>), or Dedicated Primary Care + $0 Annual Labs + 237 $0 Medications (<em>CareComplete™</em>).</li>
-              <li><strong style="color:#ffffff;">Up to 7 Family Members Included:</strong> Protects the entire household under one flat rate.</li>
-            </ul>
-          </div>
           <p style="margin:0;">
-            If you share your approximate group size, we can put together a clear, side-by-side custom quote for <strong>${org}</strong> within 24 hours.
+            <strong>Open to me sharing our 1-page group rate card for ${org}, or would a $0-budget voluntary discount link be a better fit?</strong>
           </p>
         `,
       });
     },
     buildPlainText: (r) => `${greetingFor(r)}
 
-When evaluating a new benefit for ${orgMentionFor(r)}, leadership teams always ask: "What does it cost?" and "What do families actually get?"
+Here is the simple math behind why families love CEDEXX: a single walk-in urgent care visit for a child’s ear infection or flu costs $180 to $250+ out of pocket.
 
-Even a single avoided urgent care visit ($150-$300+) pays for months of CEDEXX membership. For institutional, workforce, and community partners, we offer Custom Volume Pricing:
-- Custom Per-Door, Per-Member, or Per-Employee wholesale pricing
-- 3 Funding Models: Organization-Sponsored, Cost-Shared, or 100% Voluntary (zero budget required)
-- Complete Care Tiers: CareNow™ (24/7 Urgent Care), CareNow + Mental (Urgent Care + Unlimited Therapy), and CareComplete™ (Dedicated Primary Care + $0 Annual Labs + 237 $0 Medications)
-- Up to 7 household members covered on family plans
+With our Lyric Health-powered memberships, households get unlimited $0-copay 24/7 Urgent Care for up to 7 family members at $18.99/mo, Unlimited Therapy at $26.99/mo, or Dedicated Primary Care + $0 Annual Labs + 237 $0 Medications on CareComplete™—with deeper volume discounts for groups.
 
-Request a Custom Volume Quote: ${PARTNER_URL}
+Open to me sharing our 1-page group rate card for ${orgMentionFor(r, 'your organization')}, or would a $0-budget voluntary discount link be a better fit?
 
-With intention & care,
-Daisy Gonzalez | Founder & CEO, CEDEXX
-(754) 432-2201 | daisy@cedexx.net
+Best,
+Daisy Gonzalez | Founder & CEO, CEDEXX (Powered by Lyric Health)
+(754) 432-2201 | daisy@cedexx.net | ${PARTNER_URL}
 
 ---
-COMPLIANCE DISCLOSURE: CEDEXX is a technology and wellness membership platform, not a medical provider, doctor, or health insurance company. CEDEXX does not practice medicine, give medical advice, diagnose conditions, or prescribe medications. All clinical and behavioral health services are provided independently by licensed professionals in the Lyric Health network. For medical emergencies, call 911 immediately.`,
+COMPLIANCE DISCLOSURE: CEDEXX is a technology and wellness membership platform, not a medical provider, doctor, or health insurance company. All clinical and behavioral health services are provided independently by licensed professionals in the Lyric Health network. For medical emergencies, call 911.`,
   },
 
-  // ─── B2B EMAIL 4: DAY 18 — TURNKEY ROLLOUT, COMPLIANCE & WHOLE-PERSON CARE ───
+  // ─── B2B EMAIL 4: DAY 16 — 4-SENTENCE SOCIAL PROOF / TURNKEY NOTE ───
   {
     track: 'b2b',
     step: 4,
     id: 'campaign-4-turnkey-rollout',
-    title: 'Email 4: Zero HR Headaches — How Our 24–48 Hour Turnkey Family Rollout Works',
-    cadenceLabel: 'Day 18 (6 Days Later — Tuesday 10:00 AM EST)',
+    title: 'Email 4 (YC Turnkey Proof): How Communities Launch in 48 Hours',
+    cadenceLabel: 'Day 16 (6 Days Later — 10:00 AM EST)',
     recommendedDelayDays: 6,
-    angle: 'Operational Trust — Turnkey Implementation, Bilingual Support & Whole-Person Care',
-    subject: 'How we roll out CEDEXX across your organization (with zero HR heavy lifting)',
-    altSubject: 'Turnkey implementation + bilingual family support for your community',
-    preheader: 'Dedicated rollout, 24–48 hour Lyric Health provisioning, and multi-language member support.',
-    ctaLabel: 'Schedule a 15-Minute Rollout Walkthrough',
+    angle: 'Y Combinator Speed & Simplicity — 48-Hour Launch with Co-Branded Flyers',
+    subject: 'launching a $0-cost family healthcare perk in 48 hours',
+    altSubject: 'co-branded English & Spanish family wellness flyer for your group',
+    preheader: 'We prepare your co-branded English & Spanish flyer so families can enroll in 2 minutes.',
+    ctaLabel: 'Request Sample Co-Branded Flyer',
     ctaUrl: PARTNER_URL,
-    summary: 'Removes the #1 operational objection ("We don’t have time to manage another program") by detailing CEDEXX’s turnkey rollout, 24–48h Lyric Health activation, phone-number Member ID, and bilingual support.',
+    summary: 'Short 4-sentence note highlighting how fast communities launch using co-branded English & Spanish flyers.',
     buildHtml: (r) => {
       const greeting = greetingFor(r);
-      const org = orgMentionFor(r, 'your organization');
-      return wrapBrandedEmail({
-        preheader: 'Dedicated rollout, 24–48 hour Lyric Health provisioning, and multi-language member support.',
-        badge: 'B2B Series 4 of 5 · Turnkey Implementation',
-        headline: 'Designed so your team never has to manage clinical logistics or support tickets.',
-        ctaLabel: 'Schedule a 15-Minute Rollout Walkthrough',
-        ctaUrl: PARTNER_URL,
-        psText: 'We provide co-branded English & Spanish digital flyers, family onboarding guides, and dedicated phone/chat support so your team doesn’t have to answer member questions.',
+      const org = orgMentionFor(r, 'your community');
+      return wrapYCFounderEmail({
+        preheader: 'We prepare your co-branded English & Spanish flyer so families can enroll in 2 minutes.',
         bodyHtml: `
           <p style="margin:0 0 14px 0;">${greeting}</p>
           <p style="margin:0 0 14px 0;">
-            Even when a family wellness program makes financial sense, HR directors, school administrators, and property managers rightly worry about the workload of launching it.
+            If you want to offer a tangible new wellness benefit to families in <strong>${org}</strong> this month without touching your budget, we can set up a dedicated partner link in 48 hours.
           </p>
-          <p style="margin:0 0 16px 0;">
-            We engineered <strong>CEDEXX</strong> so that rolling out to <strong>${org}</strong> is completely turnkey:
+          <p style="margin:0 0 14px 0;">
+            We design the co-branded English &amp; Spanish digital flyer for your newsletter or resident portal, and families can enroll their household (up to 7 members) in 2 minutes for 24/7 Lyric Health doctors and mental wellness.
           </p>
-          <div style="background-color:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:18px 20px;margin:18px 0;">
-            <p style="margin:0 0 8px 0;font-size:14px;color:#050249;"><strong>✓ Dedicated Organization-Wide Rollout:</strong> We supply ready-to-send digital enrollment links or roster provisioning.</p>
-            <p style="margin:0 0 8px 0;font-size:14px;color:#050249;"><strong>✓ 24–48 Hour Lyric Health Activation:</strong> Once enrolled, Lyric Health provisions accounts within 24–48 hours and emails simple app setup instructions directly to each family.</p>
-            <p style="margin:0 0 8px 0;font-size:14px;color:#050249;"><strong>✓ Simple Phone-Number Member ID:</strong> No plastic cards to mail or lose—a member’s 10-digit phone number is their Member ID.</p>
-            <p style="margin:0;font-size:14px;color:#050249;"><strong>✓ Multilingual Member Support:</strong> Live phone desk at (754) 432-2201 and 24/7 AI support in English, Spanish, Haitian Creole, and Russian.</p>
-          </div>
           <p style="margin:0;">
-            At CEDEXX, we believe true wellness cares for the whole person—body, mind, and spirit. When families feel supported at home, they show up stronger at work, at school, and in your community.
+            <strong>Would you like me to mock up a free co-branded flyer for ${org} so you can share it with your board?</strong>
           </p>
         `,
       });
     },
     buildPlainText: (r) => `${greetingFor(r)}
 
-We engineered CEDEXX so rolling out to ${orgMentionFor(r)} requires zero heavy lifting from your team:
+If you want to offer a tangible new wellness benefit to families in ${orgMentionFor(r, 'your community')} this month without touching your budget, we can set up a dedicated partner link in 48 hours.
 
-- Dedicated Organization-Wide Rollout: Ready-to-send digital enrollment links or roster provisioning.
-- 24–48 Hour Lyric Health Activation: Families receive direct setup instructions to access the Lyric Health app.
-- Simple Phone-Number Member ID: No plastic cards to mail—their 10-digit phone number is their Member ID.
-- Multilingual Support: Toll-free desk at (754) 432-2201 and 24/7 digital support in English, Spanish, Haitian Creole, and Russian.
+We design the co-branded English & Spanish digital flyer for your newsletter or resident portal, and families can enroll their household (up to 7 members) in 2 minutes for 24/7 Lyric Health doctors and mental wellness.
 
-Schedule a 15-Minute Rollout Walkthrough: ${PARTNER_URL}
+Would you like me to mock up a free co-branded flyer for ${orgMentionFor(r, 'your community')} so you can share it with your board?
 
-With intention & care,
-Daisy Gonzalez | Founder & CEO, CEDEXX
-(754) 432-2201 | daisy@cedexx.net
+Best,
+Daisy Gonzalez | Founder & CEO, CEDEXX (Powered by Lyric Health)
+(754) 432-2201 | daisy@cedexx.net | ${PARTNER_URL}
 
 ---
-COMPLIANCE DISCLOSURE: CEDEXX is a technology and wellness membership platform, not a medical provider, doctor, or health insurance company. CEDEXX does not practice medicine, give medical advice, diagnose conditions, or prescribe medications. All clinical and behavioral health services are provided independently by licensed professionals in the Lyric Health network. For medical emergencies, call 911 immediately.`,
+COMPLIANCE DISCLOSURE: CEDEXX is a technology and wellness membership platform, not a medical provider, doctor, or health insurance company. All clinical and behavioral health services are provided independently by licensed professionals in the Lyric Health network. For medical emergencies, call 911.`,
   },
 
-  // ─── B2B EMAIL 5: DAY 25 — DIRECT 1-LINE CLOSE / PILOT INVITATION ───
+  // ─── B2B EMAIL 5: DAY 22 — YC POLITE LAST NOTE ("1, 2, OR 3") ───
   {
     track: 'b2b',
     step: 5,
     id: 'campaign-5-pilot-close',
-    title: 'Email 5: Quick Pilot or Custom Quote Check-In (High-Reply Close)',
-    cadenceLabel: 'Day 25 (7 Days Later — Tuesday 9:30 AM EST)',
-    recommendedDelayDays: 7,
-    angle: 'Low-Friction Executive Close — 15-Minute Custom Quote or Zero-Cost Voluntary Family Pilot',
-    subject: 'Should we prepare a custom family wellness quote for your group?',
-    altSubject: 'Quick question on 2026 family wellness benefits for your organization',
-    preheader: 'A quick check-in from CEDEXX Founder Daisy Gonzalez—reply with 1, 2, or 3.',
-    ctaLabel: 'Request Your Custom Institutional Quote',
+    title: 'Email 5 (YC Final Check-In): Ultra-Short 1, 2, or 3 Close',
+    cadenceLabel: 'Day 22 (6 Days Later — 9:30 AM EST)',
+    recommendedDelayDays: 6,
+    angle: 'Y Combinator Final Follow-Up — Polite, Non-Desperate 1-Word Reply Check-In',
+    subject: 'last quick note from Daisy @ CEDEXX',
+    altSubject: 'should I close your file for now, or send the 1-page overview?',
+    preheader: 'Last quick check-in on 24/7 family telehealth for your community—no worries at all if timing isn’t right.',
+    ctaLabel: 'Request 1-Page Overview',
     ctaUrl: PARTNER_URL,
-    summary: 'Uses the highest-converting B2B executive follow-up technique: a short, respectful check-in offering a "Reply 1, 2, or 3" micro-response or a zero-cost voluntary family pilot program.',
+    summary: 'Follows YC’s rule ("follow up a few times without sounding desperate"): 4 sentences, polite close with a 1-number reply.',
     buildHtml: (r) => {
       const greeting = greetingFor(r);
-      const org = orgMentionFor(r, 'your organization');
-      return wrapBrandedEmail({
-        preheader: 'A quick check-in from CEDEXX Founder Daisy Gonzalez—reply with 1, 2, or 3.',
-        badge: 'B2B Series 5 of 5 · Executive Check-In',
-        headline: 'Would a custom volume quote or a zero-cost voluntary family pilot be helpful for your upcoming planning?',
-        ctaLabel: 'Request Your Custom Institutional Quote',
-        ctaUrl: PARTNER_URL,
-        psText: 'Even if timing is better next quarter, I would love to send you our 1-page Institutional & Family Benefits Overview for your files.',
+      const org = orgMentionFor(r, 'your community');
+      return wrapYCFounderEmail({
+        preheader: 'Last quick check-in on 24/7 family telehealth for your community—no worries at all if timing isn’t right.',
         bodyHtml: `
           <p style="margin:0 0 14px 0;">${greeting}</p>
           <p style="margin:0 0 14px 0;">
-            I know your schedule is packed, so I will keep this brief. Over the past few weeks, I shared how <strong>CEDEXX</strong> (powered by <strong>Lyric Health</strong>) helps school districts, public agencies, employers, and residential communities provide <strong>24/7 virtual urgent care, primary care, mental wellness, $0 annual labs, and 237+ $0 medications</strong> for up to 7 family members per household.
+            I know your inbox is busy, so this is my last follow-up regarding <strong>CEDEXX’s</strong> $0-copay 24/7 virtual doctor and mental wellness memberships for families in <strong>${org}</strong>.
           </p>
           <p style="margin:0 0 14px 0;">
-            If expanding affordable family healthcare access for <strong>${org}</strong> is on your radar this year, simply reply to this email with <strong>1, 2, or 3</strong>:
+            If this is ever helpful for your residents, members, or staff (covering up to 7 family members per home from $18.99/mo via Lyric Health), just reply with <strong>"1"</strong> for our 1-page overview, <strong>"2"</strong> for a $0-budget community discount link, or <strong>"3"</strong> if I should check back next quarter.
           </p>
-          <div style="background-color:#f8fafc;border:1px solid #cbd5e1;border-radius:12px;padding:18px 20px;margin:16px 0;">
-            <p style="margin:0 0 10px 0;font-size:14px;color:#050249;">
-              <strong>1 — Send me a Custom Quote:</strong> Reply with your approximate staff, student, resident, or member count and we will email a tailored volume quote.
-            </p>
-            <p style="margin:0 0 10px 0;font-size:14px;color:#050249;">
-              <strong>2 — Let’s launch a $0-Budget Voluntary Family Pilot:</strong> Give your families an exclusive group discount link at zero cost to your organization.
-            </p>
-            <p style="margin:0;font-size:14px;color:#050249;">
-              <strong>3 — Better to reconnect next quarter:</strong> Let me know when your next benefits or amenity review window opens.
-            </p>
-          </div>
           <p style="margin:0;">
-            Thank you for the work you do for your community—I look forward to connecting whenever the timing is right.
+            Either way, thank you for the work you do for your community!
           </p>
         `,
       });
     },
     buildPlainText: (r) => `${greetingFor(r)}
 
-I know your schedule is packed, so I will keep this brief. Over the past few weeks, I shared how CEDEXX (powered by Lyric Health) helps school districts, public agencies, employers, and residential communities provide 24/7 virtual urgent care, primary care, mental wellness, $0 annual labs, and 237+ $0 medications for up to 7 family members per household.
+I know your inbox is busy, so this is my last follow-up regarding CEDEXX’s $0-copay 24/7 virtual doctor and mental wellness memberships for families in ${orgMentionFor(r, 'your community')}.
 
-If expanding affordable family healthcare access for ${orgMentionFor(r)} is on your radar, simply reply with 1, 2, or 3:
+If this is ever helpful for your residents, members, or staff (covering up to 7 family members per home from $18.99/mo via Lyric Health), just reply with "1" for our 1-page overview, "2" for a $0-budget community discount link, or "3" if I should check back next quarter.
 
-1 — Send me a Custom Quote (reply with your approximate headcount or unit count)
-2 — Let's launch a $0-Budget Voluntary Family Pilot for our group
-3 — Better to reconnect next quarter
+Either way, thank you for the work you do for your community!
 
-Or request a quote directly: ${PARTNER_URL}
-
-With intention & care,
-Daisy Gonzalez | Founder & CEO, CEDEXX
-(754) 432-2201 | daisy@cedexx.net
+Best,
+Daisy Gonzalez | Founder & CEO, CEDEXX (Powered by Lyric Health)
+(754) 432-2201 | daisy@cedexx.net | ${PARTNER_URL}
 
 ---
-COMPLIANCE DISCLOSURE: CEDEXX is a technology and wellness membership platform, not a medical provider, doctor, or health insurance company. CEDEXX does not practice medicine, give medical advice, diagnose conditions, or prescribe medications. All clinical and behavioral health services are provided independently by licensed professionals in the Lyric Health network. For medical emergencies, call 911 immediately.`,
+COMPLIANCE DISCLOSURE: CEDEXX is a technology and wellness membership platform, not a medical provider, doctor, or health insurance company. All clinical and behavioral health services are provided independently by licensed professionals in the Lyric Health network. For medical emergencies, call 911.`,
   },
 ];

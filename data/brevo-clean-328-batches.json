@@ -1,7 +1,7 @@
 {
-  "updatedAt": "2026-11-14T16:55:49.845Z",
-  "totalVerified": 354,
-  "erasedCount": 15,
+  "updatedAt": "2026-11-15T16:40:08.280Z",
+  "totalVerified": 344,
+  "erasedCount": 25,
   "erasedContacts": [
     {
       "id": "3226",
@@ -77,6 +77,56 @@
       "id": "atorres@thelaa.org",
       "email": "atorres@thelaa.org",
       "reason": "Hard Bounce on Batch 6 Send (Nov 14)"
+    },
+    {
+      "id": "3348",
+      "email": "hoa.secretary@gmail.com",
+      "reason": "Hard Bounce on Batch 3 Send (Nov 15)"
+    },
+    {
+      "id": "3353",
+      "email": "hoafeather1@gmail.com",
+      "reason": "Hard Bounce on Batch 3 Send (Nov 15)"
+    },
+    {
+      "id": "3375",
+      "email": "jgroves@ardsleymgmt.com",
+      "reason": "Hard Bounce on Batch 3 Send (Nov 15)"
+    },
+    {
+      "id": "3376",
+      "email": "jhbaggerly@att.net",
+      "reason": "Hard Bounce on Batch 3 Send (Nov 15)"
+    },
+    {
+      "id": "3379",
+      "email": "jmoore26@indy.rr.com",
+      "reason": "Hard Bounce on Batch 3 Send (Nov 15)"
+    },
+    {
+      "id": "3387",
+      "email": "jrc2arc3@gmail.com",
+      "reason": "Hard Bounce on Batch 3 Send (Nov 15)"
+    },
+    {
+      "id": "3393",
+      "email": "js46214@ameritech.net",
+      "reason": "Hard Bounce on Batch 3 Send (Nov 15)"
+    },
+    {
+      "id": "3406",
+      "email": "kmcquay@blueandco.com",
+      "reason": "Hard Bounce on Batch 3 Send (Nov 15)"
+    },
+    {
+      "id": "3414",
+      "email": "lanpc@michiana.org",
+      "reason": "Hard Bounce on Batch 3 Send (Nov 15)"
+    },
+    {
+      "id": "3421",
+      "email": "lgreene@peopleunitedfoundation.org",
+      "reason": "Hard Bounce on Batch 3 Send (Nov 15)"
     }
   ],
   "batches": [
@@ -881,13 +931,6 @@
           "mx": "mx1.emailsrvr.com"
         },
         {
-          "id": "3348",
-          "email": "hoa.secretary@gmail.com",
-          "firstName": "",
-          "lastName": "",
-          "mx": "alt2.gmail-smtp-in.l.google.com"
-        },
-        {
           "id": "3351",
           "email": "hoaauburnhills@gmail.com",
           "firstName": "",
@@ -900,13 +943,6 @@
           "firstName": "",
           "lastName": "",
           "mx": "omniproperty-com01b.mail.eo.outlook.com"
-        },
-        {
-          "id": "3353",
-          "email": "hoafeather1@gmail.com",
-          "firstName": "",
-          "lastName": "",
-          "mx": "alt2.gmail-smtp-in.l.google.com"
         },
         {
           "id": "3354",
@@ -1021,20 +1057,6 @@
           "mx": "hotmail-com.olc.protection.outlook.com"
         },
         {
-          "id": "3375",
-          "email": "jgroves@ardsleymgmt.com",
-          "firstName": "",
-          "lastName": "",
-          "mx": "ardsleymgmt-com.mail.protection.outlook.com"
-        },
-        {
-          "id": "3376",
-          "email": "jhbaggerly@att.net",
-          "firstName": "",
-          "lastName": "",
-          "mx": "mx-att.mail.am0.yahoodns.net"
-        },
-        {
           "id": "3377",
           "email": "jimg.stonebraehoa@gmail.com",
           "firstName": "",
@@ -1047,13 +1069,6 @@
           "firstName": "",
           "lastName": "",
           "mx": "d194730b.ess.barracudanetworks.com"
-        },
-        {
-          "id": "3379",
-          "email": "jmoore26@indy.rr.com",
-          "firstName": "",
-          "lastName": "",
-          "mx": "chr-west.mx.a.cloudfilter.net"
         },
         {
           "id": "3380",
@@ -1086,13 +1101,6 @@
         {
           "id": "3386",
           "email": "jrc2arc2@gmail.com",
-          "firstName": "",
-          "lastName": "",
-          "mx": "alt2.gmail-smtp-in.l.google.com"
-        },
-        {
-          "id": "3387",
-          "email": "jrc2arc3@gmail.com",
           "firstName": "",
           "lastName": "",
           "mx": "alt2.gmail-smtp-in.l.google.com"
@@ -1131,13 +1139,6 @@
           "firstName": "",
           "lastName": "",
           "mx": "alt2.gmail-smtp-in.l.google.com"
-        },
-        {
-          "id": "3393",
-          "email": "js46214@ameritech.net",
-          "firstName": "",
-          "lastName": "",
-          "mx": "mx-att.mail.am0.yahoodns.net"
         },
         {
           "id": "3394",
@@ -1224,13 +1225,6 @@
           "mx": "mta6.am0.yahoodns.net"
         },
         {
-          "id": "3406",
-          "email": "kmcquay@blueandco.com",
-          "firstName": "",
-          "lastName": "",
-          "mx": "us-smtp-inbound-1.mimecast.com"
-        },
-        {
           "id": "3407",
           "email": "kmholmes@atlantaga.gov",
           "firstName": "",
@@ -1280,13 +1274,6 @@
           "mx": "outlook-com.olc.protection.outlook.com"
         },
         {
-          "id": "3414",
-          "email": "lanpc@michiana.org",
-          "firstName": "",
-          "lastName": "",
-          "mx": "mail.mangobay.com"
-        },
-        {
           "id": "3415",
           "email": "lanternoverlook@gmail.com",
           "firstName": "",
@@ -1327,13 +1314,6 @@
           "firstName": "",
           "lastName": "",
           "mx": "alt2.gmail-smtp-in.l.google.com"
-        },
-        {
-          "id": "3421",
-          "email": "lgreene@peopleunitedfoundation.org",
-          "firstName": "",
-          "lastName": "",
-          "mx": "mx1.mailchannels.net"
         },
         {
           "id": "3422",
