@@ -1,7 +1,7 @@
 {
-  "updatedAt": "2026-11-15T20:13:03.275Z",
-  "totalVerified": 338,
-  "erasedCount": 31,
+  "updatedAt": "2026-11-18T14:50:55.474Z",
+  "totalVerified": 332,
+  "erasedCount": 37,
   "erasedContacts": [
     {
       "id": "3226",
@@ -157,6 +157,36 @@
       "id": "3487",
       "email": "robertbrian1969@gmail.com",
       "reason": "Hard Bounce on Batch 4 Send (Nov 15 PM)"
+    },
+    {
+      "id": "3537",
+      "email": "tonyjorgetwintowersboard@gmail.com",
+      "reason": "Hard Bounce on Batch 5 Send (Nov 18)"
+    },
+    {
+      "id": "3538",
+      "email": "topaz3@att.net",
+      "reason": "Hard Bounce on Batch 5 Send (Nov 18)"
+    },
+    {
+      "id": "3543",
+      "email": "vicki@indyami.com",
+      "reason": "Hard Bounce on Batch 5 Send (Nov 18)"
+    },
+    {
+      "id": "3547",
+      "email": "watsonfarmshoa@gmail.com",
+      "reason": "Hard Bounce on Batch 5 Send (Nov 18)"
+    },
+    {
+      "id": "3363",
+      "email": "info@hoaorganizers.com",
+      "reason": "Hard Bounce on Batch 5 Send (Nov 18)"
+    },
+    {
+      "id": "3541",
+      "email": "treasurer@austinwinds.org",
+      "reason": "Hard Bounce on Batch 5 Send (Nov 18)"
     }
   ],
   "batches": [
@@ -2100,20 +2130,6 @@
           "mx": "outlook-com.olc.protection.outlook.com"
         },
         {
-          "id": "3537",
-          "email": "tonyjorgetwintowersboard@gmail.com",
-          "firstName": "",
-          "lastName": "",
-          "mx": "alt2.gmail-smtp-in.l.google.com"
-        },
-        {
-          "id": "3538",
-          "email": "topaz3@att.net",
-          "firstName": "",
-          "lastName": "",
-          "mx": "mx-att.mail.am0.yahoodns.net"
-        },
-        {
           "id": "3539",
           "email": "totoo@atlantaga.gov",
           "firstName": "",
@@ -2135,13 +2151,6 @@
           "mx": "mx-att.mail.am0.yahoodns.net"
         },
         {
-          "id": "3543",
-          "email": "vicki@indyami.com",
-          "firstName": "",
-          "lastName": "",
-          "mx": "indyami-com.mail.protection.outlook.com"
-        },
-        {
           "id": "3544",
           "email": "walnutridgewestfield@gmail.com",
           "firstName": "",
@@ -2158,13 +2167,6 @@
         {
           "id": "3546",
           "email": "warrenlakeshoa@gmail.com",
-          "firstName": "",
-          "lastName": "",
-          "mx": "alt2.gmail-smtp-in.l.google.com"
-        },
-        {
-          "id": "3547",
-          "email": "watsonfarmshoa@gmail.com",
           "firstName": "",
           "lastName": "",
           "mx": "alt2.gmail-smtp-in.l.google.com"
@@ -2289,13 +2291,6 @@
           "mx": "smtp.secureserver.net"
         },
         {
-          "id": "3363",
-          "email": "info@hoaorganizers.com",
-          "firstName": "",
-          "lastName": "",
-          "mx": "alt2.aspmx.l.google.com"
-        },
-        {
           "id": "3364",
           "email": "info@indybluesky.com",
           "firstName": "",
@@ -2336,13 +2331,6 @@
           "firstName": "",
           "lastName": "",
           "mx": "alt4.aspmx.l.google.com"
-        },
-        {
-          "id": "3541",
-          "email": "treasurer@austinwinds.org",
-          "firstName": "",
-          "lastName": "",
-          "mx": "mx2.spacemail.com"
         }
       ]
     },
