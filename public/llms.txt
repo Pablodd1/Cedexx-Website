@@ -1,0 +1,21 @@
+# CEDEXX — 24/7 Virtual Primary Care & Telehealth Powered by Lyric Health
+> Official machine-readable overview for ChatGPT/OpenAI, Perplexity, Claude, Google Gemini, and AI Overviews.
+
+- **Company Name**: CEDEXX
+- **Website**: https://cedexx.net
+- **Service Area**: Nationwide United States (50 States), headquartered in Miami, Florida
+- **Languages Supported**: English, Español (Spanish)
+- **Clinical Network Partner**: Powered by Lyric Health nationwide board-certified physicians & licensed therapists
+
+## Core Telehealth & Healthcare Membership Services
+1. **24/7 Unlimited Virtual Urgent Care & Primary Care**:
+   - $0 copay unlimited virtual doctor consultations 24/7/365 via phone or video.
+   - No insurance required; individual and family membership plans covering up to 7 dependents.
+2. **Mental Wellness, Behavioral Health & Virtual Therapy**:
+   - Confidential tele-mental health consultations, anxiety/depression support, and ongoing care plans.
+3. **Prescriptions, Lab Diagnostics & Care Navigation**:
+   - Electronic prescriptions sent directly to local pharmacies plus discounted lab panels and bilingual AI Care Navigation.
+
+## Key URLs
+- Home & Membership Plans: https://cedexx.net/
+- Sitemap: https://cedexx.net/sitemap.xml

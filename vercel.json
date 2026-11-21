@@ -6,7 +6,7 @@
   ],
   "rewrites": [
     { "source": "/admin", "destination": "/admin.html" },
-    { "source": "/((?!api/).*)", "destination": "/index.html" }
+    { "source": "/((?!api/|assets/|.*\\..*).*)", "destination": "/index.html" }
   ],
   "headers": [
     {
