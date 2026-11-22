@@ -236,16 +236,7 @@ function buildLocalBusiness() {
       { '@type': 'City', name: 'Palm Beach' },
       { '@type': 'State', name: 'Florida' }
     ],
-    hasMap: 'https://www.google.com/maps?q=Miami,FL',
-    // Aggregate rating placeholder (updated by review aggregation)
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.9',
-      bestRating: '5',
-      worstRating: '1',
-      ratingCount: '12400',
-      reviewCount: '842'
-    }
+    hasMap: 'https://www.google.com/maps?q=Miami,FL'
   };
 }
 
