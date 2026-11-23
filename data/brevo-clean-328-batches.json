@@ -1,7 +1,7 @@
 {
-  "updatedAt": "2026-11-18T14:50:55.474Z",
-  "totalVerified": 332,
-  "erasedCount": 37,
+  "updatedAt": "2026-11-23T01:15:04.708Z",
+  "totalVerified": 331,
+  "erasedCount": 38,
   "erasedContacts": [
     {
       "id": "3226",
@@ -187,6 +187,11 @@
       "id": "3541",
       "email": "treasurer@austinwinds.org",
       "reason": "Hard Bounce on Batch 5 Send (Nov 18)"
+    },
+    {
+      "id": "3498",
+      "email": "sandra.pruitt@live.com",
+      "reason": "Hard Bounce on Follow-Up #2 Send (Nov 22 - Batch 4)"
     }
   ],
   "batches": [
@@ -1849,13 +1854,6 @@
           "firstName": "",
           "lastName": "",
           "mx": "alt2.gmail-smtp-in.l.google.com"
-        },
-        {
-          "id": "3498",
-          "email": "sandra.pruitt@live.com",
-          "firstName": "",
-          "lastName": "",
-          "mx": "live-com.olc.protection.outlook.com"
         }
       ]
     },
