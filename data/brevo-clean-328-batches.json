@@ -1,7 +1,7 @@
 {
-  "updatedAt": "2026-11-23T01:15:04.708Z",
-  "totalVerified": 331,
-  "erasedCount": 38,
+  "updatedAt": "2026-11-25T16:05:36.859Z",
+  "totalVerified": 330,
+  "erasedCount": 39,
   "erasedContacts": [
     {
       "id": "3226",
@@ -192,6 +192,11 @@
       "id": "3498",
       "email": "sandra.pruitt@live.com",
       "reason": "Hard Bounce on Follow-Up #2 Send (Nov 22 - Batch 4)"
+    },
+    {
+      "id": "3287",
+      "email": "crybanks@iupui.edu",
+      "reason": "Hard Bounce on Step 3 Send (Nov 25 - Batch 2)"
     }
   ],
   "batches": [
@@ -589,13 +594,6 @@
           "firstName": "",
           "lastName": "",
           "mx": "alt2.gmail-smtp-in.l.google.com"
-        },
-        {
-          "id": "3287",
-          "email": "crybanks@iupui.edu",
-          "firstName": "",
-          "lastName": "",
-          "mx": "iupui-edu.mail.protection.outlook.com"
         },
         {
           "id": "3288",
