@@ -1,7 +1,7 @@
 {
-  "updatedAt": "2026-11-25T16:05:36.859Z",
-  "totalVerified": 330,
-  "erasedCount": 39,
+  "updatedAt": "2026-11-27T21:54:22.088Z",
+  "totalVerified": 329,
+  "erasedCount": 40,
   "erasedContacts": [
     {
       "id": "3226",
@@ -197,6 +197,11 @@
       "id": "3287",
       "email": "crybanks@iupui.edu",
       "reason": "Hard Bounce on Step 3 Send (Nov 25 - Batch 2)"
+    },
+    {
+      "id": "3517",
+      "email": "staylornp@icloud.com",
+      "reason": "Hard Bounce on Step 3 Send (Nov 27 - Batch 5)"
     }
   ],
   "batches": [
@@ -1984,13 +1989,6 @@
           "firstName": "",
           "lastName": "",
           "mx": "mx2.mxge.comcast.net"
-        },
-        {
-          "id": "3517",
-          "email": "staylornp@icloud.com",
-          "firstName": "",
-          "lastName": "",
-          "mx": "mx01.mail.icloud.com"
         },
         {
           "id": "3518",
